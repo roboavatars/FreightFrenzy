@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleopPrograms;
+package org.firstinspires.ftc.teamcode.Teleop;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static java.lang.Math.PI;
