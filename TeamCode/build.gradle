@@ -16,7 +16,7 @@ apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
 
 android {
-    buildToolsVersion '30.0.3'
+    buildToolsVersion '31.0.0'
 }
 
 repositories {
