@@ -30,15 +30,12 @@ public class Drivetrain {
     public double commandedW;
 
     // Odometry
-    public double pod1 = 0;
-    public double pod2 = 0;
-    public double pod3 = 0;
-    private double lastPod1 = 0;
-    private double lastPod2 = 0;
-    private double lastPod3 = 0;
-    private double deltaPod1;
-    private double deltaPod2;
-    private double deltaPod3;
+    public double podR = 0;
+    public double podL = 0;
+    private double lastPodR = 0;
+    private double lastPodL = 0;
+    private double deltaPodR;
+    private double deltaPodL;
 
     // Motor Caching
     private double lastFRPower = 0;
@@ -47,15 +44,14 @@ public class Drivetrain {
     private double lastBLPower = 0;
     private final double motorUpdateTolerance = 0.05;
 
-    // Odometry constants
-    public static double ticksToInch1 = 0.0005268504;
-    public static double ticksToInch2 = 0.0005268504;
-    public static double ticksToInch3 = 0.0005292873;
+    // Odometry Constants
+    public static double ticksToInchR = 0.005;
+    public static double ticksToInchL = 0.005;
     public static double ODOMETRY_HORIZONTAL_OFFSET = 0.15;
 
     private final double ODOMETRY_HEADING_THRESHOLD = PI/8;
 
-    // PD controller constants
+    // PD Controller Constants
     public final static double xKp = 0.6;
     public final static double yKp = 0.55;
     public final static double thetaKp = 3.0;
@@ -64,7 +60,7 @@ public class Drivetrain {
     public final static double thetaKd = 0.07;
 
     // Odometry delta 0 counters
-    public int zero1, zero2, zero3;
+    public int zero1, zero2;
 
     public boolean zeroStrafeCorrection = false;
 
@@ -217,13 +213,11 @@ public class Drivetrain {
     // update position from odometry
     public void updatePose() {
         try {
-            pod1 = motorBackRight.getCurrentPosition() * ticksToInch1;
-            pod2 = motorFrontLeft.getCurrentPosition() * -ticksToInch2;
-            pod3 = motorFrontRight.getCurrentPosition() * -ticksToInch3;
+            podR = ticksToInchR * (motorFrontRight.getCurrentPosition() + motorBackRight.getCurrentPosition()) / 2.0;
+            podL = ticksToInchL * (motorFrontLeft.getCurrentPosition() + motorBackLeft.getCurrentPosition()) / 2.0;
 
-            deltaPod1 = pod1 - lastPod1;
-            deltaPod2 = pod2 - lastPod2;
-            deltaPod3 = pod3 - lastPod3;
+            deltaPodR = podR - lastPodR;
+            deltaPodL = podL - lastPodL;
 
             t265.updateCamPose();
 
@@ -245,25 +239,21 @@ public class Drivetrain {
 //            deltaHeading = imu.getDeltaHeading();
 //            deltaPod1 = deltaPod2 - deltaHeading * ODOMETRY_TRACK_WIDTH;
 
-            if (!(deltaPod1 == 0 && deltaPod2 == 0 && deltaPod3 == 0)) {
-                if (deltaPod1 == 0) {
-                    Log.w("pod-delta-log", "pod1 delta 0");
+            if (deltaPodR == 0 || deltaPodL == 0) {
+                if (deltaPodR == 0) {
+                    Log.w("pod-delta-log", "podR delta 0");
                     zero1++;
                 }
-                if (deltaPod2 == 0) {
-                    Log.w("pod-delta-log", "pod2 delta 0");
+                if (deltaPodL == 0) {
+                    Log.w("pod-delta-log", "podL delta 0");
                     zero2++;
-                }
-                if (deltaPod3 == 0) {
-                    Log.w("pod-delta-log", "pod3 delta 0");
-                    zero3++;
                 }
             }
 
 //            deltaHeading = (deltaPod2 - deltaPod1) / ODOMETRY_TRACK_WIDTH;
 
-            double localX = (deltaPod1 + deltaPod2) / 2;
-            double localY = deltaPod3 - deltaHeading * ODOMETRY_HORIZONTAL_OFFSET;
+            double localX = (deltaPodR + deltaPodL) / 2;
+            double localY = 0;
 
 //            Robot.log(deltaPod1 + " " + deltaPod2 + " " + deltaPod3 + " " + deltaHeading);
 
@@ -282,9 +272,8 @@ public class Drivetrain {
 //            theta = theta % (2*PI);
 //            if (theta < 0) theta += 2*PI;
 
-            lastPod1 = pod1;
-            lastPod2 = pod2;
-            lastPod3 = pod3;
+            lastPodR = podR;
+            lastPodL = podL;
             lastHeading = theta;
         } catch (Exception e) {
             e.printStackTrace();

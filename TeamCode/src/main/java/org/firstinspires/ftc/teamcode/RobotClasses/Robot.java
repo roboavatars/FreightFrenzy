@@ -447,7 +447,7 @@ public class Robot {
         addPacket("7 shoot", preShoot  + " " + shoot + " " + highGoal + " " + turretMode.name() + " " + round(shootTargetTheta));
         addPacket("8 Run Time", (curTime - startTime) / 1000);
         addPacket("9 Update Frequency (Hz)", round(1 / timeDiff));
-        addPacket("Pod Zeroes", drivetrain.zero1 + ", " + drivetrain.zero2 + ", " + drivetrain.zero3);
+        addPacket("Pod Zeroes", drivetrain.zero1 + ", " + drivetrain.zero2);
         addPacket("regression", round(thetaOffset) + " " + velocityFactor + " " + round(targetDist));
         addPacket("ms", round(timeDiff * 1000));
         if (!isAuto) {
