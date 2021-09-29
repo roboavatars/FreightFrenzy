@@ -3,11 +3,9 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @SuppressWarnings("FieldCanBeLocal")
@@ -17,7 +15,7 @@ public class Intake {
     private DistanceSensor intakeDistSensor;
 
     private double lastIntakePow = 10;
-    private int lastBlockerPosOpen = 2; // 2 is uninitialized, 1 is open, 0 is closed (int type allows open/close for the first time)
+    private double lastBlockerPos = 2;
 
     public Intake(LinearOpMode op, boolean isAuto) {
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
@@ -52,8 +50,12 @@ public class Intake {
     }
 
     // intake blocker
+
     private void setBlockerPos (double pos){
-        blockerServo.setPosition(pos);
+        if (pos != lastBlockerPos) {
+            blockerServo.setPosition(pos);
+            lastBlockerPos = pos;
+        }
     }
 
 
@@ -66,15 +68,15 @@ public class Intake {
     }
 
     public void close() {
-        if (lastBlockerPosOpen != 0) {
+        if (lastBlockerPos != 0) {
             blockerClose();
-            lastBlockerPosOpen = 0;
+            lastBlockerPos = 0;
         }
     }
     public void open() {
-        if (lastBlockerPosOpen != 1)  {
+        if (lastBlockerPos != 1)  {
             blockerOpen();
-            lastBlockerPosOpen = 1;
+            lastBlockerPos = 1;
         }
     }
 
