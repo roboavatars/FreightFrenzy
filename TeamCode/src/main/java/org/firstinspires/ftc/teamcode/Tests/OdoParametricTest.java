@@ -1,16 +1,16 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static java.lang.Math.PI;
+import static java.lang.Math.atan2;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
-
-import static java.lang.Math.PI;
-import static java.lang.Math.atan2;
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 
 @TeleOp(name = "Odo Parametric Test")
 @Disabled
@@ -50,9 +50,8 @@ public class OdoParametricTest extends LinearOpMode {
                 }
             }
 
-            addPacket("pod1", robot.drivetrain.pod1);
-            addPacket("pod2", robot.drivetrain.pod2);
-            addPacket("pod3", robot.drivetrain.pod3);
+            addPacket("podL", robot.drivetrain.podL);
+            addPacket("podR", robot.drivetrain.podR);
             robot.update();
         }
     }

@@ -18,7 +18,15 @@ public class BaseDetector {
     }
 
     public void start() {
-        cam.openCameraDeviceAsync(() -> cam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT));
+        cam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                cam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {}
+        });
         FtcDashboard.getInstance().startCameraStream(cam, 0);
     }
 

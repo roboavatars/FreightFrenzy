@@ -1,15 +1,15 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
-
-import static java.lang.Math.PI;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawField;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
+import static java.lang.Math.PI;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 
 @TeleOp(name = "Odometry / Drivetrain Test")
 public class OdoDrivetrainTest extends LinearOpMode {
@@ -49,12 +49,10 @@ public class OdoDrivetrainTest extends LinearOpMode {
             addPacket("Y", y);
             addPacket("Theta", theta);
             addPacket("Update Frequency (Hz)", 1 / timeDiff);
-            addPacket("pod1", dt.pod1);
-            addPacket("pod2", dt.pod2);
-            addPacket("pod3", dt.pod3);
+            addPacket("podL", dt.podL);
+            addPacket("podR", dt.podR);
             addPacket("1 zeros", dt.zero1);
             addPacket("2 zeros", dt.zero2);
-            addPacket("3 zeros", dt.zero3);
 
             addPacket("cam raw", dt.getRawTheta());
             addPacket("cam init", dt.getInitTheta());
