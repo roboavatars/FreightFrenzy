@@ -23,9 +23,6 @@ public class Teleop extends LinearOpMode {
     private final int startY = 63;
     private final double startTheta = PI/2;
 
-    public static int highGoalClose = 1570;
-    public static int highGoalFar = 1640;
-
     private Robot robot;
 
     public static boolean robotCentric = true;
@@ -37,38 +34,26 @@ public class Teleop extends LinearOpMode {
     private double wGain = 1;
 
     // Toggles
-    private boolean downToggle = false, armDown = false;
-    private boolean clampToggle = false, clamped = true;
-    private boolean armIn = true;
-    private boolean blockerToggle = false, blockerUp = false;
-    private boolean bumperToggle = false;
+    private boolean slidesToggle = false, slidesDeposit = false, slidesCap = false;
+    private boolean depositorToggle = false, depositorOpen = false;
 
     /*
     Controller Button Mappings:
     Gamepad 1
     Left Stick/Right Stick - Drivetrain Controls
-    B - Bumper Toggle
     X - Reset Odo
-    Dpad Up - High Goal Close
-    Dpad Down - High Goal Far
-    Left Bumper - High Goal Shoot
-    Right Bumper - Powershot Shoot
     Left Trigger - Intake Reverse
     Right Trigger - Intake On
+    A - Slides To Home Pos
+    B - Slides To Deposit Pos
+    Y - Slides To Capping Pos
 
     Gamepad 2
-    A - Blocker Toggle
-    B - Cancel Shoot
-    X - Move Turret to Reset
-    Y - Pre-Rev Flywheel for High Goal
     Dpad Left - Decrease Theta Offset
     Dpad Right - Increase Theta Offset
     Dpad Up - Increase Velocity Scale
     Dpad Down - Decrease Velocity Scale
-    Left Bumper - Wobble Clamp/Unclamp
-    Right Bumper - Wobble Up/Down
     Left Trigger - Slow Mode
-    Right Trigger - Shoot Override
      */
 
     @Override
@@ -84,13 +69,14 @@ public class Teleop extends LinearOpMode {
             robot.logger.startLogging(false, isRed);
         }
 
-        robot.setLockMode(Robot.TurretMode.HIGH_GOAL);
+        robot.slides.resetAtHomeHeight();
 
         waitForStart();
 
         robot.drivetrain.updateThetaError();
 
         while (opModeIsActive()) {
+
             // Intake On / Rev / Off
             if (gamepad1.right_trigger > 0) {
                 robot.intake.on();
@@ -100,98 +86,64 @@ public class Teleop extends LinearOpMode {
                 robot.intake.off();
             }
 
-            // High Goal / Powershot Shoot
-            if (gamepad1.left_bumper) {
-                robot.highGoalShoot();
-            } else if (gamepad1.right_bumper) {
-                robot.powerShotShoot();
-            } else if (gamepad1.dpad_up) {
-                robot.highGoalShoot(3, highGoalClose);
-            } else if (gamepad1.dpad_down) {
-                robot.highGoalShoot(3, highGoalFar);
-            }
+            //moving slides
+            if (gamepad1.a && !slidesToggle) {  //move slides to home
+                if (slidesDeposit || slidesCap) {
+                    slidesToggle = true;
 
-            // Stop Shoot Sequence
-            if (gamepad2.b) {
-                robot.cancelShoot();
-            }
+                    robot.slides.home();
 
-            // Rev Up Flywheel for High Goal
-            if (gamepad2.y) {
-                robot.shooter.setFlywheelVelocity(robot.calcHGVelocity());
-            }
-
-            // Turret Reset
-            if (gamepad2.x) {
-                robot.turretReset = true;
-            }
-
-            // Wobble Arm In / Up / Down
-            if (gamepad2.right_bumper && !downToggle) {
-                if (!armIn) {
-                    downToggle = true;
-                    if (armDown) {
-                        robot.wobbleArm.armUp();
-                    } else {
-                        robot.wobbleArm.armDown();
-                    }
-                    armDown = !armDown;
-                } else {
-                    robot.moveWobbleOut = 1;
-                    robot.wobbleTime = System.currentTimeMillis();
-                    armIn = false;
-                    armDown = true;
+                    slidesDeposit = false;
+                    slidesCap = false;
                 }
-            } else if (!gamepad2.right_bumper && downToggle) {
-                downToggle = false;
+            } else if (gamepad1.b && !slidesToggle) {   //move slides to deposit pos
+                if (slidesCap || (!slidesDeposit && !slidesCap)) {
+                    slidesToggle = true;
+
+                    robot.slides.deposit();
+
+                    slidesDeposit = true;
+                    slidesCap = false;
+                }
+            } else if (gamepad1.y && !slidesToggle) {   //move slides to capping pos
+                if (slidesDeposit || (!slidesDeposit && !slidesCap)) {
+                    slidesToggle = true;
+
+                    robot.slides.cap();
+
+                    slidesDeposit = false;
+                    slidesCap = true;
+                }
+            } else if (!(gamepad1.a || gamepad1.b || gamepad1.y) && slidesToggle) {
+                slidesToggle = false;
             }
 
-            if (gamepad1.b && !bumperToggle) {
-                bumperToggle = true;
-                robot.intake.bumperReverse = !robot.intake.bumperReverse;
-            } else if (!gamepad1.b && bumperToggle) {
-                bumperToggle = false;
-            }
 
-            if (armIn) {
-                robot.intake.autoBumpers(robot.x, robot.y, robot.theta, 12);
-            } else if (armDown) {
-                robot.intake.bumpersOut();
+            //toggle intake open/close
+            if (robot.intake.freightIntaked()) {
+                robot.intake.close();
             } else {
-                robot.intake.bumpersHome();
+                robot.intake.open();
             }
 
-            if (gamepad2.a && !blockerToggle) {
-                blockerToggle = true;
-                if (blockerUp) {
-                    robot.intake.blockerHome();
+            //run carousel servo
+            if (gamepad2.a){
+                robot.carousel.rotate();
+            } else {
+                robot.carousel.stop();
+            }
+
+            //toggle depositor open/close
+            if (gamepad2.a && !depositorToggle) {
+                if (depositorOpen){
+                    robot.depositor.close();
+                    depositorOpen = false;
                 } else {
-                    robot.intake.blockerVert();
+                    robot.depositor.open();
+                    depositorOpen = true;
                 }
-                blockerUp = !blockerUp;
-            } else if (!gamepad2.a && blockerToggle) {
-                blockerToggle = false;
-            }
-
-            // Wobble Clamp / Unclamp
-            if (gamepad2.left_bumper && !clampToggle) {
-                if (!armIn) {
-                    clampToggle = true;
-                    if (clamped) {
-                        robot.wobbleArm.unClamp();
-                    } else {
-                        robot.wobbleArm.clamp();
-                    }
-                    clamped = !clamped;
-                }
-            } else if (!gamepad2.left_bumper && clampToggle) {
-                clampToggle = false;
-            }
-
-            // Overrides Shoot in Case it is Taking Too Long
-            if (gamepad2.left_trigger > 0) {
-                robot.preShootOverride = true;
-                robot.shootOverride = true;
+            } else if (!gamepad2.a && depositorToggle) {
+                depositorToggle = false;
             }
 
             // Slow Mode
@@ -238,7 +190,7 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("X", robot.x);
             telemetry.addData("Y", robot.y);
             telemetry.addData("Theta", robot.theta);
-            telemetry.addData("# Rings", robot.numRings);
+            telemetry.addData("freight intaked: ", robot.intake.freightIntaked());
             telemetry.addData("Theta Offset", robot.thetaOffset);
 //            telemetry.addData("Shooter Velocity", robot.shooter.getFlywheelVelocity());
             telemetry.addData("# Cycles", robot.cycles);

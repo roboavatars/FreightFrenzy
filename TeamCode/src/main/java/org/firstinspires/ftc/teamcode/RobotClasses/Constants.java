@@ -13,7 +13,7 @@ public class Constants {
     public static double INTAKE_DISTANCE_THRESHOLD = 100;
 
     // Slides
-    public static int SLIDES_RETRACT_TICKS = 0;
+    public static int SLIDES_HOME_TICKS = 0;
     public static int SLIDES_DEPOSIT_TICKS = 1000;
     public static int SLIDES_CAP_TICKS = 1200;
 

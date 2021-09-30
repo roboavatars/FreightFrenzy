@@ -12,6 +12,7 @@ public class Slides {
 
     private double slidesLastTargetPower = 10;
     private int slidesLastTargetPos = -10;
+    private int offset = 0;
 
 
     public Slides(LinearOpMode op, boolean isAuto) {
@@ -34,33 +35,39 @@ public class Slides {
     }
 
 
-    public void resetEncoders () {
-        slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    public void resetAtHomeHeight () {
+        offset = slidesMotor.getCurrentPosition() - Constants.SLIDES_HOME_TICKS;
+    }
+    public void resetAtDepositHeight () {
+        offset = slidesMotor.getCurrentPosition() - Constants.SLIDES_DEPOSIT_TICKS;
+    }
+    public void resetAtCapHeight () {
+        offset = slidesMotor.getCurrentPosition() - Constants.SLIDES_CAP_TICKS;
     }
 
-    public void retract() {
-        if (slidesMotor.getCurrentPosition()>Constants.SLIDES_RETRACT_TICKS){
-            moveSlides(-Constants.SLIDES_POWER,Constants.SLIDES_RETRACT_TICKS);
+    public void home () {
+        if (slidesMotor.getCurrentPosition()>Constants.SLIDES_HOME_TICKS){
+            moveSlides(-Constants.SLIDES_POWER,Constants.SLIDES_HOME_TICKS + offset);
         } else {
-            moveSlides(Constants.SLIDES_POWER,Constants.SLIDES_RETRACT_TICKS);
+            moveSlides(Constants.SLIDES_POWER,Constants.SLIDES_HOME_TICKS + offset);
         }
 
     }
 
     public void deposit() {
         if (slidesMotor.getCurrentPosition()>Constants.SLIDES_DEPOSIT_TICKS){
-            moveSlides(-Constants.SLIDES_POWER,Constants.SLIDES_DEPOSIT_TICKS);
+            moveSlides(-Constants.SLIDES_POWER,Constants.SLIDES_DEPOSIT_TICKS + offset);
         } else {
-            moveSlides(Constants.SLIDES_POWER,Constants.SLIDES_DEPOSIT_TICKS);
+            moveSlides(Constants.SLIDES_POWER,Constants.SLIDES_DEPOSIT_TICKS + offset);
         }
 
     }
 
     public void cap() {
         if (slidesMotor.getCurrentPosition()>Constants.SLIDES_CAP_TICKS){
-            moveSlides(-Constants.SLIDES_POWER,Constants.SLIDES_CAP_TICKS);
+            moveSlides(-Constants.SLIDES_POWER,Constants.SLIDES_CAP_TICKS + offset);
         } else {
-            moveSlides(Constants.SLIDES_POWER,Constants.SLIDES_CAP_TICKS);
+            moveSlides(Constants.SLIDES_POWER,Constants.SLIDES_CAP_TICKS + offset);
         }
     }
 

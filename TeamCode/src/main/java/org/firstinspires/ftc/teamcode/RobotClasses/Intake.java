@@ -35,7 +35,7 @@ public class Intake {
     }
 
     public void reverse() {
-        setPower(-1);
+        setPower(-Constants.INTAKE_POWER);
     }
 
     public void off() {
