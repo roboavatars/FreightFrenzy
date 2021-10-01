@@ -58,26 +58,12 @@ public class Intake {
         }
     }
 
-
-    private void blockerOpen() {
+    public void open() {
         setBlockerPos(Constants.INTAKE_BLOCKER_OPEN_POS);
     }
 
-    private void blockerClose() {
-        setBlockerPos(Constants.INTAKE_BLOCKER_CLOSE_POS);
-    }
-
     public void close() {
-        if (lastBlockerPos != 0) {
-            blockerClose();
-            lastBlockerPos = 0;
-        }
-    }
-    public void open() {
-        if (lastBlockerPos != 1)  {
-            blockerOpen();
-            lastBlockerPos = 1;
-        }
+        setBlockerPos(Constants.INTAKE_BLOCKER_CLOSE_POS);
     }
 
     //check if freight intaked

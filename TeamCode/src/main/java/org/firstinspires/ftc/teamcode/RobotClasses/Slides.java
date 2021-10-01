@@ -4,14 +4,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-//assumes higher levels have higher encoder ticks
+//assumes higher slide positions have higher encoder ticks
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Slides {
     private DcMotorEx slidesMotor;
 
     private double slidesLastTargetPower = 10;
-    private int slidesLastTargetPos = -10;
+    private int slidesLastTargetPos = -100000000;
     private int offset = 0;
 
 
