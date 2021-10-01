@@ -3,21 +3,11 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawField;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawLine;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawRing;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawRobot;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
-import static org.firstinspires.ftc.teamcode.RobotClasses.Robot.TurretMode.HIGH_GOAL;
-import static org.firstinspires.ftc.teamcode.RobotClasses.Robot.TurretMode.MID_GOAL;
-import static org.firstinspires.ftc.teamcode.RobotClasses.Robot.TurretMode.NONE;
-import static org.firstinspires.ftc.teamcode.RobotClasses.Robot.TurretMode.PS_C;
-import static org.firstinspires.ftc.teamcode.RobotClasses.Robot.TurretMode.PS_L;
-import static org.firstinspires.ftc.teamcode.RobotClasses.Robot.TurretMode.PS_R;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
-import static java.lang.Math.cos;
 import static java.lang.Math.hypot;
-import static java.lang.Math.sin;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
@@ -64,13 +54,7 @@ public class Robot {
     public final boolean isRed;
     private boolean firstLoop = true;
     private int loopCounter = 0;
-    public int numRings = 0;
     public boolean highGoal = false;
-    public boolean preShoot = false;
-    public boolean preShootOverride = false;
-    public boolean shootOverride = false;
-    public boolean shoot = false;
-    public int moveWobbleOut = 0;
     public int lastTarget = -1;
 
     public int cycles = 0;
@@ -80,17 +64,7 @@ public class Robot {
 
     // Time and Delay Variables
     public double curTime;
-    public double shootTime;
-    public double startShootTime;
-    public double flickTime;
-    public double shootDelay;
-    private int vThresh;
-    public double wobbleTime;
-    public static double preShootTimeBackup = 4000;
-    public static double flickTimeBackup = 1500;
-    public static int highGoalDelay = 100;
-    public static int psDelay = 300;
-    public static double flickDelay = 100;
+
 
     // Motion Variables
     public double x, y, theta, vx, vy, w, turretGlobalTheta;
@@ -99,23 +73,10 @@ public class Robot {
 
     // Shooter Variables
     public double targetDist;
-    private final double[] shootXCorR = {76.5, 84, 91.5, 108};
-    private final double[] shootXCorB = {67.5, 60, 52.5, 36};
-    private final double shootYCor = 150;
-    private double shootTargetTheta;
-    public boolean turretReset;
 
-    public double shootYOverride = 0;
     public double velocityFactor = 1;
-    public int numRingsPreset = 3;
     public double thetaOffset = 0.03;
-    public double shootY = 0;
-    public int flywheelVelocitySetting = 0;
 
-    private double lockX, lockY;
-    public TurretMode turretMode = NONE;
-
-    public enum TurretMode {PS_L, PS_C, PS_R, HIGH_GOAL, MID_GOAL, NONE}
 
     // Powershot Debug Variables
     public static double theta0R = 1.671;
@@ -231,7 +192,7 @@ public class Robot {
 
         // Log Data
         if (loopCounter % loggerUpdatePeriod == 0) {
-            logger.logData(curTime - startTime, x, y, theta, turretGlobalTheta, vx, vy, w, ax, ay, a, numRings, shooter.magHome, shooter.feedHome, lastTarget, cycles, cycleTotal / cycles);
+            logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a, lastTarget, cycles, cycleTotal / cycles);
         }
 
         profile(7);

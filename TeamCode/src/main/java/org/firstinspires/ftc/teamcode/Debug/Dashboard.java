@@ -10,9 +10,6 @@ import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
-import static org.firstinspires.ftc.teamcode.RobotClasses.Shooter.TURRET_DIAMETER;
-import static org.firstinspires.ftc.teamcode.RobotClasses.Shooter.TURRET_DX;
-import static org.firstinspires.ftc.teamcode.RobotClasses.Shooter.TURRET_DY;
 
 public class Dashboard {
 
@@ -29,7 +26,6 @@ public class Dashboard {
 
     public static void drawRobot(double robotX, double robotY, double robotTheta, double turretTheta, String drivetrainColor, String turretColor) {
         drawDrivetrain(robotX, robotY, robotTheta, drivetrainColor);
-        drawTurret(robotX, robotY, robotTheta, turretTheta, turretColor);
     }
 
     public static void drawDrivetrain(double robotX, double robotY, double robotTheta, String robotColor) {
@@ -40,17 +36,6 @@ public class Dashboard {
         double[] xcoords = {r * cos(PI/4 + theta) + x, r * cos(3*PI/4 + theta) + x, r * cos(5*PI/4 + theta) + x, r * cos(7*PI/4 + theta) + x};
         double[] ycoords = {r * sin(PI/4 + theta) + y, r * sin(3*PI/4 + theta) + y, r * sin(5*PI/4 + theta) + y, r * sin(7*PI/4 + theta) + y};
         packet.fieldOverlay().setFill(robotColor).fillPolygon(xcoords, ycoords);
-    }
-
-    public static void drawTurret(double robotX, double robotY, double robotTheta, double turretTheta, String turretColor) {
-        double cx = robotX + TURRET_DX * sin(robotTheta) + TURRET_DY * cos(robotTheta);
-        double cy = robotY - TURRET_DX * cos(robotTheta) + TURRET_DY * sin(robotTheta);
-        double r = TURRET_DIAMETER / 2;
-        packet.fieldOverlay().setFill(turretColor).fillCircle(cy - 72, 72 - cx, r);
-
-        double[] xcoords = {cx - r * sin(turretTheta), cx + r*sqrt(2) * cos(turretTheta + PI/4), cx + r*sqrt(2) * cos(turretTheta - PI/4), cx + r * sin(turretTheta)};
-        double[] ycoords = {cy + r * cos(turretTheta), cy + r*sqrt(2) * sin(turretTheta + PI/4), cy + r*sqrt(2) * sin(turretTheta - PI/4), cy - r * cos(turretTheta)};
-        drawPolygon(xcoords, ycoords, turretColor);
     }
 
     public static void drawField() {

@@ -25,11 +25,8 @@ public class Logger extends Thread {
     private SimpleDateFormat df;
     private double timeSinceSt;
     private double x, y, theta;
-    private double turretTheta;
     private double vx, vy, w;
     private double ax, ay, alpha;
-    private int numRings;
-    private boolean magHome, feedHome;
     private int lastTarget;
     private int numCycles;
     private double avgCycleTime;
@@ -87,7 +84,7 @@ public class Logger extends Thread {
         while (!isInterrupted()) {
             if (writeCounter < logCounter) {
                 try {
-                    fileWriter.write(df.format(new Date()) + "," + timeSinceSt + "," + x + "," + y + "," + theta + "," + turretTheta + "," + vx + "," + vy + "," + w + "," + ax + "," + ay + "," + alpha + "," + numRings + "," + magHome + "," + feedHome + "," + lastTarget + "," + numCycles + "," + avgCycleTime + "\n");
+                    fileWriter.write(df.format(new Date()) + "," + timeSinceSt + "," + x + "," + y + "," + theta + "," + "," + vx + "," + vy + "," + w + "," + ax + "," + ay + "," + alpha + "," + "," + lastTarget + "," + numCycles + "," + avgCycleTime + "\n");
                     writeCounter++;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -100,15 +97,12 @@ public class Logger extends Thread {
      * Saves log data
      */
     @SuppressLint("SimpleDateFormat")
-    public void logData(double timeSinceSt, double x, double y, double theta, double turretTheta, double vx, double vy, double w, double ax, double ay, double alpha, int numRings, boolean magHome, boolean feedHome, int lastTarget, int numCycles, double avgCycleTime) {
+    public void logData(double timeSinceSt, double x, double y, double theta, double vx, double vy, double w, double ax, double ay, double alpha,int lastTarget, int numCycles, double avgCycleTime) {
         df = new SimpleDateFormat("HH:mm:ss.SSS");
         this.timeSinceSt = timeSinceSt;
         this.x = x; this.y = y; this.theta = theta;
-        this.turretTheta = turretTheta;
         this.vx = vx; this.vy = vy; this.w = w;
         this.ax = ax; this.ay = ay; this.alpha = alpha;
-        this.numRings = numRings;
-        this.magHome = magHome; this.feedHome = feedHome;
         this.lastTarget = lastTarget;
         this.numCycles = numCycles;
         this.avgCycleTime = avgCycleTime;

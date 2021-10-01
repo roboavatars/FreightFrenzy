@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.OpenCV;
 
 import android.annotation.SuppressLint;
 
-import org.firstinspires.ftc.teamcode.RobotClasses.Shooter;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -39,6 +37,7 @@ public class Ring {
         this.relY = relY;
     }
 
+    /*
     public Ring(double startX, double startY, double theta, double vx, double vy, double omega, double startTime) {
         this.startX = startX + Shooter.TURRET_DX * sin(theta) + Shooter.TURRET_DY * cos(theta);
         this.startY = startY - Shooter.TURRET_DX * cos(theta) + Shooter.TURRET_DY * sin(theta);
@@ -48,6 +47,7 @@ public class Ring {
         this.vy = vy + Shooter.TURRET_DX * omega * cos(theta) - Shooter.TURRET_DY * omega * sin(theta) + Shooter.RING_SPEED * sin(theta);
         this.startTime = startTime;
     }
+     */
 
     // Return a sorted list with up to three coordinate-filtered rings
     public static ArrayList<Ring> getRingCoords(ArrayList<Ring> rings, double minX, double minY, double maxX, double maxY, double robotX, double robotY) {
