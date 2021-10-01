@@ -17,14 +17,14 @@ public class Dashboard {
     public static TelemetryPacket packet = new TelemetryPacket();
 
     public static void drawRobot(Robot robot) {
-        drawRobot(robot, "black", "gray");
+        drawRobot(robot, "black");
     }
 
-    public static void drawRobot(Robot robot, String drivetrainColor, String turretColor) {
-        drawRobot(robot.x, robot.y, robot.theta, robot.turretGlobalTheta, drivetrainColor, turretColor);
+    public static void drawRobot(Robot robot, String drivetrainColor) {
+        drawRobot(robot.x, robot.y, robot.theta, drivetrainColor);
     }
 
-    public static void drawRobot(double robotX, double robotY, double robotTheta, double turretTheta, String drivetrainColor, String turretColor) {
+    public static void drawRobot(double robotX, double robotY, double robotTheta, String drivetrainColor) {
         drawDrivetrain(robotX, robotY, robotTheta, drivetrainColor);
     }
 
@@ -90,17 +90,6 @@ public class Dashboard {
         }
 
         packet.fieldOverlay().setFill(color).fillPolygon(xcoords, ycoords);
-    }
-
-    public static void drawRing(Ring ring) {
-        drawRing(ring, "orange");
-    }
-
-    public static void drawRing(Ring ring, String color) {
-        double x = ring.getY() - 72;
-        double y = 72 - ring.getX();
-        packet.fieldOverlay().setFill(color).fillCircle(x, y, 2.5);
-        packet.fieldOverlay().setFill("white").fillCircle(x, y, 1.5);
     }
 
     public static void addPacket(String key, Object value) {

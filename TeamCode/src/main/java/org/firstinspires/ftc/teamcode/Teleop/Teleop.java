@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
-import static java.lang.Math.PI;
-
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -13,14 +11,16 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.Arrays;
 
+import static java.lang.Math.PI;
+
 @TeleOp(name = "1 Teleop")
 @SuppressWarnings("FieldCanBeLocal")
 @Config
 public class Teleop extends LinearOpMode {
 
     // Backup Starting Position
-    private final int startX = 87;
-    private final int startY = 63;
+    private final double startX = 87;
+    private final double startY = 63;
     private final double startTheta = PI/2;
 
     private Robot robot;
@@ -49,10 +49,6 @@ public class Teleop extends LinearOpMode {
     Y - Slides To Capping Pos
 
     Gamepad 2
-    Dpad Left - Decrease Theta Offset
-    Dpad Right - Increase Theta Offset
-    Dpad Up - Increase Velocity Scale
-    Dpad Down - Decrease Velocity Scale
     Left Trigger - Slow Mode
      */
 
@@ -62,14 +58,14 @@ public class Teleop extends LinearOpMode {
             double[] initialData = Logger.readPos();
             telemetry.addData("Starting Position", Arrays.toString(initialData));
             telemetry.update();
-            robot = new Robot(this, initialData[1], initialData[2], initialData[3], initialData[4], false, initialData[0] == 1);
+            robot = new Robot(this, initialData[1], initialData[2], initialData[3], false, initialData[0] == 1);
             robot.logger.startLogging(false, initialData[0] == 1);
         } else {
             robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
             robot.logger.startLogging(false, isRed);
         }
 
-        robot.slides.resetAtHomeHeight();
+        robot.deposit.resetAtHomeHeight();
 
         waitForStart();
 
@@ -91,7 +87,7 @@ public class Teleop extends LinearOpMode {
                 if (slidesDeposit || slidesCap) {
                     slidesToggle = true;
 
-                    robot.slides.home();
+                    robot.deposit.home();
 
                     slidesDeposit = false;
                     slidesCap = false;
@@ -100,7 +96,7 @@ public class Teleop extends LinearOpMode {
                 if (slidesCap || (!slidesDeposit && !slidesCap)) {
                     slidesToggle = true;
 
-                    robot.slides.deposit();
+                    robot.deposit.deposit();
 
                     slidesDeposit = true;
                     slidesCap = false;
@@ -109,7 +105,7 @@ public class Teleop extends LinearOpMode {
                 if (slidesDeposit || (!slidesDeposit && !slidesCap)) {
                     slidesToggle = true;
 
-                    robot.slides.cap();
+                    robot.deposit.cap();
 
                     slidesDeposit = false;
                     slidesCap = true;
@@ -120,26 +116,26 @@ public class Teleop extends LinearOpMode {
 
 
             //toggle intake open/close
-            if (robot.intake.freightIntaked()) {
+            if (robot.intake.intakeFull()) {
                 robot.intake.close();
             } else {
                 robot.intake.open();
             }
 
-            //run carousel servo
-            if (gamepad2.a){
+            // Run Carousel Servo
+            if (gamepad2.a) {
                 robot.carousel.rotate();
             } else {
                 robot.carousel.stop();
             }
 
-            //toggle depositor open/close
+            // Toggle Depositor Open / Close
             if (gamepad2.a && !depositorToggle) {
-                if (depositorOpen){
-                    robot.depositor.close();
+                if (depositorOpen) {
+                    robot.deposit.close();
                     depositorOpen = false;
                 } else {
-                    robot.depositor.open();
+                    robot.deposit.open();
                     depositorOpen = true;
                 }
             } else if (!gamepad2.a && depositorToggle) {
@@ -158,22 +154,6 @@ public class Teleop extends LinearOpMode {
             // Reset Odometry
             if (gamepad1.x) {
                 robot.resetOdo(robot.isRed ? 87 : 57, 63, PI/2);
-                robot.thetaOffset = 0.03;
-                robot.velocityFactor = 0.96;
-            }
-
-            // Change Shooting Theta Offset to Compensate for Odometry Drift
-            if (gamepad2.dpad_left) {
-                robot.thetaOffset -= 0.006;
-            } else if (gamepad2.dpad_right) {
-                robot.thetaOffset += 0.006;
-            }
-
-            // Change Velocity Scaling
-            if (gamepad2.dpad_up) {
-                robot.velocityFactor += 0.001;
-            } else if (gamepad2.dpad_down) {
-                robot.velocityFactor -= 0.001;
             }
 
             // Drivetrain Controls
@@ -190,9 +170,7 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("X", robot.x);
             telemetry.addData("Y", robot.y);
             telemetry.addData("Theta", robot.theta);
-            telemetry.addData("freight intaked: ", robot.intake.freightIntaked());
-            telemetry.addData("Theta Offset", robot.thetaOffset);
-//            telemetry.addData("Shooter Velocity", robot.shooter.getFlywheelVelocity());
+            telemetry.addData("Intake Full", robot.intake.intakeFull());
             telemetry.addData("# Cycles", robot.cycles);
             telemetry.addData("Average Cycle Time", (robot.cycleTotal / robot.cycles) + "s");
             telemetry.update();

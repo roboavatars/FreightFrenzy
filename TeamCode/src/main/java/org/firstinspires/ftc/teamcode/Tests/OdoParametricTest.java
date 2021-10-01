@@ -23,7 +23,7 @@ public class OdoParametricTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Robot robot = new Robot(this, 87, 81, PI/2, false);
+        Robot robot = new Robot(this, 87, 81, PI/2, false, true);
 
         waitForStart();
 

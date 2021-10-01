@@ -19,11 +19,9 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
-import org.firstinspires.ftc.teamcode.OpenCV.Ring;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Config
@@ -33,8 +31,7 @@ public class Robot {
     // Robot Classes
     public Drivetrain drivetrain;
     public Intake intake;
-    public Depositor depositor;
-    public Slides slides;
+    public Deposit deposit;
     public Carousel carousel;
     public Logger logger;
 
@@ -47,14 +44,12 @@ public class Robot {
     private final int loggerUpdatePeriod = 2;
     private final double xyTolerance = 1;
     private final double thetaTolerance = PI/35;
-    private final double turretTolerance = PI/50;
 
     // State Variables
     private final boolean isAuto;
     public final boolean isRed;
     private boolean firstLoop = true;
     private int loopCounter = 0;
-    public boolean highGoal = false;
     public int lastTarget = -1;
 
     public int cycles = 0;
@@ -65,38 +60,16 @@ public class Robot {
     // Time and Delay Variables
     public double curTime;
 
-
     // Motion Variables
-    public double x, y, theta, vx, vy, w, turretGlobalTheta;
+    public double x, y, theta, vx, vy, w;
     private double prevX, prevY, prevTheta, prevVx, prevVy, prevW, prevTime, ax, ay, a;
     public double startTime;
-
-    // Shooter Variables
-    public double targetDist;
-
-    public double velocityFactor = 1;
-    public double thetaOffset = 0.03;
-
-
-    // Powershot Debug Variables
-    public static double theta0R = 1.671;
-    public static double theta1R = 1.595;
-    public static double theta2R = 1.498;
-    public static double[] thetaPositionsR = {theta0R, theta1R, theta2R};
-    public static double theta0B = 1.385;
-    public static double theta1B = 1.466;
-    public static double theta2B = 1.557;
-    public static double[] thetaPositionsB = {theta0B, theta1B, theta2B};
-
-    // Ring State Variables
-    public ArrayList<Ring> shotRings = new ArrayList<>();
-    public ArrayList<Ring> ringPos = new ArrayList<>();
 
     // OpMode Stuff
     private LinearOpMode op;
 
     // Constructor
-    public Robot(LinearOpMode op, double x, double y, double theta, double turretTheta, boolean isAuto, boolean isRed) {
+    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed) {
         this.x = x;
         this.y = y;
         this.theta = theta;
@@ -105,10 +78,9 @@ public class Robot {
         this.isRed = isRed;
 
         drivetrain = new Drivetrain(op, x, y, theta);
-        intake = new Intake(op, isAuto);
-        depositor = new Depositor(op,isAuto);
-        slides = new Slides(op, isAuto);
-        carousel = new Carousel(op, isAuto);
+        intake = new Intake(op);
+        deposit = new Deposit(op);
+        carousel = new Carousel(op);
         logger = new Logger();
 
         profiler = new ElapsedTime();
@@ -129,14 +101,6 @@ public class Robot {
         sendPacket();
     }
 
-    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed) {
-        this(op, x, y, theta, PI/2, isAuto, isRed);
-    }
-
-    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto) {
-        this(op, x, y, theta, isAuto, true);
-    }
-
     // Stop logger and t265
     public void stop() {
         logger.stopLogging();
@@ -152,23 +116,11 @@ public class Robot {
         profiler.reset();
         curTime = System.currentTimeMillis();
 
-        // Powershot Debug
-        thetaPositionsR = new double[] {theta0R, theta1R, theta2R};
-        thetaPositionsB = new double[] {theta0B, theta1B, theta2B};
-
-        double hgDist = Math.hypot(x - (isRed ? 108 : 36), 144 - y);
-
         // Track time after start
         if (firstLoop) {
             startTime = curTime;
             lastCycleTime = curTime;
             firstLoop = false;
-            targetDist = hgDist;
-        }
-
-
-        if (!isAuto) {
-            //if teleop:
         }
 
         // Update Position
@@ -188,14 +140,14 @@ public class Robot {
         prevTime = curTime / 1000;
         prevVx = vx; prevVy = vy; prevW = w;
 
-        profile(6);
+        profile(1);
 
         // Log Data
         if (loopCounter % loggerUpdatePeriod == 0) {
             logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a, lastTarget, cycles, cycleTotal / cycles);
         }
 
-        profile(7);
+        profile(2);
 
         // Dashboard Telemetry
         if (startVoltTooLow) {
@@ -207,7 +159,6 @@ public class Robot {
         addPacket("8 Run Time", (curTime - startTime) / 1000);
         addPacket("9 Update Frequency (Hz)", round(1 / timeDiff));
         addPacket("Pod Zeroes", drivetrain.zero1 + ", " + drivetrain.zero2);
-        addPacket("regression", round(thetaOffset) + " " + velocityFactor + " " + round(targetDist));
         addPacket("ms", round(timeDiff * 1000));
         if (!isAuto) {
             addPacket("Cycle Time", (curTime - lastCycleTime) / 1000);
@@ -226,25 +177,7 @@ public class Robot {
             hub.clearBulkCache();
         }
 
-        profile(9);
-    }
-
-
-
-    public int calcHGVelocity() {
-        if (y < 70) {
-            return (int) (velocityFactor * (1457 + 1.83 * targetDist));
-        } else {
-            return (int) (velocityFactor * 1585);
-        }
-    }
-
-    public int calcMGVelocity() {
-        if (y < 70) {
-            return (int) (velocityFactor * (1049 + 4.31 * targetDist));
-        } else {
-            return (int) (velocityFactor * 1350);
-        }
+        profile(3);
     }
 
     // Set target point (velocity specification, custom Kp and Kv values)
@@ -306,25 +239,13 @@ public class Robot {
         return abs(x - targetX) < xTolerance && abs(y - targetY) < yTolerance && abs(theta - targetTheta) < thetaTolerance;
     }
 
-    public boolean isAtPoseTurret(double turretTheta, double turretTolerance) {
-        return abs(turretGlobalTheta - turretTheta) < turretTolerance;
-    }
-
-    public boolean isAtPoseTurret(double turretTheta) {
-        return abs(turretGlobalTheta - turretTheta) < turretTolerance;
-    }
-
     public boolean notMoving() {
-        if (isAuto || !highGoal) {
-            return notMoving(3.0, 0.2);
-        }
-        return true;
+        return notMoving(3.0, 0.2);
     }
 
     public boolean notMoving(double xyThreshold, double thetaThreshold) {
         return (hypot(vx, vy) < xyThreshold && abs(w) < thetaThreshold);
     }
-
 
     // Logging
     public static void log(String message) {

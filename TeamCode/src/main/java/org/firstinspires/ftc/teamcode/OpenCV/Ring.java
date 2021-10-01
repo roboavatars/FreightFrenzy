@@ -37,17 +37,15 @@ public class Ring {
         this.relY = relY;
     }
 
-    /*
     public Ring(double startX, double startY, double theta, double vx, double vy, double omega, double startTime) {
-        this.startX = startX + Shooter.TURRET_DX * sin(theta) + Shooter.TURRET_DY * cos(theta);
-        this.startY = startY - Shooter.TURRET_DX * cos(theta) + Shooter.TURRET_DY * sin(theta);
+        this.startX = startX;
+        this.startY = startY;
         this.absX = this.startX;
         this.absY = this.startY;
-        this.vx = vx - Shooter.TURRET_DX * omega * sin(theta) - Shooter.TURRET_DY * omega * cos(theta) + Shooter.RING_SPEED * cos(theta);
-        this.vy = vy + Shooter.TURRET_DX * omega * cos(theta) - Shooter.TURRET_DY * omega * sin(theta) + Shooter.RING_SPEED * sin(theta);
+        this.vx = vx;
+        this.vy = vy;
         this.startTime = startTime;
     }
-     */
 
     // Return a sorted list with up to three coordinate-filtered rings
     public static ArrayList<Ring> getRingCoords(ArrayList<Ring> rings, double minX, double minY, double maxX, double maxY, double robotX, double robotY) {

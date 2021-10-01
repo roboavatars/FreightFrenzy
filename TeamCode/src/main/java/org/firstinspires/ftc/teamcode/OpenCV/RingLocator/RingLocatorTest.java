@@ -13,7 +13,6 @@ import static java.lang.Math.PI;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawField;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawRing;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
 @TeleOp(name = "Ring Locator Pipeline Test")
@@ -38,15 +37,6 @@ public class RingLocatorTest extends LinearOpMode {
 
             rings = detector.getRings(dt.x, dt.y, dt.theta);
 
-            for (int i = 0; i < rings.size(); i++) {
-                if (i == 0) {
-                    drawRing(rings.get(i), "green");
-                } else if (i == 1) {
-                    drawRing(rings.get(i), "yellow");
-                } else if (i == 2) {
-                    drawRing(rings.get(i), "red");
-                }
-            }
             drawDrivetrain(dt.x, dt.y, dt.theta, "black");
             drawField();
 
