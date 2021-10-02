@@ -15,7 +15,7 @@ public class Deposit {
     private int offset = 0;
 
     public Deposit(LinearOpMode op) {
-        depositMotor = op.hardwareMap.get(DcMotorEx.class, "depositMotor1");
+        depositMotor = op.hardwareMap.get(DcMotorEx.class, "depositMotor");
         dumperServo = op.hardwareMap.get(Servo.class, "deposit");
 
         depositMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
