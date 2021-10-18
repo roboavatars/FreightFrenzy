@@ -66,17 +66,10 @@ public class Drivetrain {
 
     public double lastHeading;
 
-//    private IMU imu;
-    private T265 t265;
-
     // Constructor
     public Drivetrain(LinearOpMode op, double initialX, double initialY, double initialTheta) {
         this.op = op;
         HardwareMap hardwareMap = op.hardwareMap;
-
-//        imu = new IMU(initialTheta, op);
-        t265 = new T265(op, initialX, initialY, initialTheta);
-        t265.startCam();
 
         motorFrontRight = hardwareMap.get(DcMotorEx.class, "motorFrontRight");
         motorFrontLeft = hardwareMap.get(DcMotorEx.class, "motorFrontLeft");
@@ -107,7 +100,7 @@ public class Drivetrain {
     public void resetOdo(double newX, double newY, double newTheta) {
         x = newX;
         y = newY;
-        t265.resetTheta(newTheta);
+        theta = newTheta;
 //        imu.resetHeading(newTheta);
     }
 
@@ -194,22 +187,6 @@ public class Drivetrain {
         setGlobalControls(0, 0, 0);
     }
 
-    public double getRawTheta() {
-        return t265.getRawTheta();
-    }
-
-    public double getThetaError() {
-        return t265.getThetaError();
-    }
-
-    public double getInitTheta() {
-        return t265.getInitTheta();
-    }
-
-    public void updateThetaError() {
-        t265.makeSureT265IsGood();
-    }
-
     // update position from odometry
     public void updatePose() {
         try {
@@ -219,19 +196,11 @@ public class Drivetrain {
             deltaPodR = podR - lastPodR;
             deltaPodL = podL - lastPodL;
 
-            t265.updateCamPose();
-
-            theta = t265.getTheta() % (2*PI);
             if (theta < 0) {
                 theta += 2*PI;
             }
             deltaHeading = theta - lastHeading;
 
-            if (Math.abs(t265.getTheta() - lastRawHeading) > PI/4) {
-                t265.thetaError += deltaHeading;
-                Robot.log("T265 Disaster Averted " + t265.getTheta() + " " + lastRawHeading + " " + deltaHeading + " " + t265.thetaError);
-            }
-            lastRawHeading = t265.getTheta();
 //            deltaPod1 = deltaPod2 - deltaHeading * ODOMETRY_TRACK_WIDTH;
 
 //            imu.updateHeading();
