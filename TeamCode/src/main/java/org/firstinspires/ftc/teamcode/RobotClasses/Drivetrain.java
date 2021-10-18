@@ -24,10 +24,8 @@ public class Drivetrain {
     private LinearOpMode op;
 
     // Tracking X/Y/Theta
-    public double x, y, theta, startTheta;
-    private double lastRawHeading = 0;
+    public double x, y, theta;
     private double deltaHeading = 0;
-    public double commandedW;
 
     // Odometry
     public double podR = 0;
@@ -47,8 +45,7 @@ public class Drivetrain {
     // Odometry Constants
     public static double ticksToInchR = 0.005;
     public static double ticksToInchL = 0.005;
-    public static double ODOMETRY_HORIZONTAL_OFFSET = 0.15;
-
+    public static double ODOMETRY_TRACK_WIDTH = 16;
     private final double ODOMETRY_HEADING_THRESHOLD = PI/8;
 
     // PD Controller Constants
@@ -60,11 +57,7 @@ public class Drivetrain {
     public final static double thetaKd = 0.07;
 
     // Odometry delta 0 counters
-    public int zero1, zero2;
-
-    public boolean zeroStrafeCorrection = false;
-
-    public double lastHeading;
+    public int zeroR, zeroL;
 
     // Constructor
     public Drivetrain(LinearOpMode op, double initialX, double initialY, double initialTheta) {
@@ -91,9 +84,7 @@ public class Drivetrain {
 
         x = initialX;
         y = initialY;
-        startTheta = initialTheta;
         theta = initialTheta;
-        lastHeading = theta;
     }
 
     // reset odometry
@@ -101,26 +92,16 @@ public class Drivetrain {
         x = newX;
         y = newY;
         theta = newTheta;
-//        imu.resetHeading(newTheta);
     }
 
     // robot centric movement
     public void setControls(double xdot, double ydot, double w) {
-        commandedW = w;
-
         double FRpower, FLpower, BRpower, BLpower;
 
-        if (!zeroStrafeCorrection) {
-            FRpower = ydot + xdot + w;
-            FLpower = -ydot + xdot - w;
-            BRpower = -ydot + xdot + w;
-            BLpower = ydot + xdot - w;
-        } else {
-            FRpower = xdot + w;
-            FLpower = xdot - w;
-            BRpower = xdot + w;
-            BLpower = xdot - w;
-        }
+        FRpower = ydot + xdot + w;
+        FLpower = -ydot + xdot - w;
+        BRpower = -ydot + xdot + w;
+        BLpower = ydot + xdot - w;
 
         double maxpower = Math.max(Math.abs(FRpower), Math.max(Math.abs(FLpower), Math.max(Math.abs(BRpower), Math.abs(BLpower))));
 
@@ -196,35 +177,23 @@ public class Drivetrain {
             deltaPodR = podR - lastPodR;
             deltaPodL = podL - lastPodL;
 
-            if (theta < 0) {
-                theta += 2*PI;
-            }
-            deltaHeading = theta - lastHeading;
-
-//            deltaPod1 = deltaPod2 - deltaHeading * ODOMETRY_TRACK_WIDTH;
-
-//            imu.updateHeading();
-//            theta = imu.getTheta() % (2*PI);
-//            deltaHeading = imu.getDeltaHeading();
-//            deltaPod1 = deltaPod2 - deltaHeading * ODOMETRY_TRACK_WIDTH;
-
             if (deltaPodR == 0 || deltaPodL == 0) {
                 if (deltaPodR == 0) {
                     Log.w("pod-delta-log", "podR delta 0");
-                    zero1++;
+                    zeroR++;
                 }
                 if (deltaPodL == 0) {
                     Log.w("pod-delta-log", "podL delta 0");
-                    zero2++;
+                    zeroL++;
                 }
             }
 
-//            deltaHeading = (deltaPod2 - deltaPod1) / ODOMETRY_TRACK_WIDTH;
+            deltaHeading = (deltaPodR - deltaPodL) / ODOMETRY_TRACK_WIDTH;
 
             double localX = (deltaPodR + deltaPodL) / 2;
             double localY = 0;
 
-//            Robot.log(deltaPod1 + " " + deltaPod2 + " " + deltaPod3 + " " + deltaHeading);
+//            Robot.log(deltaPodL + " " + deltaPodR + " " + deltaHeading);
 
             if (deltaHeading < ODOMETRY_HEADING_THRESHOLD) {
                 x += localX * Math.cos(theta) - localY * Math.sin(theta);
@@ -237,13 +206,12 @@ public class Drivetrain {
                         - localY * Math.sin(theta) + localX * Math.cos(theta)) / deltaHeading;
             }
 
-//            theta = startTheta + (pod2 - pod1) / ODOMETRY_TRACK_WIDTH;
-//            theta = theta % (2*PI);
-//            if (theta < 0) theta += 2*PI;
+            theta += deltaHeading;
+            theta = theta % (2*PI);
+            if (theta < 0) theta += 2*PI;
 
             lastPodR = podR;
             lastPodL = podL;
-            lastHeading = theta;
         } catch (Exception e) {
             e.printStackTrace();
         }

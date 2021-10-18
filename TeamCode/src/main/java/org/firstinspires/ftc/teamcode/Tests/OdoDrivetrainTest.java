@@ -21,8 +21,6 @@ public class OdoDrivetrainTest extends LinearOpMode {
 
         waitForStart();
 
-        dt.updateThetaError();
-
         while(opModeIsActive()) {
             dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
 
@@ -49,14 +47,10 @@ public class OdoDrivetrainTest extends LinearOpMode {
             addPacket("Y", y);
             addPacket("Theta", theta);
             addPacket("Update Frequency (Hz)", 1 / timeDiff);
-            addPacket("podL", dt.podL);
             addPacket("podR", dt.podR);
-            addPacket("1 zeros", dt.zero1);
-            addPacket("2 zeros", dt.zero2);
-
-            addPacket("cam raw", dt.getRawTheta());
-            addPacket("cam init", dt.getInitTheta());
-            addPacket("cam error", dt.getThetaError());
+            addPacket("podL", dt.podL);
+            addPacket("R zeros", dt.zeroR);
+            addPacket("L zeros", dt.zeroL);
             sendPacket();
 
             telemetry.addData("X: ", x);

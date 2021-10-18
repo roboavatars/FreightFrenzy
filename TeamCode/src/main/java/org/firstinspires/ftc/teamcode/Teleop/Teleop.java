@@ -69,8 +69,6 @@ public class Teleop extends LinearOpMode {
 
         waitForStart();
 
-        robot.drivetrain.updateThetaError();
-
         while (opModeIsActive()) {
 
             // Intake On / Rev / Off

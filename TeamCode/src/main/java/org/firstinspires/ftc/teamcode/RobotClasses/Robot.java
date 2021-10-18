@@ -158,7 +158,7 @@ public class Robot {
         addPacket("3 Theta", round(theta));
         addPacket("8 Run Time", (curTime - startTime) / 1000);
         addPacket("9 Update Frequency (Hz)", round(1 / timeDiff));
-        addPacket("Pod Zeroes", drivetrain.zero1 + ", " + drivetrain.zero2);
+        addPacket("Pod Zeroes", drivetrain.zeroR + ", " + drivetrain.zeroL);
         addPacket("ms", round(timeDiff * 1000));
         if (!isAuto) {
             addPacket("Cycle Time", (curTime - lastCycleTime) / 1000);
