@@ -55,7 +55,7 @@ public class PDTest extends LinearOpMode {
             } else if (gamepad1.b) {
                 robot.setTargetPoint(111, 63, 1.91, 0, 0, 0, xKp, yKp, thetaKp, xKd, yKd, thetaKd);
             } else {
-                robot.drivetrain.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
+                robot.drivetrain.setControls(-gamepad1.left_stick_y, -gamepad1.right_stick_x);
             }
 
             robot.update();

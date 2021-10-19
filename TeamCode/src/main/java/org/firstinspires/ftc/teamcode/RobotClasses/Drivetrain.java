@@ -95,6 +95,10 @@ public class Drivetrain {
     }
 
     // robot centric movement
+    public void setControls(double xdot, double w) {
+        setControls(xdot, 0, w);
+    }
+
     public void setControls(double xdot, double ydot, double w) {
         double FRpower, FLpower, BRpower, BLpower;
 
@@ -165,7 +169,7 @@ public class Drivetrain {
 
     // stop drivetrain
     public void stop() {
-        setGlobalControls(0, 0, 0);
+        setControls(0, 0);
     }
 
     // update position from odometry

@@ -22,7 +22,7 @@ public class OdoDrivetrainTest extends LinearOpMode {
         waitForStart();
 
         while(opModeIsActive()) {
-            dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
+            dt.setControls(-gamepad1.left_stick_y, -gamepad1.right_stick_x);
 
             if (gamepad1.x) {
                 dt.resetOdo(90, 9, PI/2);

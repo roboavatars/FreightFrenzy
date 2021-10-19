@@ -29,7 +29,7 @@ public class IMUTest extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
+            dt.setControls(-gamepad1.left_stick_y, -gamepad1.right_stick_x);
             imu.updateHeading();
 
             if (gamepad1.x) {

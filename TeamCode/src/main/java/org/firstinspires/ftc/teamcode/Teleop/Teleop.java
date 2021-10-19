@@ -25,7 +25,6 @@ public class Teleop extends LinearOpMode {
 
     private Robot robot;
 
-    public static boolean robotCentric = true;
     public static boolean useAutoPos = true;
     public static boolean isRed = true;
 
@@ -155,11 +154,7 @@ public class Teleop extends LinearOpMode {
             }
 
             // Drivetrain Controls
-            if (robotCentric) {
-                robot.drivetrain.setControls(-gamepad1.left_stick_y * xyGain, -gamepad1.left_stick_x * xyGain, -gamepad1.right_stick_x * wGain);
-            } else {
-                robot.drivetrain.setGlobalControls((isRed ? 1 : -1) * gamepad1.left_stick_y * xyGain, (isRed ? 1 : -1) * gamepad1.left_stick_x * xyGain, -gamepad1.right_stick_x * wGain);
-            }
+            robot.drivetrain.setControls(-gamepad1.left_stick_y * xyGain, -gamepad1.right_stick_x * wGain);
 
             // Update Robot
             robot.update();
