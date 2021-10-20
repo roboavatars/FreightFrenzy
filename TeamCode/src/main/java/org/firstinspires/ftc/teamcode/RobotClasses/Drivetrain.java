@@ -43,9 +43,9 @@ public class Drivetrain {
     private final double motorUpdateTolerance = 0.05;
 
     // Odometry Constants
-    public static double ticksToInchR = 0.005;
-    public static double ticksToInchL = 0.005;
-    public static double ODOMETRY_TRACK_WIDTH = 16;
+    public static double ticksToInchR = .02379460495125061744669650421102;
+    public static double ticksToInchL = .02379460495125061744669650421102;
+    public static double ODOMETRY_TRACK_WIDTH = 14.1;
     private final double ODOMETRY_HEADING_THRESHOLD = PI/8;
 
     // PD Controller Constants
