@@ -18,8 +18,8 @@ public class Intake {
 
     public Intake(LinearOpMode op) {
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
-        blockerServo = op.hardwareMap.get(Servo.class, "blocker");
-        intakeSensor = op.hardwareMap.get(DistanceSensor.class, "intakeSensor");
+        //blockerServo = op.hardwareMap.get(Servo.class, "blocker");
+        //intakeSensor = op.hardwareMap.get(DistanceSensor.class, "intakeSensor");
 
         op.telemetry.addData("Status", "Intake Initialized");
     }
@@ -45,7 +45,9 @@ public class Intake {
     }
 
     // Blocker
+   /*
     private void setBlockerPos (double pos) {
+    /*
         if (pos != lastBlockerPos) {
             blockerServo.setPosition(pos);
             lastBlockerPos = pos;
@@ -68,4 +70,6 @@ public class Intake {
     public boolean intakeFull() {
         return getDistance() < Constants.INTAKE_DISTANCE_THRESHOLD;
     }
+
+    */
 }

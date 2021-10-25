@@ -113,12 +113,15 @@ public class Teleop extends LinearOpMode {
 
 
             //toggle intake open/close
+
+            /*
             if (robot.intake.intakeFull()) {
                 robot.intake.close();
             } else {
                 robot.intake.open();
             }
 
+             */
             // Run Carousel Servo
             if (gamepad2.a) {
                 robot.carousel.rotate();
@@ -163,7 +166,7 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("X", robot.x);
             telemetry.addData("Y", robot.y);
             telemetry.addData("Theta", robot.theta);
-            telemetry.addData("Intake Full", robot.intake.intakeFull());
+            //telemetry.addData("Intake Full", robot.intake.intakeFull());
             telemetry.addData("# Cycles", robot.cycles);
             telemetry.addData("Average Cycle Time", (robot.cycleTotal / robot.cycles) + "s");
             telemetry.update();
