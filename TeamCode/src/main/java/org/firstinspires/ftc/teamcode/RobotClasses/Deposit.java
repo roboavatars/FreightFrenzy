@@ -1,82 +1,76 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
+import android.net.wifi.hotspot2.pps.HomeSp;
+
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.checkerframework.checker.units.qual.C;
+
+@Config
 @SuppressWarnings("FieldCanBeLocal")
 public class Deposit {
-    private DcMotorEx depositMotor;
-    private Servo dumperServo;
+    private DcMotorEx depositor;
+    private Servo depositServo;
 
-    private double lastTargetPower = 0;
-    private int lastTargetPos = 0;
-    private double lastServoPos = 0;
-    private int offset = 0;
+    private static double lastTargetPower = 0;
+    private static int lastTargetPos = 0;
+    private static double lastServoPos = 0;
+    private static int offset = 0;
+
+    public enum deposit_height{
+        HOME, MID, TOP, CAP
+    }
 
     public Deposit(LinearOpMode op) {
-        depositMotor = op.hardwareMap.get(DcMotorEx.class, "depositMotor");
-        dumperServo = op.hardwareMap.get(Servo.class, "deposit");
+        depositor = op.hardwareMap.get(DcMotorEx.class, "depositor");
+        depositServo = op.hardwareMap.get(Servo.class, "depositServo");
 
-        depositMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+//        depositor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         op.telemetry.addData("Status", "Deposit Initialized");
     }
 
     private void moveSlides(double power, int ticks) {
         if (power != lastTargetPower) {
-            depositMotor.setPower(power);
+            depositor.setPower(power);
             lastTargetPower = power;
         }
 
         if (ticks != lastTargetPos) {
-            depositMotor.setTargetPosition(ticks);
+            depositor.setTargetPosition(ticks);
             lastTargetPos = ticks;
+            depositor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         }
     }
 
-
-    public void resetAtHomeHeight() {
-        offset = depositMotor.getCurrentPosition() - Constants.HOME_TICKS;
-    }
-
-    public void resetAtDepositHeight() {
-        offset = depositMotor.getCurrentPosition() - Constants.DEPOSIT_TICKS;
-    }
-
-    public void resetAtCapHeight() {
-        offset = depositMotor.getCurrentPosition() - Constants.CAP_TICKS;
-    }
-
-    public void home () {
-        if (depositMotor.getCurrentPosition() > Constants.HOME_TICKS) {
-            moveSlides(-Constants.DEPOSIT_POWER,Constants.HOME_TICKS + offset);
+    public void moveSlides(double power, deposit_height deposit_height) {
+        depositor.setPower(power);
+        if (deposit_height == deposit_height.HOME) {
+            depositor.setTargetPosition(Constants.HOME);
+        } else if (deposit_height == deposit_height.MID) {
+            depositor.setTargetPosition(Constants.MID_GOAL);
+        } else if (deposit_height == deposit_height.TOP) {
+            depositor.setTargetPosition(Constants.TOP_GOAL);
+        } else if (deposit_height == deposit_height.CAP) {
+            depositor.setTargetPosition(Constants.CAP);
         } else {
-            moveSlides(Constants.DEPOSIT_POWER,Constants.HOME_TICKS + offset);
-        }
-    }
-
-    public void deposit() {
-        if (depositMotor.getCurrentPosition() > Constants.DEPOSIT_TICKS) {
-            moveSlides(-Constants.DEPOSIT_POWER,Constants.DEPOSIT_TICKS + offset);
-        } else {
-            moveSlides(Constants.DEPOSIT_POWER,Constants.DEPOSIT_TICKS + offset);
-        }
-    }
-
-    public void cap() {
-        if (depositMotor.getCurrentPosition() > Constants.CAP_TICKS){
-            moveSlides(-Constants.DEPOSIT_POWER,Constants.CAP_TICKS + offset);
-        } else {
-            moveSlides(Constants.DEPOSIT_POWER,Constants.CAP_TICKS + offset);
+            depositor.setTargetPosition(0);
         }
     }
 
     private void setPosition(double pos) {
         if (pos != lastServoPos) {
-            dumperServo.setPosition(pos);
+            depositServo.setPosition(pos);
             lastServoPos = pos;
         }
+    }
+
+    public double getPosition() {
+        return depositor.getCurrentPosition();
     }
 
     public void open() {
