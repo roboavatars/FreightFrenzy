@@ -64,7 +64,7 @@ public class Teleop extends LinearOpMode {
             robot.logger.startLogging(false, isRed);
         }
 
-        robot.deposit.resetAtHomeHeight();
+//        robot.deposit.resetAtHomeHeight();
 
         waitForStart();
 
@@ -84,7 +84,7 @@ public class Teleop extends LinearOpMode {
                 if (slidesDeposit || slidesCap) {
                     slidesToggle = true;
 
-                    robot.deposit.home();
+//                    robot.deposit.home();
 
                     slidesDeposit = false;
                     slidesCap = false;
@@ -93,7 +93,7 @@ public class Teleop extends LinearOpMode {
                 if (slidesCap || (!slidesDeposit && !slidesCap)) {
                     slidesToggle = true;
 
-                    robot.deposit.deposit();
+//                    robot.deposit.deposit();
 
                     slidesDeposit = true;
                     slidesCap = false;
@@ -102,7 +102,7 @@ public class Teleop extends LinearOpMode {
                 if (slidesDeposit || (!slidesDeposit && !slidesCap)) {
                     slidesToggle = true;
 
-                    robot.deposit.cap();
+//                    robot.deposit.cap();
 
                     slidesDeposit = false;
                     slidesCap = true;
