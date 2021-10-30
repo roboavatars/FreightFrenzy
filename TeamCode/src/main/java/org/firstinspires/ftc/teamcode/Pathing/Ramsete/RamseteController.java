@@ -10,8 +10,9 @@ public class RamseteController {
     Drivetrain drivetrain;
     ElapsedTime time = new ElapsedTime();
 
-    public RamseteController(){
+    public RamseteController(Drivetrain drivetrain){
         time.reset();
+        this.drivetrain = drivetrain;
     }
 
 

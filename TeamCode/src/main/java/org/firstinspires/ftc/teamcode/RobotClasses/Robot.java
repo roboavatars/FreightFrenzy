@@ -88,6 +88,8 @@ public class Robot {
         carousel = new Carousel(op);
         logger = new Logger();
 
+        controller = new RamseteController(drivetrain);
+
         profiler = new ElapsedTime();
 
         allHubs = op.hardwareMap.getAll(LynxModule.class);
