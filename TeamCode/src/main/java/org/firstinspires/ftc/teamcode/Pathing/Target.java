@@ -9,12 +9,13 @@ public class Target {
     private double vxTarget;
     private double vyTarget;
     private double wTarget;
-    private double xKp = Drivetrain.xKp;
-    private double yKp = Drivetrain.yKp;
-    private double thetaKp = Drivetrain.thetaKp;
-    private double xKd = Drivetrain.xKd;
-    private double yKd = Drivetrain.yKd;
-    private double thetaKd = Drivetrain.thetaKd;
+
+    //constants
+    private double Kp = Drivetrain.Kd;
+    private double Kd = Drivetrain.Kp;
+    private double b = Drivetrain.b;
+    private double zeta = Drivetrain.zeta;
+
 
     public Target(Pose pose) {
         xTarget = pose.x;
@@ -55,45 +56,20 @@ public class Target {
         return this;
     }
 
-    public Target xKp(double xKp) {
-        this.xKp = xKp;
+    public Target Kp(double Kp) {
+        this.Kp = Kp;
         return this;
     }
-
-    public Target yKp(double yKp) {
-        this.yKp = yKp;
+    public Target Kd(double Kd) {
+        this.Kd = Kd;
         return this;
     }
-
-    public Target xyKp(double xyKp) {
-        this.xKp = xyKp;
-        this.yKp = xyKp;
+    public Target b(double b) {
+        this.b = b;
         return this;
     }
-
-    public Target thetaKp(double thetaKp) {
-        this.thetaKp = thetaKp;
-        return this;
-    }
-
-    public Target xKd(double xKd) {
-        this.xKd = xKd;
-        return this;
-    }
-
-    public Target yKd(double yKd) {
-        this.yKd = yKd;
-        return this;
-    }
-
-    public Target xyKd(double xyKd) {
-        this.xKd = xyKd;
-        this.yKd = xyKd;
-        return this;
-    }
-
-    public Target thetaKd(double thetaKd) {
-        this.thetaKd = thetaKd;
+    public Target zeta(double zeta) {
+        this.zeta = zeta;
         return this;
     }
 
@@ -101,27 +77,17 @@ public class Target {
         return new Pose(xTarget, yTarget, thetaTarget, vxTarget, vyTarget, wTarget);
     }
 
-    public double xKp() {
-        return xKp;
+    public double Kp() {
+        return Kp;
     }
 
-    public double yKp() {
-        return yKp;
+    public double Kd() { return Kd; }
+
+    public double b() {
+        return b;
     }
 
-    public double thetaKp() {
-        return thetaKp;
-    }
-
-    public double xKd() {
-        return xKd;
-    }
-
-    public double yKd() {
-        return yKd;
-    }
-
-    public double thetaKd() {
-        return thetaKd;
+    public double zeta() {
+        return zeta;
     }
 }
