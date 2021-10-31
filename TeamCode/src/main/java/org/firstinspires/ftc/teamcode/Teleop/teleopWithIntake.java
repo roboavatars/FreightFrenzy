@@ -28,9 +28,9 @@ public class teleopWithIntake extends LinearOpMode {
 
 
             if (gamepad1.right_trigger>.5){
-                intake.on();
+                intake.on(1);
             } else if (gamepad1.left_trigger > .5){
-                intake.reverse();
+                intake.reverse(1);
             } else{
                 intake.off();
             }

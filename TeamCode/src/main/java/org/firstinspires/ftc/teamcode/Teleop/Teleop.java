@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
+import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.Arrays;
@@ -36,6 +37,8 @@ public class Teleop extends LinearOpMode {
     private boolean slidesToggle = false, slidesDeposit = false, slidesCap = false;
     private boolean depositorToggle = false, depositorOpen = false;
 
+    double slidesPower = 1;
+
     /*
     Controller Button Mappings:
     Gamepad 1
@@ -64,6 +67,8 @@ public class Teleop extends LinearOpMode {
             robot.logger.startLogging(false, isRed);
         }
 
+
+
 //        robot.deposit.resetAtHomeHeight();
 
         waitForStart();
@@ -71,15 +76,31 @@ public class Teleop extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Intake On / Rev / Off
-            if (gamepad1.right_trigger > 0) {
-                robot.intake.on();
-            } else if (gamepad1.left_trigger > 0) {
-                robot.intake.reverse();
+            if (gamepad1.right_trigger > 0.51) {
+                robot.intake.on(gamepad1.right_trigger);
+            } else if (gamepad1.left_trigger > 0.5) {
+                robot.intake.reverse(gamepad1.left_trigger);
             } else {
                 robot.intake.off();
             }
 
             //moving slides
+            if (gamepad1.a) {
+                robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.HOME);
+            }
+
+            if (gamepad1.b) {
+                robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.MID);
+            }
+
+            if (gamepad1.x) {
+                robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.TOP);
+            }
+
+            if (gamepad1.y) {
+                robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.CAP);
+            }
+            /*
             if (gamepad1.a && !slidesToggle) {  //move slides to home
                 if (slidesDeposit || slidesCap) {
                     slidesToggle = true;
@@ -110,7 +131,7 @@ public class Teleop extends LinearOpMode {
             } else if (!(gamepad1.a || gamepad1.b || gamepad1.y) && slidesToggle) {
                 slidesToggle = false;
             }
-
+*/
 
             //toggle intake open/close
 
@@ -123,14 +144,16 @@ public class Teleop extends LinearOpMode {
 
              */
             // Run Carousel Servo
+            /*
             if (gamepad2.a) {
                 robot.carousel.rotate();
             } else {
                 robot.carousel.stop();
             }
+             */
 
             // Toggle Depositor Open / Close
-            if (gamepad2.a && !depositorToggle) {
+            if (gamepad1.right_bumper && !depositorToggle) {
                 if (depositorOpen) {
                     robot.deposit.close();
                     depositorOpen = false;
@@ -138,7 +161,9 @@ public class Teleop extends LinearOpMode {
                     robot.deposit.open();
                     depositorOpen = true;
                 }
-            } else if (!gamepad2.a && depositorToggle) {
+                depositorToggle = true;
+            } else
+                if (!gamepad1.right_bumper && depositorToggle) {
                 depositorToggle = false;
             }
 
@@ -157,7 +182,7 @@ public class Teleop extends LinearOpMode {
             }
 
             // Drivetrain Controls
-            robot.drivetrain.setControls(-gamepad1.left_stick_y * xyGain, -gamepad1.right_stick_x * wGain);
+            robot.drivetrain.setControls(-gamepad1.left_stick_y * xyGain, gamepad1.right_stick_x * wGain);
 
             // Update Robot
             robot.update();

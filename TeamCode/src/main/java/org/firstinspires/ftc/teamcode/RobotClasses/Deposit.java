@@ -29,7 +29,12 @@ public class Deposit {
         depositor = op.hardwareMap.get(DcMotorEx.class, "depositor");
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
 
-//        depositor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        depositServo.setPosition(0);
+
+        depositor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        depositor.setTargetPosition(0);
+        depositor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        depositor.setTargetPosition(0);
 
         op.telemetry.addData("Status", "Deposit Initialized");
     }

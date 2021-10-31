@@ -85,7 +85,7 @@ public class Robot {
         drivetrain = new Drivetrain(op, x, y, theta);
         intake = new Intake(op);
         deposit = new Deposit(op);
-        carousel = new Carousel(op);
+        //carousel = new Carousel(op);
         logger = new Logger();
 
         controller = new RamseteController(drivetrain);

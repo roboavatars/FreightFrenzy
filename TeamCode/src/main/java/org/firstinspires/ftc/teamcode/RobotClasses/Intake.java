@@ -25,12 +25,12 @@ public class Intake {
     }
 
     // Intake Motor
-    public void on() {
-        setPower(Constants.INTAKE_POWER);
+    public void on(double power) {
+        setPower(power);
     }
 
-    public void reverse() {
-        setPower(-Constants.INTAKE_POWER);
+    public void reverse(double power) {
+        setPower(-power);
     }
 
     public void off() {
