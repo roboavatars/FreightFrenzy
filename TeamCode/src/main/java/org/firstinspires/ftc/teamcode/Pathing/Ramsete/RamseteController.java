@@ -16,7 +16,7 @@ public class RamseteController {
     }
 
 
-    public void calculate(double x, double y, double theta, double xTarget, double yTarget, double thetaTarget, double vx, double vy, double w, double vxTarget, double vyTarget, double wTarget, double Kp, double Kd, double b, double zeta) {
+    public void follow(double x, double y, double theta, double xTarget, double yTarget, double thetaTarget, double vx, double vy, double w, double vxTarget, double vyTarget, double wTarget, double Kp, double Kd, double b, double zeta) {
         double eX = xTarget - x;
         double eY = yTarget - y;
         double eTheta = thetaTarget - theta;

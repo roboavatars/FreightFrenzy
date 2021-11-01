@@ -207,7 +207,7 @@ public class Robot {
 
         drawDrivetrain(xTarget, yTarget, thetaTarget, "blue");
 
-        controller.calculate(x, y, theta, xTarget, yTarget, thetaTarget, vx, vy, w, vxTarget, vyTarget, wTarget, Kp, Kd, b, zeta);
+        controller.follow(x, y, theta, xTarget, yTarget, thetaTarget, vx, vy, w, vxTarget, vyTarget, wTarget, Kp, Kd, b, zeta);
         //drivetrain.setGlobalControls(xKp * (xTarget - x) + xKd * (vxTarget - vx), yKp * (yTarget - y) + yKd * (vyTarget - vy), thetaKp * (-thetaControl) + thetaKd * (wTarget - w));
     }
 
