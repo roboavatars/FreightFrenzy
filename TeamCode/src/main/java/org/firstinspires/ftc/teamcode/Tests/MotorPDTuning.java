@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
+
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -9,10 +13,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Pathing.Ramsete.PDController;
 
-@Autonomous()
+@Autonomous
+@Config
     public class MotorPDTuning extends LinearOpMode {
-    private double Kp = .6;
-    private double Kd = .05;
+    private double Kp = 0.0003;
+    private double Kd = 0;
     private double target_ticks = 1000;
 
     double right_power;
@@ -50,15 +55,19 @@ import org.firstinspires.ftc.teamcode.Pathing.Ramsete.PDController;
                 left_power = left.output(current_left, target, Kp, Kd, time.seconds());
                 right_power = right.output(current_right, target, Kp, Kd, time.seconds());
 
-                telemetry.addData("currentVelo", (current_left+current_right)/2);
-                telemetry.addData("target", target);
-
                 motorBackLeft.setPower(left_power);
                 motorFrontLeft.setPower(left_power);
                 motorBackRight.setPower(right_power);
                 motorFrontRight.setPower(right_power);
 
+                telemetry.addData("currentVelo: ", (current_left+current_right)/2);
+                telemetry.addData("target: ", target);
                 telemetry.update();
+
+                addPacket("currentVelo", (current_left+current_right)/2);
+                addPacket("target", target);
+                sendPacket();
+
             }
 
 
