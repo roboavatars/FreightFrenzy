@@ -188,7 +188,7 @@ public class Robot {
     }
 
     // Set target point (velocity specification, custom Kp and Kv values)
-    public void setTargetPoint(double xTarget, double yTarget, double thetaTarget, double vxTarget, double vyTarget, double wTarget, double Kp, double Ki, double Kd, double b, double zeta) {
+    public void setTargetPoint(double xTarget, double yTarget, double thetaTarget, double vxTarget, double vyTarget, double wTarget, double Kp, double Kd, double b, double zeta) {
         // Make Sure thetaTarget is Between 0 and 2pi
         thetaTarget = thetaTarget % (2*PI);
         if (thetaTarget < 0) {
@@ -207,29 +207,29 @@ public class Robot {
 
         drawDrivetrain(xTarget, yTarget, thetaTarget, "blue");
 
-        controller.follow(x, y, theta, xTarget, yTarget, thetaTarget, vx, vy, w, vxTarget, vyTarget, wTarget, Kp, Ki, Kd, b, zeta);
+        controller.follow(x, y, theta, xTarget, yTarget, thetaTarget, vx, vy, w, vxTarget, vyTarget, wTarget, Kp, Kd, b, zeta);
         //drivetrain.setGlobalControls(xKp * (xTarget - x) + xKd * (vxTarget - vx), yKp * (yTarget - y) + yKd * (vyTarget - vy), thetaKp * (-thetaControl) + thetaKd * (wTarget - w));
     }
 
     // Set target point (default Kp and Kv gains)
     public void setTargetPoint(double xTarget, double yTarget, double thetaTarget) {
-        setTargetPoint(xTarget, yTarget, thetaTarget, 0, 0, 0, Drivetrain.Kp, Drivetrain.Ki, Drivetrain.Kd, Drivetrain.b, Drivetrain.zeta);
+        setTargetPoint(xTarget, yTarget, thetaTarget, 0, 0, 0, Drivetrain.Kp, Drivetrain.Kd, Drivetrain.b, Drivetrain.zeta);
     }
 
     // Set target point (using pose, velocity specification, default Kp and Kv gains)
     public void setTargetPoint(Pose pose) {
-        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, Drivetrain.Kp, Drivetrain.Ki, Drivetrain.Kd, Drivetrain.b, Drivetrain.zeta);
+        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, Drivetrain.Kp, Drivetrain.Kd, Drivetrain.b, Drivetrain.zeta);
     }
 
     // Set target point (using pose, custom theta and omega, default Kp and Kv gains)
     public void setTargetPoint(Pose pose, double theta, double w) {
-        setTargetPoint(pose.x, pose.y, theta, pose.vx, pose.vy, w, Drivetrain.Kp, Drivetrain.Ki, Drivetrain.Kd, Drivetrain.b, Drivetrain.zeta);
+        setTargetPoint(pose.x, pose.y, theta, pose.vx, pose.vy, w, Drivetrain.Kp, Drivetrain.Kd, Drivetrain.b, Drivetrain.zeta);
     }
 
     // Set target point (using target object)
     public void setTargetPoint(Target target) {
         Pose pose = target.getPose();
-        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, target.Kp(), target.Ki(), target.Kd(), target.b(), target.zeta());
+        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, target.Kp(), target.Kd(), target.b(), target.zeta());
     }
 
     // Check if robot is at a certain point/angle (default tolerance)

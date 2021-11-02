@@ -1,24 +1,19 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Pathing.Ramsete.VeloPIDController;
-import org.firstinspires.ftc.teamcode.Teleop.Teleop;
+import org.firstinspires.ftc.teamcode.Pathing.Ramsete.PDController;
 
-import com.acmerobotics.dashboard.config.Config;
-
-@Autonomous
-@Config
-public class MotorPIDTuning extends Teleop {
-    public static double Kp = 0.0003;
-    public static double Ki = 0;
-    public static double Kd = 0;
-    public static double target_ticks = 1700;
+@Autonomous()
+    public class MotorPDTuning extends LinearOpMode {
+    private double Kp = .6;
+    private double Kd = .05;
+    private double target_ticks = 1000;
 
     double right_power;
     double left_power;
@@ -33,8 +28,8 @@ public class MotorPIDTuning extends Teleop {
             DcMotorEx motorBackRight = hardwareMap.get(DcMotorEx.class, "motorBackRight");
             DcMotorEx motorBackLeft = hardwareMap.get(DcMotorEx.class, "motorBackLeft");
 
-            VeloPIDController left = new VeloPIDController();
-            VeloPIDController right = new VeloPIDController();
+            PDController left = new PDController();
+            PDController right = new PDController();
 
             ElapsedTime time = new ElapsedTime();
 
@@ -49,21 +44,21 @@ public class MotorPIDTuning extends Teleop {
                     target = -target_ticks;
                 }
 
+                current_left = (motorFrontLeft.getVelocity() + motorBackLeft.getVelocity())/2;
                 current_right = (motorFrontRight.getVelocity() + motorBackRight.getVelocity())/2;
 
-                right_power = right.output(current_right, target, Kp, Ki, Kd, time.seconds());
+                left_power = left.output(current_left, target, Kp, Kd, time.seconds());
+                right_power = right.output(current_right, target, Kp, Kd, time.seconds());
 
+                telemetry.addData("currentVelo", (current_left+current_right)/2);
+                telemetry.addData("target", target);
+
+                motorBackLeft.setPower(left_power);
+                motorFrontLeft.setPower(left_power);
                 motorBackRight.setPower(right_power);
                 motorFrontRight.setPower(right_power);
 
-                telemetry.addData("currentVelo: ", current_right);
-                telemetry.addData("target: ", target);
                 telemetry.update();
-                addPacket("currentVelo", current_right);
-                addPacket("target", target);
-                sendPacket();
-
-
             }
 
 
