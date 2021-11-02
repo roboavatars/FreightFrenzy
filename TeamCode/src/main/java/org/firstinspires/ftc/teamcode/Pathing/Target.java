@@ -11,8 +11,9 @@ public class Target {
     private double wTarget;
 
     //constants
-    private double Kp = Drivetrain.Kd;
-    private double Kd = Drivetrain.Kp;
+    private double Kp = Drivetrain.Kp;
+    private double Ki = Drivetrain.Ki;
+    private double Kd = Drivetrain.Kd;
     private double b = Drivetrain.b;
     private double zeta = Drivetrain.zeta;
 
@@ -60,14 +61,22 @@ public class Target {
         this.Kp = Kp;
         return this;
     }
+
+    public Target Ki(double Ki) {
+        this.Ki = Ki;
+        return this;
+    }
+
     public Target Kd(double Kd) {
         this.Kd = Kd;
         return this;
     }
+
     public Target b(double b) {
         this.b = b;
         return this;
     }
+
     public Target zeta(double zeta) {
         this.zeta = zeta;
         return this;
@@ -80,6 +89,8 @@ public class Target {
     public double Kp() {
         return Kp;
     }
+
+    public double Ki() { return Ki; }
 
     public double Kd() { return Kd; }
 

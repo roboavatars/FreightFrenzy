@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 
 public class RamseteController {
-    PDController leftPD;
-    PDController rightPD;
+    VeloPIDController leftPD;
+    VeloPIDController rightPD;
     Drivetrain drivetrain;
     ElapsedTime time = new ElapsedTime();
 
@@ -16,7 +16,7 @@ public class RamseteController {
     }
 
 
-    public void follow(double x, double y, double theta, double xTarget, double yTarget, double thetaTarget, double vx, double vy, double w, double vxTarget, double vyTarget, double wTarget, double Kp, double Kd, double b, double zeta) {
+    public void follow(double x, double y, double theta, double xTarget, double yTarget, double thetaTarget, double vx, double vy, double w, double vxTarget, double vyTarget, double wTarget, double Kp, double Ki, double Kd, double b, double zeta) {
         double eX = xTarget - x;
         double eY = yTarget - y;
         double eTheta = thetaTarget - theta;
@@ -40,8 +40,8 @@ public class RamseteController {
         double currRightVelo = linearVelo + Drivetrain.ODOMETRY_TRACK_WIDTH / 2 * w;
         double currLeftVelo = linearVelo - Drivetrain.ODOMETRY_TRACK_WIDTH / 2 * w;
 
-        double rightPower = rightPD.output(currRightVelo, rightVelocity, Kp, Kd, time.seconds());
-        double leftPower = leftPD.output(currLeftVelo, leftVelocity, Kp, Kd, time.seconds());
+        double rightPower = rightPD.output(currRightVelo, rightVelocity, Kp, Ki, Kd, time.seconds());
+        double leftPower = leftPD.output(currLeftVelo, leftVelocity, Kp, Ki, Kd, time.seconds());
         drivetrain.setRawPower(rightPower, leftPower, rightPower, leftPower);
 
     }

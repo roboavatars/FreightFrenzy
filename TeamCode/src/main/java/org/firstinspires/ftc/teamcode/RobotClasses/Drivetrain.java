@@ -49,8 +49,9 @@ public class Drivetrain {
     private final double ODOMETRY_HEADING_THRESHOLD = PI/8;
 
     // PD Controller Constants
-    public final static double Kp = 0.6;
-    public final static double Kd = 0.05;
+    public final static double Kp = 0.0003;
+    public final static double Ki = 0;
+    public final static double Kd = 0;
     public final static double b = 2;
     public final static double zeta = .7;
 
