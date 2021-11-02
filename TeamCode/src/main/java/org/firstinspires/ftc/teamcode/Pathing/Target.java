@@ -11,8 +11,8 @@ public class Target {
     private double wTarget;
 
     //constants
-    private double Kp = Drivetrain.Kd;
-    private double Kd = Drivetrain.Kp;
+    private double Kp = Drivetrain.Kp;
+    private double Kd = Drivetrain.Kd;
     private double b = Drivetrain.b;
     private double zeta = Drivetrain.zeta;
 
