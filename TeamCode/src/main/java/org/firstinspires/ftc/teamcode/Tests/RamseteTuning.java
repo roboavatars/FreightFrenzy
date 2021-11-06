@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
+
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -7,7 +11,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-@Autonomous()
+@Autonomous
+@Config
 public class RamseteTuning extends LinearOpMode {
     private double b = 2;
     private double zeta = .7;
@@ -32,10 +37,13 @@ public class RamseteTuning extends LinearOpMode {
 
             robot.setTargetPoint(0, target, 0, 0, 0, 0, Drivetrain.Kp, Drivetrain.Kd, b, zeta);
 
-            telemetry.addData("current", robot.y);
-            telemetry.addData("target", target);
-
+            telemetry.addData("current: ", robot.y);
+            telemetry.addData("target: ", target);
             telemetry.update();
+
+            addPacket("current", robot.y);
+            addPacket("target", target);
+            sendPacket();
         }
 
 

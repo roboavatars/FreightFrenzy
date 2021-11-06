@@ -35,7 +35,7 @@ public class Teleop extends LinearOpMode {
 
     // Toggles
     private boolean slidesToggle = false, slidesDeposit = false, slidesCap = false;
-    private boolean depositorToggle = false, depositorOpen = false;
+    private boolean markerToggle = false, markerArmDown = false;
 
     double slidesPower = 1;
 
@@ -79,9 +79,9 @@ public class Teleop extends LinearOpMode {
 
             // Intake On / Rev / Off
             if (gamepad1.right_trigger > 0.1) {
-                robot.intake.on(gamepad1.right_trigger);
+                robot.intake.setPower(gamepad1.right_trigger);
             } else if (gamepad1.left_trigger > 0.1) {
-                robot.intake.reverse(gamepad1.left_trigger);
+                robot.intake.setPower(gamepad1.left_trigger);
             } else {
                 robot.intake.off();
             }
@@ -110,75 +110,20 @@ public class Teleop extends LinearOpMode {
             if (gamepad1.b){
                 robot.deposit.open();
             }
-            /*
-            if (gamepad1.a && !slidesToggle) {  //move slides to home
-                if (slidesDeposit || slidesCap) {
-                    slidesToggle = true;
 
-//                    robot.deposit.home();
-
-                    slidesDeposit = false;
-                    slidesCap = false;
-                }
-            } else if (gamepad1.b && !slidesToggle) {   //move slides to deposit pos
-                if (slidesCap || (!slidesDeposit && !slidesCap)) {
-                    slidesToggle = true;
-
-//                    robot.deposit.deposit();
-
-                    slidesDeposit = true;
-                    slidesCap = false;
-                }
-            } else if (gamepad1.y && !slidesToggle) {   //move slides to capping pos
-                if (slidesDeposit || (!slidesDeposit && !slidesCap)) {
-                    slidesToggle = true;
-
-//                    robot.deposit.cap();
-
-                    slidesDeposit = false;
-                    slidesCap = true;
-                }
-            } else if (!(gamepad1.a || gamepad1.b || gamepad1.y) && slidesToggle) {
-                slidesToggle = false;
-            }
-*/
-
-            //toggle intake open/close
-
-            /*
-            if (robot.intake.intakeFull()) {
-                robot.intake.close();
-            } else {
-                robot.intake.open();
-            }
-
-             */
-            // Run Carousel Servo
-            /*
-            if (gamepad2.a) {
-                robot.carousel.rotate();
-            } else {
-                robot.carousel.stop();
-            }
-             */
-
-            /*
-            // Toggle Depositor Open / Close
-            if (gamepad1.right_bumper && !depositorToggle) {
-                if (depositorOpen) {
-                    robot.deposit.close();
-                    depositorOpen = false;
+            if (gamepad1.right_bumper && !markerToggle) {
+                if (markerArmDown) {
+                    robot.deposit.markerArmUp();
+                    markerArmDown = false;
                 } else {
-                    robot.deposit.open();
-                    depositorOpen = true;
+                    robot.deposit.markerArmDown();
+                    markerArmDown = true;
                 }
-                depositorToggle = true;
+                markerToggle = true;
             } else
-                if (!gamepad1.right_bumper && depositorToggle) {
-                depositorToggle = false;
+            if (!gamepad1.right_bumper && markerToggle) {
+                markerToggle = false;
             }
-
-             */
 
             // Slow Mode
             if (gamepad2.right_trigger > 0) {

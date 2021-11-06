@@ -33,8 +33,8 @@ public class Dashboard {
         double x = robotY - 72;
         double y = 72 - robotX;
         double theta = PI/2 + robotTheta;
-        double[] xcoords = {r * cos(PI/4 + theta) + x, r * cos(3*PI/4 + theta) + x, r * cos(5*PI/4 + theta) + x, r * cos(7*PI/4 + theta) + x};
-        double[] ycoords = {r * sin(PI/4 + theta) + y, r * sin(3*PI/4 + theta) + y, r * sin(5*PI/4 + theta) + y, r * sin(7*PI/4 + theta) + y};
+        double[] xcoords = {-6.5*cos(theta)-9*sin(theta)+x,6.5*cos(theta)-9*sin(theta)+x, 6.5*cos(theta)+9*sin(theta)+x, -6.5*cos(theta)+9*sin(theta)+x};
+        double[] ycoords = {-6.5*sin(theta)+9*cos(theta)+x, 6.5*sin(theta)+9*cos(theta)+x, 6.5*sin(theta)-9*cos(theta)+x, -6.5*sin(theta)-9*cos(theta)+x};
         packet.fieldOverlay().setFill(robotColor).fillPolygon(xcoords, ycoords);
     }
 

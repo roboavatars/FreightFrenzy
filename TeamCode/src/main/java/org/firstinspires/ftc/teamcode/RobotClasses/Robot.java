@@ -46,6 +46,7 @@ public class Robot {
 
     // Class Constants
     private final int loggerUpdatePeriod = 2;
+    private final int sensorUpdatePeriod = 3;
     private final double xyTolerance = 1;
     private final double thetaTolerance = PI/35;
 
@@ -61,6 +62,18 @@ public class Robot {
     public double cycleTotal;
     public double lastCycleTime;
     public double longestCycle = 0;
+
+    public boolean slidesMoving = false;
+    public boolean intakeFull = false;
+    public Deposit.deposit_height depositHeight = Deposit.deposit_height.HOME;
+    public double intakePower = 0;
+
+    private boolean depositReadyToMove = false;
+    private boolean depositReadyToScore = false;
+    private boolean depositReadyToReturn = false;
+    public Deposit.deposit_height depositMoveApproval = Deposit.deposit_height.UNDEFINED;
+    public boolean depositScoreApproval = false;
+    public boolean depositReturnApproval = false;
 
     // Time and Delay Variables
     public double curTime;
@@ -130,6 +143,41 @@ public class Robot {
             firstLoop = false;
         }
 
+        if (loopCounter % sensorUpdatePeriod == 0){
+            slidesMoving = deposit.slidesMoving();
+            intakeFull = intake.intakeFull();
+            depositHeight = deposit.getTargHeight();
+            intakePower = intake.getLastIntakePow();
+        }
+
+        //State Controller
+        if (depositHeight == depositHeight.HOME && !slidesMoving && !intakeFull){
+            if(isAuto){
+                intake.on();
+            }
+        }
+        else if (depositHeight == depositHeight.HOME && intakeFull){
+            intake.off();
+            deposit.hold();
+            if (depositMoveApproval != Deposit.deposit_height.UNDEFINED) {
+                deposit.moveSlides(1, depositMoveApproval);
+                depositMoveApproval = Deposit.deposit_height.UNDEFINED;
+                depositReadyToScore = true;
+            }
+        }
+        else if (depositReadyToScore && depositScoreApproval && depositHeight != Deposit.deposit_height.CAP && !slidesMoving && intakeFull){
+            depositReadyToScore = false;
+            depositScoreApproval = false;
+            deposit.open();
+            depositReadyToReturn = true;
+        }
+        else if (depositReadyToReturn && depositReturnApproval && !slidesMoving && !intakeFull){
+            depositReadyToReturn = false;
+            depositReturnApproval = false;
+            deposit.close();
+            deposit.moveSlides(1, Deposit.deposit_height.HOME);
+        }
+
         // Update Position
         drivetrain.updatePose();
 
@@ -185,6 +233,8 @@ public class Robot {
         }
 
         profile(3);
+
+
     }
 
     // Set target point (velocity specification, custom Kp and Kv values)

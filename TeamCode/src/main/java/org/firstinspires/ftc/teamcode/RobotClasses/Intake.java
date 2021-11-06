@@ -25,12 +25,12 @@ public class Intake {
     }
 
     // Intake Motor
-    public void on(double power) {
-        setPower(power);
+    public void on() {
+        setPower(1);
     }
 
-    public void reverse(double power) {
-        setPower(-power);
+    public void reverse() {
+        setPower(-1);
     }
 
     public void off() {
@@ -45,21 +45,18 @@ public class Intake {
     }
 
     // Blocker
-   /*
+
     private void setBlockerPos (double pos) {
-    /*
+
         if (pos != lastBlockerPos) {
             blockerServo.setPosition(pos);
             lastBlockerPos = pos;
         }
     }
 
-    public void open() {
-        setBlockerPos(Constants.BLOCKER_OPEN_POS);
-    }
-
-    public void close() {
-        setBlockerPos(Constants.BLOCKER_CLOSE_POS);
+    //get power
+    public double getLastIntakePow(){
+        return lastIntakePow;
     }
 
     // Distance Sensor
@@ -71,5 +68,5 @@ public class Intake {
         return getDistance() < Constants.INTAKE_DISTANCE_THRESHOLD;
     }
 
-    */
+
 }
