@@ -15,7 +15,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 
-class AprilTagPipeline extends OpenCvPipeline {
+public class AprilTagPipeline extends OpenCvPipeline {
     private long nativeApriltagPtr;
     private Mat grey = new Mat();
     private ArrayList<AprilTagDetection> detections = new ArrayList<>();
@@ -40,7 +40,7 @@ class AprilTagPipeline extends OpenCvPipeline {
     double tagsizeX;
     double tagsizeY;
 
-    private float decimation;
+    private double decimation;
     private boolean needToSetDecimation;
     private final Object decimationSync = new Object();
 
@@ -54,6 +54,27 @@ class AprilTagPipeline extends OpenCvPipeline {
         this.cy = cy;
 
         constructMatrix();
+    }
+
+
+    public double getFx() {
+        return fx;
+    }
+
+    public double getFy() {
+        return fy;
+    }
+
+    public double getCx() {
+        return cx;
+    }
+
+    public double getCy() {
+        return cy;
+    }
+
+    public double getTagSize() {
+        return tagsize;
     }
 
     @Override
@@ -75,7 +96,7 @@ class AprilTagPipeline extends OpenCvPipeline {
 
         synchronized (decimationSync) {
             if(needToSetDecimation) {
-                AprilTagDetectorJNI.setApriltagDetectorDecimation(nativeApriltagPtr, decimation);
+                AprilTagDetectorJNI.setApriltagDetectorDecimation(nativeApriltagPtr, (float) decimation);
                 needToSetDecimation = false;
             }
         }
@@ -98,7 +119,7 @@ class AprilTagPipeline extends OpenCvPipeline {
         return input;
     }
 
-    public void setDecimation(float decimation) {
+    public void setDecimation(double decimation) {
         synchronized (decimationSync) {
             this.decimation = decimation;
             needToSetDecimation = true;

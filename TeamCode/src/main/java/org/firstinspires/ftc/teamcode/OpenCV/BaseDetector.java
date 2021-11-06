@@ -14,14 +14,14 @@ public class BaseDetector {
 
     public BaseDetector(LinearOpMode op) {
         int cameraMonitorViewId = op.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", op.hardwareMap.appContext.getPackageName());
-        cam = OpenCvCameraFactory.getInstance().createWebcam(op.hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
+        cam = OpenCvCameraFactory.getInstance().createWebcam(op.hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
     }
 
     public void start() {
         cam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                cam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                cam.startStreaming(1600, 1200, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
