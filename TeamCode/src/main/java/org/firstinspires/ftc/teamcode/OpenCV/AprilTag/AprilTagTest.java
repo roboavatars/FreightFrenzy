@@ -29,9 +29,9 @@ public class AprilTagTest extends LinearOpMode {
 
     int numFramesWithoutDetection = 0;
 
-    final float DECIMATION_HIGH = 3;
-    final float DECIMATION_LOW = 2;
-    final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
+    final double DECIMATION_HIGH = 3;
+    final double DECIMATION_LOW = 2;
+    final double THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
     final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
 
     @Override
@@ -92,12 +92,12 @@ public class AprilTagTest extends LinearOpMode {
 
                     for(AprilTagDetection detection : detections) {
                         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-                        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
-                        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
-                        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
-                        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
-                        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
-                        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
+                        telemetry.addLine(String.format("Translation X: %.4f inches", detection.pose.x*FEET_PER_METER*12));
+                        telemetry.addLine(String.format("Translation Y: %.4f inches", detection.pose.y*FEET_PER_METER*12));
+                        telemetry.addLine(String.format("Translation Z: %.4f inches", detection.pose.z*FEET_PER_METER*12));
+                        telemetry.addLine(String.format("Rotation Yaw: %.4f degrees", Math.toDegrees(detection.pose.yaw)));
+                        telemetry.addLine(String.format("Rotation Pitch: %.4f degrees", Math.toDegrees(detection.pose.pitch)));
+                        telemetry.addLine(String.format("Rotation Roll: %.4f degrees", Math.toDegrees(detection.pose.roll)));
                     }
                 }
 
