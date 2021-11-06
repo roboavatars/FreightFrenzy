@@ -82,6 +82,8 @@ public class Deposit {
         setPosition(Constants.DEPOSIT_OPEN_POS);
     }
 
+    public void hold(){setPosition(Constants.DEPOSIT_HOLD_POS);}
+
     public void close() {
         setPosition(Constants.DEPOSIT_CLOSE_POS);
     }

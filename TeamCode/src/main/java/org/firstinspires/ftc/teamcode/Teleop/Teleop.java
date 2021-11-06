@@ -71,14 +71,16 @@ public class Teleop extends LinearOpMode {
 
 //        robot.deposit.resetAtHomeHeight();
 
+        robot.deposit.close();
+
         waitForStart();
 
         while (opModeIsActive()) {
 
             // Intake On / Rev / Off
-            if (gamepad1.right_trigger > 0.51) {
+            if (gamepad1.right_trigger > 0.1) {
                 robot.intake.on(gamepad1.right_trigger);
-            } else if (gamepad1.left_trigger > 0.5) {
+            } else if (gamepad1.left_trigger > 0.1) {
                 robot.intake.reverse(gamepad1.left_trigger);
             } else {
                 robot.intake.off();
@@ -87,18 +89,26 @@ public class Teleop extends LinearOpMode {
             //moving slides
             if (gamepad1.a) {
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.HOME);
+                robot.deposit.close();
             }
 
+            /*
             if (gamepad1.b) {
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.MID);
             }
+             */
 
             if (gamepad1.x) {
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.TOP);
+                robot.deposit.hold();
             }
 
             if (gamepad1.y) {
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.CAP);
+            }
+
+            if (gamepad1.b){
+                robot.deposit.open();
             }
             /*
             if (gamepad1.a && !slidesToggle) {  //move slides to home
@@ -152,6 +162,7 @@ public class Teleop extends LinearOpMode {
             }
              */
 
+            /*
             // Toggle Depositor Open / Close
             if (gamepad1.right_bumper && !depositorToggle) {
                 if (depositorOpen) {
@@ -166,6 +177,8 @@ public class Teleop extends LinearOpMode {
                 if (!gamepad1.right_bumper && depositorToggle) {
                 depositorToggle = false;
             }
+
+             */
 
             // Slow Mode
             if (gamepad2.right_trigger > 0) {
