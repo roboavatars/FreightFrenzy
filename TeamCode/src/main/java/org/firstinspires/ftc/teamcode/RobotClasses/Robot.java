@@ -49,6 +49,7 @@ public class Robot {
     private final int sensorUpdatePeriod = 3;
     private final double xyTolerance = 1;
     private final double thetaTolerance = PI/35;
+    private final double slidesRetractMinDist = 6;
 
     // State Variables
     private final boolean isAuto;
@@ -67,13 +68,12 @@ public class Robot {
     public boolean intakeFull = false;
     public Deposit.deposit_height depositHeight = Deposit.deposit_height.HOME;
     public double intakePower = 0;
+    private double[] scoringPos;
 
-    private boolean depositReadyToMove = false;
     private boolean depositReadyToScore = false;
     private boolean depositReadyToReturn = false;
     public Deposit.deposit_height depositMoveApproval = Deposit.deposit_height.UNDEFINED;
     public boolean depositScoreApproval = false;
-    public boolean depositReturnApproval = false;
 
     // Time and Delay Variables
     public double curTime;
@@ -170,10 +170,12 @@ public class Robot {
             depositScoreApproval = false;
             deposit.open();
             depositReadyToReturn = true;
+            scoringPos[0] = x;
+            scoringPos[1] = y;
+
         }
-        else if (depositReadyToReturn && depositReturnApproval && !slidesMoving && !intakeFull){
+        else if (depositReadyToReturn && !slidesMoving && Math.sqrt(Math.pow(x-scoringPos[0],2)+Math.pow(y-scoringPos[1],2))>slidesRetractMinDist){
             depositReadyToReturn = false;
-            depositReturnApproval = false;
             deposit.close();
             deposit.moveSlides(1, Deposit.deposit_height.HOME);
         }
