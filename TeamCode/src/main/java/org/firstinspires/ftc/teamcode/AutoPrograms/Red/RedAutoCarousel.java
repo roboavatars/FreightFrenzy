@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@Autonomous(name = "Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
+@Autonomous(name = "Red Auto Carousel", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoCarousel extends LinearOpMode {
 
     @Override
