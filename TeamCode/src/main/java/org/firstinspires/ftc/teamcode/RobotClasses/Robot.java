@@ -98,7 +98,7 @@ public class Robot {
         drivetrain = new Drivetrain(op, x, y, theta);
         intake = new Intake(op);
         deposit = new Deposit(op);
-        //carousel = new Carousel(op);
+        carousel = new Carousel(op);
         logger = new Logger();
 
         controller = new RamseteController(drivetrain);
@@ -142,7 +142,7 @@ public class Robot {
             lastCycleTime = curTime;
             firstLoop = false;
         }
-
+/*
         if (loopCounter % sensorUpdatePeriod == 0){
             slidesMoving = deposit.slidesMoving();
             intakeFull = intake.intakeFull();
@@ -179,6 +179,8 @@ public class Robot {
             deposit.close();
             deposit.moveSlides(1, Deposit.deposit_height.HOME);
         }
+
+ */
 
         // Update Position
         drivetrain.updatePose();
