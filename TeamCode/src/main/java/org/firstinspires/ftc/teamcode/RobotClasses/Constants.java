@@ -23,5 +23,7 @@ public class Constants {
     public static double TEAM_MARKER_DOWN_POS = 0;
     public static double TEAM_MARKER_UP_POS = 1;
 
+    public static double CAROUSEL_POWER = .8;
+
 
 }

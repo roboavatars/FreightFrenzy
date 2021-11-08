@@ -81,7 +81,7 @@ public class Teleop extends LinearOpMode {
             if (gamepad1.right_trigger > 0.1) {
                 robot.intake.setPower(gamepad1.right_trigger);
             } else if (gamepad1.left_trigger > 0.1) {
-                robot.intake.setPower(gamepad1.left_trigger);
+                robot.intake.setPower(-gamepad1.left_trigger);
             } else {
                 robot.intake.off();
             }
@@ -125,6 +125,12 @@ public class Teleop extends LinearOpMode {
                 markerToggle = false;
             }
 
+            if(gamepad1.left_bumper){
+                robot.carousel.rotate();
+            } else{
+                robot.carousel.stop();
+            }
+
             // Slow Mode
             if (gamepad2.right_trigger > 0) {
                 xyGain = 0.22;
@@ -140,7 +146,7 @@ public class Teleop extends LinearOpMode {
             }
 
             // Drivetrain Controls
-            robot.drivetrain.setControls(-gamepad1.left_stick_y * xyGain, gamepad1.right_stick_x * wGain);
+            robot.drivetrain.setControls(-gamepad1.left_stick_y * xyGain, -gamepad1.right_stick_x * wGain);
 
             // Update Robot
             robot.update();

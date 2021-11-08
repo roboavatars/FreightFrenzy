@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -21,6 +22,7 @@ public class Intake {
         //blockerServo = op.hardwareMap.get(Servo.class, "blocker");
         //intakeSensor = op.hardwareMap.get(DistanceSensor.class, "intakeSensor");
 
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         op.telemetry.addData("Status", "Intake Initialized");
     }
 
