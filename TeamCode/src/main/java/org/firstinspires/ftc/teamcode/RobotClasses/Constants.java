@@ -11,7 +11,7 @@ public class Constants {
     // Deposit
     public static int HOME = 0;
     public static int MID_GOAL = -227;
-    public static int TOP_GOAL = -480;
+    public static int TOP_GOAL = -500;
     public static int CAP = -500;
 
     public static double DEPOSIT_POWER = 1;

@@ -95,23 +95,26 @@ public class Teleop extends LinearOpMode {
 
             //moving slides
             if (gamepad2.a) {
-                robot.deposit.hold();
-                depositServoStatus = 1;
+                robot.deposit.close();
+                depositServoStatus = 0;
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.HOME);
             }
 
             if (gamepad2.b) {
                 robot.deposit.hold();
+                depositServoStatus = 1;
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.MID);
             }
 
             if (gamepad2.x) {
                 robot.deposit.hold();
+                depositServoStatus = 1;
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.TOP);
             }
 
             if (gamepad2.y) {
                 robot.deposit.hold();
+                depositServoStatus = 1;
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.CAP);
             }
 
@@ -174,7 +177,7 @@ public class Teleop extends LinearOpMode {
             }
 
             // Drivetrain Controls
-            robot.drivetrain.setControls(-gamepad1.left_stick_y * xyGain, -gamepad1.right_stick_x * wGain);
+            robot.drivetrain.setControls(-gamepad1.left_stick_y * xyGain, -Math.pow(gamepad1.right_stick_x * wGain, 3));
 
             // Update Robot
             robot.update();

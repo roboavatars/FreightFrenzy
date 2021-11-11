@@ -15,10 +15,10 @@ import static java.lang.Math.PI;
 public class Drivetrain {
 
     // Electronics
-    private DcMotorEx motorFrontRight;
-    private DcMotorEx motorFrontLeft;
-    private DcMotorEx motorBackRight;
-    private DcMotorEx motorBackLeft;
+    public DcMotorEx motorFrontRight;
+    public DcMotorEx motorFrontLeft;
+    public DcMotorEx motorBackRight;
+    public DcMotorEx motorBackLeft;
 
     // OpMode
     private LinearOpMode op;
@@ -43,9 +43,9 @@ public class Drivetrain {
     private final double motorUpdateTolerance = 0.05;
 
     // Odometry Constants
-    public static double ticksToInchR = .02379460495125061744669650421102;
-    public static double ticksToInchL = .02379460495125061744669650421102;
-    public static double ODOMETRY_TRACK_WIDTH = 14.352975945297081051751308041349;
+    public static double ticksToInchL = 0.0381406436;
+    public static double ticksToInchR = 0.0373686259;
+    public static double ODOMETRY_TRACK_WIDTH = 10;
     private final double ODOMETRY_HEADING_THRESHOLD = PI/8;
 
     // PD Controller Constants
@@ -176,7 +176,7 @@ public class Drivetrain {
     // update position from odometry
     public void updatePose() {
         try {
-            podR = ticksToInchR * (motorFrontRight.getCurrentPosition() + motorBackRight.getCurrentPosition()) / 2.0;
+            podR = ticksToInchR * motorFrontRight.getCurrentPosition();
             podL = ticksToInchL * (motorFrontLeft.getCurrentPosition() + motorBackLeft.getCurrentPosition()) / 2.0;
 
             deltaPodR = podR - lastPodR;

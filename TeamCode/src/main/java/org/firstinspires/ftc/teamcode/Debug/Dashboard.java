@@ -32,29 +32,15 @@ public class Dashboard {
         double r = 9 * sqrt(2);
         double x = robotY - 72;
         double y = 72 - robotX;
-        double theta = PI/2 + robotTheta;
+        double theta = robotTheta;
         double[] xcoords = {-6.5*cos(theta)-9*sin(theta)+x,6.5*cos(theta)-9*sin(theta)+x, 6.5*cos(theta)+9*sin(theta)+x, -6.5*cos(theta)+9*sin(theta)+x};
-        double[] ycoords = {-6.5*sin(theta)+9*cos(theta)+x, 6.5*sin(theta)+9*cos(theta)+x, 6.5*sin(theta)-9*cos(theta)+x, -6.5*sin(theta)-9*cos(theta)+x};
+        double[] ycoords = {-6.5*sin(theta)+9*cos(theta)+y, 6.5*sin(theta)+9*cos(theta)+y, 6.5*sin(theta)-9*cos(theta)+y, -6.5*sin(theta)-9*cos(theta)+y};
         packet.fieldOverlay().setFill(robotColor).fillPolygon(xcoords, ycoords);
     }
 
     public static void drawField() {
         // Perimeter
         outlineRect(0, 0, 144, 144, "black");
-
-        // Tower Goals
-        drawRect(24, 144, 48, 150, "black");
-        drawRect(96, 144, 120, 150, "black");
-
-        // Blue Powershots
-        drawRect(67, 144, 68, 147.5, "blue");
-        drawRect(59.5, 144, 60.5, 147.5, "blue");
-        drawRect(52, 144, 53, 147.5, "blue");
-
-        // Red Powershots
-        drawRect(76, 144, 77, 147.5, "red");
-        drawRect(83.5, 144, 84.5, 147.5, "red");
-        drawRect(91, 144, 92, 147.5, "red");
     }
 
     public static void drawPoint(double x, double y, String color) {

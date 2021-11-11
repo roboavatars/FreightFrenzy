@@ -38,6 +38,8 @@ public class RedAutoWarehouse extends LinearOpMode {
         boolean preloadScore = false;
         boolean goToWarehouse = false;
         boolean cycleScore = false;
+        int cycleCounter = 0;
+        boolean cycle = false;
 
         // Segment Times
         double preloadScoreTime = 1.5;
@@ -48,12 +50,10 @@ public class RedAutoWarehouse extends LinearOpMode {
         double parkTime1 = 1.2;
         double parkTime2 = 1.9;
 
+        int numOfCycles = 5; //<<<<<<<<<<<<<
+
         double depositTime = 2;
         double intakeTime = 2;
-        boolean firstCycle = true;
-
-        boolean generateGoToWarehousePath = true;
-        boolean generateCycleScorePath = true;
 
         // Paths
         Path preloadScorePath = null;
@@ -62,117 +62,93 @@ public class RedAutoWarehouse extends LinearOpMode {
         Path parkPath = null;
 
         double[][] preloadScoreCoord = {{117, 60}, {120, 60}, {130, 60}};
-        double[] preloadScoreCur = new double[1];
+
 
         waitForStart();
 
         // Put Vision Stuff Here
         int barcodeCase = 0; // 0 = left, 1 = mid, 2 = right
 
-        // Paths
+        // waypoint arrays
         Waypoint[] preloadScoreWaypoints;
+        Waypoint[] goToWarehouseWaypoints;
+        Waypoint[] cycleScoreWaypoints;
 
-        if (barcodeCase == 0) {
-            preloadScoreWaypoints = new Waypoint[]{
-                    new Waypoint(135, 84, 0, -10, .1, 2, 0.0),
-            };
-            preloadScoreCur[0] = preloadScoreCoord[0][0];
-            preloadScoreCur[1] = preloadScoreCoord[0][1];
 
-        } else if (barcodeCase == 1) {
-
-            preloadScoreWaypoints = new Waypoint[]{
-                    new Waypoint(135, 84, 0, -10, .1, 10, 0.0),
-                    new Waypoint(preloadScoreCoord[1][0], preloadScoreCoord[1][1], PI, 20, .1, 3, preloadScoreTime)
-            };
-            preloadScoreCur[0] = preloadScoreCoord[1][0];
-            preloadScoreCur[1] = preloadScoreCoord[1][1];
-        } else {
-            preloadScoreWaypoints = new Waypoint[]{
-                    new Waypoint(135, 84, 0, -10, .1, 10, 0.0),
-                    new Waypoint(preloadScoreCoord[2][0], preloadScoreCoord[2][1], PI, 20, .1, 3, preloadScoreTime)
-            };
-            preloadScoreCur[0] = preloadScoreCoord[2][0];
-            preloadScoreCur[1] = preloadScoreCoord[2][1];
-
-        }
+        preloadScoreWaypoints = new Waypoint[]{
+                new Waypoint(135, 84, 0, -10, .1, 2, 0.0),
+                new Waypoint(preloadScoreCoord[barcodeCase][0], preloadScoreCoord[barcodeCase][1], PI, 20, .1, 3, preloadScoreTime)
+        };
         preloadScorePath = new Path(new ArrayList<>(Arrays.asList(preloadScoreWaypoints)));
-
 
 
         ElapsedTime time = new ElapsedTime();
         time.reset();
-        while (opModeIsActive()){
+        while (opModeIsActive()) {
+            if (!preloadScore) {
                 robot.setTargetPoint(preloadScorePath.getRobotPose(Math.min(preloadScoreTime, time.seconds())));
-                if (time.seconds() > preloadScoreTime){
-                    break;
+                if (time.seconds() > preloadScoreTime) {
+                    goToWarehouseWaypoints = new Waypoint[]{
+                            new Waypoint(robot.x, robot.y, robot.theta, 40, 40, .1, 0),
+                            new Waypoint(117 + 20, 60 + 40, PI / 2, 40, .1, 0, goToWarehouseTime1),
+                            new Waypoint(137, 120.19, PI / 2, 20, 0, 0, goToWarehouseTime2)
+                    };
+                    goToWarehousePath = new Path(new ArrayList<>(Arrays.asList(goToWarehouseWaypoints)));
+
+                    time.reset();
+                    preloadScore = true;
                 }
-            }
-        time.reset();
-        while (goToWarehouse && cycleScore && time.seconds()<cycleScoreTime2+goToWarehouseTime2+parkTime2){
-            if(!goToWarehouse) {
-                if (generateGoToWarehousePath) {
-                    generateGoToWarehousePath = false;
-                    Waypoint[] goToWarehouseWaypoints;
-                    if (firstCycle) {
-                        firstCycle = false;
-                        goToWarehouseWaypoints = new Waypoint[]{
-                                new Waypoint(robot.x, robot.y, robot.theta, 40, 40, .1, 0),
-                                new Waypoint(preloadScoreCur[0] + 20, preloadScoreCur[1] + 40, PI / 2, 40, .1, 0, goToWarehouseTime1),
-                                new Waypoint(137, 120.19, PI / 2, 20, 0, 0, goToWarehouseTime2)
+            } else if (!cycle) {
+                if (!goToWarehouse) {
+                    robot.setTargetPoint(goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime2, time.seconds())));
+                    if (time.seconds() > goToWarehouseTime2) {
+                        cycleScoreWaypoints = new Waypoint[]{
+                                new Waypoint(robot.x, robot.y, robot.theta, -20, .1, .1, 0),
+                                new Waypoint(137, 120.19 - 20, -PI / 2, 20, .1, .5, cycleScoreTime1),
+                                new Waypoint(117, 60, -PI, 40, 20, .1, cycleScoreTime2)
                         };
+                        cycleScorePath = new Path(new ArrayList<>(Arrays.asList(cycleScoreWaypoints)));
+
+                        time.reset();
+                        goToWarehouse = true;
+                    }
+                } else if (!cycleScore) {
+                    robot.setTargetPoint(cycleScorePath.getRobotPose(Math.min(cycleScoreTime2, time.seconds())));
+                    if (time.seconds() > cycleScoreTime2) {
+                        time.reset();
+                        cycleScore = true;
+                    }
+
+                } else {
+                    cycleCounter += 1;
+                    if (cycleCounter >= numOfCycles) {
+                        Waypoint[] parkWaypoints = new Waypoint[]{
+                                new Waypoint(robot.x, robot.y, robot.theta, 40, 40, .1, 0),
+                                new Waypoint(117 + 20, 60 + 30, -PI / 2, -30, .1, .1, parkTime1),
+                                new Waypoint(135, 110, PI / 2, 10, 5, 0, parkTime2)
+                        };
+                        parkPath = new Path(new ArrayList<>(Arrays.asList(parkWaypoints)));
+
+                        time.reset();
+                        cycle = true;
                     } else {
                         goToWarehouseWaypoints = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, robot.theta, 40, 40, .1, 0),
-                                new Waypoint(117 + 20, 110 + 40, PI / 2, 40, .1, 0, goToWarehouseTime1),
+                                new Waypoint(117 + 20, 60 + 40, PI / 2, 40, .1, 0, goToWarehouseTime1),
                                 new Waypoint(137, 120.19, PI / 2, 20, 0, 0, goToWarehouseTime2)
                         };
-                    }
-                    goToWarehousePath = new Path(new ArrayList<>(Arrays.asList(goToWarehouseWaypoints)));
+                        goToWarehousePath = new Path(new ArrayList<>(Arrays.asList(goToWarehouseWaypoints)));
 
-                }
-                robot.setTargetPoint(goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime2, time.seconds())));
-                if (time.seconds() > goToWarehouseTime2) {
-                    goToWarehouse = true;
-                    time.reset();
-                    break;
-                }
-            }
-            else if (!cycleScore){
-                if (generateCycleScorePath) {
-                    Waypoint[] cycleScoreWaypoints = new Waypoint[]{
-                            new Waypoint(robot.x, robot.y, robot.theta, -20, .1, .1, 0),
-                            new Waypoint(137, 120.19 - 20, -PI / 2, 20, .1, .5, cycleScoreTime1),
-                            new Waypoint(117, 60, -PI, 40, 20, .1, cycleScoreTime2)
-                    };
-                    cycleScorePath = new Path(new ArrayList<>(Arrays.asList(cycleScoreWaypoints)));
-                }
-                robot.setTargetPoint(cycleScorePath.getRobotPose(Math.min(cycleScoreTime2,time.seconds())));
-                if(time.seconds()>cycleScoreTime2){
-                    cycleScore = true;
-                    time.reset();
-                    break;
+                        goToWarehouse = false;
+                        cycleScore = false;
+                        time.reset();
+                    }
                 }
             } else {
-                goToWarehouse = false;
-                cycleScore = false;
-
-                generateGoToWarehousePath = true;
-                generateCycleScorePath = true;
-            }
-        }
-
-        Waypoint[] parkWaypoints = new Waypoint[]{
-                new Waypoint(robot.x, robot.y, robot.theta, 40, 40, .1, 0),
-                new Waypoint(117 + 20, 60 + 30, -PI / 2, -30, .1, .1, parkTime1),
-                new Waypoint(135, 110, PI / 2, 10, 5, 0, parkTime2)
-        };
-        parkPath = new Path(new ArrayList<>(Arrays.asList(parkWaypoints)));
-
-        while(opModeIsActive()){
-            robot.setTargetPoint(parkPath.getRobotPose(Math.min(parkTime2,time.seconds())));
-            if (time.seconds()>parkTime2){
-                break;
+                robot.setTargetPoint(parkPath.getRobotPose(Math.min(parkTime2, time.seconds())));
+                if (time.seconds()>parkTime2){
+                    break;
+                }
             }
         }
     }
