@@ -36,6 +36,8 @@ public class Teleop extends LinearOpMode {
     // Toggles
     private boolean slidesToggle = false, slidesDeposit = false, slidesCap = false;
     private boolean markerToggle = false, markerArmDown = false;
+    private boolean servoToggle = false;
+    private int depositServoStatus = 0;
 
     double slidesPower = 1;
 
@@ -46,12 +48,17 @@ public class Teleop extends LinearOpMode {
     X - Reset Odo
     Left Trigger - Intake Reverse
     Right Trigger - Intake On
-    A - Slides To Home Pos
-    B - Slides To Deposit Pos
-    Y - Slides To Capping Pos
+
 
     Gamepad 2
-    Left Trigger - Slow Mode
+    Right Trigger - Slow Mode
+    A - Slides To Home Pos
+    B - Slides to Mid Pos
+    X - Slides To Top Pos
+    Y - Slides To Capping Pos
+    Right Bumper - Open Depositor Servo
+    Left Bumper - Carousel Motor
+    dPad Up - Team Marker Servo
      */
 
     @Override
@@ -87,31 +94,52 @@ public class Teleop extends LinearOpMode {
             }
 
             //moving slides
-            if (gamepad1.a) {
+            if (gamepad2.a) {
+                robot.deposit.hold();
+                depositServoStatus = 1;
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.HOME);
-                robot.deposit.close();
             }
 
-            /*
-            if (gamepad1.b) {
+            if (gamepad2.b) {
+                robot.deposit.hold();
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.MID);
             }
-             */
 
-            if (gamepad1.x) {
-                robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.TOP);
+            if (gamepad2.x) {
                 robot.deposit.hold();
+                robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.TOP);
             }
 
-            if (gamepad1.y) {
+            if (gamepad2.y) {
+                robot.deposit.hold();
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.CAP);
             }
 
-            if (gamepad1.b){
-                robot.deposit.open();
+//            if (gamepad2.left_trigger > 0.1) {
+//                robot.deposit.moveSlides(gamepad2.left_trigger);
+//            } else {
+//                robot.deposit.moveSlides(0);
+//            }
+
+            if (gamepad2.right_bumper && !servoToggle){
+                if (depositServoStatus == 0) {
+                    robot.deposit.hold();
+                    depositServoStatus = 1;
+                } else if (depositServoStatus == 1) {
+                    robot.deposit.open();
+                    depositServoStatus = 2;
+                } else if (depositServoStatus == 2) {
+                    robot.deposit.close();
+                    depositServoStatus = 0;
+                }
+
+                servoToggle = true;
+            } else
+            if (!gamepad2.right_bumper && servoToggle) {
+                servoToggle = false;
             }
 
-            if (gamepad1.right_bumper && !markerToggle) {
+            if (gamepad2.dpad_up && !markerToggle) {
                 if (markerArmDown) {
                     robot.deposit.markerArmUp();
                     markerArmDown = false;
@@ -121,11 +149,11 @@ public class Teleop extends LinearOpMode {
                 }
                 markerToggle = true;
             } else
-            if (!gamepad1.right_bumper && markerToggle) {
+            if (!gamepad2.dpad_up && markerToggle) {
                 markerToggle = false;
             }
 
-            if(gamepad1.left_bumper){
+            if(gamepad2.left_bumper){
                 robot.carousel.rotate();
             } else{
                 robot.carousel.stop();
@@ -155,6 +183,7 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("X", robot.x);
             telemetry.addData("Y", robot.y);
             telemetry.addData("Theta", robot.theta);
+            telemetry.addData("Slides Height", robot.deposit.getSlidesHeight());
             //telemetry.addData("Intake Full", robot.intake.intakeFull());
             telemetry.addData("# Cycles", robot.cycles);
             telemetry.addData("Average Cycle Time", (robot.cycleTotal / robot.cycles) + "s");

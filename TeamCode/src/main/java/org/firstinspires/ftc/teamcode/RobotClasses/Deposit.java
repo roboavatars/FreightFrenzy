@@ -29,7 +29,9 @@ public class Deposit {
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         teamMarkerServo = op.hardwareMap.get(Servo.class, "teamMarkerArm");
 
-        depositServo.setPosition(0);
+        depositServo.setPosition(Constants.DEPOSIT_HOLD_POS);
+
+        teamMarkerServo.setPosition(Constants.TEAM_MARKER_UP_POS);
 
         depositor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         depositor.setTargetPosition(0);
@@ -56,6 +58,14 @@ public class Deposit {
         } else {
             depositor.setTargetPosition(0);
         }
+    }
+
+    public void moveSlides (float power) {
+        depositor.setPower(power);
+    }
+
+    public double getSlidesHeight() {
+        return depositor.getCurrentPosition();
     }
 
     public deposit_height getTargHeight(){
@@ -86,7 +96,6 @@ public class Deposit {
         depositSetPosition(Constants.DEPOSIT_CLOSE_POS);
     }
 
-
     //team marker
 
     private void markerSetPosition(double pos) {
@@ -98,7 +107,5 @@ public class Deposit {
 
     public void markerArmDown(){markerSetPosition(Constants.TEAM_MARKER_DOWN_POS);};
     public void markerArmUp(){markerSetPosition(Constants.TEAM_MARKER_UP_POS);};
-
-
 
 }

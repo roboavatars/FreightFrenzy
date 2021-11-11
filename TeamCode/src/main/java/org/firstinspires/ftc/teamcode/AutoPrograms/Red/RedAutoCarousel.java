@@ -1,19 +1,26 @@
 package org.firstinspires.ftc.teamcode.AutoPrograms.Red;
 
-import static java.lang.Math.PI;
-
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.OpenCV.Vision;
 import org.firstinspires.ftc.teamcode.Pathing.Path;
+import org.firstinspires.ftc.teamcode.Pathing.Pose;
+import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
+import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static java.lang.Math.PI;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.*;
+
+@Config
 @Autonomous(name = "Red Auto Carousel", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoCarousel extends LinearOpMode {
 
@@ -39,8 +46,8 @@ public class RedAutoCarousel extends LinearOpMode {
         // Segments
         boolean deliverPreloadedFreight = false;
         boolean spinCarousel = false;
-        boolean intakeDuck = false;
         boolean deliverDuck = false;
+        boolean goToWarehouse = false;
         boolean cycle = false;
         boolean park = false;
 
@@ -48,16 +55,16 @@ public class RedAutoCarousel extends LinearOpMode {
         double detectBarcodeTime = 0.75;
         double deliverPreloadedFreightTime = 2.0;
         double spinCarouselTime = 1.5;
-        double intakeDuckTime = 1.0;
         double deliverDuckTime = 1.5;
+        double goToWarehouseTime = 1.5;
         double cycleTime = 4.0;
         double parkTime = 1.5;
 
         // Paths
         Path deliverPreloadedFreightPath = null;
         Path spinCarouselPath = null;
-        Path intakeDuckPath = null;
         Path deliverDuckPath = null;
+        Path goToWarehousePath = null;
         Path cyclePath = null;
         Path parkPath = null;
 
@@ -72,7 +79,7 @@ public class RedAutoCarousel extends LinearOpMode {
             deliverPreloadedFreightTime = 2.0;
             Waypoint[] deliverPreloadedFreightWaypoints = new Waypoint[] {
                     new Waypoint(135, 36, PI, 30, 30, 0, 0),
-                    new Waypoint(104, 51, 3*PI/4, 5, 30, 0, deliverPreloadedFreightTime), // fix theta
+                    new Waypoint(115, 51, 7*PI/4, 10, -10, 0, deliverPreloadedFreightTime),
             };
             deliverPreloadedFreightPath = new Path(new ArrayList<>(Arrays.asList(deliverPreloadedFreightWaypoints)));
 
@@ -80,14 +87,14 @@ public class RedAutoCarousel extends LinearOpMode {
             deliverPreloadedFreightTime = 2.0;
             Waypoint[] deliverPreloadedFreightWaypoints = new Waypoint[] {
                     new Waypoint(135, 36, PI, 30, 30, 0, 0),
-                    new Waypoint(108, 50, 3*PI/4, 5, 30, 0, deliverPreloadedFreightTime), // fix theta
+                    new Waypoint(116, 54, 19*PI/10, 10, -10, 0, deliverPreloadedFreightTime),
             };
             deliverPreloadedFreightPath = new Path(new ArrayList<>(Arrays.asList(deliverPreloadedFreightWaypoints)));
         } else {
             deliverPreloadedFreightTime = 2.25;
             Waypoint[] deliverPreloadedFreightWaypoints = new Waypoint[] {
                     new Waypoint(135, 36, PI, 30, 30, 0, 0),
-                    new Waypoint(112, 53, 2*PI/3, 5, 30, 0, deliverPreloadedFreightTime), // fix theta
+                    new Waypoint(120, 57, 197*PI/100, 10, -10, 0, deliverPreloadedFreightTime),
             };
             deliverPreloadedFreightPath = new Path(new ArrayList<>(Arrays.asList(deliverPreloadedFreightWaypoints)));
         }
@@ -95,5 +102,166 @@ public class RedAutoCarousel extends LinearOpMode {
         detector.setPipeline(Vision.Pipeline.AprilTag);
 
         ElapsedTime time = new ElapsedTime();
+
+        while (opModeIsActive()) {
+            // Deliver Preloaded Freight
+            if(!deliverPreloadedFreight) {
+                robot.setTargetPoint(new Target(deliverPreloadedFreightPath.getRobotPose(Math.min(time.seconds(), deliverPreloadedFreightTime))));
+
+                if (barcodeCase == 0) {
+                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                    robot.deposit.open();
+                } else if (barcodeCase == 1) {
+                    robot.deposit.moveSlides(1, Deposit.deposit_height.MID);
+                    robot.deposit.open();
+                } else {
+                    robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
+                    robot.deposit.open();
+                }
+
+                robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                robot.deposit.close();
+
+                Waypoint[] spinCarouselWaypoints = new Waypoint[] {
+                        new Waypoint(robot.x, robot.y, robot.theta, 40, 30, 0, 0),
+                        new Waypoint(130, 15, 7*PI/4, -20, -10, 0, spinCarouselTime),
+                };
+                spinCarouselPath = new Path(new ArrayList<>(Arrays.asList(spinCarouselWaypoints)));
+
+                deliverPreloadedFreight = true;
+                time.reset();
+            }
+
+            // Go to Carousel
+            else if (!spinCarousel) {
+                robot.setTargetPoint(new Target(spinCarouselPath.getRobotPose(Math.min(time.seconds(), spinCarouselTime))));
+
+                // spin
+                robot.carousel.rotate();
+                time.reset();
+
+                if (time.milliseconds() > 1000) {
+                    robot.carousel.stop();
+                }
+
+                // Intake rings
+                robot.intake.on();
+
+                Waypoint[] deliverDuckWaypoints = new Waypoint[] {
+                        new Waypoint(130, 15, 3*PI/4, -20, -10, 0, 0),
+                        new Waypoint(120, 60, 0, -20, -10, 0, deliverDuckTime),
+                };
+                deliverDuckPath = new Path(new ArrayList<>(Arrays.asList(deliverDuckWaypoints)));
+
+                spinCarousel = true;
+                time.reset();
+            }
+
+            // Deliver Duck
+            else if (!deliverDuck) {
+                robot.setTargetPoint(new Target(deliverDuckPath.getRobotPose(Math.min(time.seconds(), deliverDuckTime))));
+
+
+                robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
+                robot.deposit.open();
+
+                time.reset();
+
+                if (time.milliseconds() > 300) {
+                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                    robot.deposit.close();
+                }
+
+                Waypoint[] goToWarehouseWaypoints = new Waypoint[] {
+                        new Waypoint(120, 60, 0, -20, -10, 0, 0),
+                        new Waypoint(135, 78, PI/2, -20, -10, 0, 1),
+                        new Waypoint(135, 110, PI/2,-20,-10,0,goToWarehouseTime),
+                };
+                goToWarehousePath = new Path(new ArrayList<>(Arrays.asList(goToWarehouseWaypoints)));
+                deliverDuck = true;
+                time.reset();
+            }
+
+            else if (!goToWarehouse) {
+                robot.setTargetPoint(new Target(goToWarehousePath.getRobotPose(Math.min(time.seconds(), goToWarehouseTime))));
+
+                robot.intake.on();
+
+                Waypoint[] cycleWaypoints = new Waypoint[] {
+                        new Waypoint(135, 110, PI/2,-20,-10,0,0),
+                        new Waypoint(135, 78, PI/2,-20,-10,0,0.5),
+                        new Waypoint(116, 73, PI/5,-20,-10,0,1.5),
+
+                };
+                cyclePath = new Path(new ArrayList<>(Arrays.asList(cycleWaypoints)));
+
+                goToWarehouse = true;
+                time.reset();
+            }
+
+            // cycle freight
+            else if (!cycle) {
+                if ((System.currentTimeMillis() - robot.startTime) > 3000) {
+
+                    Pose pose = cyclePath.getRobotPose(Math.min(time.seconds(), cycleTime));
+                    robot.setTargetPoint(new Target(pose).theta(pose.theta+PI/2));
+
+
+
+                    robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
+                    robot.deposit.open();
+                    time.reset();
+
+                    if (time.milliseconds() > 300) {
+                        robot.deposit.close();
+                    }
+
+                    robot.setTargetPoint(new Target(goToWarehousePath.getRobotPose(Math.min(time.seconds(), goToWarehouseTime))));
+                } else {
+                    cycle = true;
+                    time.reset();
+                }
+            }
+
+            // park
+            else if (!park) {
+                if ((System.currentTimeMillis() - robot.startTime) <= 3000) {
+                    double curTime = Math.min(time.seconds(), parkTime);
+                    Pose curPose = parkPath.getRobotPose(curTime);
+
+                    robot.setTargetPoint(114,111,PI/2);
+
+                    if (time.seconds() > parkTime) {
+                        Robot.log("Auto finished in " + ((System.currentTimeMillis() - robot.startTime) / 1000) + " seconds");
+
+                        park = true;
+                    }
+                } else {
+                    Robot.log("Stopping Robot");
+                    robot.drivetrain.stop();
+                }
+
+                if ((System.currentTimeMillis() - robot.startTime) >= 33000) {
+                    Robot.log("Breaking Loop");
+                    break;
+                }
+
+            }
+
+            else {
+                robot.drivetrain.stop();
+                if (robot.notMoving() || (System.currentTimeMillis() - robot.startTime) >= 30000) {
+                    break;
+                }
+            }
+
+            addPacket("BarcodeCase", barcodeCase);
+            robot.update();
+        }
+
+        robot.stop();
+        try {
+            detector.stop();
+        } catch (Exception ignore) {}
     }
 }
