@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.AutoPrograms.Red;
+package org.firstinspires.ftc.teamcode.Autonomous.Red;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;

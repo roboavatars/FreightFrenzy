@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.AutoPrograms.Red;
+package org.firstinspires.ftc.teamcode.Autonomous.Red;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.scalb;
@@ -84,6 +84,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         ElapsedTime time = new ElapsedTime();
         time.reset();
+
         while (opModeIsActive()) {
             if (!preloadScore) {
                 robot.setTargetPoint(preloadScorePath.getRobotPose(Math.min(preloadScoreTime, time.seconds())));

@@ -74,8 +74,6 @@ public class Teleop extends LinearOpMode {
             robot.logger.startLogging(false, isRed);
         }
 
-
-
 //        robot.deposit.resetAtHomeHeight();
 
         robot.deposit.close();
@@ -124,7 +122,7 @@ public class Teleop extends LinearOpMode {
 //                robot.deposit.moveSlides(0);
 //            }
 
-            if (gamepad2.right_bumper && !servoToggle){
+            if (gamepad2.right_bumper && !servoToggle) {
                 if (depositServoStatus == 0) {
                     robot.deposit.hold();
                     depositServoStatus = 1;
@@ -137,8 +135,7 @@ public class Teleop extends LinearOpMode {
                 }
 
                 servoToggle = true;
-            } else
-            if (!gamepad2.right_bumper && servoToggle) {
+            } else if (!gamepad2.right_bumper && servoToggle) {
                 servoToggle = false;
             }
 
@@ -151,14 +148,13 @@ public class Teleop extends LinearOpMode {
                     markerArmDown = true;
                 }
                 markerToggle = true;
-            } else
-            if (!gamepad2.dpad_up && markerToggle) {
+            } else if (!gamepad2.dpad_up && markerToggle) {
                 markerToggle = false;
             }
 
-            if(gamepad2.left_bumper){
+            if (gamepad2.left_bumper) {
                 robot.carousel.rotate();
-            } else{
+            } else {
                 robot.carousel.stop();
             }
 

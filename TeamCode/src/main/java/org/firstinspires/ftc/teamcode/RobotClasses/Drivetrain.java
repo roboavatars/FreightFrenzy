@@ -43,9 +43,9 @@ public class Drivetrain {
     private final double motorUpdateTolerance = 0.05;
 
     // Odometry Constants
-    public static double ticksToInchL = 0.0381406436;
-    public static double ticksToInchR = 0.0373686259;
-    public static double ODOMETRY_TRACK_WIDTH = 10;
+    public static double ticksToInchL = 0.0378367670;
+    public static double ticksToInchR = 0.0375245580;
+    public static double ODOMETRY_TRACK_WIDTH = 10.420;
     private final double ODOMETRY_HEADING_THRESHOLD = PI/8;
 
     // PD Controller Constants
@@ -176,7 +176,7 @@ public class Drivetrain {
     // update position from odometry
     public void updatePose() {
         try {
-            podR = ticksToInchR * motorFrontRight.getCurrentPosition();
+            podR = ticksToInchR * (motorFrontRight.getCurrentPosition() + motorBackRight.getCurrentPosition()) / 2.0;
             podL = ticksToInchL * (motorFrontLeft.getCurrentPosition() + motorBackLeft.getCurrentPosition()) / 2.0;
 
             deltaPodR = podR - lastPodR;

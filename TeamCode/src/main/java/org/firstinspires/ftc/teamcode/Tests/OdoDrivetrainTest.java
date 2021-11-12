@@ -1,15 +1,14 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
+
+import static java.lang.Math.PI;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawField;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
-import static java.lang.Math.PI;
-
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 
 @TeleOp(name = "0 Odometry / Drivetrain Test")
 public class OdoDrivetrainTest extends LinearOpMode {
@@ -17,15 +16,15 @@ public class OdoDrivetrainTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Drivetrain dt = new Drivetrain(this, 90, 9, PI/2);
+        Drivetrain dt = new Drivetrain(this, 54.5, 15, PI/2);
 
         waitForStart();
 
         while(opModeIsActive()) {
-            dt.setControls(-gamepad1.left_stick_y, gamepad1.right_stick_x);
+            dt.setControls(-gamepad1.left_stick_y, -0.5 * gamepad1.right_stick_x);
 
             if (gamepad1.x) {
-                dt.resetOdo(90, 9, PI/2);
+                dt.resetOdo(54.5, 15, PI/2);
             }
 
             if (gamepad1.dpad_right || gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left) {
@@ -48,8 +47,8 @@ public class OdoDrivetrainTest extends LinearOpMode {
             addPacket("Theta", theta);
             addPacket("Update Frequency (Hz)", 1 / timeDiff);
             addPacket("Positions", dt.motorFrontLeft.getCurrentPosition() + " " + dt.motorFrontRight.getCurrentPosition() + " " + dt.motorBackLeft.getCurrentPosition() + " " + dt.motorBackRight.getCurrentPosition());
-            addPacket("podR", dt.podR);
             addPacket("podL", dt.podL);
+            addPacket("podR", dt.podR);
             addPacket("R zeros", dt.zeroR);
             addPacket("L zeros", dt.zeroL);
             sendPacket();

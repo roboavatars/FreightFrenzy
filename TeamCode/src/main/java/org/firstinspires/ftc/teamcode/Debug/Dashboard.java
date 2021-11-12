@@ -3,10 +3,8 @@ package org.firstinspires.ftc.teamcode.Debug;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 
-import org.firstinspires.ftc.teamcode.OpenCV.Ring;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
@@ -33,8 +31,8 @@ public class Dashboard {
         double x = robotY - 72;
         double y = 72 - robotX;
         double theta = robotTheta;
-        double[] xcoords = {-6.5*cos(theta)-9*sin(theta)+x,6.5*cos(theta)-9*sin(theta)+x, 6.5*cos(theta)+9*sin(theta)+x, -6.5*cos(theta)+9*sin(theta)+x};
-        double[] ycoords = {-6.5*sin(theta)+9*cos(theta)+y, 6.5*sin(theta)+9*cos(theta)+y, 6.5*sin(theta)-9*cos(theta)+y, -6.5*sin(theta)-9*cos(theta)+y};
+        double[] xcoords = {-6.5*cos(theta) - 9*sin(theta) + x, 6.5*cos(theta) - 9*sin(theta) + x, 6.5*cos(theta) + 9*sin(theta) + x, -6.5*cos(theta) + 9*sin(theta) + x};
+        double[] ycoords = {-6.5*sin(theta) + 9*cos(theta) + y, 6.5*sin(theta) + 9*cos(theta) + y, 6.5*sin(theta) - 9*cos(theta) + y, -6.5*sin(theta) - 9*cos(theta) + y};
         packet.fieldOverlay().setFill(robotColor).fillPolygon(xcoords, ycoords);
     }
 
