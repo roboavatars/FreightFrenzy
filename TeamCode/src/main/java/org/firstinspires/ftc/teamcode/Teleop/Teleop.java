@@ -80,10 +80,6 @@ public class Teleop extends LinearOpMode {
             robot.logger.startLogging(false, isRed);
         }
 
-
-
-//        robot.deposit.resetAtHomeHeight();
-
         robot.deposit.close();
 
         waitForStart();
@@ -102,7 +98,7 @@ public class Teleop extends LinearOpMode {
                 robot.intake.off();
             }
 
-            //moving slides
+            // Moving Slides
             if (gamepad2.a) {
                 robot.deposit.close();
                 depositServoStatus = 0;
@@ -124,7 +120,7 @@ public class Teleop extends LinearOpMode {
                 cycles.add(cycleTimer.seconds());
                 cycleTimer.reset();
 
-            } else if (!gamepad2.x && cycleToggle){
+            } else if (!gamepad2.x && cycleToggle) {
                 cycleToggle = false;
             }
 
@@ -140,7 +136,7 @@ public class Teleop extends LinearOpMode {
 //                robot.deposit.moveSlides(0);
 //            }
 
-            if (gamepad1.right_bumper && !servoToggle){
+            if (gamepad1.right_bumper && !servoToggle) {
                 if (depositServoStatus == 0) {
                     robot.deposit.hold();
                     depositServoStatus = 1;
@@ -153,8 +149,7 @@ public class Teleop extends LinearOpMode {
                 }
 
                 servoToggle = true;
-            } else
-            if (!gamepad1.right_bumper && servoToggle) {
+            } else if (!gamepad1.right_bumper && servoToggle) {
                 servoToggle = false;
             }
 
@@ -167,12 +162,11 @@ public class Teleop extends LinearOpMode {
                     markerArmDown = true;
                 }
                 markerToggle = true;
-            } else
-            if (!gamepad2.dpad_up && markerToggle) {
+            } else if (!gamepad2.dpad_up && markerToggle) {
                 markerToggle = false;
             }
 
-            if(gamepad2.left_bumper){
+            if (gamepad2.left_bumper) {
                 robot.carousel.rotate();
             } else{
                 robot.carousel.stop();
@@ -199,12 +193,9 @@ public class Teleop extends LinearOpMode {
             robot.update();
 
             // Telemetry
-
-                int i = 0;
-                for (double cycle : cycles) {
-                    i++;
-                    telemetry.addData("cycle " + i, cycle);
-                }
+            for (int i = 0; i < cycles.size(); i++) {
+                telemetry.addData("cycle " + i, cycles.get(i));
+            }
 
             telemetry.addData("X", robot.x);
             telemetry.addData("Y", robot.y);

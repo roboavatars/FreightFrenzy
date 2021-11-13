@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.Autonomous.Red;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -14,13 +12,9 @@ import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import static java.lang.Math.PI;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.*;
 
-@Config
 @Autonomous(name = "Red Auto Carousel", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoCarousel extends LinearOpMode {
 
@@ -40,8 +34,8 @@ public class RedAutoCarousel extends LinearOpMode {
         Robot robot = new Robot(this, 135, 36, PI, true, true);
         robot.logger.startLogging(true, true);
 
-        Vision detector = new Vision(this, Vision.Pipeline.AprilTag);
-        detector.start();
+//        Vision detector = new Vision(this, Vision.Pipeline.AprilTag);
+//        detector.start();
 
         // Segments
         boolean deliverPreloadedFreight = false;
@@ -52,7 +46,6 @@ public class RedAutoCarousel extends LinearOpMode {
         boolean park = false;
 
         // Segment Times
-        double detectBarcodeTime = 0.75;
         double deliverPreloadedFreightTime = 2.0;
         double spinCarouselTime = 1.5;
         double deliverDuckTime = 1.5;
@@ -70,36 +63,34 @@ public class RedAutoCarousel extends LinearOpMode {
 
         waitForStart();
 
-        // Put Vision Stuff Here
+//        int barcodeCase = detector.getAprilTagPipe().getResult();
         int barcodeCase = 0; // 0 = left, 1 = mid, 2 = right
+        Robot.log("Barcode Case: " + barcodeCase);
 
         // Paths
-
         if (barcodeCase == 0) {
             deliverPreloadedFreightTime = 2.0;
             Waypoint[] deliverPreloadedFreightWaypoints = new Waypoint[] {
                     new Waypoint(135, 36, PI, 30, 30, 0, 0),
                     new Waypoint(115, 51, 7*PI/4, 10, -10, 0, deliverPreloadedFreightTime),
             };
-            deliverPreloadedFreightPath = new Path(new ArrayList<>(Arrays.asList(deliverPreloadedFreightWaypoints)));
+            deliverPreloadedFreightPath = new Path(deliverPreloadedFreightWaypoints);
 
         } else if (barcodeCase == 1) {
             deliverPreloadedFreightTime = 2.0;
             Waypoint[] deliverPreloadedFreightWaypoints = new Waypoint[] {
                     new Waypoint(135, 36, PI, 30, 30, 0, 0),
-                    new Waypoint(116, 54, 19*PI/10, 10, -10, 0, deliverPreloadedFreightTime),
+                    new Waypoint(116, 54, 0, 10, -10, 0, deliverPreloadedFreightTime),
             };
-            deliverPreloadedFreightPath = new Path(new ArrayList<>(Arrays.asList(deliverPreloadedFreightWaypoints)));
+            deliverPreloadedFreightPath = new Path(deliverPreloadedFreightWaypoints);
         } else {
             deliverPreloadedFreightTime = 2.25;
             Waypoint[] deliverPreloadedFreightWaypoints = new Waypoint[] {
                     new Waypoint(135, 36, PI, 30, 30, 0, 0),
-                    new Waypoint(120, 57, 197*PI/100, 10, -10, 0, deliverPreloadedFreightTime),
+                    new Waypoint(120, 57, 0, 10, -10, 0, deliverPreloadedFreightTime),
             };
-            deliverPreloadedFreightPath = new Path(new ArrayList<>(Arrays.asList(deliverPreloadedFreightWaypoints)));
+            deliverPreloadedFreightPath = new Path(deliverPreloadedFreightWaypoints);
         }
-
-        detector.setPipeline(Vision.Pipeline.AprilTag);
 
         ElapsedTime time = new ElapsedTime();
 
@@ -126,7 +117,7 @@ public class RedAutoCarousel extends LinearOpMode {
                         new Waypoint(robot.x, robot.y, robot.theta, 40, 30, 0, 0),
                         new Waypoint(130, 15, 7*PI/4, -20, -10, 0, spinCarouselTime),
                 };
-                spinCarouselPath = new Path(new ArrayList<>(Arrays.asList(spinCarouselWaypoints)));
+                spinCarouselPath = new Path(spinCarouselWaypoints);
 
                 deliverPreloadedFreight = true;
                 time.reset();
@@ -151,7 +142,7 @@ public class RedAutoCarousel extends LinearOpMode {
                         new Waypoint(130, 15, 3*PI/4, -20, -10, 0, 0),
                         new Waypoint(120, 60, 0, -20, -10, 0, deliverDuckTime),
                 };
-                deliverDuckPath = new Path(new ArrayList<>(Arrays.asList(deliverDuckWaypoints)));
+                deliverDuckPath = new Path(deliverDuckWaypoints);
 
                 spinCarousel = true;
                 time.reset();
@@ -160,7 +151,6 @@ public class RedAutoCarousel extends LinearOpMode {
             // Deliver Duck
             else if (!deliverDuck) {
                 robot.setTargetPoint(new Target(deliverDuckPath.getRobotPose(Math.min(time.seconds(), deliverDuckTime))));
-
 
                 robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
                 robot.deposit.open();
@@ -177,7 +167,7 @@ public class RedAutoCarousel extends LinearOpMode {
                         new Waypoint(135, 78, PI/2, -20, -10, 0, 1),
                         new Waypoint(135, 110, PI/2,-20,-10,0,goToWarehouseTime),
                 };
-                goToWarehousePath = new Path(new ArrayList<>(Arrays.asList(goToWarehouseWaypoints)));
+                goToWarehousePath = new Path(goToWarehouseWaypoints);
                 deliverDuck = true;
                 time.reset();
             }
@@ -193,7 +183,7 @@ public class RedAutoCarousel extends LinearOpMode {
                         new Waypoint(116, 73, PI/5,-20,-10,0,1.5),
 
                 };
-                cyclePath = new Path(new ArrayList<>(Arrays.asList(cycleWaypoints)));
+                cyclePath = new Path(cycleWaypoints);
 
                 goToWarehouse = true;
                 time.reset();
@@ -202,11 +192,8 @@ public class RedAutoCarousel extends LinearOpMode {
             // cycle freight
             else if (!cycle) {
                 if ((System.currentTimeMillis() - robot.startTime) > 3000) {
-
                     Pose pose = cyclePath.getRobotPose(Math.min(time.seconds(), cycleTime));
-                    robot.setTargetPoint(new Target(pose).theta(pose.theta+PI/2));
-
-
+                    robot.setTargetPoint(new Target(pose).theta(pose.theta + PI/2));
 
                     robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
                     robot.deposit.open();
@@ -225,43 +212,31 @@ public class RedAutoCarousel extends LinearOpMode {
 
             // park
             else if (!park) {
-                if ((System.currentTimeMillis() - robot.startTime) <= 3000) {
-                    double curTime = Math.min(time.seconds(), parkTime);
-                    Pose curPose = parkPath.getRobotPose(curTime);
+                double curTime = Math.min(time.seconds(), parkTime);
+                Pose curPose = parkPath.getRobotPose(curTime);
 
-                    robot.setTargetPoint(114,111,PI/2);
+                robot.setTargetPoint(114,111,PI/2);
 
-                    if (time.seconds() > parkTime) {
-                        Robot.log("Auto finished in " + ((System.currentTimeMillis() - robot.startTime) / 1000) + " seconds");
+                if (time.seconds() > parkTime) {
+                    Robot.log("Auto finished in " + ((System.currentTimeMillis() - robot.startTime) / 1000) + " seconds");
 
-                        park = true;
-                    }
-                } else {
-                    Robot.log("Stopping Robot");
-                    robot.drivetrain.stop();
+                    park = true;
                 }
-
-                if ((System.currentTimeMillis() - robot.startTime) >= 33000) {
-                    Robot.log("Breaking Loop");
-                    break;
-                }
-
             }
 
             else {
-                robot.drivetrain.stop();
-                if (robot.notMoving() || (System.currentTimeMillis() - robot.startTime) >= 30000) {
-                    break;
-                }
+//                robot.drivetrain.stop();
+                break;
             }
 
-            addPacket("BarcodeCase", barcodeCase);
-            robot.update();
+            sendPacket();
+
+//            robot.update();
         }
 
         robot.stop();
-        try {
-            detector.stop();
-        } catch (Exception ignore) {}
+//        try {
+//            detector.stop();
+//        } catch (Exception ignore) {}
     }
 }

@@ -10,7 +10,7 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawField;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
-@TeleOp(name = "0 Odometry / Drivetrain Test")
+@TeleOp(name = "Odometry / Drivetrain Test")
 public class OdoDrivetrainTest extends LinearOpMode {
     private double x, y, theta, prevTime;
 
