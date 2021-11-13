@@ -34,6 +34,7 @@ public class Dashboard {
         double[] xcoords = {-6.5*cos(theta) - 9*sin(theta) + x, 6.5*cos(theta) - 9*sin(theta) + x, 6.5*cos(theta) + 9*sin(theta) + x, -6.5*cos(theta) + 9*sin(theta) + x};
         double[] ycoords = {-6.5*sin(theta) + 9*cos(theta) + y, 6.5*sin(theta) + 9*cos(theta) + y, 6.5*sin(theta) - 9*cos(theta) + y, -6.5*sin(theta) - 9*cos(theta) + y};
         packet.fieldOverlay().setFill(robotColor).fillPolygon(xcoords, ycoords);
+        packet.fieldOverlay().setFill("green").fillCircle(-6.5*cos(theta) + 9*sin(theta) + x, -6.5*sin(theta) - 9*cos(theta) + y, 2);
     }
 
     public static void drawField() {
