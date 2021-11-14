@@ -283,13 +283,10 @@ public class RedAutoCarousel extends LinearOpMode {
                     }
                 }
             } else {
-//                robot.drivetrain.stop();
-                break;
+                robot.drivetrain.stop();
             }
 
-            sendPacket();
-
-//            robot.update();
+            robot.update();
         }
 
         robot.stop();
