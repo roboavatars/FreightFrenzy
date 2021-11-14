@@ -11,11 +11,8 @@ public class Target {
     private double wTarget;
 
     //constants
-    private double Kp = Drivetrain.Kp;
-    private double Kd = Drivetrain.Kd;
     private double b = Drivetrain.b;
     private double zeta = Drivetrain.zeta;
-
 
     public Target(Pose pose) {
         xTarget = pose.x;
@@ -56,18 +53,12 @@ public class Target {
         return this;
     }
 
-    public Target Kp(double Kp) {
-        this.Kp = Kp;
-        return this;
-    }
-    public Target Kd(double Kd) {
-        this.Kd = Kd;
-        return this;
-    }
+
     public Target b(double b) {
         this.b = b;
         return this;
     }
+
     public Target zeta(double zeta) {
         this.zeta = zeta;
         return this;
@@ -76,12 +67,6 @@ public class Target {
     public Pose getPose() {
         return new Pose(xTarget, yTarget, thetaTarget, vxTarget, vyTarget, wTarget);
     }
-
-    public double Kp() {
-        return Kp;
-    }
-
-    public double Kd() { return Kd; }
 
     public double b() {
         return b;

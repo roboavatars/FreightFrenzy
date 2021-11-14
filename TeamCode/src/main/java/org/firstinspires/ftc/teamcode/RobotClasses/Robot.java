@@ -7,14 +7,16 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawRobot;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
+import static java.lang.Math.cos;
 import static java.lang.Math.hypot;
+import static java.lang.Math.sin;
+import static java.lang.Math.sqrt;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
 
-import org.firstinspires.ftc.teamcode.Pathing.Ramsete.RamseteController;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -36,8 +38,6 @@ public class Robot {
     public Deposit deposit;
     public Carousel carousel;
     public Logger logger;
-
-    RamseteController controller;
 
     private ElapsedTime profiler;
     private List<LynxModule> allHubs;
@@ -100,8 +100,6 @@ public class Robot {
         deposit = new Deposit(op);
         carousel = new Carousel(op);
         logger = new Logger();
-
-        controller = new RamseteController(drivetrain);
 
         profiler = new ElapsedTime();
 
@@ -228,7 +226,6 @@ public class Robot {
         // Dashboard Drawings
         drawField();
         drawRobot(this);
-
         sendPacket();
 
         // Clear bulk cache
@@ -237,53 +234,51 @@ public class Robot {
         }
 
         profile(3);
-
-
     }
 
-    // Set target point (velocity specification, custom Kp and Kv values)
-    public void setTargetPoint(double xTarget, double yTarget, double thetaTarget, double vxTarget, double vyTarget, double wTarget, double Kp, double Kd, double b, double zeta) {
+    // Set target point (velocity specification, custom b and zeta values)
+    public void setTargetPoint(double xTarget, double yTarget, double thetaTarget, double vxTarget, double vyTarget, double wTarget, double b, double zeta) {
         // Make Sure thetaTarget is Between 0 and 2pi
         thetaTarget = thetaTarget % (2*PI);
         if (thetaTarget < 0) {
             thetaTarget += 2*PI;
         }
 
-        // Picking the Smaller Distance to Rotate
-        /*
-        double thetaControl;
-        if (abs(theta - thetaTarget) > PI) {
-            thetaControl = abs(theta - thetaTarget) / (theta - thetaTarget) * (abs(theta - thetaTarget) - 2*PI);
-        } else {
-            thetaControl = theta - thetaTarget;
-        }
-         */
+        // Ramsete Controller
+        double eX = cos(theta) * (xTarget - x) + sin(theta) * (yTarget - y);
+        double eY = -sin(theta) * (xTarget - x) + cos(theta) * (yTarget - y);
+        double eTheta = thetaTarget - theta;
+
+        double vTarget = hypot(vxTarget, vyTarget);
+
+        double k = 2 * zeta * sqrt(wTarget * wTarget + b * vTarget * vTarget);
+
+        double commandedV = vTarget * cos(eTheta) + k * eX;
+        double commandedW = wTarget + k * eTheta + b * vTarget * sinc(eTheta) * eY;
 
         drawDrivetrain(xTarget, yTarget, thetaTarget, "blue");
-
-//        controller.follow(x, y, theta, xTarget, yTarget, thetaTarget, vx, vy, w, vxTarget, vyTarget, wTarget, Kp, Kd, b, zeta);
-        //drivetrain.setGlobalControls(xKp * (xTarget - x) + xKd * (vxTarget - vx), yKp * (yTarget - y) + yKd * (vyTarget - vy), thetaKp * (-thetaControl) + thetaKd * (wTarget - w));
+        drivetrain.setControls(commandedV, commandedW);
     }
 
-    // Set target point (default Kp and Kv gains)
+    // Set target point (default velocities)
     public void setTargetPoint(double xTarget, double yTarget, double thetaTarget) {
-        setTargetPoint(xTarget, yTarget, thetaTarget, 0, 0, 0, Drivetrain.Kp, Drivetrain.Kd, Drivetrain.b, Drivetrain.zeta);
+        setTargetPoint(xTarget, yTarget, thetaTarget, 0, 0, 0, Drivetrain.b, Drivetrain.zeta);
     }
 
-    // Set target point (using pose, velocity specification, default Kp and Kv gains)
+    // Set target point (using pose, velocity specification)
     public void setTargetPoint(Pose pose) {
-        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, Drivetrain.Kp, Drivetrain.Kd, Drivetrain.b, Drivetrain.zeta);
+        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, Drivetrain.b, Drivetrain.zeta);
     }
 
-    // Set target point (using pose, custom theta and omega, default Kp and Kv gains)
-    public void setTargetPoint(Pose pose, double theta, double w) {
-        setTargetPoint(pose.x, pose.y, theta, pose.vx, pose.vy, w, Drivetrain.Kp, Drivetrain.Kd, Drivetrain.b, Drivetrain.zeta);
+    // Set target point (using pose, custom theta and omega)
+    public void setTargetPoint(Pose pose, double b, double zeta) {
+        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, b, zeta);
     }
 
     // Set target point (using target object)
     public void setTargetPoint(Target target) {
         Pose pose = target.getPose();
-        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, target.Kp(), target.Kd(), target.b(), target.zeta());
+        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, target.b(), target.zeta());
     }
 
     // Check if robot is at a certain point/angle (default tolerance)
@@ -311,6 +306,14 @@ public class Robot {
         return (hypot(vx, vy) < xyThreshold && abs(w) < thetaThreshold);
     }
 
+    private static double sinc(double x) {
+        if (abs(x) < 1e-6) {
+            return 1.0 - 1.0 / 6.0 * x * x;
+        } else {
+            return sin(x) / x;
+        }
+    }
+
     // Logging
     public static void log(String message) {
         Log.w("robot-log", message);
@@ -324,6 +327,4 @@ public class Robot {
     public static double round(double num) {
         return Double.parseDouble(String.format("%.5f", num));
     }
-
-
 }

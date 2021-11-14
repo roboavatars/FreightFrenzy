@@ -5,40 +5,50 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-import static java.lang.Math.cos;
 import static java.lang.Math.sin;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.cos;
 
 public class Dashboard {
-
     public static FtcDashboard dashboard = FtcDashboard.getInstance();
     public static TelemetryPacket packet = new TelemetryPacket();
 
     public static void drawRobot(Robot robot) {
-        drawRobot(robot, "black");
+        drawRobot(robot, "grey");
     }
 
     public static void drawRobot(Robot robot, String drivetrainColor) {
-        drawRobot(robot.x, robot.y, robot.theta, drivetrainColor);
+        drawRobot(robot.x, robot.y, robot.theta, robot.deposit.getSlidesHeight(), drivetrainColor);
     }
 
-    public static void drawRobot(double robotX, double robotY, double robotTheta, String drivetrainColor) {
+    public static void drawRobot(double robotX, double robotY, double robotTheta, double slidesPosition, String drivetrainColor) {
         drawDrivetrain(robotX, robotY, robotTheta, drivetrainColor);
+        drawSlides(robotX, robotY, robotTheta, slidesPosition);
     }
 
-    public static void drawDrivetrain(double robotX, double robotY, double robotTheta, String robotColor) {
-        double r = 9 * sqrt(2);
+    public static void drawDrivetrain(double robotX, double robotY, double robotTheta, String color) {
         double x = robotY - 72;
         double y = 72 - robotX;
         double theta = robotTheta;
-        double[] xcoords = {-6.5*cos(theta) - 9*sin(theta) + x, 6.5*cos(theta) - 9*sin(theta) + x, 6.5*cos(theta) + 9*sin(theta) + x, -6.5*cos(theta) + 9*sin(theta) + x};
-        double[] ycoords = {-6.5*sin(theta) + 9*cos(theta) + y, 6.5*sin(theta) + 9*cos(theta) + y, 6.5*sin(theta) - 9*cos(theta) + y, -6.5*sin(theta) - 9*cos(theta) + y};
-        packet.fieldOverlay().setFill(robotColor).fillPolygon(xcoords, ycoords);
-        packet.fieldOverlay().setFill("green").fillCircle(-6.5*cos(theta) + 9*sin(theta) + x, -6.5*sin(theta) - 9*cos(theta) + y, 2);
+
+        double[] xcoords = {-6.5 * cos(theta) - 9 * sin(theta) + x, 6.5 * cos(theta) - 9 * sin(theta) + x, 6.5 * cos(theta) + 9 * sin(theta) + x, -6.5 * cos(theta) + 9 * sin(theta) + x};
+        double[] ycoords = {-6.5 * sin(theta) + 9 * cos(theta) + y, 6.5 * sin(theta) + 9 * cos(theta) + y, 6.5 * sin(theta) - 9 * cos(theta) + y, -6.5 * sin(theta) - 9 * cos(theta) + y};
+
+        packet.fieldOverlay().setFill(color).fillPolygon(xcoords, ycoords);
+        packet.fieldOverlay().setFill("green").fillCircle(-4.5 * cos(theta) + 6.5 * sin(theta) + x, -4.5 * sin(theta) - 6.5 * cos(theta) + y, 2.25);
+    }
+
+    public static void drawSlides(double x, double y, double theta, double position) {
+        double[] leftX = {-4 * cos(theta) - 9 * sin(theta) + x, -2.5 * cos(theta) - 9 * sin(theta) + x, -2.5 * cos(theta) - (9 + position) * sin(theta) + x, -4 * cos(theta) - (9 + position) * sin(theta) + x};
+        double[] leftY = {4 * sin(theta) - 9 * cos(theta) + y, 2.5 * sin(theta) - 9 * cos(theta) + y, 2.5 * sin(theta) - (9 + position) * cos(theta) + y, 4 * sin(theta) - (9 + position) * cos(theta) + y};
+
+        double[] rightX = {4 * cos(theta) - 9 * sin(theta) + x, 2.5 * cos(theta) - 9 * sin(theta) + x, 2.5 * cos(theta) - (9 + position) * sin(theta) + x, 4 * cos(theta) - (9 + position) * sin(theta) + x};
+        double[] rightY = {-4 * sin(theta) - 9 * cos(theta) + y, -2.5 * sin(theta) - 9 * cos(theta) + y, -2.5 * sin(theta) - (9 + position) * cos(theta) + y, -4 * sin(theta) - (9 + position) * cos(theta) + y};
+
+        drawPolygon(leftX, leftY, "grey");
+        drawPolygon(rightX, rightY, "grey");
     }
 
     public static void drawField() {
-        // Perimeter
         outlineRect(0, 0, 144, 144, "black");
     }
 
@@ -71,7 +81,7 @@ public class Dashboard {
         }
 
         for (int i = 0; i < ycoords.length; i++) {
-            ycoords[i] = 72- x[i];
+            ycoords[i] = 72 - x[i];
         }
 
         packet.fieldOverlay().setFill(color).fillPolygon(xcoords, ycoords);

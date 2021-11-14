@@ -60,7 +60,7 @@ public class Deposit {
         }
     }
 
-    public void moveSlides (float power) {
+    public void moveSlides(float power) {
         depositor.setPower(power);
     }
 
@@ -68,11 +68,11 @@ public class Deposit {
         return depositor.getCurrentPosition();
     }
 
-    public deposit_height getTargHeight(){
+    public deposit_height getTargHeight() {
         return getTargHeight();
     }
 
-    public boolean slidesMoving(){
+    public boolean slidesMoving() {
         return depositor.isBusy();
     }
 
@@ -89,8 +89,9 @@ public class Deposit {
         depositSetPosition(Constants.DEPOSIT_OPEN_POS);
     }
 
-    public void hold(){
-        depositSetPosition(Constants.DEPOSIT_HOLD_POS);}
+    public void hold() {
+        depositSetPosition(Constants.DEPOSIT_HOLD_POS);
+    }
 
     public void close() {
         depositSetPosition(Constants.DEPOSIT_CLOSE_POS);
@@ -105,7 +106,10 @@ public class Deposit {
         }
     }
 
-    public void markerArmDown(){markerSetPosition(Constants.TEAM_MARKER_DOWN_POS);};
-    public void markerArmUp(){markerSetPosition(Constants.TEAM_MARKER_UP_POS);};
-
+    public void markerArmDown() {
+        markerSetPosition(Constants.TEAM_MARKER_DOWN_POS);
+    }
+    public void markerArmUp() {
+        markerSetPosition(Constants.TEAM_MARKER_UP_POS);
+    }
 }
