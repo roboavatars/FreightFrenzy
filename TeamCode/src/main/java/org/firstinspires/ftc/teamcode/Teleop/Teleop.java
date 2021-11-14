@@ -5,11 +5,13 @@ import android.util.Log;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static java.lang.Math.PI;
@@ -30,8 +32,8 @@ public class Teleop extends LinearOpMode {
     public static boolean isRed = true;
 
     // Control Gains
-    private double xyGain = 1;
-    private double wGain = 1;
+    private double xyGain;
+    private double wGain;
 
     // Toggles
     private boolean slidesToggle = false, slidesDeposit = false, slidesCap = false;
@@ -39,7 +41,11 @@ public class Teleop extends LinearOpMode {
     private boolean servoToggle = false;
     private int depositServoStatus = 0;
 
-    double slidesPower = 1;
+    private double slidesPower = 1;
+
+    //cycle counter stuff
+    private ArrayList<Double> cycles = new ArrayList<Double>();
+    private boolean cycleToggle = false;
 
     /*
     Controller Button Mappings:
@@ -74,13 +80,12 @@ public class Teleop extends LinearOpMode {
             robot.logger.startLogging(false, isRed);
         }
 
-
-
-//        robot.deposit.resetAtHomeHeight();
-
         robot.deposit.close();
 
         waitForStart();
+
+        ElapsedTime cycleTimer = new ElapsedTime();
+        cycleTimer.reset();
 
         while (opModeIsActive()) {
 
@@ -93,25 +98,35 @@ public class Teleop extends LinearOpMode {
                 robot.intake.off();
             }
 
-            //moving slides
+            // Moving Slides
             if (gamepad2.a) {
-                robot.deposit.hold();
-                depositServoStatus = 1;
+                robot.deposit.close();
+                depositServoStatus = 0;
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.HOME);
             }
 
             if (gamepad2.b) {
                 robot.deposit.hold();
+                depositServoStatus = 1;
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.MID);
             }
 
-            if (gamepad2.x) {
+            if (gamepad2.x && !cycleToggle) {
                 robot.deposit.hold();
+                depositServoStatus = 1;
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.TOP);
+//cycle stuff
+                cycleToggle = true;
+                cycles.add(cycleTimer.seconds());
+                cycleTimer.reset();
+
+            } else if (!gamepad2.x && cycleToggle) {
+                cycleToggle = false;
             }
 
             if (gamepad2.y) {
                 robot.deposit.hold();
+                depositServoStatus = 1;
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.CAP);
             }
 
@@ -121,7 +136,7 @@ public class Teleop extends LinearOpMode {
 //                robot.deposit.moveSlides(0);
 //            }
 
-            if (gamepad2.right_bumper && !servoToggle){
+            if (gamepad1.right_bumper && !servoToggle) {
                 if (depositServoStatus == 0) {
                     robot.deposit.hold();
                     depositServoStatus = 1;
@@ -134,8 +149,7 @@ public class Teleop extends LinearOpMode {
                 }
 
                 servoToggle = true;
-            } else
-            if (!gamepad2.right_bumper && servoToggle) {
+            } else if (!gamepad1.right_bumper && servoToggle) {
                 servoToggle = false;
             }
 
@@ -148,12 +162,11 @@ public class Teleop extends LinearOpMode {
                     markerArmDown = true;
                 }
                 markerToggle = true;
-            } else
-            if (!gamepad2.dpad_up && markerToggle) {
+            } else if (!gamepad2.dpad_up && markerToggle) {
                 markerToggle = false;
             }
 
-            if(gamepad2.left_bumper){
+            if (gamepad2.left_bumper) {
                 robot.carousel.rotate();
             } else{
                 robot.carousel.stop();
@@ -165,7 +178,7 @@ public class Teleop extends LinearOpMode {
                 wGain = 0.17;
             } else {
                 xyGain = 1;
-                wGain = 1;
+                wGain = .6;
             }
 
             // Reset Odometry
@@ -180,12 +193,16 @@ public class Teleop extends LinearOpMode {
             robot.update();
 
             // Telemetry
+            for (int i = 0; i < cycles.size(); i++) {
+                telemetry.addData("cycle " + i, cycles.get(i));
+            }
+
             telemetry.addData("X", robot.x);
             telemetry.addData("Y", robot.y);
             telemetry.addData("Theta", robot.theta);
             telemetry.addData("Slides Height", robot.deposit.getSlidesHeight());
             //telemetry.addData("Intake Full", robot.intake.intakeFull());
-            telemetry.addData("# Cycles", robot.cycles);
+            telemetry.addData("# Cycles", cycles.size());
             telemetry.addData("Average Cycle Time", (robot.cycleTotal / robot.cycles) + "s");
             telemetry.update();
         }

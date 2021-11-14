@@ -33,6 +33,7 @@ public class RamseteController {
         double angularVelocityCommand = wTarget + k * eTheta + b * linearVeloTarget * sinc(eTheta) * eYLocal;
         double velocityCommand = linearVeloTarget * Math.cos(eTheta) + k * eXLocal;
 
+//        drivetrain.setControls(velocityCommand, angularVelocityCommand);
 
         double rightVelocity = velocityCommand + Drivetrain.ODOMETRY_TRACK_WIDTH / 2 * angularVelocityCommand;
         double leftVelocity = velocityCommand - Drivetrain.ODOMETRY_TRACK_WIDTH / 2 * angularVelocityCommand;

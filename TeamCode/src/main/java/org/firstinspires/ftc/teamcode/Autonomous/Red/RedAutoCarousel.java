@@ -1,8 +1,6 @@
-package org.firstinspires.ftc.teamcode.AutoPrograms.Red;
+package org.firstinspires.ftc.teamcode.Autonomous.Red;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -14,12 +12,9 @@ import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import static java.lang.Math.PI;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.*;
 
-@Config
 @Autonomous(name = "Red Auto Carousel", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoCarousel extends LinearOpMode {
 
@@ -39,8 +34,8 @@ public class RedAutoCarousel extends LinearOpMode {
         Robot robot = new Robot(this, 135, 36, PI, true, true);
         robot.logger.startLogging(true, true);
 
-        Vision detector = new Vision(this, Vision.Pipeline.AprilTag);
-        detector.start();
+//        Vision detector = new Vision(this, Vision.Pipeline.AprilTag);
+//        detector.start();
 
         // Segments
         boolean deliverPreloadedFreight = false;
@@ -75,8 +70,9 @@ public class RedAutoCarousel extends LinearOpMode {
 
         waitForStart();
 
-        // Put Vision Stuff Here
+//        int barcodeCase = detector.getAprilTagPipe().getResult();
         int barcodeCase = 0; // 0 = left, 1 = mid, 2 = right
+        Robot.log("Barcode Case: " + barcodeCase);
 
         // Paths
 
@@ -92,7 +88,6 @@ public class RedAutoCarousel extends LinearOpMode {
         ElapsedTime time = new ElapsedTime();
 
         while (opModeIsActive()) {
-
             // Deliver Preloaded Freight
             if(!deliverPreloadedFreight) {
                 Pose pose = deliverPreloadedFreightPath.getRobotPose(Math.min(time.seconds(), deliverPreloadedFreightTime));
@@ -116,7 +111,7 @@ public class RedAutoCarousel extends LinearOpMode {
                         new Waypoint(robot.x, robot.y, robot.theta, 40, 30, 0, 0),
                         new Waypoint(130, 15, 7*PI/4, 30, -10, 0, spinCarouselTime),
                 };
-                spinCarouselPath = new Path(new ArrayList<>(Arrays.asList(spinCarouselWaypoints)));
+                spinCarouselPath = new Path(spinCarouselWaypoints);
 
                 deliverPreloadedFreight = true;
                 time.reset();
@@ -142,7 +137,7 @@ public class RedAutoCarousel extends LinearOpMode {
                         new Waypoint(127, 20, 3*PI/5, 20, 10, 0, 0.5),
                         new Waypoint(124, 57, PI, 20, 5, 0, deliverDuckTime),
                 };
-                deliverDuckPath = new Path(new ArrayList<>(Arrays.asList(deliverDuckWaypoints)));
+                deliverDuckPath = new Path(deliverDuckWaypoints);
 
                 spinCarousel = true;
                 time.reset();
@@ -168,7 +163,7 @@ public class RedAutoCarousel extends LinearOpMode {
                         new Waypoint(135, 78, PI/2, 20, 20, 0, 1),
                         new Waypoint(135, 115, PI/2,10,-5,0,goToWarehouseTime),
                 };
-                goToWarehousePath = new Path(new ArrayList<>(Arrays.asList(goToWarehouseWaypoints)));
+                goToWarehousePath = new Path(goToWarehouseWaypoints);
                 deliverDuck = true;
                 time.reset();
             }
@@ -184,7 +179,7 @@ public class RedAutoCarousel extends LinearOpMode {
                         new Waypoint(118, 63, PI/12,-20,-10,0,cycleTime),
 
                 };
-                cyclePath = new Path(new ArrayList<>(Arrays.asList(cycleWaypoints)));
+                cyclePath = new Path(cycleWaypoints);
 
                 Waypoint[] goToWarehouseWaypoints2 = new Waypoint[] {
                         new Waypoint(118, 63, PI/12,10,10,0,0),
@@ -261,27 +256,21 @@ public class RedAutoCarousel extends LinearOpMode {
 
                     park = true;
                 }
-
-                if ((System.currentTimeMillis() - robot.startTime) >= 33000) {
-                    Robot.log("Breaking Loop");
-                    break;
-                }
-
             }
 
             else {
-                robot.drivetrain.stop();
-                if (robot.notMoving() || (System.currentTimeMillis() - robot.startTime) >= 30000) {
-                    break;
-                }
+//                robot.drivetrain.stop();
+                break;
             }
 
-            robot.update();
+            sendPacket();
+
+//            robot.update();
         }
 
         robot.stop();
-        try {
-            detector.stop();
-        } catch (Exception ignore) {}
+//        try {
+//            detector.stop();
+//        } catch (Exception ignore) {}
     }
 }

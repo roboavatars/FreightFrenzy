@@ -29,7 +29,7 @@ public class Deposit {
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         teamMarkerServo = op.hardwareMap.get(Servo.class, "teamMarkerArm");
 
-        depositServo.setPosition(Constants.DEPOSIT_HOLD_POS);
+//        depositServo.setPosition(Constants.DEPOSIT_HOLD_POS);
 
         teamMarkerServo.setPosition(Constants.TEAM_MARKER_UP_POS);
 

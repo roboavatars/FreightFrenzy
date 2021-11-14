@@ -11,7 +11,7 @@ public class Constants {
     // Deposit
     public static int HOME = 0;
     public static int MID_GOAL = -227;
-    public static int TOP_GOAL = -480;
+    public static int TOP_GOAL = -500;
     public static int CAP = -500;
 
     public static double DEPOSIT_POWER = 1;
@@ -23,7 +23,7 @@ public class Constants {
     public static double TEAM_MARKER_DOWN_POS = 0;
     public static double TEAM_MARKER_UP_POS = 1;
 
-    public static double CAROUSEL_POWER = .8;
+    public static double CAROUSEL_POWER = .7;
 
 
 }

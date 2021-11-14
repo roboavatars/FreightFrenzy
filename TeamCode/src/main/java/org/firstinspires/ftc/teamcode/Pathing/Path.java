@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Pathing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Path {
     private ArrayList<Spline[]> splines = new ArrayList<>();
@@ -50,6 +51,10 @@ public class Path {
             // Add Time
             waypointTimes.add(waypoint2.time);
         }
+    }
+
+    public Path(Waypoint[] waypoints) {
+        this(new ArrayList<>(Arrays.asList(waypoints)));
     }
 
     public Pose getRobotPose(double time) {
