@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static java.lang.Math.PI;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.*;
 
 @Config
 @Autonomous(name = "Red Auto Carousel", preselectTeleOp = "1 Teleop", group = "Red")
@@ -48,23 +47,29 @@ public class RedAutoCarousel extends LinearOpMode {
         boolean spinCarousel = false;
         boolean deliverDuck = false;
         boolean goToWarehouse = false;
+        boolean goToWarehouse2 = false;
+        boolean cycleFreight = false;
         boolean cycle = false;
         boolean park = false;
 
         // Segment Times
         double detectBarcodeTime = 0.75;
-        double deliverPreloadedFreightTime = 2.0;
+        double deliverPreloadedFreightTime = 1.0;
         double spinCarouselTime = 1.5;
         double deliverDuckTime = 1.5;
         double goToWarehouseTime = 1.5;
-        double cycleTime = 4.0;
+        double goToWarehouseTime2 = 1.5;
+        double cycleTime = 1.5;
         double parkTime = 1.5;
+
+        int cycleCount = 0;
 
         // Paths
         Path deliverPreloadedFreightPath = null;
         Path spinCarouselPath = null;
         Path deliverDuckPath = null;
         Path goToWarehousePath = null;
+        Path goToWarehousePath2 = null;
         Path cyclePath = null;
         Path parkPath = null;
 
@@ -75,38 +80,23 @@ public class RedAutoCarousel extends LinearOpMode {
 
         // Paths
 
-        if (barcodeCase == 0) {
-            deliverPreloadedFreightTime = 2.0;
-            Waypoint[] deliverPreloadedFreightWaypoints = new Waypoint[] {
-                    new Waypoint(135, 36, PI, 30, 30, 0, 0),
-                    new Waypoint(115, 51, 7*PI/4, 10, -10, 0, deliverPreloadedFreightTime),
-            };
-            deliverPreloadedFreightPath = new Path(new ArrayList<>(Arrays.asList(deliverPreloadedFreightWaypoints)));
-
-        } else if (barcodeCase == 1) {
-            deliverPreloadedFreightTime = 2.0;
-            Waypoint[] deliverPreloadedFreightWaypoints = new Waypoint[] {
-                    new Waypoint(135, 36, PI, 30, 30, 0, 0),
-                    new Waypoint(116, 54, 19*PI/10, 10, -10, 0, deliverPreloadedFreightTime),
-            };
-            deliverPreloadedFreightPath = new Path(new ArrayList<>(Arrays.asList(deliverPreloadedFreightWaypoints)));
-        } else {
-            deliverPreloadedFreightTime = 2.25;
-            Waypoint[] deliverPreloadedFreightWaypoints = new Waypoint[] {
-                    new Waypoint(135, 36, PI, 30, 30, 0, 0),
-                    new Waypoint(120, 57, 197*PI/100, 10, -10, 0, deliverPreloadedFreightTime),
-            };
-            deliverPreloadedFreightPath = new Path(new ArrayList<>(Arrays.asList(deliverPreloadedFreightWaypoints)));
-        }
+        Waypoint[] deliverPreloadedFreightWaypoints = new Waypoint[] {
+                new Waypoint(135, 36, PI, 20, 20, 0, 0),
+                new Waypoint(135, 38, PI, 20, 20, 0, 0.5),
+                new Waypoint(120, 58, PI, 20, 20, 0, deliverPreloadedFreightTime),
+        };
+        deliverPreloadedFreightPath = new Path(new ArrayList<>(Arrays.asList(deliverPreloadedFreightWaypoints)));
 
         detector.setPipeline(Vision.Pipeline.AprilTag);
 
         ElapsedTime time = new ElapsedTime();
 
         while (opModeIsActive()) {
+
             // Deliver Preloaded Freight
             if(!deliverPreloadedFreight) {
-                robot.setTargetPoint(new Target(deliverPreloadedFreightPath.getRobotPose(Math.min(time.seconds(), deliverPreloadedFreightTime))));
+                Pose pose = deliverPreloadedFreightPath.getRobotPose(Math.min(time.seconds(), deliverPreloadedFreightTime));
+                robot.setTargetPoint(new Target(pose).theta(pose.theta+PI));
 
                 if (barcodeCase == 0) {
                     robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
@@ -124,7 +114,7 @@ public class RedAutoCarousel extends LinearOpMode {
 
                 Waypoint[] spinCarouselWaypoints = new Waypoint[] {
                         new Waypoint(robot.x, robot.y, robot.theta, 40, 30, 0, 0),
-                        new Waypoint(130, 15, 7*PI/4, -20, -10, 0, spinCarouselTime),
+                        new Waypoint(130, 15, 7*PI/4, 30, -10, 0, spinCarouselTime),
                 };
                 spinCarouselPath = new Path(new ArrayList<>(Arrays.asList(spinCarouselWaypoints)));
 
@@ -140,7 +130,7 @@ public class RedAutoCarousel extends LinearOpMode {
                 robot.carousel.rotate();
                 time.reset();
 
-                if (time.milliseconds() > 1000) {
+                if (time.seconds() > 1) {
                     robot.carousel.stop();
                 }
 
@@ -148,8 +138,9 @@ public class RedAutoCarousel extends LinearOpMode {
                 robot.intake.on();
 
                 Waypoint[] deliverDuckWaypoints = new Waypoint[] {
-                        new Waypoint(130, 15, 3*PI/4, -20, -10, 0, 0),
-                        new Waypoint(120, 60, 0, -20, -10, 0, deliverDuckTime),
+                        new Waypoint(robot.x, robot.y, robot.theta+PI, 20, 10, 0, 0),
+                        new Waypoint(127, 20, 3*PI/5, 20, 10, 0, 0.5),
+                        new Waypoint(124, 57, PI, 20, 5, 0, deliverDuckTime),
                 };
                 deliverDuckPath = new Path(new ArrayList<>(Arrays.asList(deliverDuckWaypoints)));
 
@@ -159,23 +150,23 @@ public class RedAutoCarousel extends LinearOpMode {
 
             // Deliver Duck
             else if (!deliverDuck) {
-                robot.setTargetPoint(new Target(deliverDuckPath.getRobotPose(Math.min(time.seconds(), deliverDuckTime))));
-
+                Pose pose = deliverDuckPath.getRobotPose(Math.min(time.seconds(), deliverDuckTime));
+                robot.setTargetPoint(new Target(pose).theta(pose.theta+PI));
 
                 robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
                 robot.deposit.open();
 
                 time.reset();
 
-                if (time.milliseconds() > 300) {
+                if (time.seconds() > 0.1) {
                     robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
                     robot.deposit.close();
                 }
 
                 Waypoint[] goToWarehouseWaypoints = new Waypoint[] {
-                        new Waypoint(120, 60, 0, -20, -10, 0, 0),
-                        new Waypoint(135, 78, PI/2, -20, -10, 0, 1),
-                        new Waypoint(135, 110, PI/2,-20,-10,0,goToWarehouseTime),
+                        new Waypoint(robot.x, robot.y, robot.theta, 35, 30, 0, 0),
+                        new Waypoint(135, 78, PI/2, 20, 20, 0, 1),
+                        new Waypoint(135, 115, PI/2,10,-5,0,goToWarehouseTime),
                 };
                 goToWarehousePath = new Path(new ArrayList<>(Arrays.asList(goToWarehouseWaypoints)));
                 deliverDuck = true;
@@ -188,57 +179,87 @@ public class RedAutoCarousel extends LinearOpMode {
                 robot.intake.on();
 
                 Waypoint[] cycleWaypoints = new Waypoint[] {
-                        new Waypoint(135, 110, PI/2,-20,-10,0,0),
-                        new Waypoint(135, 78, PI/2,-20,-10,0,0.5),
-                        new Waypoint(116, 73, PI/5,-20,-10,0,1.5),
+                        new Waypoint(robot.x, robot.y, robot.theta,-10,-20,0,0),
+                        new Waypoint(135, 82, PI/2,-20,-5,0,1),
+                        new Waypoint(118, 63, PI/12,-20,-10,0,cycleTime),
 
                 };
                 cyclePath = new Path(new ArrayList<>(Arrays.asList(cycleWaypoints)));
+
+                Waypoint[] goToWarehouseWaypoints2 = new Waypoint[] {
+                        new Waypoint(118, 63, PI/12,10,10,0,0),
+                        new Waypoint(135, 82, PI/2,10,10,0,1),
+                        new Waypoint(135, 115, PI/2,10,10,0,cycleTime),
+
+                };
+                goToWarehousePath2 = new Path(new ArrayList<>(Arrays.asList(goToWarehouseWaypoints2)));
 
                 goToWarehouse = true;
                 time.reset();
             }
 
             // cycle freight
-            else if (!cycle) {
-                if ((System.currentTimeMillis() - robot.startTime) > 3000) {
-
+            else if (!cycleFreight) {
+                if (!cycle) {
                     Pose pose = cyclePath.getRobotPose(Math.min(time.seconds(), cycleTime));
-                    robot.setTargetPoint(new Target(pose).theta(pose.theta+PI/2));
-
-
+                    robot.setTargetPoint(new Target(pose).theta(pose.theta+PI));
 
                     robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
                     robot.deposit.open();
                     time.reset();
 
-                    if (time.milliseconds() > 300) {
+                    if (time.seconds() > 0.1) {
                         robot.deposit.close();
                     }
 
-                    robot.setTargetPoint(new Target(goToWarehousePath.getRobotPose(Math.min(time.seconds(), goToWarehouseTime))));
-                } else {
+                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                    cycleCount++;
+
                     cycle = true;
                     time.reset();
                 }
+
+                else if (!goToWarehouse2) {
+                    robot.setTargetPoint(new Target(goToWarehousePath2.getRobotPose(Math.min(time.seconds(), goToWarehouseTime))));
+                    robot.intake.on();
+
+                    if (time.seconds() > 0.3) {
+                        robot.intake.off();
+                    }
+
+                    goToWarehouse2 = true;
+                    time.reset();
+                }
+
+                else {
+                    if (cycleCount >= 5) {
+                        cycle = true;
+                        goToWarehouse2 = true;
+                        cycleFreight = true;
+                    } else {
+                        cycle = false;
+                        goToWarehouse2 = false;
+                    }
+                    time.reset();
+                }
+
+                Waypoint[] parkWaypoints = new Waypoint[] {
+                        new Waypoint(robot.x, robot.y, robot.theta,10,10,0,0),
+                        new Waypoint(114, 111, PI/2,10,10,0,parkTime),
+
+                };
+                parkPath = new Path(new ArrayList<>(Arrays.asList(parkWaypoints)));
+
             }
 
             // park
             else if (!park) {
-                if ((System.currentTimeMillis() - robot.startTime) <= 3000) {
-                    double curTime = Math.min(time.seconds(), parkTime);
-                    Pose curPose = parkPath.getRobotPose(curTime);
+                robot.setTargetPoint(new Target(parkPath.getRobotPose(Math.min(time.seconds(), parkTime))));
 
-                    robot.setTargetPoint(114,111,PI/2);
+                if (time.seconds() > parkTime) {
+                    Robot.log("Auto finished in " + ((System.currentTimeMillis() - robot.startTime) / 1000) + " seconds");
 
-                    if (time.seconds() > parkTime) {
-                        Robot.log("Auto finished in " + ((System.currentTimeMillis() - robot.startTime) / 1000) + " seconds");
-
-                        park = true;
-                    }
-                } else {
-                    Robot.log("Stopping Robot");
-                    robot.drivetrain.stop();
+                    park = true;
                 }
 
                 if ((System.currentTimeMillis() - robot.startTime) >= 33000) {
@@ -255,7 +276,6 @@ public class RedAutoCarousel extends LinearOpMode {
                 }
             }
 
-            addPacket("BarcodeCase", barcodeCase);
             robot.update();
         }
 
