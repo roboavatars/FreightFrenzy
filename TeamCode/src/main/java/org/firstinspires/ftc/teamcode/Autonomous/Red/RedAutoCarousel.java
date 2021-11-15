@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-@Autonomous(name = "0 Red Auto Carousel", preselectTeleOp = "1 Teleop", group = "Red")
+@Autonomous(name = "Red Auto Carousel", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoCarousel extends LinearOpMode {
 
     @Override
