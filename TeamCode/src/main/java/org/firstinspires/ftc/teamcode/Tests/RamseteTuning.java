@@ -13,15 +13,13 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 import static java.lang.Math.PI;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.*;
 
-@TeleOp(name = "Ramsete Controller Tuning")
+@TeleOp(name = "0 Ramsete Controller Tuning")
 @Config
 public class RamseteTuning extends LinearOpMode {
-    public static double x = 96;
+    public static double x = 54.5;
     public static double y = 120;
-    public static double theta = 0;
-    public static double splineTime = 5;
-    public static double b = 0.00032;
-    public static double zeta = 0.7;
+    public static double theta = 0.5;
+    public static double splineTime = 2;
     public static boolean move = false;
     public static boolean reset = false;
 
@@ -33,35 +31,44 @@ public class RamseteTuning extends LinearOpMode {
 
         ElapsedTime time = new ElapsedTime();
         Path path = null;
+        Pose pose = null;
 
         while (opModeIsActive()) {
-            if (reset) {
+            if (reset || gamepad1.a) {
                 robot.resetOdo(54.5, 63, PI/2);
                 reset = false;
             }
 
             if (!move) {
                 path = new Path(new Waypoint[] {
-                        new Waypoint(robot.x, robot.y, robot.theta, 0, 0, 0, 0),
-                        new Waypoint(x, y, theta * PI, 0, 0, 0, splineTime)
+                        new Waypoint(robot.x, robot.y, robot.theta, 0.1, 1, 0, 0),
+                        new Waypoint(x, y, theta * PI, 0.1, -1, 0, splineTime)
                 });
 
-                for (int i = 0; i < 25; i++) {
-                    Pose pose = path.getRobotPose(splineTime * i/25);
-                    drawPoint(pose.x, pose.y, "blue");
-                }
+                pose = new Pose(robot.x, robot.y, robot.theta, robot.vx, robot.vy, robot.w);
 
-                robot.drivetrain.stop();
+                robot.drivetrain.setControls(-gamepad1.left_stick_y * 0.5, -gamepad1.right_stick_x * 0.5);
                 time.reset();
-            } else if (time.seconds() >= splineTime && robot.isAtPose(x, y, theta * PI)) {
-                move = false;
             } else {
-                robot.setTargetPoint(path.getRobotPose(Math.min(splineTime, time.seconds())), b, zeta);
+                if (time.seconds() >= splineTime) {
+                    move = false;
+                } else {
+                    pose = path.getRobotPose(Math.min(splineTime, time.seconds()));
+                    robot.setTargetPoint(pose);
+                }
             }
 
-            addPacket("Target X", x);
-            addPacket("Target Y", y);
-            addPacket("Target Theta", theta + " PI");
+            for (int i = 0; i < 25; i++) {
+                Pose pose2 = path.getRobotPose(splineTime * i/25);
+                drawPoint(pose2.x, pose2.y, "blue");
+            }
+
+            addPacket("Target X", pose.x);
+            addPacket("Target Y", pose.y);
+            addPacket("Target Theta", pose.theta);
+            addPacket("Target VX", pose.vx);
+            addPacket("Target VY", pose.vy);
+            addPacket("Target W", pose.w);
 
             robot.update();
         }

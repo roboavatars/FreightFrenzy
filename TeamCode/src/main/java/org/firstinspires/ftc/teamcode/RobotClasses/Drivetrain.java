@@ -49,11 +49,12 @@ public class Drivetrain {
     private final double ODOMETRY_HEADING_THRESHOLD = PI/8;
 
     // PD Controller Constants
-    public final static double Kp = 0.6;
-    public final static double Kd = 0.05;
-    public final static double b = 2;
-    public final static double zeta = .7;
-
+    public static double leftFF = 0; // 0.0054;
+    public static double leftKp = 0.004;
+    public static double rightFF = 0; // 0.0066;
+    public static double rightKp = 0.0049;
+    public static double b = 0.0027;
+    public static double zeta = 0.95;
 
     // Odometry delta 0 counters
     public int zeroR, zeroL;
@@ -145,6 +146,22 @@ public class Drivetrain {
             lastBRPower = BRpower;
             lastBLPower = BLpower;
         }
+    }
+
+    public void tankControls(double leftVelocity, double rightVelocity, double theta, double vx, double vy, double w) {
+        double v;
+        if (Math.hypot(vx, vy) < 0.01 || Math.abs(Math.atan2(vy, vx) - theta) < 0.01) {
+            v = Math.hypot(vx, vy);
+        } else {
+            v = -Math.hypot(vx, vy);
+        }
+        double vRight = v + w * ODOMETRY_TRACK_WIDTH / 2;
+        double vLeft = v - w * ODOMETRY_TRACK_WIDTH / 2;
+        setTankControls(leftFF * leftVelocity + leftKp * (leftVelocity - vLeft), rightFF * rightVelocity + rightKp * (rightVelocity - vRight));
+    }
+
+    public void setTankControls(double leftPower, double rightPower) {
+        setControls((rightPower + leftPower) / 2, (rightPower - leftPower) / 2);
     }
 
     public void setRawPower(double frontRight, double frontLeft, double backRight, double backLeft) {

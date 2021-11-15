@@ -213,6 +213,9 @@ public class Robot {
         addPacket("1 X", round(x));
         addPacket("2 Y", round(y));
         addPacket("3 Theta", round(theta));
+        addPacket("4 VX", round(vx));
+        addPacket("5 VY", round(vy));
+        addPacket("6 W", round(w));
         addPacket("8 Run Time", (curTime - startTime) / 1000);
         addPacket("9 Update Frequency (Hz)", round(1 / timeDiff));
         addPacket("Pod Zeroes", drivetrain.zeroR + ", " + drivetrain.zeroL);
@@ -249,15 +252,18 @@ public class Robot {
         double eY = -sin(theta) * (xTarget - x) + cos(theta) * (yTarget - y);
         double eTheta = thetaTarget - theta;
 
-        double vTarget = hypot(vxTarget, vyTarget);
+        double vTarget = signOf(vyTarget) * hypot(vxTarget, vyTarget);
 
         double k = 2 * zeta * sqrt(wTarget * wTarget + b * vTarget * vTarget);
 
         double commandedV = vTarget * cos(eTheta) + k * eX;
         double commandedW = wTarget + k * eTheta + b * vTarget * sinc(eTheta) * eY;
 
+        double rightVelocity = commandedV + commandedW * Drivetrain.ODOMETRY_TRACK_WIDTH / 2;
+        double leftVelocity = commandedV - commandedW * Drivetrain.ODOMETRY_TRACK_WIDTH / 2;
+
         drawDrivetrain(xTarget, yTarget, thetaTarget, "blue");
-        drivetrain.setControls(commandedV, commandedW);
+        drivetrain.tankControls(leftVelocity, rightVelocity, theta, vx, vy, w);
     }
 
     // Set target point (default velocities)
@@ -311,6 +317,14 @@ public class Robot {
             return 1.0 - 1.0 / 6.0 * x * x;
         } else {
             return sin(x) / x;
+        }
+    }
+
+    private static double signOf(double x) {
+        if (abs(x) < 1e-6) {
+            return 1;
+        } else {
+            return abs(x) / x;
         }
     }
 
