@@ -29,9 +29,8 @@ public class Deposit {
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         teamMarkerServo = op.hardwareMap.get(Servo.class, "teamMarkerArm");
 
-//        depositServo.setPosition(Constants.DEPOSIT_HOLD_POS);
-
-        teamMarkerServo.setPosition(Constants.TEAM_MARKER_UP_POS);
+        depositServo.setPosition(Constants.DEPOSIT_CLOSE_POS);
+        teamMarkerServo.setPosition(Constants.TEAM_MARKER_HOME_POS);
 
         depositor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         depositor.setTargetPosition(0);
@@ -91,7 +90,7 @@ public class Deposit {
 
     //team marker
 
-    private void markerSetPosition(double pos) {
+    public void markerSetPosition(double pos) {
         if (pos != lastServoPos) {
             teamMarkerServo.setPosition(pos);
             lastServoPos = pos;

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
+import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
@@ -42,6 +43,10 @@ public class Teleop extends LinearOpMode {
     private int depositServoStatus = 0;
 
     private double slidesPower = 1;
+
+    //Team Marker Arm Controls
+    double teamMarkerManualPos = Constants.TEAM_MARKER_UP_POS;
+    double teamMarkerArmSpeed = .001;
 
     //cycle counter stuff
     private ArrayList<Double> cycles = new ArrayList<Double>();
@@ -124,10 +129,21 @@ public class Teleop extends LinearOpMode {
                 cycleToggle = false;
             }
 
+            //Capping Controls
             if (gamepad2.y) {
-                robot.deposit.hold();
-                depositServoStatus = 1;
+                robot.deposit.markerArmUp();
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.CAP);
+            } else if (gamepad2.dpad_up){
+                robot.deposit.markerArmUp();
+                teamMarkerManualPos = Constants.TEAM_MARKER_UP_POS;
+            } else if(gamepad2.dpad_down){
+                robot.deposit.markerArmDown();
+            } else if (gamepad2.right_trigger>.1){
+                teamMarkerManualPos += gamepad2.right_trigger * teamMarkerArmSpeed;
+                robot.deposit.markerSetPosition(teamMarkerManualPos);
+            } else if (gamepad2.left_trigger>.1){
+                teamMarkerManualPos -= gamepad2.left_trigger * teamMarkerArmSpeed;
+                robot.deposit.markerSetPosition(teamMarkerManualPos);
             }
 
 //            if (gamepad2.left_trigger > 0.1) {
@@ -153,18 +169,18 @@ public class Teleop extends LinearOpMode {
                 servoToggle = false;
             }
 
-            if (gamepad2.dpad_up && !markerToggle) {
-                if (markerArmDown) {
-                    robot.deposit.markerArmUp();
-                    markerArmDown = false;
-                } else {
-                    robot.deposit.markerArmDown();
-                    markerArmDown = true;
-                }
-                markerToggle = true;
-            } else if (!gamepad2.dpad_up && markerToggle) {
-                markerToggle = false;
-            }
+//            if (gamepad2.dpad_up && !markerToggle) {
+//                if (markerArmDown) {
+//                    robot.deposit.markerArmUp();
+//                    markerArmDown = false;
+//                } else {
+//                    robot.deposit.markerArmDown();
+//                    markerArmDown = true;
+//                }
+//                markerToggle = true;
+//            } else if (!gamepad2.dpad_up && markerToggle) {
+//                markerToggle = false;
+//            }
 
             if (gamepad2.left_bumper) {
                 robot.carousel.rotate();
