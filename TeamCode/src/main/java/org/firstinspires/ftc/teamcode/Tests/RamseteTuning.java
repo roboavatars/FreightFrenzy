@@ -19,13 +19,13 @@ public class RamseteTuning extends LinearOpMode {
     public static double x = 54.5;
     public static double y = 120;
     public static double theta = 0.5;
-    public static double splineTime = 2;
+    public static double splineTime = 4;
     public static boolean move = false;
     public static boolean reset = false;
 
     @Override
     public void runOpMode() {
-        Robot robot = new Robot(this, 54.5, 63, PI/2, false, true);
+        Robot robot = new Robot(this, 54.5, 20, PI/2, false, true);
 
         waitForStart();
 
@@ -35,14 +35,15 @@ public class RamseteTuning extends LinearOpMode {
 
         while (opModeIsActive()) {
             if (reset || gamepad1.a) {
-                robot.resetOdo(54.5, 63, PI/2);
+                robot.resetOdo(54.5, 20, PI/2);
                 reset = false;
             }
 
             if (!move) {
                 path = new Path(new Waypoint[] {
-                        new Waypoint(robot.x, robot.y, robot.theta, 0.1, 1, 0, 0),
-                        new Waypoint(x, y, theta * PI, 0.1, -1, 0, splineTime)
+                        new Waypoint(robot.x, robot.y, robot.theta, 30, 10, 0, 0),
+                        new Waypoint(60.5, 70, PI/2, 40, 10, 0, 2),
+                        new Waypoint(x, y, theta * PI, 10, -10, 0, splineTime)
                 });
 
                 pose = new Pose(robot.x, robot.y, robot.theta, robot.vx, robot.vy, robot.w);

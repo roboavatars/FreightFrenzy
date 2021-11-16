@@ -65,15 +65,7 @@ public class Deposit {
     }
 
     public double getSlidesHeight() {
-        return depositor.getCurrentPosition();
-    }
-
-    public deposit_height getTargHeight() {
-        return getTargHeight();
-    }
-
-    public boolean slidesMoving() {
-        return depositor.isBusy();
+        return depositor.getCurrentPosition() * 0.043;
     }
 
     //deposit
