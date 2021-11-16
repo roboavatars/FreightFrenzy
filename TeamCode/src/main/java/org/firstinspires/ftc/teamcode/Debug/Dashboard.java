@@ -38,11 +38,11 @@ public class Dashboard {
     }
 
     public static void drawSlides(double x, double y, double theta, double position) {
-        double[] leftX = {-4 * cos(theta) - 9 * sin(theta) + x, -2.5 * cos(theta) - 9 * sin(theta) + x, -2.5 * cos(theta) - (9 + position) * sin(theta) + x, -4 * cos(theta) - (9 + position) * sin(theta) + x};
-        double[] leftY = {4 * sin(theta) - 9 * cos(theta) + y, 2.5 * sin(theta) - 9 * cos(theta) + y, 2.5 * sin(theta) - (9 + position) * cos(theta) + y, 4 * sin(theta) - (9 + position) * cos(theta) + y};
+        double[] leftX = {-4 * sin(theta) - 9 * cos(theta) + x, -2.5 * sin(theta) - 9 * cos(theta) + x, -2.5 * sin(theta) - (9 + position) * cos(theta) + x, -4 * sin(theta) - (9 + position) * cos(theta) + x};
+        double[] leftY = {4 * cos(theta) - 9 * sin(theta) + y, 2.5 * cos(theta) - 9 * sin(theta) + y, 2.5 * cos(theta) - (9 + position) * sin(theta) + y, 4 * cos(theta) - (9 + position) * sin(theta) + y};
 
-        double[] rightX = {4 * cos(theta) - 9 * sin(theta) + x, 2.5 * cos(theta) - 9 * sin(theta) + x, 2.5 * cos(theta) - (9 + position) * sin(theta) + x, 4 * cos(theta) - (9 + position) * sin(theta) + x};
-        double[] rightY = {-4 * sin(theta) - 9 * cos(theta) + y, -2.5 * sin(theta) - 9 * cos(theta) + y, -2.5 * sin(theta) - (9 + position) * cos(theta) + y, -4 * sin(theta) - (9 + position) * cos(theta) + y};
+        double[] rightX = {4 * sin(theta) - 9 * cos(theta) + x, 2.5 * sin(theta) - 9 * cos(theta) + x, 2.5 * sin(theta) - (9 + position) * cos(theta) + x, 4 * sin(theta) - (9 + position) * cos(theta) + x};
+        double[] rightY = {-4 * cos(theta) - 9 * sin(theta) + y, -2.5 * cos(theta) - 9 * sin(theta) + y, -2.5 * cos(theta) - (9 + position) * sin(theta) + y, -4 * cos(theta) - (9 + position) * sin(theta) + y};
 
         drawPolygon(leftX, leftY, "grey");
         drawPolygon(rightX, rightY, "grey");
