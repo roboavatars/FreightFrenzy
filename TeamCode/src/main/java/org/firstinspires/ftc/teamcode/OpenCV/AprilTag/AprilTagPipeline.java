@@ -30,32 +30,38 @@ public class AprilTagPipeline extends OpenCvPipeline {
     Scalar green = new Scalar(0,255,0,255);
     Scalar white = new Scalar(255,255,255,255);
 
-    double fx;
-    double fy;
-    double cx;
-    double cy;
+    double fx = 578.272;
+    double fy = 578.272;
+    double cx = 402.145;
+    double cy = 221.506;
 
     // UNITS ARE METERS
     double tagsize;
     double tagsizeX;
     double tagsizeY;
 
+    final double FEET_PER_METER = 3.28084;
+
     private double decimation;
     private boolean needToSetDecimation;
     private final Object decimationSync = new Object();
 
-    public AprilTagPipeline(double tagsize, double fx, double fy, double cx, double cy) {
+    int numFramesWithoutDetection = 0;
+
+    final float DECIMATION_HIGH = 3;
+    final float DECIMATION_LOW = 2;
+    final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
+    final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
+
+    private double[] location = new double[3];
+
+    public AprilTagPipeline(double tagsize) {
         this.tagsize = tagsize;
         this.tagsizeX = tagsize;
         this.tagsizeY = tagsize;
-        this.fx = fx;
-        this.fy = fy;
-        this.cx = cx;
-        this.cy = cy;
 
         constructMatrix();
     }
-
 
     public double getFx() {
         return fx;
@@ -75,6 +81,43 @@ public class AprilTagPipeline extends OpenCvPipeline {
 
     public double getTagSize() {
         return tagsize;
+    }
+
+    public double[] getLocation () {
+        return location;
+    }
+
+    public void runAprilTag () {
+        ArrayList<AprilTagDetection> detections = this.getDetectionsUpdate();
+
+        if(detections != null) {
+
+            // if we don't see any tags
+            if(detections.size() == 0) {
+                numFramesWithoutDetection++;
+
+                // if we haven't seen a tag for a few frames, lower the decimation to increase changes of seeing the tag
+                if(numFramesWithoutDetection >= THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION) {
+                    this.setDecimation(DECIMATION_LOW);
+                }
+            }
+            // if we see the tags
+            else {
+                numFramesWithoutDetection = 0;
+
+                // if the target is within 1 meter, turn on high decimation to increase the frame rate
+                if(detections.get(0).pose.z < THRESHOLD_HIGH_DECIMATION_RANGE_METERS) {
+                    this.setDecimation(DECIMATION_HIGH);
+                }
+
+                for(AprilTagDetection detection : detections) {
+                    location[0] = detection.pose.x*FEET_PER_METER;
+                    location[1] = detection.pose.y*FEET_PER_METER;
+                    location[2] = detection.pose.z*FEET_PER_METER;
+                    location[3] = detection.pose.yaw;
+                }
+            }
+        }
     }
 
     @Override

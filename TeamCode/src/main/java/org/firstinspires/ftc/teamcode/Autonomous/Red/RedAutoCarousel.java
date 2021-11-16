@@ -244,7 +244,6 @@ public class RedAutoCarousel extends LinearOpMode {
                                 new Waypoint(robot.x, robot.y, PI / 2, -10, -20, 0, 0),
                                 new Waypoint(138, 82, PI / 2, -20, -5, 0, 1),
                                 new Waypoint(118, 63, PI / 12, -20, -10, 0, cycleTime),
-
                         };
                         cyclePath = new Path(cycleWaypoints);
 
@@ -261,12 +260,9 @@ public class RedAutoCarousel extends LinearOpMode {
                         goToWarehouse2 = true;
                     }
 
-
                     time.reset();
-
                 }
             }
-
 
             // park
             else if (!park) {

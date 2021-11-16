@@ -10,16 +10,19 @@ public class Vision extends BaseDetector {
 
     public enum Pipeline {AprilTag}
 
-    public Vision(LinearOpMode op, Pipeline pipeline) {
+    public Vision(LinearOpMode op, Pipeline pipeline, double tagsize) {
         super(op);
 
-        aprilTagPipeline = new AprilTagPipeline(aprilTagPipeline.getFx(), aprilTagPipeline.getFy(), aprilTagPipeline.getCx(),aprilTagPipeline.getCy(),aprilTagPipeline.getTagSize());
+        aprilTagPipeline = new AprilTagPipeline(tagsize);
 
         setPipeline(pipeline);
     }
 
+
+
+
     public void setPipeline(Pipeline pipeline) {
-        if (pipeline ==Pipeline.AprilTag) {
+        if (pipeline == Pipeline.AprilTag) {
             setPipeline(aprilTagPipeline);
         }
     }
