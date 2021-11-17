@@ -56,7 +56,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
     final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
     final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
 
-    private double[] location = new double[3];
+    private double[] location = new double[4];
 
     public AprilTagPipeline(double tagsize) {
         this.tagsize = tagsize;
