@@ -1,4 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpenCV.AprilTag;
+import static java.lang.Math.PI;
+
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -9,8 +11,6 @@ import org.opencv.core.Point;
 import org.opencv.core.Point3;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
-import org.openftc.apriltag.AprilTagDetection;
-import org.openftc.apriltag.AprilTagDetectorJNI;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
@@ -22,6 +22,9 @@ public class AprilTagPipeline extends OpenCvPipeline {
 
     private ArrayList<AprilTagDetection> detectionsUpdate = new ArrayList<>();
     private final Object detectionsUpdateSync = new Object();
+
+    private AprilTagDetection largestDetection = new AprilTagDetection();
+    private boolean firstForLoop = true;
 
     Mat cameraMatrix;
 
@@ -87,6 +90,25 @@ public class AprilTagPipeline extends OpenCvPipeline {
         return location;
     }
 
+    public double[] getCenterOfMarker(){
+        return getCenterOfMarker(largestDetection.pose.x, largestDetection.pose.y, largestDetection.pose.yaw, largestDetection.id);
+    }
+
+    public double[] getCenterOfMarker(double tagX, double tagY, double tagTheta, double tagID) {
+        double[] pose = new double[3];
+
+        pose[0] = 2*Math.cos(tagTheta) + tagX;
+        pose[1] = 2*Math.sin(tagTheta) + tagY;
+
+        pose[2] = tagTheta + tagID*PI/2;
+        pose[2] = pose[2] % 2*PI;
+        if (pose[2] < 0 ){
+            pose[2] += 2*PI;
+        }
+
+        return pose;
+    }
+
     public void runAprilTag () {
         ArrayList<AprilTagDetection> detections = this.getDetectionsUpdate();
 
@@ -111,11 +133,16 @@ public class AprilTagPipeline extends OpenCvPipeline {
                 }
 
                 for(AprilTagDetection detection : detections) {
+                    if (firstForLoop || (largestDetection.pose.x + largestDetection.pose.y)/2 < (detection.pose.x + detection.pose.y)/2){
+                            largestDetection = detection;
+                            firstForLoop = false;
+                    }
                     location[0] = detection.pose.x*FEET_PER_METER;
                     location[1] = detection.pose.y*FEET_PER_METER;
                     location[2] = detection.pose.z*FEET_PER_METER;
                     location[3] = detection.pose.yaw;
                 }
+                firstForLoop = true;
             }
         }
     }
@@ -179,6 +206,25 @@ public class AprilTagPipeline extends OpenCvPipeline {
             detectionsUpdate = null;
             return ret;
         }
+    }
+
+    public double[] localizeRobot (double[] starting_marker){
+        double[] pose = new double[3];
+        double camera_x, camera_y;
+
+        double[] current_marker = getCenterOfMarker();
+
+        double offsetTheta = -(current_marker[2] - starting_marker[2]);
+
+        camera_x = starting_marker[0]+ -current_marker[0]*Math.cos(offsetTheta) - -current_marker[1]*Math.sin(offsetTheta);
+        camera_y = starting_marker[1] + -current_marker[0]*Math.sin(offsetTheta) + -current_marker[1]*Math.cos(offsetTheta);
+
+        pose[2] = PI - (Math.atan2(current_marker[1],current_marker[0])-PI/2) + Math.atan2(camera_y,camera_x);
+
+        pose[0] = 9*Math.cos(pose[2]) + camera_x;
+        pose[1] = 9*Math.sin(pose[2]) + camera_y;
+
+        return pose;
     }
 
     void constructMatrix() {
@@ -323,5 +369,6 @@ public class AprilTagPipeline extends OpenCvPipeline {
             this.rvec = rvec;
             this.tvec = tvec;
         }
+
     }
 }

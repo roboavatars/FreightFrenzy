@@ -22,6 +22,8 @@ public class AprilTagTest extends LinearOpMode {
         while (opModeIsActive()) {
             detector.getAprilTagPipe().runAprilTag();
 
+
+
             telemetry.addData("X: ", detector.getAprilTagPipe().getLocation()[0]);
             telemetry.addData("Y: ", detector.getAprilTagPipe().getLocation()[1]);
             telemetry.addData("Z: ", detector.getAprilTagPipe().getLocation()[2]);
