@@ -23,7 +23,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
     private ArrayList<AprilTagDetection> detectionsUpdate = new ArrayList<>();
     private final Object detectionsUpdateSync = new Object();
 
-    private AprilTagDetection largestDetection = new AprilTagDetection();
+    private AprilTagDetection ClosestDetection = new AprilTagDetection();
     private boolean firstForLoop = true;
 
     Mat cameraMatrix;
@@ -91,7 +91,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
     }
 
     public double[] getCenterOfMarker(){
-        return getCenterOfMarker(largestDetection.pose.x, largestDetection.pose.y, largestDetection.pose.yaw, largestDetection.id);
+        return getCenterOfMarker(ClosestDetection.pose.x * FEET_PER_METER, ClosestDetection.pose.y * FEET_PER_METER, ClosestDetection.pose.yaw, ClosestDetection.id);
     }
 
     public double[] getCenterOfMarker(double tagX, double tagY, double tagTheta, double tagID) {
@@ -133,8 +133,8 @@ public class AprilTagPipeline extends OpenCvPipeline {
                 }
 
                 for(AprilTagDetection detection : detections) {
-                    if (firstForLoop || (largestDetection.pose.x + largestDetection.pose.y)/2 < (detection.pose.x + detection.pose.y)/2){
-                            largestDetection = detection;
+                    if (firstForLoop || Math.hypot(detection.pose.x, detection.pose.y) < Math.hypot(ClosestDetection.pose.x, ClosestDetection.pose.y)){
+                            ClosestDetection = detection;
                             firstForLoop = false;
                     }
                     location[0] = detection.pose.x*FEET_PER_METER;
