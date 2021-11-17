@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.OpenCV.AprilTag;
+import static org.firstinspires.ftc.teamcode.RobotClasses.Robot.cameraRelativeToRobot;
 import static java.lang.Math.PI;
 
 import org.opencv.calib3d.Calib3d;
@@ -24,7 +25,6 @@ public class AprilTagPipeline extends OpenCvPipeline {
     private final Object detectionsUpdateSync = new Object();
 
     private AprilTagDetection ClosestDetection = new AprilTagDetection();
-    private boolean firstForLoop = true;
 
     Mat cameraMatrix;
 
@@ -97,10 +97,10 @@ public class AprilTagPipeline extends OpenCvPipeline {
     public double[] getCenterOfMarker(double tagX, double tagY, double tagTheta, double tagID) {
         double[] pose = new double[3];
 
-        pose[0] = 2*Math.cos(tagTheta) + tagX;
-        pose[1] = 2*Math.sin(tagTheta) + tagY;
+        pose[0] = 2*Math.cos(tagTheta + PI/2) + tagX;
+        pose[1] = 2*Math.sin(tagTheta + PI/2) + tagY;
 
-        pose[2] = tagTheta + tagID*PI/2;
+        pose[2] = tagTheta - tagID*PI/2;
         pose[2] = pose[2] % 2*PI;
         if (pose[2] < 0 ){
             pose[2] += 2*PI;
@@ -132,17 +132,17 @@ public class AprilTagPipeline extends OpenCvPipeline {
                     this.setDecimation(DECIMATION_HIGH);
                 }
 
+                //Find the closest detection and record its position
+                ClosestDetection = detections.get(0);
                 for(AprilTagDetection detection : detections) {
-                    if (firstForLoop || Math.hypot(detection.pose.x, detection.pose.y) < Math.hypot(ClosestDetection.pose.x, ClosestDetection.pose.y)){
-                            ClosestDetection = detection;
-                            firstForLoop = false;
+                    if (Math.hypot(detection.pose.x, detection.pose.y) < Math.hypot(ClosestDetection.pose.x, ClosestDetection.pose.y)){
+                        ClosestDetection = detection;
                     }
-                    location[0] = detection.pose.x*FEET_PER_METER;
-                    location[1] = detection.pose.y*FEET_PER_METER;
-                    location[2] = detection.pose.z*FEET_PER_METER;
-                    location[3] = detection.pose.yaw;
                 }
-                firstForLoop = true;
+                location[0] = ClosestDetection.pose.x*FEET_PER_METER;
+                location[1] = ClosestDetection.pose.y*FEET_PER_METER;
+                location[2] = ClosestDetection.pose.z*FEET_PER_METER;
+                location[3] = ClosestDetection.pose.yaw;
             }
         }
     }
@@ -216,13 +216,20 @@ public class AprilTagPipeline extends OpenCvPipeline {
 
         double offsetTheta = -(current_marker[2] - starting_marker[2]);
 
-        camera_x = starting_marker[0]+ -current_marker[0]*Math.cos(offsetTheta) - -current_marker[1]*Math.sin(offsetTheta);
+        //find the coords of the camera
+        camera_x = starting_marker[0] + -current_marker[0]*Math.cos(offsetTheta) - -current_marker[1]*Math.sin(offsetTheta);
         camera_y = starting_marker[1] + -current_marker[0]*Math.sin(offsetTheta) + -current_marker[1]*Math.cos(offsetTheta);
 
+        //find robot heading
         pose[2] = PI - (Math.atan2(current_marker[1],current_marker[0])-PI/2) + Math.atan2(camera_y,camera_x);
+        pose[2] = pose[2] % 2*PI;
+        if (pose[2] < 0 ){
+            pose[2] += 2*PI;
+        }
 
-        pose[0] = 9*Math.cos(pose[2]) + camera_x;
-        pose[1] = 9*Math.sin(pose[2]) + camera_y;
+        //find the coords of the center of the robot
+        pose[0] = camera_x + -cameraRelativeToRobot[0]*Math.cos(pose[2]) - -cameraRelativeToRobot[1]*Math.sin(pose[2]);
+        pose[1] = camera_x + -cameraRelativeToRobot[0]*Math.sin(pose[2]) + -cameraRelativeToRobot[1]*Math.cos(pose[2]);
 
         return pose;
     }

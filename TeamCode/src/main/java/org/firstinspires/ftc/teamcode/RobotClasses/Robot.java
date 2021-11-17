@@ -50,6 +50,7 @@ public class Robot {
     private final double xyTolerance = 1;
     private final double thetaTolerance = PI/35;
     private final double slidesRetractMinDist = 6;
+    public final static double[] cameraRelativeToRobot = new double[]{1,3};
 
     // State Variables
     private final boolean isAuto;
