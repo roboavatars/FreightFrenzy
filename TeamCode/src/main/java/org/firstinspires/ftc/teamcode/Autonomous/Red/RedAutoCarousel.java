@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Autonomous.Red;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 import static java.lang.Math.PI;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -12,9 +11,10 @@ import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
+import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-@Autonomous(name = "Red Auto Carousel", preselectTeleOp = "1 Teleop", group = "Red")
+@Autonomous(name = "1 Red Auto Carousel", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoCarousel extends LinearOpMode {
 
     @Override
@@ -72,6 +72,13 @@ public class RedAutoCarousel extends LinearOpMode {
 //        int barcodeCase = detector.getAprilTagPipe().getResult();
         int barcodeCase = 0; // 0 = left, 1 = mid, 2 = right
         Robot.log("Barcode Case: " + barcodeCase);
+        if (barcodeCase == 0) {
+            robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
+        } else if (barcodeCase == 1) {
+            robot.deposit.moveSlides(1, Deposit.deposit_height.MID);
+        } else {
+            robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+        }
 
         // Paths
 
@@ -95,20 +102,6 @@ public class RedAutoCarousel extends LinearOpMode {
 
                 if (time.seconds() > deliverPreloadedFreightTime) {
 
-//                if (barcodeCase == 0) {
-//                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
-//                    robot.deposit.open();
-//                } else if (barcodeCase == 1) {
-//                    robot.deposit.moveSlides(1, Deposit.deposit_height.MID);
-//                    robot.deposit.open();
-//                } else {
-//                    robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
-//                    robot.deposit.open();
-//                }
-//
-//                robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
-//                robot.deposit.close();
-
                     Waypoint[] spinCarouselWaypoints = new Waypoint[]{
                             new Waypoint(robot.x, robot.y, 0, 40, 30, 0, 0),
                             new Waypoint(130, 15, 7 * PI / 4, 30, -10, 0, spinCarouselTime),
@@ -122,21 +115,23 @@ public class RedAutoCarousel extends LinearOpMode {
 
             // Go to Carousel
             else if (!spinCarousel) {
-                addPacket("path", "spinCarousel");
-
                 robot.setTargetPoint(new Target(spinCarouselPath.getRobotPose(Math.min(time.seconds(), spinCarouselTime))));
+
+                if (time.seconds() > 1) {
+                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                    robot.deposit.close();
+                }
+
                 if (time.seconds() > spinCarouselTime) {
 
                     // spin
-//                robot.carousel.rotate();
+                    robot.carousel.rotate();
                     time.reset();
 
                     if (time.seconds() > 1) {
-//                    robot.carousel.stop();
+                        robot.carousel.stop();
                     }
-
-                    // Intake rings
-//                robot.intake.on();
+                    robot.intake.on();
 
                     Waypoint[] deliverDuckWaypoints = new Waypoint[]{
                             new Waypoint(robot.x, robot.y, 3 * PI / 4, 20, 10, 0, 0),
@@ -152,8 +147,6 @@ public class RedAutoCarousel extends LinearOpMode {
 
             // Deliver Duck
             else if (!deliverDuck) {
-                addPacket("path", "deliverDuck");
-
                 Pose pose = deliverDuckPath.getRobotPose(Math.min(time.seconds(), deliverDuckTime));
                 robot.setTargetPoint(new Target(pose).theta(pose.theta + PI));
 
@@ -161,13 +154,6 @@ public class RedAutoCarousel extends LinearOpMode {
 
 //                robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
 //                robot.deposit.open();
-
-                    time.reset();
-
-                    if (time.seconds() > 0.1) {
-//                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
-//                    robot.deposit.close();
-                    }
 
                     Waypoint[] goToWarehouseWaypoints = new Waypoint[]{
                             new Waypoint(robot.x, robot.y, 0, 35, 30, 0, 0),
@@ -179,13 +165,18 @@ public class RedAutoCarousel extends LinearOpMode {
                     time.reset();
                 }
             } else if (!goToWarehouse) {
-                addPacket("path", "goToWarehouse");
-
                 robot.setTargetPoint(new Target(goToWarehousePath.getRobotPose(Math.min(time.seconds(), goToWarehouseTime))));
 
-                if (time.seconds() > goToWarehouseTime) {
+                if (time.seconds() > 1) {
+                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                    robot.deposit.close();
+                }
 
-//                robot.intake.on();
+                if (robot.y > 100) {
+                    robot.intake.on();
+                }
+
+                if (time.seconds() > goToWarehouseTime) {
 
                     Waypoint[] cycleWaypoints = new Waypoint[]{
                             new Waypoint(robot.x, robot.y, PI / 2, -10, -20, 0, 0),
@@ -205,19 +196,15 @@ public class RedAutoCarousel extends LinearOpMode {
                 Pose pose = cyclePath.getRobotPose(Math.min(time.seconds(), cycleTime));
                 robot.setTargetPoint(new Target(pose).theta(pose.theta + PI));
 
+                if (robot.y < 92) {
+                    robot.intake.off();
+                    robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
+                    robot.deposit.hold();
+                } else if (time.seconds() > 0.5) {
+                    robot.intake.reverse();
+                }
+
                 if (time.seconds() > cycleTime) {
-
-//                    robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
-//                    robot.deposit.open();
-                    time.reset();
-
-                    if (time.seconds() > 0.1) {
-//                        robot.deposit.close();
-                    }
-
-//                        robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
-                    cycle = true;
-
                     Waypoint[] goToWarehouseWaypoints2 = new Waypoint[]{
                             new Waypoint(robot.x, robot.y, PI / 12, 10, 10, 0, 0),
                             new Waypoint(138, 82, PI / 2, 10, 10, 0, 1),
@@ -226,16 +213,19 @@ public class RedAutoCarousel extends LinearOpMode {
                     };
                     goToWarehousePath2 = new Path(goToWarehouseWaypoints2);
 
+                    cycle = true;
                     time.reset();
                 }
             } else if (!goToWarehouse2) {
-                addPacket("path", "goToWarehouse2");
-
                 robot.setTargetPoint(new Target(goToWarehousePath2.getRobotPose(Math.min(time.seconds(), goToWarehouseTime))));
-                if (time.seconds() > 0.3) {
-//                        robot.intake.off();
-                } else {
-                    //                    robot.intake.on();
+
+                if (time.seconds() > 1) {
+                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                    robot.deposit.close();
+                }
+
+                if (robot.y > 100) {
+                    robot.intake.on();
                 }
 
                 if (time.seconds() > goToWarehouseTime2) {
@@ -266,8 +256,6 @@ public class RedAutoCarousel extends LinearOpMode {
 
             // park
             else if (!park) {
-                addPacket("path", "park");
-
                 robot.setTargetPoint(new Target(parkPath.getRobotPose(Math.min(time.seconds(), parkTime))));
 
                 if (time.seconds() > parkTime) {
