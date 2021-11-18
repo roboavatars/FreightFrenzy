@@ -98,7 +98,7 @@ public class Robot {
 
         drivetrain = new Drivetrain(op, x, y, theta);
         intake = new Intake(op);
-        deposit = new Deposit(op);
+        deposit = new Deposit(op, isAuto);
         carousel = new Carousel(op);
         logger = new Logger();
 
@@ -269,6 +269,7 @@ public class Robot {
         double rightVelocity = commandedV + commandedW * Drivetrain.ODOMETRY_TRACK_WIDTH / 2;
         double leftVelocity = commandedV - commandedW * Drivetrain.ODOMETRY_TRACK_WIDTH / 2;
 
+        addPacket("Target Theta", thetaTarget);
         drawDrivetrain(xTarget, yTarget, thetaTarget, "blue");
         drivetrain.tankControls(leftVelocity, rightVelocity, theta, vx, vy, w);
     }

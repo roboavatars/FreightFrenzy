@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.OpenCV.AprilTag;
 
 import static org.firstinspires.ftc.teamcode.RobotClasses.Robot.cameraRelativeToRobot;
 import static java.lang.Math.PI;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.CvType;
@@ -108,7 +110,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
         pose[1] = 2*Math.sin(tagTheta + PI/2) + tagY;
 
         pose[2] = tagTheta - tagID*PI/2;
-        pose[2] = pose[2] % 2*PI;
+        pose[2] %= 2*PI;
         if (pose[2] < 0) {
             pose[2] += 2*PI;
         }
@@ -220,14 +222,22 @@ public class AprilTagPipeline extends OpenCvPipeline {
     public double[] localizeRobot(double[] starting_marker) {
         double[] pose = new double[3];
         double camera_x, camera_y;
-
         double[] current_marker = getCenterOfMarker();
 
+        addPacket("current marker x", current_marker[0]);
+        addPacket("current marker y", current_marker[1]);
+        addPacket("current marker theta", current_marker[2]);
+
         double offsetTheta = -(current_marker[2] - starting_marker[2]);
+
+        addPacket("offset theta", offsetTheta);
 
         //find the coords of the camera
         camera_x = starting_marker[0] + -current_marker[0]*Math.cos(offsetTheta) - -current_marker[1]*Math.sin(offsetTheta);
         camera_y = starting_marker[1] + -current_marker[0]*Math.sin(offsetTheta) + -current_marker[1]*Math.cos(offsetTheta);
+
+        addPacket("camera y", camera_y);
+        addPacket("camera x", camera_x);
 
         //find robot heading
         pose[2] = PI - (Math.atan2(current_marker[1],current_marker[0])-PI/2) + Math.atan2(camera_y,camera_x);

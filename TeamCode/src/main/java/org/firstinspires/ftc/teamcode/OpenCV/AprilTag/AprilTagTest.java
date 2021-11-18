@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.OpenCV.Vision;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
 @Config
 @TeleOp(name = "April Tag Test")
@@ -32,6 +33,7 @@ public class AprilTagTest extends LinearOpMode {
             addPacket("Y: ", detector.getAprilTagPipe().getLocation()[1]);
             addPacket("Z: ", detector.getAprilTagPipe().getLocation()[2]);
             addPacket("Yaw: ", detector.getAprilTagPipe().getLocation()[3]);
+            sendPacket();
         }
     }
 }

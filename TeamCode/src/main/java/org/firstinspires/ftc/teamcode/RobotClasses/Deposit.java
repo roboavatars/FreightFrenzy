@@ -24,12 +24,16 @@ public class Deposit {
 
     private deposit_height targHeight = deposit_height.HOME;
 
-    public Deposit(LinearOpMode op) {
+    public Deposit(LinearOpMode op, boolean isAuto) {
         depositor = op.hardwareMap.get(DcMotorEx.class, "depositor");
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         teamMarkerServo = op.hardwareMap.get(Servo.class, "teamMarkerArm");
 
-        depositServo.setPosition(Constants.DEPOSIT_CLOSE_POS);
+        if (isAuto) {
+            hold();
+        } else{
+            close();
+        }
         teamMarkerServo.setPosition(Constants.TEAM_MARKER_HOME_POS);
 
         depositor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

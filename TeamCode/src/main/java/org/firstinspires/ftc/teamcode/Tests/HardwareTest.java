@@ -31,7 +31,7 @@ public class HardwareTest extends LinearOpMode {
     public void runOpMode() {
         DcMotor motor1 = hardwareMap.get(DcMotorEx.class, motorName1);
 //        DcMotor motor3 = hardwareMap.get(DcMotor.class, motorName3);
-        Deposit motor3 = new Deposit(this);
+        Deposit motor3 = new Deposit(this, true);
 //        Deposit motor3 = hardwareMap.get(DcMotor.class, motorName3);
         Servo servo1 = hardwareMap.get(Servo.class, servoName1);
 
