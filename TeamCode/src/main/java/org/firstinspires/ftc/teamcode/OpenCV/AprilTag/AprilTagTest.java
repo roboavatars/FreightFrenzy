@@ -14,15 +14,13 @@ public class AprilTagTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Vision detector = new Vision(this, Vision.Pipeline.AprilTag, 0.166);
+        Vision detector = new Vision(this, Vision.Pipeline.AprilTag);
         detector.start();
 
         waitForStart();
 
         while (opModeIsActive()) {
             detector.getAprilTagPipe().runAprilTag();
-
-
 
             telemetry.addData("X: ", detector.getAprilTagPipe().getLocation()[0]);
             telemetry.addData("Y: ", detector.getAprilTagPipe().getLocation()[1]);

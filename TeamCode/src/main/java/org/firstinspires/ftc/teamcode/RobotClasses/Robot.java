@@ -251,7 +251,13 @@ public class Robot {
         // Ramsete Controller
         double eX = cos(theta) * (xTarget - x) + sin(theta) * (yTarget - y);
         double eY = -sin(theta) * (xTarget - x) + cos(theta) * (yTarget - y);
-        double eTheta = thetaTarget - theta;
+        double eTheta;
+        if (abs(theta - thetaTarget) > PI) {
+            eTheta = abs(theta - thetaTarget) / (theta - thetaTarget) * (abs(theta - thetaTarget) - 2*PI);
+        } else {
+            eTheta = theta - thetaTarget;
+        }
+        eTheta *= -1;
 
         double vTarget = signOf(vyTarget) * hypot(vxTarget, vyTarget);
 

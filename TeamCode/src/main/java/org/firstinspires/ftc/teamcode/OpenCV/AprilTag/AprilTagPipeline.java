@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.OpenCV.AprilTag;
+
 import static org.firstinspires.ftc.teamcode.RobotClasses.Robot.cameraRelativeToRobot;
 import static java.lang.Math.PI;
 
@@ -12,6 +13,8 @@ import org.opencv.core.Point;
 import org.opencv.core.Point3;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.openftc.apriltag.AprilTagDetection;
+import org.openftc.apriltag.AprilTagDetectorJNI;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
@@ -43,7 +46,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
     double tagsizeX;
     double tagsizeY;
 
-    final double FEET_PER_METER = 3.28084;
+    final double INCHES_PER_METER = 39.3701;
 
     private double decimation;
     private boolean needToSetDecimation;
@@ -90,8 +93,12 @@ public class AprilTagPipeline extends OpenCvPipeline {
         return location;
     }
 
-    public double[] getCenterOfMarker(){
-        return getCenterOfMarker(ClosestDetection.pose.x * FEET_PER_METER, ClosestDetection.pose.y * FEET_PER_METER, ClosestDetection.pose.yaw, ClosestDetection.id);
+    public double[] getCenterOfMarker() {
+        if (ClosestDetection == null) {
+            return new double[] {-1, -1, -1};
+        } else {
+            return getCenterOfMarker(ClosestDetection.pose.x * INCHES_PER_METER, ClosestDetection.pose.z * INCHES_PER_METER, ClosestDetection.pose.yaw, ClosestDetection.id);
+        }
     }
 
     public double[] getCenterOfMarker(double tagX, double tagY, double tagTheta, double tagID) {
@@ -102,7 +109,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
 
         pose[2] = tagTheta - tagID*PI/2;
         pose[2] = pose[2] % 2*PI;
-        if (pose[2] < 0 ){
+        if (pose[2] < 0) {
             pose[2] += 2*PI;
         }
 
@@ -122,6 +129,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
                 if(numFramesWithoutDetection >= THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION) {
                     this.setDecimation(DECIMATION_LOW);
                 }
+                ClosestDetection = null;
             }
             // if we see the tags
             else {
@@ -139,9 +147,10 @@ public class AprilTagPipeline extends OpenCvPipeline {
                         ClosestDetection = detection;
                     }
                 }
-                location[0] = ClosestDetection.pose.x*FEET_PER_METER;
-                location[1] = ClosestDetection.pose.y*FEET_PER_METER;
-                location[2] = ClosestDetection.pose.z*FEET_PER_METER;
+
+                location[0] = ClosestDetection.pose.x * INCHES_PER_METER;
+                location[1] = ClosestDetection.pose.y * INCHES_PER_METER;
+                location[2] = ClosestDetection.pose.z * INCHES_PER_METER;
                 location[3] = ClosestDetection.pose.yaw;
             }
         }
@@ -180,7 +189,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
 
         // For fun, use OpenCV to draw 6DOF markers on the image. We actually recompute the pose using
         // OpenCV because I haven't yet figured out how to re-use AprilTag's pose in OpenCV.
-        for(AprilTagDetection detection : detections) {
+        for (AprilTagDetection detection : detections) {
             Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
             drawAxisMarker(input, tagsizeY/2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
             draw3dCubeMarker(input, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
@@ -208,7 +217,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
         }
     }
 
-    public double[] localizeRobot (double[] starting_marker){
+    public double[] localizeRobot(double[] starting_marker) {
         double[] pose = new double[3];
         double camera_x, camera_y;
 

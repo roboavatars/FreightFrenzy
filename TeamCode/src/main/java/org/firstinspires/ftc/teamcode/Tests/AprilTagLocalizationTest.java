@@ -21,7 +21,7 @@ public class AprilTagLocalizationTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Robot robot = new Robot(this, 63 , 135, PI/2 , true, true);
 
-        Vision detector = new Vision(this, Vision.Pipeline.AprilTag, 0.166);
+        Vision detector = new Vision(this, Vision.Pipeline.AprilTag);
         detector.start();
 
         waitForStart();
@@ -33,7 +33,7 @@ public class AprilTagLocalizationTest extends LinearOpMode {
         startMarkerPos[1] += robot.y;
         startMarkerPos[2] += robot.theta;
 
-        while(opModeIsActive()){
+        while (opModeIsActive()) {
             telemetry.addData("x", detector.getAprilTagPipe().localizeRobot(startMarkerPos)[0]);
             telemetry.addData("y", detector.getAprilTagPipe().localizeRobot(startMarkerPos)[1]);
             telemetry.addData("theta", detector.getAprilTagPipe().localizeRobot(startMarkerPos)[2]);
