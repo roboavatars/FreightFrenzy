@@ -10,15 +10,16 @@ public class Constants {
 
     // Deposit
     public static int HOME = 0;
-    public static int MID_GOAL = -227;
+    public static int LOW_GOAL = -60;
+    public static int MID_GOAL = -250;
     public static int TOP_GOAL = -500;
     public static int CAP = -550;
 
     public static double DEPOSIT_POWER = 1;
 
     public static double DEPOSIT_OPEN_POS = 0;
-    public static double DEPOSIT_HOLD_POS = .7;
-    public static double DEPOSIT_CLOSE_POS = .8;
+    public static double DEPOSIT_HOLD_POS = 0.28;
+    public static double DEPOSIT_CLOSE_POS = 0.4;
 
     public static double TEAM_MARKER_HOME_POS = 0.3;
     public static double TEAM_MARKER_UP_POS = 0.7;

@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 @TeleOp
 @Config
 public class HardwareTest extends LinearOpMode {
-    public static String motorName1 = "depositor";
+    public static String motorName1 = "slides";
     public static String motorName3 = "depositor";
     public static String servoName1 = "depositServo";
 
@@ -29,16 +29,15 @@ public class HardwareTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        DcMotor motor1 = hardwareMap.get(DcMotorEx.class, motorName1);
-//        DcMotor motor3 = hardwareMap.get(DcMotor.class, motorName3);
-        Deposit motor3 = new Deposit(this, true);
-//        Deposit motor3 = hardwareMap.get(DcMotor.class, motorName3);
-        Servo servo1 = hardwareMap.get(Servo.class, servoName1);
+        DcMotor motor1 = hardwareMap.get(DcMotorEx.class, motorName3);
+////        DcMotor motor3 = hardwareMap.get(DcMotor.class, motorName3);
+//        Deposit motor3 = new Deposit(this, true);
+////        Deposit motor3 = hardwareMap.get(DcMotor.class, motorName3);
+//        Servo servo1 = hardwareMap.get(Servo.class, servoName1);
 
         waitForStart();
 
         while(opModeIsActive()) {
-            motor1.setPower(gamepad1.right_stick_y);
             telemetry.addData("encoder ticks", motor1.getCurrentPosition());
             telemetry.update();
 

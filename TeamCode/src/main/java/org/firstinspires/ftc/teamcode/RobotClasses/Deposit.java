@@ -19,7 +19,7 @@ public class Deposit {
     private static int offset = 0;
 
     public enum deposit_height{
-        HOME, MID, TOP, CAP, UNDEFINED
+        HOME, LOW, MID, TOP, CAP, UNDEFINED
     }
 
     private deposit_height targHeight = deposit_height.HOME;
@@ -49,9 +49,12 @@ public class Deposit {
         if (deposit_height == deposit_height.HOME) {
             depositor.setTargetPosition(Constants.HOME);
             targHeight = deposit_height.HOME;
-        } else if (deposit_height == deposit_height.MID) {
-            depositor.setTargetPosition(Constants.MID_GOAL);
-            targHeight = deposit_height.MID;
+        } else if (deposit_height == deposit_height.LOW) {
+            depositor.setTargetPosition(Constants.LOW_GOAL);
+            targHeight = deposit_height.LOW;
+        }else if (deposit_height == deposit_height.MID) {
+                depositor.setTargetPosition(Constants.MID_GOAL);
+                targHeight = deposit_height.MID;
         } else if (deposit_height == deposit_height.TOP) {
             depositor.setTargetPosition(Constants.TOP_GOAL);
             targHeight = deposit_height.TOP;
