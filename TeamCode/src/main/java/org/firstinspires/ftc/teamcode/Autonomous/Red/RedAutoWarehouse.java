@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.Autonomous.Red;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -14,8 +13,6 @@ import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
-
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 
 @Config
 @Autonomous(name = "0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
@@ -104,22 +101,22 @@ public class RedAutoWarehouse extends LinearOpMode {
                         goToWarehouseWaypoints = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, preloadScoreCoord[barcodeCase][2], 40, 40, 0, 0),
                                 new Waypoint(130, 70, 5*PI/12, 20, 5, -1, goToWarehouseTime1-1.5),
-                                new Waypoint(cycleX, 84, PI / 2, 20, 5, -1, goToWarehouseTime1),
-                                new Waypoint(cycleX + 10, 122, PI / 2, 20, 0, 0, goToWarehouseTime2)
+                                new Waypoint(cycleX, 84, PI/2, 20, 5, -1, goToWarehouseTime1),
+                                new Waypoint(cycleX + 10, 122, PI/2, 20, 0, 0, goToWarehouseTime2)
                         };
                     } else if (barcodeCase == 1) {
                         goToWarehouseWaypoints = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, preloadScoreCoord[barcodeCase][2], 40, 40, 0, 0),
                                 new Waypoint(130, 70, 5*PI/12, 20, 5, -1, goToWarehouseTime1-1.5),
-                                new Waypoint(cycleX, 84, PI / 2, 20, 5, -1, goToWarehouseTime1),
-                                new Waypoint(cycleX + 10, 122, PI / 2, 20, 0, 0, goToWarehouseTime2)
+                                new Waypoint(cycleX, 84, PI/2, 20, 5, -1, goToWarehouseTime1),
+                                new Waypoint(cycleX + 10, 122, PI/2, 20, 0, 0, goToWarehouseTime2)
                         };
                     } else {
                         goToWarehouseWaypoints = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, preloadScoreCoord[barcodeCase][2], 40, 40, 0, 0),
                                 new Waypoint(130, 70, 5*PI/12, 20, 5, -1, goToWarehouseTime1-1.5),
-                                new Waypoint(cycleX, 84, PI / 2, 20, 5, -1, goToWarehouseTime1),
-                                new Waypoint(cycleX + 10, 122, PI / 2, 20, 0, 0, goToWarehouseTime2)
+                                new Waypoint(cycleX, 84, PI/2, 20, 5, -1, goToWarehouseTime1),
+                                new Waypoint(cycleX + 10, 122, PI/2, 20, 0, 0, goToWarehouseTime2)
                         };
                     }
                     goToWarehousePath = new Path(goToWarehouseWaypoints);
@@ -150,7 +147,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                     Waypoint[] cycleScoreWaypoints = new Waypoint[] {
                             new Waypoint(robot.x, robot.y, robot.theta, -20, 5, 0, 0),
                             new Waypoint(cycleX + 2, 86, -PI/2, 20, 5, 0, cycleScoreTime1),
-                            new Waypoint(depositX, depositY, depositTh + PI, 40, 20, 0 -2*cycleCounter, cycleScoreTime2)
+                            new Waypoint(depositX, depositY, depositTh + PI, 40, 20, -2 * cycleCounter, cycleScoreTime2)
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 
@@ -209,7 +206,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 }
 
                 if (time.seconds() > parkTime1){
-                    robot.drivetrain.setRawPower(.5,1,.5,1);
+                    robot.drivetrain.setRawPower(0.5, 1, 0.5, 1);
                 }
                 robot.setTargetPoint(parkPath.getRobotPose(Math.min(parkTime2, time.seconds())));
                 if (time.seconds() > parkTime2 || robot.y > 100) {
