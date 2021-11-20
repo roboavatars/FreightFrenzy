@@ -27,10 +27,12 @@ public class JankAprilTagPipeline extends OpenCvPipeline {
     public static int RECT_Y = 0;
     public static int RECT_WIDTH = 640;
     public static int RECT_HEIGHT = 320;
+    public static int LEFT_DIVIDER = 106;
+    public static int RIGHT_DIVIDER = 214;
     public static int RETURN_IMAGE = 1;
 
     // Debug
-    public static boolean debug = false;
+    public static boolean debug = true;
 
     // Results
     private Case outputCase = Case.None;
@@ -60,9 +62,9 @@ public class JankAprilTagPipeline extends OpenCvPipeline {
 
         // Draw Three Red Rectangles
         if (debug) {
-            Imgproc.rectangle(input, new Point(0, 0), new Point(RECT_WIDTH/3, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
-            Imgproc.rectangle(input, new Point(RECT_WIDTH/3, 0), new Point(2*RECT_WIDTH/3, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
-            Imgproc.rectangle(input, new Point(2*RECT_WIDTH/3, 0), new Point(RECT_WIDTH, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
+            Imgproc.rectangle(input, new Point(0, 0), new Point(LEFT_DIVIDER, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
+            Imgproc.rectangle(input, new Point(LEFT_DIVIDER, 0), new Point(RIGHT_DIVIDER, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
+            Imgproc.rectangle(input, new Point(RIGHT_DIVIDER, 0), new Point(RECT_WIDTH, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
         }
 
         // Convert to HSV Color Space
@@ -74,9 +76,9 @@ public class JankAprilTagPipeline extends OpenCvPipeline {
         Imgproc.morphologyEx(processed, processed, Imgproc.MORPH_CLOSE, new Mat());
 
         // Split Into Three Regions
-        Mat left = new Mat(processed, new Rect(0, 0, RECT_WIDTH/3, RECT_HEIGHT));
-        Mat middle = new Mat(processed, new Rect(RECT_WIDTH/3, 0, RECT_WIDTH/3, RECT_HEIGHT));
-        Mat right = new Mat(processed, new Rect(2*RECT_WIDTH/3, 0, RECT_WIDTH/3, RECT_HEIGHT));
+        Mat left = new Mat(processed, new Rect(0, 0, LEFT_DIVIDER, RECT_HEIGHT));
+        Mat middle = new Mat(processed, new Rect(LEFT_DIVIDER, 0, RIGHT_DIVIDER - LEFT_DIVIDER, RECT_HEIGHT));
+        Mat right = new Mat(processed, new Rect(RIGHT_DIVIDER, 0, RECT_WIDTH - RIGHT_DIVIDER, RECT_HEIGHT));
 
         // Compute White Area for each Region
         int leftArea = Core.countNonZero(left);

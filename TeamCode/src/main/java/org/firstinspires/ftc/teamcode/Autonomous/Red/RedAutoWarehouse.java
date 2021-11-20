@@ -20,7 +20,7 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 @Config
 @Autonomous(name = "0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoWarehouse extends LinearOpMode {
-    public static int barcodeCase = 2; // 0 = left, 1 = mid, 2 = right
+    public static int barcodeCase = 0; // 0 = left, 1 = mid, 2 = right
 
 
     @Override
@@ -54,17 +54,14 @@ public class RedAutoWarehouse extends LinearOpMode {
         double parkTime1 = 2;
         double parkTime2 = 3.5;
 
-        double cycleX = 137;
+        double cycleX = 138;
         double depositX = 117;
         double depositY = 68;
         double depositTh = PI/10;
 
-        double[][] preloadScoreCoord = {{113, 63, 5*PI/6}, {115.5, 63, 5*PI/6}, {117, 68, PI/10 + PI}};
+        double[][] preloadScoreCoord = {{112.25, 63, 5*PI/6}, {115.5, 63, 5*PI/6}, {119, 63, 5*PI/6}};
 
         // Paths
-
-
-
         Path preloadScorePath = null;
         Path cycleScorePath = null;
         Path goToWarehousePath = null;
@@ -98,7 +95,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
 
                 if (robot.isAtPose(depositX, depositY) || time.seconds() > preloadScoreTime + 0.5) {
-                    robot.deposit.open();
+                    robot.deposit.autoOpen();
                 }
 
                 if (time.seconds() > preloadScoreTime + 1.5) {
@@ -108,21 +105,21 @@ public class RedAutoWarehouse extends LinearOpMode {
                                 new Waypoint(robot.x, robot.y, preloadScoreCoord[barcodeCase][2], 40, 40, 0, 0),
                                 new Waypoint(130, 70, 5*PI/12, 20, 5, -1, goToWarehouseTime1-1.5),
                                 new Waypoint(cycleX, 84, PI / 2, 20, 5, -1, goToWarehouseTime1),
-                                new Waypoint(cycleX + 10, 125, PI / 2, 20, 0, 0, goToWarehouseTime2)
+                                new Waypoint(cycleX + 10, 122, PI / 2, 20, 0, 0, goToWarehouseTime2)
                         };
                     } else if (barcodeCase == 1) {
                         goToWarehouseWaypoints = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, preloadScoreCoord[barcodeCase][2], 40, 40, 0, 0),
                                 new Waypoint(130, 70, 5*PI/12, 20, 5, -1, goToWarehouseTime1-1.5),
                                 new Waypoint(cycleX, 84, PI / 2, 20, 5, -1, goToWarehouseTime1),
-                                new Waypoint(cycleX + 10, 125, PI / 2, 20, 0, 0, goToWarehouseTime2)
+                                new Waypoint(cycleX + 10, 122, PI / 2, 20, 0, 0, goToWarehouseTime2)
                         };
                     } else {
                         goToWarehouseWaypoints = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, preloadScoreCoord[barcodeCase][2], 40, 40, 0, 0),
                                 new Waypoint(130, 70, 5*PI/12, 20, 5, -1, goToWarehouseTime1-1.5),
                                 new Waypoint(cycleX, 84, PI / 2, 20, 5, -1, goToWarehouseTime1),
-                                new Waypoint(cycleX + 10, 125, PI / 2, 20, 0, 0, goToWarehouseTime2)
+                                new Waypoint(cycleX + 10, 122, PI / 2, 20, 0, 0, goToWarehouseTime2)
                         };
                     }
                     goToWarehousePath = new Path(goToWarehouseWaypoints);
@@ -152,8 +149,8 @@ public class RedAutoWarehouse extends LinearOpMode {
                 if (time.seconds() > goToWarehouseTime2 + .5) {
                     Waypoint[] cycleScoreWaypoints = new Waypoint[] {
                             new Waypoint(robot.x, robot.y, robot.theta, -20, 5, 0, 0),
-                            new Waypoint(cycleX + 2/* + 6*cycleCounter*/, 84, -PI/2, 20, 5, 0, cycleScoreTime1),
-                            new Waypoint(depositX, depositY + 4*cycleCounter, depositTh + PI, 40, 20, 0, cycleScoreTime2)
+                            new Waypoint(cycleX + 2, 86, -PI/2, 20, 5, 0, cycleScoreTime1),
+                            new Waypoint(depositX, depositY, depositTh + PI, 40, 20, 0 -2*cycleCounter, cycleScoreTime2)
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 
@@ -179,7 +176,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                     robot.intake.off();
                 }
 
-                if (robot.isAtPose(depositX, depositY) || time.seconds() > cycleScoreTime2 + 0.75) {
+                if (robot.isAtPose(depositX, depositY, depositTh) || time.seconds() > cycleScoreTime2 + 0.75) {
                     robot.deposit.open();
                 }
 
@@ -188,16 +185,15 @@ public class RedAutoWarehouse extends LinearOpMode {
                     if (30 - (System.currentTimeMillis() - robot.startTime) / 1000 > goToWarehouseTime2 + cycleScoreTime2 + parkTime2 + 1) {
                         Waypoint[] goToWarehouseWaypoints = new Waypoint[] {
                                 new Waypoint(robot.x, robot.y, depositTh, 40, 40, 0, 0),
-                                new Waypoint(cycleX+2/* + 3*cycleCounter*/, 84, PI/2, 20, 5, -1, goToWarehouseTime1/* + .5* cycleCounter*/),
-                                new Waypoint(cycleX + 12, 125, PI/2, 20, 0, 0, goToWarehouseTime2)
+                                new Waypoint(cycleX+2, 84, PI/2, 20, 5, -1, goToWarehouseTime1/* + .5* cycleCounter*/),
+                                new Waypoint(cycleX + 12, 122 + 3 * cycleCounter, PI/2, 20, 0, 0, goToWarehouseTime2)
                         };
                         goToWarehousePath = new Path(goToWarehouseWaypoints);
                         goToWarehouse = false;
                     } else {
                         Waypoint[] parkWaypoints = new Waypoint[] {
                                 new Waypoint(robot.x, robot.y, depositTh, 40, 40, 0, 0),
-                                new Waypoint(cycleX + 2, 84, 5*PI/12, 20, 5, -1, parkTime1),
-                                new Waypoint(cycleX + 12, 125, PI/2, 20, 0, 0, parkTime2)
+                                new Waypoint(cycleX + 7.5, 84, 5*PI/12, 20, 5, -1, parkTime1),
                         };
                         parkPath = new Path(parkWaypoints);
 
@@ -212,8 +208,11 @@ public class RedAutoWarehouse extends LinearOpMode {
                     robot.deposit.close();
                 }
 
+                if (time.seconds() > parkTime1){
+                    robot.drivetrain.setRawPower(.5,1,.5,1);
+                }
                 robot.setTargetPoint(parkPath.getRobotPose(Math.min(parkTime2, time.seconds())));
-                if (time.seconds() > parkTime2) {
+                if (time.seconds() > parkTime2 || robot.y > 100) {
                     Robot.log("Auto finished in " + ((System.currentTimeMillis() - robot.startTime) / 1000) + " seconds");
 
                     park = true;

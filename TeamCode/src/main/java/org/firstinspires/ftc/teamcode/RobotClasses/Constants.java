@@ -17,6 +17,7 @@ public class Constants {
 
     public static double DEPOSIT_POWER = 1;
 
+    public static double DEPOSIT_AUTO_OPEN_POS = .18;
     public static double DEPOSIT_OPEN_POS = 0;
     public static double DEPOSIT_HOLD_POS = 0.28;
     public static double DEPOSIT_CLOSE_POS = 0.4;

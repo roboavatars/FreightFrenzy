@@ -83,6 +83,10 @@ public class Deposit {
         }
     }
 
+    public void autoOpen() {
+        depositSetPosition(Constants.DEPOSIT_AUTO_OPEN_POS);
+    }
+
     public void open() {
         depositSetPosition(Constants.DEPOSIT_OPEN_POS);
     }
