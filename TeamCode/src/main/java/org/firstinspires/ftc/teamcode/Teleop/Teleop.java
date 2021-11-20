@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import static java.lang.Math.PI;
+
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -14,8 +16,6 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import static java.lang.Math.PI;
 
 @TeleOp(name = "1 Teleop")
 @SuppressWarnings("FieldCanBeLocal")
@@ -49,7 +49,7 @@ public class Teleop extends LinearOpMode {
     double teamMarkerArmSpeed = .001;
 
     //cycle counter stuff
-    private ArrayList<Double> cycles = new ArrayList<Double>();
+    private ArrayList<Double> cycles = new ArrayList<>();
     private boolean cycleToggle = false;
 
     /*
@@ -104,10 +104,18 @@ public class Teleop extends LinearOpMode {
             }
 
             // Moving Slides
-            if (gamepad2.a) {
+            if (gamepad2.a && !cycleToggle) {
                 robot.deposit.close();
                 depositServoStatus = 0;
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.HOME);
+
+                // cycle stuff
+                cycleToggle = true;
+                cycles.add(cycleTimer.seconds());
+                cycleTimer.reset();
+                robot.markCycle();
+            } else if (!gamepad2.a && cycleToggle) {
+                cycleToggle = false;
             }
 
             if (gamepad2.b) {
@@ -116,20 +124,13 @@ public class Teleop extends LinearOpMode {
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.MID);
             }
 
-            if (gamepad2.x && !cycleToggle) {
+            if (gamepad2.x) {
                 robot.deposit.hold();
                 depositServoStatus = 1;
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.TOP);
-//cycle stuff
-                cycleToggle = true;
-                cycles.add(cycleTimer.seconds());
-                cycleTimer.reset();
-
-            } else if (!gamepad2.x && cycleToggle) {
-                cycleToggle = false;
             }
 
-            //Capping Controls
+            // Capping Controls
             if (gamepad2.y) {
                 robot.deposit.markerArmUp();
                 robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.CAP);

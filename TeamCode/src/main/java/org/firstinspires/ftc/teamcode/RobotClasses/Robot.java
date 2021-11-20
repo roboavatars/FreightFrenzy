@@ -16,7 +16,6 @@ import android.annotation.SuppressLint;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
-
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -58,7 +57,6 @@ public class Robot {
     private boolean firstLoop = true;
     private boolean firstPDLoop = true;
     private int loopCounter = 0;
-    public int lastTarget = -1;
 
     public int cycles = 0;
     public double cycleTotal;
@@ -202,7 +200,7 @@ public class Robot {
 
         // Log Data
         if (loopCounter % loggerUpdatePeriod == 0) {
-            logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a, lastTarget, cycles, cycleTotal / cycles);
+            logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a, cycles, cycleTotal / cycles);
         }
 
         profile(2);
@@ -238,6 +236,17 @@ public class Robot {
         }
 
         profile(3);
+    }
+
+    public void markCycle() {
+        double cycleTime = (curTime - lastCycleTime) / 1000;
+        cycleTotal += cycleTime;
+        cycles++;
+        Log.w("cycle-log", "Cycle " + cycles + ": " + cycleTime + "s");
+        if (cycleTime > longestCycle) {
+            longestCycle = cycleTime;
+        }
+        lastCycleTime = curTime;
     }
 
     // Set target point (velocity specification, custom b and zeta values)

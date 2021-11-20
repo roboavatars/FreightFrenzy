@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Config
 @Autonomous(name = "0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoWarehouse extends LinearOpMode {
-    public static int barcodeCase = 0; // 0 = left, 1 = mid, 2 = right
+    public static int barcodeCase = 2; // 0 = left, 1 = mid, 2 = right
 
 
     @Override

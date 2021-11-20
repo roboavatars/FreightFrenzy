@@ -4,8 +4,8 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class Constants {
-    public static double INTAKE_POWER = 1;
 
+    public static double INTAKE_POWER = 1;
     public static double INTAKE_DISTANCE_THRESHOLD = 100;
 
     // Deposit
@@ -17,7 +17,7 @@ public class Constants {
 
     public static double DEPOSIT_POWER = 1;
 
-    public static double DEPOSIT_AUTO_OPEN_POS = .18;
+    public static double DEPOSIT_AUTO_OPEN_POS = 0.18;
     public static double DEPOSIT_OPEN_POS = 0;
     public static double DEPOSIT_HOLD_POS = 0.28;
     public static double DEPOSIT_CLOSE_POS = 0.4;
@@ -26,7 +26,5 @@ public class Constants {
     public static double TEAM_MARKER_UP_POS = 0.7;
     public static double TEAM_MARKER_DOWN_POS = 1;
 
-    public static double CAROUSEL_POWER = .65;
-
-
+    public static double CAROUSEL_POWER = 0.6;
 }
