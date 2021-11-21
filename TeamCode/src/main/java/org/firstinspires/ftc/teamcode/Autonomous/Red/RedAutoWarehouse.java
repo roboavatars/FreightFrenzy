@@ -56,7 +56,7 @@ public class RedAutoWarehouse extends LinearOpMode {
         double depositY = 68;
         double depositTh = PI/10;
 
-        double[][] preloadScoreCoord = {{112.25, 63, 5*PI/6}, {115.5, 63, 5*PI/6}, {119, 63, 5*PI/6}};
+        double[][] preloadScoreCoord = {{111.5, 63, 5*PI/6}, {115.5, 63, 5*PI/6}, {119, 63, 5*PI/6}};
 
         // Paths
         Path preloadScorePath = null;
@@ -165,12 +165,12 @@ public class RedAutoWarehouse extends LinearOpMode {
                 if (robot.y < 92) {
                     robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
                     robot.deposit.hold();
-                } else if (time.seconds() > 0.5) {
-                    robot.intake.reverse();
                 }
 
                 if (time.seconds() > 1.5) {
                     robot.intake.off();
+                } else if (time.seconds() > 0.75) {
+                    robot.intake.reverse();
                 }
 
                 if (robot.isAtPose(depositX, depositY, depositTh) || time.seconds() > cycleScoreTime2 + 0.75) {

@@ -158,11 +158,7 @@ public class Teleop extends LinearOpMode {
                     robot.deposit.hold();
                     depositServoStatus = 1;
                 } else if (depositServoStatus == 1) {
-                    if (cycles.size()>10){
-                        robot.deposit.autoOpen();
-                    } else {
-                        robot.deposit.open();
-                    }
+                    robot.deposit.open();
                     depositServoStatus = 2;
                 } else if (depositServoStatus == 2) {
                     robot.deposit.close();
