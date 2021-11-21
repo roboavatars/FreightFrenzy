@@ -4,17 +4,17 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.OpenCV.BaseDetector;
 
-public class JankAprilTagDetector extends BaseDetector {
-    private JankAprilTagPipeline pipeline;
+public class BarcodeDetector extends BaseDetector {
+    private BarcodePipeline pipeline;
 
-    public JankAprilTagDetector(LinearOpMode op) {
+    public BarcodeDetector(LinearOpMode op, boolean isRed) {
         super(op);
 
-        pipeline = new JankAprilTagPipeline();
+        pipeline = new BarcodePipeline(isRed);
         setPipeline(pipeline);
     }
 
-    public JankAprilTagPipeline.Case getResult() {
+    public BarcodePipeline.Case getResult() {
         return pipeline.getResult();
     }
 }

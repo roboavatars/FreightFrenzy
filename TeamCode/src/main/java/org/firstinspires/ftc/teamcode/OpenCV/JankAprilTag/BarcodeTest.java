@@ -1,17 +1,21 @@
 package org.firstinspires.ftc.teamcode.OpenCV.JankAprilTag;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.*;
 
+@Config
 @TeleOp(name = "Jank April Tag Pipeline Test")
-public class JankAprilTagTest extends LinearOpMode {
-    private JankAprilTagDetector detector;
+public class BarcodeTest extends LinearOpMode {
+    public static boolean isRed = false;
+
+    private BarcodeDetector detector;
 
     @Override
     public void runOpMode() {
-        detector = new JankAprilTagDetector(this);
+        detector = new BarcodeDetector(this, isRed);
 
         waitForStart();
         detector.start();

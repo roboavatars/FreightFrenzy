@@ -3,11 +3,11 @@ package org.firstinspires.ftc.teamcode.OpenCV;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.OpenCV.AprilTag.AprilTagPipeline;
-import org.firstinspires.ftc.teamcode.OpenCV.JankAprilTag.JankAprilTagPipeline;
+import org.firstinspires.ftc.teamcode.OpenCV.JankAprilTag.BarcodePipeline;
 
 public class Vision extends BaseDetector {
     private AprilTagPipeline aprilTagPipeline;
-    private JankAprilTagPipeline jankAprilTagPipeline;
+    private BarcodePipeline jankAprilTagPipeline;
     public static double TAG_SIZE = 0.079;
 
     public enum Pipeline {AprilTag, JankAprilTag}
@@ -16,7 +16,7 @@ public class Vision extends BaseDetector {
         super(op);
 
         aprilTagPipeline = new AprilTagPipeline(TAG_SIZE);
-        jankAprilTagPipeline = new JankAprilTagPipeline();
+        jankAprilTagPipeline = new BarcodePipeline(true);
 
         setPipeline(pipeline);
     }
@@ -32,7 +32,7 @@ public class Vision extends BaseDetector {
     public AprilTagPipeline getAprilTagPipe() {
         return aprilTagPipeline;
     }
-    public JankAprilTagPipeline getJankAprilTagPipe() {
+    public BarcodePipeline getJankAprilTagPipe() {
         return jankAprilTagPipeline;
     }
 }

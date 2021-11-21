@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.OpenCV.JankAprilTag.BarcodeDetector;
+import org.firstinspires.ftc.teamcode.OpenCV.JankAprilTag.BarcodePipeline;
 import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
@@ -30,11 +32,11 @@ public class BlueAutoWarehouse extends LinearOpMode {
             park in warehouse
         */
 
-        Robot robot = new Robot(this, 9, 78.5, PI, true, true);
+        Robot robot = new Robot(this, 9, 78.5, PI, true, false);
         robot.logger.startLogging(true, true);
 
-//        Vision detector = new Vision(this, Vision.Pipeline.AprilTag);
-//        detector.start();
+        BarcodeDetector detector = new BarcodeDetector(this, false);
+        detector.start();
 
         // Segments
         boolean preloadScore = false;
@@ -68,7 +70,13 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
         waitForStart();
 
-//        int barcodeCase = detector.getAprilTagPipe().getResult();
+        if(detector.getResult() == BarcodePipeline.Case.Left){
+            barcodeCase = 0;
+        } else if(detector.getResult() == BarcodePipeline.Case.Middle){
+            barcodeCase = 1;
+        } else {
+            barcodeCase = 2;
+        }
         Robot.log("Barcode Case: " + barcodeCase);
 
         if (barcodeCase == 0) {

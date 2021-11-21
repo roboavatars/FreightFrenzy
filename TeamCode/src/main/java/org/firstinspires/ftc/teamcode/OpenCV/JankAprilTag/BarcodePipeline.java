@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Config
-public class JankAprilTagPipeline extends OpenCvPipeline {
+public class BarcodePipeline extends OpenCvPipeline {
 
     // Cases
     public enum Case {None, Left, Middle, Right}
@@ -27,9 +27,13 @@ public class JankAprilTagPipeline extends OpenCvPipeline {
     public static int RECT_Y = 0;
     public static int RECT_WIDTH = 640;
     public static int RECT_HEIGHT = 320;
-    public static int LEFT_DIVIDER = 106;
-    public static int RIGHT_DIVIDER = 214;
+    public static int BLUE_LEFT_DIVIDER = 200;
+    public static int BLUE_RIGHT_DIVIDER = 400;
+    public static int RED_LEFT_DIVIDER = 400;
+    public static int RED_RIGHT_DIVIDER = 640;
     public static int RETURN_IMAGE = 1;
+    public static int leftDivider;
+    public static int rightDivider;
 
     // Debug
     public static boolean debug = true;
@@ -46,13 +50,21 @@ public class JankAprilTagPipeline extends OpenCvPipeline {
     public static int MAX_H = 80;
     public static int MAX_S = 200;
     public static int MAX_V = 255;
-    public static int AREA_MIN = 7000;
+    public static int AREA_MIN = 5000;
 
     // Image Processing Mats
     private Mat hsv = new Mat();
     private Mat processed = new Mat();
 
-    public JankAprilTagPipeline() {}
+    public BarcodePipeline(boolean isRed) {
+        if (isRed){
+            leftDivider = RED_LEFT_DIVIDER;
+            rightDivider = RED_RIGHT_DIVIDER;
+        } else {
+            leftDivider = BLUE_LEFT_DIVIDER;
+            rightDivider = BLUE_RIGHT_DIVIDER;
+        }
+    }
 
     @Override
     public Mat processFrame(Mat input) {
@@ -62,9 +74,9 @@ public class JankAprilTagPipeline extends OpenCvPipeline {
 
         // Draw Three Red Rectangles
         if (debug) {
-            Imgproc.rectangle(input, new Point(0, 0), new Point(LEFT_DIVIDER, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
-            Imgproc.rectangle(input, new Point(LEFT_DIVIDER, 0), new Point(RIGHT_DIVIDER, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
-            Imgproc.rectangle(input, new Point(RIGHT_DIVIDER, 0), new Point(RECT_WIDTH, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
+            Imgproc.rectangle(input, new Point(0, 0), new Point(leftDivider, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
+            Imgproc.rectangle(input, new Point(leftDivider, 0), new Point(rightDivider, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
+            Imgproc.rectangle(input, new Point(rightDivider, 0), new Point(RECT_WIDTH, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
         }
 
         // Convert to HSV Color Space
@@ -76,9 +88,9 @@ public class JankAprilTagPipeline extends OpenCvPipeline {
         Imgproc.morphologyEx(processed, processed, Imgproc.MORPH_CLOSE, new Mat());
 
         // Split Into Three Regions
-        Mat left = new Mat(processed, new Rect(0, 0, LEFT_DIVIDER, RECT_HEIGHT));
-        Mat middle = new Mat(processed, new Rect(LEFT_DIVIDER, 0, RIGHT_DIVIDER - LEFT_DIVIDER, RECT_HEIGHT));
-        Mat right = new Mat(processed, new Rect(RIGHT_DIVIDER, 0, RECT_WIDTH - RIGHT_DIVIDER, RECT_HEIGHT));
+        Mat left = new Mat(processed, new Rect(0, 0, leftDivider, RECT_HEIGHT));
+        Mat middle = new Mat(processed, new Rect(leftDivider, 0, rightDivider - leftDivider, RECT_HEIGHT));
+        Mat right = new Mat(processed, new Rect(rightDivider, 0, RECT_WIDTH - rightDivider, RECT_HEIGHT));
 
         // Compute White Area for each Region
         int leftArea = Core.countNonZero(left);
@@ -135,9 +147,9 @@ public class JankAprilTagPipeline extends OpenCvPipeline {
         int middle = Collections.frequency(list, Case.Middle);
         int right = Collections.frequency(list, Case.Right);
 
-        if (none > left && none > middle && none > right) {
+        /*if (none > left && none > middle && none > right) {
             return Case.None;
-        } else if (left > none && left > middle && left > right) {
+        } else */if (left > none && left > middle && left > right) {
             return Case.Left;
         } else if (middle > none && middle > left && middle > right) {
             return Case.Middle;
