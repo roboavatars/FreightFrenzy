@@ -53,9 +53,9 @@ public class BlueAutoWarehouse extends LinearOpMode {
         double parkTime1 = 2;
         double parkTime2 = 4;
 
-        double cycleX = 6.5;
+        double cycleX = 5.5;
         double depositX = 29;
-        double depositY = 73;
+        double depositY = 74;
         double depositTh = 9*PI/10;
 
         double[][] preloadScoreCoord = {{30, 65.5, -PI/10}, {28.5, 65.5, -PI/10}, {25, 71, -PI/10}};
@@ -159,7 +159,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     Waypoint[] cycleScoreWaypoints = new Waypoint[] {
                             new Waypoint(robot.x, robot.y, robot.theta, -20, 5, 0, 0),
                             new Waypoint(cycleX - 2, 86, -PI/2, 20, 5, 0, cycleScoreTime1),
-                            new Waypoint(depositX, depositY, depositTh + PI, 40, 20, 2 * cycleCounter, cycleScoreTime2)
+                            new Waypoint(depositX, depositY, depositTh + PI, 40, 20, 1, cycleScoreTime2)
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 

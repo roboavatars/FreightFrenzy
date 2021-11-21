@@ -51,7 +51,7 @@ public class BarcodePipeline extends OpenCvPipeline {
     public static int MAX_H = 80;
     public static int MAX_S = 200;
     public static int MAX_V = 255;
-    public static int AREA_MIN = 5000;
+    public static int AREA_MIN = 3000;
 
     // Image Processing Mats
     private Mat hsv = new Mat();
