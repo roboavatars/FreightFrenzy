@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static java.lang.Math.PI;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
+@Disabled
 @Autonomous(name = "1 Red Auto Carousel", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoCarousel extends LinearOpMode {
 
