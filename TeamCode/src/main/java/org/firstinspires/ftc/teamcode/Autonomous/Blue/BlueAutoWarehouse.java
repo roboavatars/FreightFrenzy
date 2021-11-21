@@ -53,7 +53,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
         double parkTime1 = 2;
         double parkTime2 = 4;
 
-        double cycleX = 5.5;
+        double cycleX = 6.5;
         double depositX = 29;
         double depositY = 74;
         double depositTh = 9*PI/10;
@@ -70,9 +70,9 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
         waitForStart();
 
-        if(detector.getResult() == BarcodePipeline.Case.Left){
+        if (detector.getResult() == BarcodePipeline.Case.Left) {
             barcodeCase = 0;
-        } else if(detector.getResult() == BarcodePipeline.Case.Middle){
+        } else if (detector.getResult() == BarcodePipeline.Case.Middle) {
             barcodeCase = 1;
         } else {
             barcodeCase = 2;
@@ -110,25 +110,25 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 if (time.seconds() > preloadScoreTime + 1.5) {
                     Waypoint[] goToWarehouseWaypoints;
                     if (barcodeCase == 0) {
-                        goToWarehouseWaypoints = new Waypoint[]{
+                        goToWarehouseWaypoints = new Waypoint[] {
                                 new Waypoint(robot.x, robot.y, preloadScoreCoord[barcodeCase][2], 40, 40, 0, 0),
-                                new Waypoint(14, 76, 7*PI/12, 20, 5, 1, goToWarehouseTime1-1.5),
-                                new Waypoint(cycleX + 7, 90, PI/3, 20, 5, 1, goToWarehouseTime1),
-                                new Waypoint(cycleX - 10, 120, PI/2, 20, 0, 0, goToWarehouseTime2)
+                                new Waypoint(14, 76, 7 * PI / 12, 20, 5, 1, goToWarehouseTime1 - 1.5),
+                                new Waypoint(cycleX + 7, 90, PI / 3, 20, 5, 1, goToWarehouseTime1),
+                                new Waypoint(cycleX - 10, 120, PI / 2, 20, 0, 0, goToWarehouseTime2)
                         };
                     } else if (barcodeCase == 1) {
-                        goToWarehouseWaypoints = new Waypoint[]{
+                        goToWarehouseWaypoints = new Waypoint[] {
                                 new Waypoint(robot.x, robot.y, preloadScoreCoord[barcodeCase][2], 40, 40, 0, 0),
-                                new Waypoint(14, 70, 7*PI/12, 20, 5, 1, goToWarehouseTime1-1.5),
-                                new Waypoint(cycleX + 7, 84, PI/3, 20, 5, 1, goToWarehouseTime1),
-                                new Waypoint(cycleX - 10, 120, PI/2, 20, 0, 0, goToWarehouseTime2)
+                                new Waypoint(14, 70, 7 * PI / 12, 20, 5, 1, goToWarehouseTime1 - 1.5),
+                                new Waypoint(cycleX + 7, 84, PI / 3, 20, 5, 1, goToWarehouseTime1),
+                                new Waypoint(cycleX - 10, 120, PI / 2, 20, 0, 0, goToWarehouseTime2)
                         };
                     } else {
-                        goToWarehouseWaypoints = new Waypoint[]{
+                        goToWarehouseWaypoints = new Waypoint[] {
                                 new Waypoint(robot.x, robot.y, preloadScoreCoord[barcodeCase][2], 40, 40, 0, 0),
-                                new Waypoint(14, 72, 7*PI/12, 20, 5, 1, goToWarehouseTime1-1.5),
-                                new Waypoint(cycleX + 4, 88, PI/3, 20, 5, 1, goToWarehouseTime1),
-                                new Waypoint(cycleX - 10, 120, PI/2, 20, 0, 0, goToWarehouseTime2)
+                                new Waypoint(14, 72, 7 * PI / 12, 20, 5, 1, goToWarehouseTime1 - 1.5),
+                                new Waypoint(cycleX + 4, 88, PI / 3, 20, 5, 1, goToWarehouseTime1),
+                                new Waypoint(cycleX - 10, 120, PI / 2, 20, 0, 0, goToWarehouseTime2)
                         };
                     }
                     goToWarehousePath = new Path(goToWarehouseWaypoints);
@@ -136,96 +136,28 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     time.reset();
                     preloadScore = true;
                 }
-            } else if (!goToWarehouse) {
-                robot.setTargetPoint(goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime2, time.seconds())));
-
-                if (time.seconds() > goToWarehouseTime1 && time.seconds() < goToWarehouseTime1 + 0.1) {
-                    robot.resetOdo(cycleX, robot.y, PI/2);
-                }
-                if (time.seconds() > goToWarehouseTime2) {
-                    robot.resetOdo(cycleX, robot.y, 7*PI/12);
-                }
-
-                if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
-                    robot.deposit.close();
-                }
-
-                if (robot.y > 100) {
-                    robot.intake.on();
-                }
-
-                if (time.seconds() > goToWarehouseTime2 + .5) {
-                    Waypoint[] cycleScoreWaypoints = new Waypoint[] {
-                            new Waypoint(robot.x, robot.y, robot.theta, -20, 5, 0, 0),
-                            new Waypoint(cycleX - 2, 86, -PI/2, 20, 5, 0, cycleScoreTime1),
-                            new Waypoint(depositX, depositY, depositTh + PI, 40, 20, 1, cycleScoreTime2)
-                    };
-                    cycleScorePath = new Path(cycleScoreWaypoints);
-
-                    time.reset();
-                    goToWarehouse = true;
-                }
-            } else if (!cycleScore) {
-                Pose pose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime2, time.seconds()));
-                robot.setTargetPoint(new Target(pose).theta(pose.theta + PI));
-
-                if (time.seconds() > cycleScoreTime1 && time.seconds() < cycleScoreTime1 + 0.1) {
-                    robot.resetOdo(cycleX, robot.y, PI/2);
-                }
-
-                if (robot.y < 92) {
-                    robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
-                    robot.deposit.hold();
-                }
-
-                if (time.seconds() > 1.5) {
-                    robot.intake.off();
-                } else if (time.seconds() > 0.75) {
-                    robot.intake.reverse();
-                }
-
-
-                if (robot.isAtPose(depositX, depositY, depositTh) || time.seconds() > cycleScoreTime2 + 1.5) {
-                    robot.deposit.open();
-                }
-
-                if (time.seconds() > cycleScoreTime2 + 2) {
-                    cycleCounter++;
-                    if (30 - (System.currentTimeMillis() - robot.startTime) / 1000 > goToWarehouseTime2 + cycleScoreTime2 + parkTime2 + 1) {
-                        Waypoint[] goToWarehouseWaypoints = new Waypoint[] {
-                                new Waypoint(robot.x, robot.y, depositTh, 40, 40, 0, 0),
-                                new Waypoint(cycleX - 3, 88, PI/3, 10, 5, 1.5, goToWarehouseTime1),
-                                new Waypoint(cycleX - 10, 120 + 10 * cycleCounter, PI/2, 20, 0, 0, goToWarehouseTime2)
-                        };
-                        goToWarehousePath = new Path(goToWarehouseWaypoints);
-                        goToWarehouse = false;
-                    } else {
-                        Waypoint[] parkWaypoints = new Waypoint[] {
-                                new Waypoint(robot.x, robot.y, depositTh, 40, 40, 0, 0),
-                                new Waypoint(cycleX-3, 88, 7*PI/12, 20, 5, 1, parkTime1),
-                        };
-                        parkPath = new Path(parkWaypoints);
-
-                        cycleScore = true;
-                    }
-
-                    time.reset();
-                }
             } else if (!park) {
-                if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
-                    robot.deposit.close();
+                Pose curPose = goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime2, time.seconds()));
+                if (time.seconds() < 5) {
+                    robot.setTargetPoint(curPose);
+                } else if (robot.y > 104 && time.seconds() < 5.5) {
+                    robot.drivetrain.setRawPower(-0.1, 0.1, -0.1, 0.1);
+                } else if (robot.y > 104 && time.seconds() < 6) {
+                    robot.drivetrain.setRawPower(0.1, -0.1, 0.1, -0.1);
+                } else {
+                    robot.drivetrain.stop();
                 }
 
-                if (time.seconds() > parkTime1){
-                    robot.drivetrain.setRawPower(1, 0.5, 1, 0.5);
-                }
-                robot.setTargetPoint(parkPath.getRobotPose(Math.min(parkTime2, time.seconds())));
-                if (time.seconds() > parkTime2 || robot.y > 100) {
-                    Robot.log("Auto finished in " + ((System.currentTimeMillis() - robot.startTime) / 1000) + " seconds");
+                robot.deposit.moveSlides(1,Deposit.DepositHeight.HOME);
+                robot.deposit.close();
 
+                if (time.seconds() > 7) {
+                    robot.intake.off();
                     park = true;
+                } else if (time.seconds() > 5) {
+                    robot.intake.reverse();
+                } else if (time.seconds() > 2) {
+                    robot.intake.on();
                 }
             } else {
                 robot.drivetrain.stop();
