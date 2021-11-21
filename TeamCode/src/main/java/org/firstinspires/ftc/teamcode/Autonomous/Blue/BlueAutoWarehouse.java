@@ -33,7 +33,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
         */
 
         Robot robot = new Robot(this, 9, 78.5, PI, true, false);
-        robot.logger.startLogging(true, true);
+        robot.logger.startLogging(true, false);
 
         BarcodeDetector detector = new BarcodeDetector(this, false);
         detector.start();
@@ -80,11 +80,11 @@ public class BlueAutoWarehouse extends LinearOpMode {
         Robot.log("Barcode Case: " + barcodeCase);
 
         if (barcodeCase == 0) {
-            robot.deposit.moveSlides(1, Deposit.deposit_height.LOW);
+            robot.deposit.moveSlides(1, Deposit.DepositHeight.LOW);
         } else if (barcodeCase == 1) {
-            robot.deposit.moveSlides(1, Deposit.deposit_height.MID);
+            robot.deposit.moveSlides(1, Deposit.DepositHeight.MID);
         } else {
-            robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
+            robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
         }
         Waypoint[] preloadScoreWaypoints = new Waypoint[]{
                 new Waypoint(9, 78.5, PI, -5, -5, 0, 0),
@@ -147,7 +147,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 }
 
                 if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
                     robot.deposit.close();
                 }
 
@@ -175,7 +175,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 }
 
                 if (robot.y < 92) {
-                    robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
+                    robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
                     robot.deposit.hold();
                 }
 
@@ -214,7 +214,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 }
             } else if (!park) {
                 if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
                     robot.deposit.close();
                 }
 

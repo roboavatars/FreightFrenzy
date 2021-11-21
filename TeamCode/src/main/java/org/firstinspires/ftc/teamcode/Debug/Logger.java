@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Debug;
 
 import android.annotation.SuppressLint;
 
+import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.io.BufferedReader;
@@ -27,7 +28,7 @@ public class Logger extends Thread {
     private double x, y, theta;
     private double vx, vy, w;
     private double ax, ay, alpha;
-    private int lastTarget;
+    private Deposit.DepositHeight slides;
     private int numCycles;
     private double avgCycleTime;
 
@@ -39,7 +40,7 @@ public class Logger extends Thread {
             File robotDataLog = new File(getLogName(true));
             fileWriter = new FileWriter(robotDataLog);
             fileWriter.write("# " + (isAuto ? "Auto" : "Teleop") + "\n# " + (isRed ? "Red" : "Blue") + "\n");
-            fileWriter.write("Timestamp,SinceStart,X,Y,Theta,VelocityX,VelocityY,VelocityTheta,AccelX,AccelY,AccelTheta,Cycles,AvgCycle\n");
+            fileWriter.write("Timestamp,SinceStart,X,Y,Theta,VelocityX,VelocityY,VelocityTheta,AccelX,AccelY,AccelTheta,Slides,Cycles,AvgCycle\n");
             logCounter = 0;
             writeCounter = 0;
             start();
@@ -84,7 +85,7 @@ public class Logger extends Thread {
         while (!isInterrupted()) {
             if (writeCounter < logCounter) {
                 try {
-                    fileWriter.write(df.format(new Date()) + "," + timeSinceSt + "," + x + "," + y + "," + theta + "," + vx + "," + vy + "," + w + "," + ax + "," + ay + "," + alpha + "," + "," + lastTarget + "," + numCycles + "," + avgCycleTime + "\n");
+                    fileWriter.write(df.format(new Date()) + "," + timeSinceSt + "," + x + "," + y + "," + theta + "," + vx + "," + vy + "," + w + "," + ax + "," + ay + "," + alpha + "," + slides + ", " + numCycles + "," + avgCycleTime + "\n");
                     writeCounter++;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -97,12 +98,13 @@ public class Logger extends Thread {
      * Saves log data
      */
     @SuppressLint("SimpleDateFormat")
-    public void logData(double timeSinceSt, double x, double y, double theta, double vx, double vy, double w, double ax, double ay, double alpha, int numCycles, double avgCycleTime) {
+    public void logData(double timeSinceSt, double x, double y, double theta, double vx, double vy, double w, double ax, double ay, double alpha, Deposit.DepositHeight slides, int numCycles, double avgCycleTime) {
         df = new SimpleDateFormat("HH:mm:ss.SSS");
         this.timeSinceSt = timeSinceSt;
         this.x = x; this.y = y; this.theta = theta;
         this.vx = vx; this.vy = vy; this.w = w;
         this.ax = ax; this.ay = ay; this.alpha = alpha;
+        this.slides = slides;
         this.numCycles = numCycles;
         this.avgCycleTime = avgCycleTime;
 

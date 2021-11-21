@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawPoint;
+import static java.lang.Math.PI;
+
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Pathing.Path;
@@ -10,11 +15,9 @@ import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-import static java.lang.Math.PI;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.*;
-
-@TeleOp(name = "0 Ramsete Controller Tuning")
+@TeleOp(name = "Ramsete Controller Tuning")
 @Config
+@Disabled
 public class RamseteTuning extends LinearOpMode {
     public static double x = 54.5;
     public static double y = 120;

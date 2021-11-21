@@ -7,13 +7,15 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 
-@TeleOp(name = "Track width tuning")
+@TeleOp(name = "Track Width Tuning")
 @Config
+@Disabled
 public class TrackWidthTuning extends LinearOpMode {
     public static double rotations = 3;
 

@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode.OpenCV.Barcode;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.*;
-
 @Config
-@TeleOp(name = "Jank April Tag Pipeline Test")
+@TeleOp(name = "Barcode Pipeline Test")
 public class BarcodeTest extends LinearOpMode {
     public static boolean isRed = false;
 

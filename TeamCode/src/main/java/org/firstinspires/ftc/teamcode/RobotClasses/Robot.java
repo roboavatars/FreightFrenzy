@@ -15,7 +15,6 @@ import static java.lang.Math.sqrt;
 import android.annotation.SuppressLint;
 import android.util.Log;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -27,7 +26,6 @@ import org.firstinspires.ftc.teamcode.Pathing.Target;
 
 import java.util.List;
 
-@Config
 @SuppressWarnings("FieldCanBeLocal")
 public class Robot {
 
@@ -55,7 +53,6 @@ public class Robot {
     private final boolean isAuto;
     public final boolean isRed;
     private boolean firstLoop = true;
-    private boolean firstPDLoop = true;
     private int loopCounter = 0;
 
     public int cycles = 0;
@@ -65,13 +62,13 @@ public class Robot {
 
     public boolean slidesMoving = false;
     public boolean intakeFull = false;
-    public Deposit.deposit_height depositHeight = Deposit.deposit_height.HOME;
+    public Deposit.DepositHeight depositHeight = Deposit.DepositHeight.HOME;
     public double intakePower = 0;
     private double[] scoringPos;
 
     private boolean depositReadyToScore = false;
     private boolean depositReadyToReturn = false;
-    public Deposit.deposit_height depositMoveApproval = Deposit.deposit_height.UNDEFINED;
+    public Deposit.DepositHeight depositMoveApproval = Deposit.DepositHeight.UNDEFINED;
     public boolean depositScoreApproval = false;
 
     // Time and Delay Variables
@@ -139,11 +136,11 @@ public class Robot {
             lastCycleTime = curTime;
             firstLoop = false;
         }
-/*
-        if (loopCounter % sensorUpdatePeriod == 0){
+
+        /*if (loopCounter % sensorUpdatePeriod == 0){
             slidesMoving = deposit.slidesMoving();
             intakeFull = intake.intakeFull();
-            depositHeight = deposit.getTargHeight();
+            depositHeight = deposit.getTargetHeight();
             intakePower = intake.getLastIntakePow();
         }
 
@@ -175,9 +172,7 @@ public class Robot {
             depositReadyToReturn = false;
             deposit.close();
             deposit.moveSlides(1, Deposit.deposit_height.HOME);
-        }
-
- */
+        }*/
 
         // Update Position
         drivetrain.updatePose();
@@ -200,7 +195,7 @@ public class Robot {
 
         // Log Data
         if (loopCounter % loggerUpdatePeriod == 0) {
-            logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a, cycles, cycleTotal / cycles);
+            logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a, deposit.targetHeight, cycles, cycleTotal / cycles);
         }
 
         profile(2);
@@ -215,10 +210,10 @@ public class Robot {
         addPacket("4 VX", round(vx));
         addPacket("5 VY", round(vy));
         addPacket("6 W", round(w));
+        addPacket("7 Slides", deposit.targetHeight);
         addPacket("8 Run Time", (curTime - startTime) / 1000);
         addPacket("9 Update Frequency (Hz)", round(1 / timeDiff));
         addPacket("Pod Zeroes", drivetrain.zeroR + ", " + drivetrain.zeroL);
-        addPacket("ms", round(timeDiff * 1000));
         if (!isAuto) {
             addPacket("Cycle Time", (curTime - lastCycleTime) / 1000);
             addPacket("Average Cycle Time", round(cycleTotal / cycles));

@@ -5,17 +5,16 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Pathing.Ramsete.PDController;
-import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 
 @Autonomous
 @Config
+@Disabled
 public class MotorPDTuning extends LinearOpMode {
     public static double Kp = 0;
     public static double Kd = 0;

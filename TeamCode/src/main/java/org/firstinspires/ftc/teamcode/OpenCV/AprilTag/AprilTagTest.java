@@ -1,16 +1,16 @@
 package org.firstinspires.ftc.teamcode.OpenCV.AprilTag;
 
-import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
-import org.firstinspires.ftc.teamcode.OpenCV.Vision;
-
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
-@Config
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.OpenCV.Vision;
+
 @TeleOp(name = "April Tag Test")
+@Disabled
 public class AprilTagTest extends LinearOpMode {
 
     @Override

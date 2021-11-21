@@ -23,14 +23,14 @@ import java.util.Arrays;
 public class Teleop extends LinearOpMode {
 
     // Backup Starting Position
-    private final double startX = 87;
-    private final double startY = 63;
-    private final double startTheta = PI/2;
-
-    private Robot robot;
+    public static double startX = 138;
+    public static double startY = 122;
+    public static double startTheta = PI / 2;
 
     public static boolean useAutoPos = false;
     public static boolean isRed = true;
+
+    private Robot robot;
 
     // Control Gains
     private double xyGain;
@@ -40,23 +40,27 @@ public class Teleop extends LinearOpMode {
     private boolean slidesToggle = false, slidesDeposit = false, slidesCap = false;
     private boolean markerToggle = false, markerArmDown = false;
     private boolean servoToggle = false;
-    private int depositServoStatus = 0;
 
+    private int depositServoStatus = 0;
     private double slidesPower = 1;
 
-    //Team Marker Arm Controls
+    // Team Marker Arm Controls
     double teamMarkerManualPos = Constants.TEAM_MARKER_UP_POS;
     double teamMarkerArmSpeed = .001;
 
-    //cycle counter stuff
+    // Cycle counter stuff
     private ArrayList<Double> cycles = new ArrayList<>();
     private boolean cycleToggle = false;
+
+    // Rumbles
+    private boolean teleRumble1 = false;
+    private boolean midTeleRumble = false;
+    private boolean endgameRumble = false;
 
     /*
     Controller Button Mappings:
     Gamepad 1
     Left Stick/Right Stick - Drivetrain Controls
-    X - Reset Odo
     Left Trigger - Intake Reverse
     Right Trigger - Intake On
 
@@ -69,7 +73,7 @@ public class Teleop extends LinearOpMode {
     Y - Slides To Capping Pos
     Right Bumper - Open Depositor Servo
     Left Bumper - Carousel Motor
-    dPad Up - Team Marker Servo
+    Dpad Up - Team Marker Servo
      */
 
     @Override
@@ -107,7 +111,7 @@ public class Teleop extends LinearOpMode {
             if (gamepad2.a && !cycleToggle) {
                 robot.deposit.close();
                 depositServoStatus = 0;
-                robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.HOME);
+                robot.deposit.moveSlides(slidesPower, Deposit.DepositHeight.HOME);
 
                 // cycle stuff
                 cycleToggle = true;
@@ -121,38 +125,33 @@ public class Teleop extends LinearOpMode {
             if (gamepad2.b) {
                 robot.deposit.hold();
                 depositServoStatus = 1;
-                robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.MID);
+                robot.deposit.moveSlides(slidesPower, Deposit.DepositHeight.MID);
             }
 
             if (gamepad2.x) {
                 robot.deposit.hold();
                 depositServoStatus = 1;
-                robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.TOP);
+                robot.deposit.moveSlides(slidesPower, Deposit.DepositHeight.TOP);
             }
 
             // Capping Controls
             if (gamepad2.y) {
                 robot.deposit.markerArmUp();
-                robot.deposit.moveSlides(slidesPower, Deposit.deposit_height.CAP);
-            } else if (gamepad2.dpad_up){
+                robot.deposit.moveSlides(slidesPower, Deposit.DepositHeight.CAP);
+            } else if (gamepad2.dpad_up) {
                 robot.deposit.markerArmUp();
                 teamMarkerManualPos = Constants.TEAM_MARKER_UP_POS;
-            } else if(gamepad2.dpad_down){
+            } else if (gamepad2.dpad_down) {
                 robot.deposit.markerArmDown();
-            } else if (gamepad2.right_trigger>.1){
+            } else if (gamepad2.right_trigger > .1) {
                 teamMarkerManualPos += gamepad2.right_trigger * teamMarkerArmSpeed;
                 robot.deposit.markerSetPosition(teamMarkerManualPos);
-            } else if (gamepad2.left_trigger>.1){
+            } else if (gamepad2.left_trigger > .1) {
                 teamMarkerManualPos -= gamepad2.left_trigger * teamMarkerArmSpeed;
                 robot.deposit.markerSetPosition(teamMarkerManualPos);
             }
 
-//            if (gamepad2.left_trigger > 0.1) {
-//                robot.deposit.moveSlides(gamepad2.left_trigger);
-//            } else {
-//                robot.deposit.moveSlides(0);
-//            }
-
+            // Deposit Servo
             if (gamepad1.right_bumper && !servoToggle) {
                 if (depositServoStatus == 0) {
                     robot.deposit.hold();
@@ -164,28 +163,15 @@ public class Teleop extends LinearOpMode {
                     robot.deposit.close();
                     depositServoStatus = 0;
                 }
-
                 servoToggle = true;
             } else if (!gamepad1.right_bumper && servoToggle) {
                 servoToggle = false;
             }
 
-//            if (gamepad2.dpad_up && !markerToggle) {
-//                if (markerArmDown) {
-//                    robot.deposit.markerArmUp();
-//                    markerArmDown = false;
-//                } else {
-//                    robot.deposit.markerArmDown();
-//                    markerArmDown = true;
-//                }
-//                markerToggle = true;
-//            } else if (!gamepad2.dpad_up && markerToggle) {
-//                markerToggle = false;
-//            }
-
+            // Carousel
             if (gamepad2.left_bumper) {
                 robot.carousel.rotate();
-            } else{
+            } else {
                 robot.carousel.stop();
             }
 
@@ -195,12 +181,7 @@ public class Teleop extends LinearOpMode {
                 wGain = 0.17;
             } else {
                 xyGain = 1;
-                wGain = .6;
-            }
-
-            // Reset Odometry
-            if (gamepad1.x) {
-                robot.resetOdo(robot.isRed ? 87 : 57, 63, PI/2);
+                wGain = 0.6;
             }
 
             // Drivetrain Controls
@@ -208,6 +189,20 @@ public class Teleop extends LinearOpMode {
 
             // Update Robot
             robot.update();
+
+            // Rumble
+            if (!teleRumble1 && 120 - (System.currentTimeMillis() - robot.startTime) / 1000 < 90) {
+                gamepad1.rumble(0.5, 0.5, 1000);
+                teleRumble1 = true;
+            }
+            if (!midTeleRumble && 120 - (System.currentTimeMillis() - robot.startTime) / 1000 < 60) {
+                gamepad1.rumble(0.5, 0.5, 1000);
+                midTeleRumble = true;
+            }
+            if (!endgameRumble && 120 - (System.currentTimeMillis() - robot.startTime) / 1000 < 35) {
+                gamepad1.rumble(0.5, 0.5, 1000);
+                endgameRumble = true;
+            }
 
             // Telemetry
             for (int i = 0; i < cycles.size(); i++) {
@@ -217,8 +212,7 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("X", robot.x);
             telemetry.addData("Y", robot.y);
             telemetry.addData("Theta", robot.theta);
-            telemetry.addData("Slides Height", robot.deposit.getSlidesHeight());
-            //telemetry.addData("Intake Full", robot.intake.intakeFull());
+            telemetry.addData("Slides Height", robot.deposit.targetHeight);
             telemetry.addData("# Cycles", cycles.size());
             telemetry.addData("Average Cycle Time", (robot.cycleTotal / robot.cycles) + "s");
             telemetry.update();

@@ -1,21 +1,21 @@
 package org.firstinspires.ftc.teamcode.OpenCV.AprilTag;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawRect;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
-
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.OpenCV.Vision;
-import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Autonomous
+@Disabled
 public class AprilTagLocalizationTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

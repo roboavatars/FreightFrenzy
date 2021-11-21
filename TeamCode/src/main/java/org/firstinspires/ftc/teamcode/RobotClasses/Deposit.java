@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Config
 @SuppressWarnings("FieldCanBeLocal")
 public class Deposit {
     private DcMotorEx depositor;
@@ -18,11 +16,11 @@ public class Deposit {
     private static double lastServoPos = 0;
     private static int offset = 0;
 
-    public enum deposit_height{
+    public enum DepositHeight {
         HOME, LOW, MID, TOP, CAP, UNDEFINED
     }
 
-    private deposit_height targHeight = deposit_height.HOME;
+    public DepositHeight targetHeight = DepositHeight.HOME;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
         depositor = op.hardwareMap.get(DcMotorEx.class, "depositor");
@@ -44,23 +42,24 @@ public class Deposit {
         op.telemetry.addData("Status", "Deposit Initialized");
     }
 
-    public void moveSlides(double power, deposit_height deposit_height) {
+    // Slides
+    public void moveSlides(double power, DepositHeight depositHeight) {
         depositor.setPower(power);
-        if (deposit_height == deposit_height.HOME) {
+        if (depositHeight == depositHeight.HOME) {
             depositor.setTargetPosition(Constants.HOME);
-            targHeight = deposit_height.HOME;
-        } else if (deposit_height == deposit_height.LOW) {
+            targetHeight = depositHeight.HOME;
+        } else if (depositHeight == depositHeight.LOW) {
             depositor.setTargetPosition(Constants.LOW_GOAL);
-            targHeight = deposit_height.LOW;
-        }else if (deposit_height == deposit_height.MID) {
-                depositor.setTargetPosition(Constants.MID_GOAL);
-                targHeight = deposit_height.MID;
-        } else if (deposit_height == deposit_height.TOP) {
+            targetHeight = depositHeight.LOW;
+        } else if (depositHeight == depositHeight.MID) {
+            depositor.setTargetPosition(Constants.MID_GOAL);
+            targetHeight = depositHeight.MID;
+        } else if (depositHeight == depositHeight.TOP) {
             depositor.setTargetPosition(Constants.TOP_GOAL);
-            targHeight = deposit_height.TOP;
-        } else if (deposit_height == deposit_height.CAP) {
+            targetHeight = depositHeight.TOP;
+        } else if (depositHeight == depositHeight.CAP) {
             depositor.setTargetPosition(Constants.CAP);
-            targHeight = deposit_height.CAP;
+            targetHeight = depositHeight.CAP;
         } else {
             depositor.setTargetPosition(0);
         }
@@ -74,8 +73,7 @@ public class Deposit {
         return depositor.getCurrentPosition() * 0.043;
     }
 
-    //deposit
-
+    // Deposit
     private void depositSetPosition(double pos) {
         if (pos != lastServoPos) {
             depositServo.setPosition(pos);
@@ -99,8 +97,7 @@ public class Deposit {
         depositSetPosition(Constants.DEPOSIT_CLOSE_POS);
     }
 
-    //team marker
-
+    // Team marker
     public void markerSetPosition(double pos) {
         if (pos != lastServoPos) {
             teamMarkerServo.setPosition(pos);
@@ -111,6 +108,7 @@ public class Deposit {
     public void markerArmDown() {
         markerSetPosition(Constants.TEAM_MARKER_DOWN_POS);
     }
+
     public void markerArmUp() {
         markerSetPosition(Constants.TEAM_MARKER_UP_POS);
     }

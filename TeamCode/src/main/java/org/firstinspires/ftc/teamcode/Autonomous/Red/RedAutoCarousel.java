@@ -75,11 +75,11 @@ public class RedAutoCarousel extends LinearOpMode {
         int barcodeCase = 0; // 0 = left, 1 = mid, 2 = right
         Robot.log("Barcode Case: " + barcodeCase);
         if (barcodeCase == 0) {
-            robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
+            robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
         } else if (barcodeCase == 1) {
-            robot.deposit.moveSlides(1, Deposit.deposit_height.MID);
+            robot.deposit.moveSlides(1, Deposit.DepositHeight.MID);
         } else {
-            robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+            robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
         }
 
         // Paths
@@ -120,7 +120,7 @@ public class RedAutoCarousel extends LinearOpMode {
                 robot.setTargetPoint(new Target(spinCarouselPath.getRobotPose(Math.min(time.seconds(), spinCarouselTime))));
 
                 if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
                     robot.deposit.close();
                 }
 
@@ -170,7 +170,7 @@ public class RedAutoCarousel extends LinearOpMode {
                 robot.setTargetPoint(new Target(goToWarehousePath.getRobotPose(Math.min(time.seconds(), goToWarehouseTime))));
 
                 if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
                     robot.deposit.close();
                 }
 
@@ -200,7 +200,7 @@ public class RedAutoCarousel extends LinearOpMode {
 
                 if (robot.y < 92) {
                     robot.intake.off();
-                    robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
+                    robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
                     robot.deposit.hold();
                 } else if (time.seconds() > 0.5) {
                     robot.intake.reverse();
@@ -222,7 +222,7 @@ public class RedAutoCarousel extends LinearOpMode {
                 robot.setTargetPoint(new Target(goToWarehousePath2.getRobotPose(Math.min(time.seconds(), goToWarehouseTime))));
 
                 if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
                     robot.deposit.close();
                 }
 

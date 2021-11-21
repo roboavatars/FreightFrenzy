@@ -80,11 +80,11 @@ public class RedAutoWarehouse extends LinearOpMode {
         Robot.log("Barcode Case: " + barcodeCase);
 
         if (barcodeCase == 0) {
-            robot.deposit.moveSlides(1, Deposit.deposit_height.LOW);
+            robot.deposit.moveSlides(1, Deposit.DepositHeight.LOW);
         } else if (barcodeCase == 1) {
-            robot.deposit.moveSlides(1, Deposit.deposit_height.MID);
+            robot.deposit.moveSlides(1, Deposit.DepositHeight.MID);
         } else {
-            robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
+            robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
         }
         Waypoint[] preloadScoreWaypoints = new Waypoint[]{
                 new Waypoint(135, 78.5, 0, -10, -20, 0, 0),
@@ -143,7 +143,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 }
 
                 if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
                     robot.deposit.close();
                 }
 
@@ -171,7 +171,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 }
 
                 if (robot.y < 92) {
-                    robot.deposit.moveSlides(1, Deposit.deposit_height.TOP);
+                    robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
                     robot.deposit.hold();
                 }
 
@@ -209,7 +209,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 }
             } else if (!park) {
                 if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.deposit_height.HOME);
+                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
                     robot.deposit.close();
                 }
 
