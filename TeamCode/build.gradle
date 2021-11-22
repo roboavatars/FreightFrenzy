@@ -29,6 +29,6 @@ dependencies {
 
     implementation group: 'org.ejml', name: 'ejml-all', version: '0.41'
     implementation 'com.spartronics4915.lib:ftc265:2.1.9'
-    implementation 'org.openftc:easyopencv:1.5.0'
+    implementation 'org.openftc:easyopencv:1.5.1'
     implementation 'org.openftc:apriltag:1.0.0'
 }

@@ -23,8 +23,12 @@ public class Carousel {
         }
     }
 
-    public void rotate() {
+    public void rotateRed() {
         setPower(Constants.CAROUSEL_POWER);
+    }
+
+    public void rotateBlue() {
+        setPower(-Constants.CAROUSEL_POWER);
     }
 
     public void stop() {

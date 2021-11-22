@@ -26,12 +26,12 @@ public class BarcodePipeline extends OpenCvPipeline {
     // Image Cropping
     public static int RECT_X = 0;
     public static int RECT_Y = 0;
-    public static int RECT_WIDTH = 640;
-    public static int RECT_HEIGHT = 320;
-    public static int BLUE_LEFT_DIVIDER = 200;
-    public static int BLUE_RIGHT_DIVIDER = 400;
-    public static int RED_LEFT_DIVIDER = 400;
-    public static int RED_RIGHT_DIVIDER = 640;
+    public static int RECT_WIDTH = 320;
+    public static int RECT_HEIGHT = 160;
+    public static int BLUE_LEFT_DIVIDER = 100;
+    public static int BLUE_RIGHT_DIVIDER = 200;
+    public static int RED_LEFT_DIVIDER = 250;
+    public static int RED_RIGHT_DIVIDER = 320;
     public static int RETURN_IMAGE = 1;
     public static int leftDivider;
     public static int rightDivider;
@@ -51,12 +51,16 @@ public class BarcodePipeline extends OpenCvPipeline {
     public static int MAX_H = 80;
     public static int MAX_S = 200;
     public static int MAX_V = 255;
-    public static int AREA_MIN = 3000;
+    public static int AREA_MIN = 750;
 
     // Image Processing Mats
     private Mat hsv = new Mat();
     private Mat processed = new Mat();
     private Mat save;
+    private Mat left = new Mat();
+    private Mat middle = new Mat();
+    private Mat right = new Mat();
+    private Mat blank = new Mat();
 
     private String path = "/sdcard/EasyOpenCV/";
 
@@ -92,14 +96,14 @@ public class BarcodePipeline extends OpenCvPipeline {
 //        saveMatToDisk("processed.jpg", processed);
 
         // Remove Noise
-        Imgproc.morphologyEx(processed, processed, Imgproc.MORPH_OPEN, new Mat());
-        Imgproc.morphologyEx(processed, processed, Imgproc.MORPH_CLOSE, new Mat());
+        Imgproc.morphologyEx(processed, processed, Imgproc.MORPH_OPEN, blank);
+        Imgproc.morphologyEx(processed, processed, Imgproc.MORPH_CLOSE, blank);
         saveMatToDisk("processed2.jpg", processed);
 
         // Split Into Three Regions
-        Mat left = new Mat(processed, new Rect(0, 0, leftDivider, RECT_HEIGHT));
-        Mat middle = new Mat(processed, new Rect(leftDivider, 0, rightDivider - leftDivider, RECT_HEIGHT));
-        Mat right = new Mat(processed, new Rect(rightDivider, 0, RECT_WIDTH - rightDivider, RECT_HEIGHT));
+        left = new Mat(processed, new Rect(0, 0, leftDivider, RECT_HEIGHT));
+        middle = new Mat(processed, new Rect(leftDivider, 0, rightDivider - leftDivider, RECT_HEIGHT));
+        right = new Mat(processed, new Rect(rightDivider, 0, RECT_WIDTH - rightDivider, RECT_HEIGHT));
 //        saveMatToDisk("left.jpg", left);
 //        saveMatToDisk("middle.jpg", middle);
 //        saveMatToDisk("right.jpg", right);

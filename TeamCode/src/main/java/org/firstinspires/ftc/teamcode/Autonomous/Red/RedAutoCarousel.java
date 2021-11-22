@@ -127,7 +127,7 @@ public class RedAutoCarousel extends LinearOpMode {
                 if (time.seconds() > spinCarouselTime) {
 
                     // spin
-                    robot.carousel.rotate();
+                    robot.carousel.rotateRed();
                     time.reset();
 
                     if (time.seconds() > 1) {

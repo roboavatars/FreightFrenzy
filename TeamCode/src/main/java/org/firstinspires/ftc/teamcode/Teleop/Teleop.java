@@ -67,12 +67,14 @@ public class Teleop extends LinearOpMode {
 
     Gamepad 2
     Right Trigger - Slow Mode
+    Left Trigger - Intake Override
     A - Slides To Home Pos
     B - Slides to Mid Pos
     X - Slides To Top Pos
     Y - Slides To Capping Pos
     Right Bumper - Open Depositor Servo
-    Left Bumper - Carousel Motor
+    Left Bumper - Carousel Motor Red
+    Dpad Down - Carousel Motor Blue
     Dpad Up - Team Marker Servo
      */
 
@@ -99,12 +101,16 @@ public class Teleop extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Intake On / Rev / Off
-            if (gamepad1.right_trigger > 0.1) {
-                robot.intake.setPower(gamepad1.right_trigger);
-            } else if (gamepad1.left_trigger > 0.1) {
-                robot.intake.setPower(-gamepad1.left_trigger);
+            if (gamepad2.left_trigger > 0.1) {
+                robot.intake.reverse();
             } else {
-                robot.intake.off();
+                if (gamepad1.right_trigger > 0.1) {
+                    robot.intake.setPower(gamepad1.right_trigger);
+                } else if (gamepad1.left_trigger > 0.1) {
+                    robot.intake.setPower(-gamepad1.left_trigger);
+                } else {
+                    robot.intake.off();
+                }
             }
 
             // Moving Slides
@@ -170,7 +176,9 @@ public class Teleop extends LinearOpMode {
 
             // Carousel
             if (gamepad2.left_bumper) {
-                robot.carousel.rotate();
+                robot.carousel.rotateRed();
+            } else if (gamepad2.dpad_down) {
+                robot.carousel.rotateBlue();
             } else {
                 robot.carousel.stop();
             }

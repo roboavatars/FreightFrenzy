@@ -21,7 +21,6 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 public class BlueAutoWarehouse extends LinearOpMode {
     public static int barcodeCase = 2; // 0 = left, 1 = mid, 2 = right
 
-
     @Override
     public void runOpMode() {
         /*
@@ -53,7 +52,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
         double parkTime1 = 2;
         double parkTime2 = 4;
 
-        double cycleX = 6.5;
+        double cycleX = 6;
         double depositX = 29;
         double depositY = 74;
         double depositTh = 9*PI/10;
@@ -77,6 +76,8 @@ public class BlueAutoWarehouse extends LinearOpMode {
         } else {
             barcodeCase = 2;
         }
+        detector.stop();
+//        barcodeCase = 2;
         Robot.log("Barcode Case: " + barcodeCase);
 
         if (barcodeCase == 0) {
@@ -86,7 +87,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
         } else {
             robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
         }
-        Waypoint[] preloadScoreWaypoints = new Waypoint[]{
+        Waypoint[] preloadScoreWaypoints = new Waypoint[] {
                 new Waypoint(9, 78.5, PI, -5, -5, 0, 0),
                 new Waypoint(preloadScoreCoord[barcodeCase][0], preloadScoreCoord[barcodeCase][1], preloadScoreCoord[barcodeCase][2], 40, 20, 2, preloadScoreTime)
         };
@@ -137,27 +138,16 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     preloadScore = true;
                 }
             } else if (!park) {
-                Pose curPose = goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime2, time.seconds()));
-                if (time.seconds() < 5) {
-                    robot.setTargetPoint(curPose);
-                } else if (robot.y > 104 && time.seconds() < 5.5) {
-                    robot.drivetrain.setRawPower(-0.1, 0.1, -0.1, 0.1);
-                } else if (robot.y > 104 && time.seconds() < 6) {
-                    robot.drivetrain.setRawPower(0.1, -0.1, 0.1, -0.1);
-                } else {
-                    robot.drivetrain.stop();
+                robot.setTargetPoint(goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime2, time.seconds())));
+
+                if (time.seconds() > 2) {
+                    robot.deposit.moveSlides(1,Deposit.DepositHeight.HOME);
+                    robot.deposit.close();
                 }
 
-                robot.deposit.moveSlides(1,Deposit.DepositHeight.HOME);
-                robot.deposit.close();
-
-                if (time.seconds() > 7) {
-                    robot.intake.off();
+                if (time.seconds() > goToWarehouseTime2) {
                     park = true;
-                } else if (time.seconds() > 5) {
-                    robot.intake.reverse();
-                } else if (time.seconds() > 2) {
-                    robot.intake.on();
+                    time.reset();
                 }
             } else {
                 robot.drivetrain.stop();
@@ -167,8 +157,5 @@ public class BlueAutoWarehouse extends LinearOpMode {
         }
 
         robot.stop();
-//        try {
-//            detector.stop();
-//        } catch (Exception ignore) {}
     }
 }
