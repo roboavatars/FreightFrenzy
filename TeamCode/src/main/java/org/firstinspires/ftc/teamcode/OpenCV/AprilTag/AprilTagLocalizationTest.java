@@ -29,7 +29,7 @@ public class AprilTagLocalizationTest extends LinearOpMode {
 
         startMarkerPos[0] += 48;
         startMarkerPos[1] += 48;
-        startMarkerPos[2] += PI/2;
+//        startMarkerPos[2] += PI/2;
 
         while (opModeIsActive()) {
             telemetry.addData("x", detector.getAprilTagPipe().localizeRobot(startMarkerPos)[0]);

@@ -23,6 +23,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
+import org.firstinspires.ftc.teamcode.RobotClasses.whitetapedetectionstuff.TapeDetector;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class Robot {
     public Intake intake;
     public Deposit deposit;
     public Carousel carousel;
+    public TapeDetector tapeDetector;
     public Logger logger;
 
     private ElapsedTime profiler;
@@ -96,6 +98,10 @@ public class Robot {
         deposit = new Deposit(op, isAuto);
         carousel = new Carousel(op);
         logger = new Logger();
+
+        if (isAuto){
+            tapeDetector = new TapeDetector(op);
+        }
 
         profiler = new ElapsedTime();
 
@@ -176,12 +182,19 @@ public class Robot {
 
         // Update Position
         drivetrain.updatePose();
+        tapeDetector.update(drivetrain.x, drivetrain.y, drivetrain.theta);
 
         // Calculate Motion Info
         double timeDiff = curTime / 1000 - prevTime;
-        x = drivetrain.x;
-        y = drivetrain.y;
-        theta = drivetrain.theta;
+        if (isAuto) {
+            x = drivetrain.x;
+            y = drivetrain.y + tapeDetector.yOffset;
+            theta = drivetrain.theta + tapeDetector.thetaOffset;
+        } else {
+            x = drivetrain.x;
+            y = drivetrain.y;
+            theta = drivetrain.theta;
+        }
         vx = (x - prevX) / timeDiff; vy = (y - prevY) / timeDiff; w = (theta - prevTheta) / timeDiff;
         ax = (vx - prevVx) / timeDiff; ay = (vy - prevVy) / timeDiff; a = (w - prevW) / timeDiff;
 
