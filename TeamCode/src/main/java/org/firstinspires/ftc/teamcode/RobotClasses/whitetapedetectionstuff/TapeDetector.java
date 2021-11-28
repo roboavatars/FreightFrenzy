@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotClasses.whitetapedetectionstuff;
 
 import static java.lang.Math.PI;
+import static java.lang.Math.asin;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -17,8 +18,8 @@ public class TapeDetector {
     public double SENSORS_DIST = 10;
 
     public TapeDetector(LinearOpMode op) {
-        left = new ColorSensorForTapeDetection(op);
-        right = new ColorSensorForTapeDetection(op);
+        left = new ColorSensorForTapeDetection(op, "left");
+        right = new ColorSensorForTapeDetection(op, "right");
 
         yOffset = 0;
         thetaOffset = 0;
@@ -42,12 +43,14 @@ public class TapeDetector {
 
         if (!right.isNull && !left.isNull) {
             if (Math.abs(left.theta - right.theta) < THETA_THRESHOLD) {
-
-                /*
-                calculate robot here
-                */
-
-                double correctTheta = 0; // <--------
+                double correctTheta = PI/2 + Math.asin((left.y - right.y)/SENSORS_DIST);
+                while (Math.abs(correctTheta - theta) > 2*PI) {
+                    if ((correctTheta - theta) > 2 * PI) {
+                        theta += 2 * PI;
+                    } else if ((correctTheta - theta) < -2 * PI) {
+                        correctTheta += 2 * PI;
+                    }
+                }
                 thetaOffset += correctTheta - theta;
 
                 if (entering) {

@@ -11,8 +11,8 @@ public class ColorSensorForTapeDetection {
 
     double x,y,theta;
 
-    public ColorSensorForTapeDetection(LinearOpMode op){
-        colorSensor = op.hardwareMap.colorSensor.get("color");
+    public ColorSensorForTapeDetection(LinearOpMode op, String sensorName){
+        colorSensor = op.hardwareMap.colorSensor.get(sensorName);
         isNull = true;
         hitTape = false;
     }
