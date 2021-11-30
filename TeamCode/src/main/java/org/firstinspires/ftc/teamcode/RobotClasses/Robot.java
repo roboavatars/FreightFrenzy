@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawRobot;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
+import static java.lang.Math.atan2;
 import static java.lang.Math.cos;
 import static java.lang.Math.hypot;
 import static java.lang.Math.sin;
@@ -67,6 +68,10 @@ public class Robot {
     public Deposit.DepositHeight depositHeight = Deposit.DepositHeight.HOME;
     public double intakePower = 0;
     private double[] scoringPos;
+
+    public boolean depositToHome;
+    public Deposit.DepositHeight depositTargetHeight;
+    public boolean allianceHub;
 
     private boolean depositReadyToScore = false;
     private boolean depositReadyToReturn = false;
@@ -203,6 +208,32 @@ public class Robot {
         prevTheta = theta;
         prevTime = curTime / 1000;
         prevVx = vx; prevVy = vy; prevW = w;
+
+        //Update depositor (arm + turret)
+        if (depositToHome){
+            deposit.setControlsHome();
+        } else {
+            double lockTheta;
+            if (allianceHub && isRed){
+                lockTheta = atan2(y - 60, x - 96);
+            } else if (allianceHub && !isRed){
+                lockTheta = atan2(y - 60, x - 48);
+            } else {
+                lockTheta = atan2(y - 120, x - 72);
+            }
+            if (depositTargetHeight == Deposit.DepositHeight.HOME){
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_HOME);
+            } else if (depositTargetHeight == Deposit.DepositHeight.LOW){
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_LOW_GOAL);
+            } else if (depositTargetHeight == Deposit.DepositHeight.MID){
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_MID_GOAL);
+            } else if (depositTargetHeight == Deposit.DepositHeight.TOP){
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_TOP_GOAL);
+            } else {
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_CAP);
+            }
+        }
+//        deposit.update(theta, drivetrain.commandedW);
 
         profile(1);
 
@@ -366,4 +397,21 @@ public class Robot {
     public static double round(double num) {
         return Double.parseDouble(String.format("%.5f", num));
     }
+
+    //Set Depositor Controls
+    public void setDepositToHome(){
+        depositToHome = true;
+        this.depositTargetHeight = Deposit.DepositHeight.HOME;
+    }
+    public void depositTrackAllianceHub(Deposit.DepositHeight depositTargetHeight){
+        depositToHome = false;
+        allianceHub = true;
+        this.depositTargetHeight = depositTargetHeight;
+    }
+    public void depositTrackSharedHub(){
+        depositToHome = false;
+        allianceHub = false;
+        this.depositTargetHeight = Deposit.DepositHeight.LOW;
+    }
+
 }

@@ -26,6 +26,7 @@ public class Drivetrain {
     // Tracking X/Y/Theta
     public double x, y, theta;
     private double deltaHeading = 0;
+    public double commandedW;
 
     // Odometry
     public double podR = 0;
@@ -102,6 +103,8 @@ public class Drivetrain {
     }
 
     public void setControls(double xdot, double ydot, double w) {
+        commandedW = w;
+
         double FRpower, FLpower, BRpower, BLpower;
 
         FRpower = ydot + xdot + w;
