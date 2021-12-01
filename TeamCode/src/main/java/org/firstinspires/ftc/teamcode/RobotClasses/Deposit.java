@@ -41,6 +41,7 @@ public class Deposit {
     public static int targetArmHeight;
     public static int overrideTargetArmHeight;
     private final int turretInsideBotThreshold = 10;
+    private boolean holdArmAtThreshold;
 
 
     public enum DepositHeight {
@@ -89,14 +90,22 @@ public class Deposit {
     }
 
     public void update(double robotTheta, double commandedW){
-        overrideTargetArmHeight = targetArmHeight;
         armOverThreshold = armMotor.getCurrentPosition() > Constants.DEPOSIT_ARM_THRESHOLD;
         if (!armOverThreshold){
             if (home && !turretThetaInsideBot(getTurretTheta())){
-                overrideTargetArmHeight = Constants.DEPOSIT_ARM_THRESHOLD;
+                holdArmAtThreshold = true;
             } else if (!home && turretThetaInsideBot(getTurretTheta())){
-                overrideTargetArmHeight = Constants.DEPOSIT_ARM_THRESHOLD;
+                holdArmAtThreshold = true;
+            } else {
+                holdArmAtThreshold = false;
             }
+        } else {
+            holdArmAtThreshold = false;
+        }
+        if (holdArmAtThreshold){
+            overrideTargetArmHeight = Constants.DEPOSIT_ARM_THRESHOLD;
+        } else {
+            overrideTargetArmHeight = targetArmHeight;
         }
         moveArm(Constants.Deposit_ARM_POWER);
 
