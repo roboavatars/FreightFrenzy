@@ -51,7 +51,7 @@ public class RamseteTuning extends LinearOpMode {
 
                 pose = new Pose(robot.x, robot.y, robot.theta, robot.vx, robot.vy, robot.w);
 
-                robot.drivetrain.setControls(-gamepad1.left_stick_y * 0.5, -gamepad1.right_stick_x * 0.5);
+                robot.drivetrain.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
                 time.reset();
             } else {
                 if (time.seconds() >= splineTime) {

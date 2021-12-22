@@ -37,7 +37,7 @@ public class LocalizationTest extends LinearOpMode {
 
         while(opModeIsActive()) {
             // Driving
-            dt.setControls(-gamepad1.left_stick_y, -gamepad1.right_stick_x);
+            dt.setControls(-gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
 
             // Update Time Variables
             curTime = (double) System.currentTimeMillis() / 1000;

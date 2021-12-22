@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Const;
+
 @SuppressWarnings("FieldCanBeLocal")
 public class Deposit {
     private DcMotorEx depositor;
@@ -15,6 +17,7 @@ public class Deposit {
 
     private DcMotorEx turretMotor;
     private DcMotorEx armMotor;
+    private DcMotorEx slidesMotor;
 
     private static double lastTargetPower = 0;
     private static int lastTargetPos = 0;
@@ -40,9 +43,12 @@ public class Deposit {
     private static boolean armOverThreshold = false;
     public static int targetArmHeight;
     public static int overrideTargetArmHeight;
-    private final int turretInsideBotThreshold = 10;
     private boolean holdArmAtThreshold;
 
+    public int targetSlidesTicks;
+
+    private final double turretInsideBotThreshold = PI/10;
+    private final int slidesInsideBotThreshold = (int) Math.round(5 * Constants.DEPOSIT_SLIDES_INCHES_TO_TICKS);
 
     public enum DepositHeight {
         HOME, LOW, MID, TOP, CAP, UNDEFINED
@@ -55,8 +61,9 @@ public class Deposit {
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         teamMarkerServo = op.hardwareMap.get(Servo.class, "teamMarkerArm");
 
-//        turretMotor = op.hardwareMap.get(DcMotorEx.class, "turret");
-//        armMotor = op.hardwareMap.get(DcMotorEx.class, "v4b");
+        turretMotor = op.hardwareMap.get(DcMotorEx.class, "turret");
+        armMotor = op.hardwareMap.get(DcMotorEx.class, "v4b");
+        slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
         initialTheta = Constants.TURRET_HOME_THETA;
 
         setControlsHome();
@@ -81,20 +88,22 @@ public class Deposit {
         home = true;
         targetTheta = Constants.TURRET_HOME_THETA;
         targetArmHeight = Constants.DEPOSIT_ARM_HOME;
+        targetSlidesTicks = 0;
     }
 
-    public void setControlsDepositing (double lockTheta, int targetArmHeight) {
+    public void setControlsDepositing (double lockTheta, int targetArmHeight, double slidesDist) {
         home = false;
         this.lockTheta = lockTheta;
         this.targetArmHeight = targetArmHeight;
+        targetSlidesTicks = (int) Math.round(slidesDist * Constants.DEPOSIT_SLIDES_INCHES_TO_TICKS);
     }
 
     public void update(double robotTheta, double commandedW){
         armOverThreshold = armMotor.getCurrentPosition() > Constants.DEPOSIT_ARM_THRESHOLD;
         if (!armOverThreshold){
-            if (home && !turretThetaInsideBot(getTurretTheta())){
+            if (home && !depositInsideBot(getTurretTheta(), getSlidesDist())){
                 holdArmAtThreshold = true;
-            } else if (!home && turretThetaInsideBot(getTurretTheta())){
+            } else if (!home && depositInsideBot(getTurretTheta(), getSlidesDist())){
                 holdArmAtThreshold = true;
             } else {
                 holdArmAtThreshold = false;
@@ -116,15 +125,18 @@ public class Deposit {
             if (targetTheta < 0) {
                 targetTheta += 2 * PI;
             }
-            if (turretThetaInsideBot(targetTheta)){
+            if (depositInsideBot(targetTheta, getSlidesDist())){
                 if (targetTheta<Constants.TURRET_HOME_THETA){
                     targetTheta = Constants.TURRET_HOME_THETA - turretInsideBotThreshold;
                 } else {
                     targetTheta = Constants.TURRET_HOME_THETA + turretInsideBotThreshold;
                 }
+                targetSlidesTicks = slidesInsideBotThreshold;
             }
             setTurretThetaPDF(targetTheta, commandedW);
         }
+
+        moveSlides(Constants.DEPOSIT_SLIDES_POWER);
     }
 
     //Turret
@@ -163,8 +175,8 @@ public class Deposit {
         return turretMotor.getCurrentPosition() / TICKS_PER_RADIAN + initialTheta;
     }
 
-    public boolean turretThetaInsideBot(double theta){
-        return Math.abs(theta-Constants.TURRET_HOME_THETA) < turretInsideBotThreshold;
+    public boolean depositInsideBot(double theta, double slidesDist){
+        return Math.abs(theta-Constants.TURRET_HOME_THETA) < turretInsideBotThreshold && slidesDist < slidesInsideBotThreshold;
     }
 
     //Arm
@@ -173,46 +185,14 @@ public class Deposit {
         armMotor.setTargetPosition(overrideTargetArmHeight);
     }
 
-
-
-
-
-
-
-
-    //////////////////////////////////////
-    public void moveSlides(double power, DepositHeight depositHeight) {
-        depositor.setPower(power);
-        if (depositHeight == depositHeight.HOME) {
-            depositor.setTargetPosition(Constants.HOME);
-            targetHeight = depositHeight.HOME;
-        } else if (depositHeight == depositHeight.LOW) {
-            depositor.setTargetPosition(Constants.LOW_GOAL);
-            targetHeight = depositHeight.LOW;
-        } else if (depositHeight == depositHeight.MID) {
-            depositor.setTargetPosition(Constants.MID_GOAL);
-            targetHeight = depositHeight.MID;
-        } else if (depositHeight == depositHeight.TOP) {
-            depositor.setTargetPosition(Constants.TOP_GOAL);
-            targetHeight = depositHeight.TOP;
-        } else if (depositHeight == depositHeight.CAP) {
-            depositor.setTargetPosition(Constants.CAP);
-            targetHeight = depositHeight.CAP;
-        } else {
-            depositor.setTargetPosition(0);
-        }
+    //Slides
+    public void moveSlides(double power){
+        slidesMotor.setPower(power);
+        slidesMotor.setTargetPosition(targetSlidesTicks);
     }
-
-    public double getSlidesHeight() {
-        return depositor.getCurrentPosition() * 0.043;
+    public double getSlidesDist(){
+        return slidesMotor.getCurrentPosition();
     }
-    //////////////////////////////////////////
-
-
-
-
-
-
 
 
     // Deposit
@@ -254,4 +234,37 @@ public class Deposit {
     public void markerArmUp() {
         markerSetPosition(Constants.TEAM_MARKER_UP_POS);
     }
+
+
+
+    //////////////////////////////////////
+    public void moveSlides(double power, DepositHeight depositHeight) {
+        depositor.setPower(power);
+        if (depositHeight == depositHeight.HOME) {
+            depositor.setTargetPosition(Constants.HOME);
+            targetHeight = depositHeight.HOME;
+        } else if (depositHeight == depositHeight.LOW) {
+            depositor.setTargetPosition(Constants.LOW_GOAL);
+            targetHeight = depositHeight.LOW;
+        } else if (depositHeight == depositHeight.MID) {
+            depositor.setTargetPosition(Constants.MID_GOAL);
+            targetHeight = depositHeight.MID;
+        } else if (depositHeight == depositHeight.TOP) {
+            depositor.setTargetPosition(Constants.TOP_GOAL);
+            targetHeight = depositHeight.TOP;
+        } else if (depositHeight == depositHeight.CAP) {
+            depositor.setTargetPosition(Constants.CAP);
+            targetHeight = depositHeight.CAP;
+        } else {
+            depositor.setTargetPosition(0);
+        }
+    }
+
+    public double getSlidesHeight() {
+        return depositor.getCurrentPosition() * 0.043;
+    }
+    //////////////////////////////////////////
+
+
+
 }

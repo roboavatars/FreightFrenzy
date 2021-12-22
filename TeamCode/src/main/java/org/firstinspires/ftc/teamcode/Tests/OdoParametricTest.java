@@ -49,8 +49,9 @@ public class OdoParametricTest extends LinearOpMode {
                 }
             }
 
-            addPacket("podL", robot.drivetrain.podL);
-            addPacket("podR", robot.drivetrain.podR);
+            addPacket("pod1", robot.drivetrain.pod1);
+            addPacket("pod2", robot.drivetrain.pod2);
+            addPacket("pod3", robot.drivetrain.pod3);
             robot.update();
         }
     }

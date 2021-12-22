@@ -40,4 +40,9 @@ public class Constants {
     public static int DEPOSIT_ARM_CAP = 550;
     public static int DEPOSIT_ARM_THRESHOLD = 100;
     public static double Deposit_ARM_POWER = 1;
+
+    public static double DEPOSIT_SLIDES_INCHES_TO_TICKS = 1;
+    public static double DEPOSIT_SLIDES_POWER = 1;
+    public static double SLIDES_EXTENSION_DIST = 5;
+
 }

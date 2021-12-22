@@ -214,26 +214,30 @@ public class Robot {
             deposit.setControlsHome();
         } else {
             double lockTheta;
+            double slidesDist;
             if (allianceHub && isRed){
                 lockTheta = atan2(y - 60, x - 96);
+                slidesDist = hypot(y - 60, x - 96) - Constants.SLIDES_EXTENSION_DIST;
             } else if (allianceHub && !isRed){
                 lockTheta = atan2(y - 60, x - 48);
+                slidesDist = hypot(y - 60, x - 48) - Constants.SLIDES_EXTENSION_DIST;
             } else {
                 lockTheta = atan2(y - 120, x - 72);
+                slidesDist = hypot(y - 120, x - 72) - Constants.SLIDES_EXTENSION_DIST;
             }
             if (depositTargetHeight == Deposit.DepositHeight.HOME){
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_HOME);
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_HOME, slidesDist);
             } else if (depositTargetHeight == Deposit.DepositHeight.LOW){
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_LOW_GOAL);
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_LOW_GOAL, slidesDist);
             } else if (depositTargetHeight == Deposit.DepositHeight.MID){
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_MID_GOAL);
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_MID_GOAL, slidesDist);
             } else if (depositTargetHeight == Deposit.DepositHeight.TOP){
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_TOP_GOAL);
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_TOP_GOAL, slidesDist);
             } else {
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_CAP);
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_CAP, slidesDist);
             }
         }
-//        deposit.update(theta, drivetrain.commandedW);
+        deposit.update(theta, drivetrain.commandedW);
 
         profile(1);
 
@@ -257,7 +261,6 @@ public class Robot {
         addPacket("7 Slides", deposit.targetHeight);
         addPacket("8 Run Time", (curTime - startTime) / 1000);
         addPacket("9 Update Frequency (Hz)", round(1 / timeDiff));
-        addPacket("Pod Zeroes", drivetrain.zeroR + ", " + drivetrain.zeroL);
         if (!isAuto) {
             addPacket("Cycle Time", (curTime - lastCycleTime) / 1000);
             addPacket("Average Cycle Time", round(cycleTotal / cycles));
@@ -289,58 +292,45 @@ public class Robot {
     }
 
     // Set target point (velocity specification, custom b and zeta values)
-    public void setTargetPoint(double xTarget, double yTarget, double thetaTarget, double vxTarget, double vyTarget, double wTarget, double b, double zeta) {
+    public void setTargetPoint(double xTarget, double yTarget, double thetaTarget, double vxTarget, double vyTarget, double wTarget, double xKp, double yKp, double thetaKp, double xKd, double yKd, double thetaKd) {
         // Make Sure thetaTarget is Between 0 and 2pi
         thetaTarget = thetaTarget % (2*PI);
         if (thetaTarget < 0) {
             thetaTarget += 2*PI;
         }
 
-        // Ramsete Controller
-        double eX = cos(theta) * (xTarget - x) + sin(theta) * (yTarget - y);
-        double eY = -sin(theta) * (xTarget - x) + cos(theta) * (yTarget - y);
-        double eTheta;
+        // Picking the Smaller Distance to Rotate
+        double thetaControl;
         if (abs(theta - thetaTarget) > PI) {
-            eTheta = abs(theta - thetaTarget) / (theta - thetaTarget) * (abs(theta - thetaTarget) - 2*PI);
+            thetaControl = abs(theta - thetaTarget) / (theta - thetaTarget) * (abs(theta - thetaTarget) - 2*PI);
         } else {
-            eTheta = theta - thetaTarget;
+            thetaControl = theta - thetaTarget;
         }
-        eTheta *= -1;
 
-        double vTarget = signOf(vyTarget) * hypot(vxTarget, vyTarget);
-
-        double k = 2 * zeta * sqrt(wTarget * wTarget + b * vTarget * vTarget);
-
-        double commandedV = vTarget * cos(eTheta) + k * eX;
-        double commandedW = wTarget + k * eTheta + b * vTarget * sinc(eTheta) * eY;
-
-        double rightVelocity = commandedV + commandedW * Drivetrain.ODOMETRY_TRACK_WIDTH / 2;
-        double leftVelocity = commandedV - commandedW * Drivetrain.ODOMETRY_TRACK_WIDTH / 2;
-
-        addPacket("Target Theta", thetaTarget);
         drawDrivetrain(xTarget, yTarget, thetaTarget, "blue");
-        drivetrain.tankControls(leftVelocity, rightVelocity, theta, vx, vy, w);
+
+        drivetrain.setGlobalControls(xKp * (xTarget - x) + xKd * (vxTarget - vx), yKp * (yTarget - y) + yKd * (vyTarget - vy), thetaKp * (-thetaControl) + thetaKd * (wTarget - w));
     }
 
-    // Set target point (default velocities)
+    // Set target point (default Kp and Kv gains)
     public void setTargetPoint(double xTarget, double yTarget, double thetaTarget) {
-        setTargetPoint(xTarget, yTarget, thetaTarget, 0, 0, 0, Drivetrain.b, Drivetrain.zeta);
+        setTargetPoint(xTarget, yTarget, thetaTarget, 0, 0, 0, Drivetrain.xKp, Drivetrain.yKp, Drivetrain.thetaKp, Drivetrain.xKd, Drivetrain.yKd, Drivetrain.thetaKd);
     }
 
-    // Set target point (using pose, velocity specification)
+    // Set target point (using pose, velocity specification, default Kp and Kv gains)
     public void setTargetPoint(Pose pose) {
-        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, Drivetrain.b, Drivetrain.zeta);
+        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, Drivetrain.xKp, Drivetrain.yKp, Drivetrain.thetaKp, Drivetrain.xKd, Drivetrain.yKd, Drivetrain.thetaKd);
     }
 
-    // Set target point (using pose, custom theta and omega)
-    public void setTargetPoint(Pose pose, double b, double zeta) {
-        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, b, zeta);
+    // Set target point (using pose, custom theta and omega, default Kp and Kv gains)
+    public void setTargetPoint(Pose pose, double theta, double w) {
+        setTargetPoint(pose.x, pose.y, theta, pose.vx, pose.vy, w, Drivetrain.xKp, Drivetrain.yKp, Drivetrain.thetaKp, Drivetrain.xKd, Drivetrain.yKd, Drivetrain.thetaKd);
     }
 
     // Set target point (using target object)
     public void setTargetPoint(Target target) {
         Pose pose = target.getPose();
-        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, target.b(), target.zeta());
+        setTargetPoint(pose.x, pose.y, pose.theta, pose.vx, pose.vy, pose.w, target.xKp(), target.yKp(), target.thetaKp(), target.xKd(), target.yKd(), target.thetaKd());
     }
 
     // Check if robot is at a certain point/angle (default tolerance)

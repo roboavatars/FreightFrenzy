@@ -28,7 +28,7 @@ public class TrackWidthTuning extends LinearOpMode {
         waitForStart();
 
         while(opModeIsActive()) {
-            dt.setControls(0, Math.abs(gamepad1.right_stick_x));
+            dt.setControls(0, 0, Math.abs(gamepad1.right_stick_x));
 
             if (gamepad1.x) {
                 dt.resetOdo(90, 9, PI/2);
@@ -59,10 +59,9 @@ public class TrackWidthTuning extends LinearOpMode {
             addPacket("Theta", theta);
             addPacket("Track Width", trackWidth);
             addPacket("Update Frequency (Hz)", 1 / timeDiff);
-            addPacket("podR", dt.podR);
-            addPacket("podL", dt.podL);
-            addPacket("R zeros", dt.zeroR);
-            addPacket("L zeros", dt.zeroL);
+            addPacket("pod1", dt.pod1);
+            addPacket("pod2", dt.pod2);
+            addPacket("pod3", dt.pod3);
             sendPacket();
 
             telemetry.addData("X: ", x);

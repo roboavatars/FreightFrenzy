@@ -48,7 +48,7 @@ public class PDTest extends LinearOpMode {
                 thetaControl = dt.theta - targetTheta;
             }
 
-            dt.setControls(yKp * (targetY - dt.y), thetaKp * (-thetaControl));
+            dt.setControls(0, yKp * (targetY - dt.y), thetaKp * (-thetaControl));
 
 //            if (gamepad1.dpad_left) {
 //                dt.setControls(yKp * (72 - dt.y), thetaKp * (PI/2 - dt.theta));

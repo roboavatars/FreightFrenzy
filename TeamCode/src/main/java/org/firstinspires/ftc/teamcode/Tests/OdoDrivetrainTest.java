@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 
 import static java.lang.Math.PI;
@@ -16,15 +17,17 @@ public class OdoDrivetrainTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Drivetrain dt = new Drivetrain(this, 54.5, 15, PI/2);
+        Drivetrain dt = new Drivetrain(this, 90, 9, PI/2);
 
         waitForStart();
 
+        dt.updateThetaError();
+
         while(opModeIsActive()) {
-            dt.setControls(-gamepad1.left_stick_y, -0.5 * gamepad1.right_stick_x);
+            dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
 
             if (gamepad1.x) {
-                dt.resetOdo(54.5, 15, PI/2);
+                dt.resetOdo(90, 9, PI/2);
             }
 
             if (gamepad1.dpad_right || gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left) {
@@ -46,11 +49,16 @@ public class OdoDrivetrainTest extends LinearOpMode {
             addPacket("Y", y);
             addPacket("Theta", theta);
             addPacket("Update Frequency (Hz)", 1 / timeDiff);
-            addPacket("Positions", dt.motorFrontLeft.getCurrentPosition() + " " + dt.motorFrontRight.getCurrentPosition() + " " + dt.motorBackLeft.getCurrentPosition() + " " + dt.motorBackRight.getCurrentPosition());
-            addPacket("podL", dt.podL);
-            addPacket("podR", dt.podR);
-            addPacket("R zeros", dt.zeroR);
-            addPacket("L zeros", dt.zeroL);
+            addPacket("pod1", dt.pod1);
+            addPacket("pod2", dt.pod2);
+            addPacket("pod3", dt.pod3);
+            addPacket("1 zeros", dt.zero1);
+            addPacket("2 zeros", dt.zero2);
+            addPacket("3 zeros", dt.zero3);
+
+            addPacket("cam raw", dt.getRawTheta());
+            addPacket("cam init", dt.getInitTheta());
+            addPacket("cam error", dt.getThetaError());
             sendPacket();
 
             telemetry.addData("X: ", x);

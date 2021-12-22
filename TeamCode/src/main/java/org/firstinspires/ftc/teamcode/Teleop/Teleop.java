@@ -193,7 +193,7 @@ public class Teleop extends LinearOpMode {
             }
 
             // Drivetrain Controls
-            robot.drivetrain.setControls(-gamepad1.left_stick_y * xyGain, -gamepad1.right_stick_x * wGain);
+            robot.drivetrain.setControls(-gamepad1.left_stick_x * xyGain, -gamepad1.left_stick_y * xyGain, -gamepad1.right_stick_x * wGain);
 
             // Update Robot
             robot.update();
