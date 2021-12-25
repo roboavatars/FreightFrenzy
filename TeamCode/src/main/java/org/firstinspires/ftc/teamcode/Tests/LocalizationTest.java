@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
-import org.firstinspires.ftc.teamcode.RobotClasses.T265;
 
 import static java.lang.Math.PI;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
@@ -29,10 +28,8 @@ public class LocalizationTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         Drivetrain dt = new Drivetrain(this, startX, startY, startTheta);
-        T265 t265 = new T265(this, startX, startY, startTheta);
 
         waitForStart();
-        t265.startCam();
         startTime = System.currentTimeMillis();
 
         while(opModeIsActive()) {
@@ -56,33 +53,9 @@ public class LocalizationTest extends LinearOpMode {
             odoY = dt.y;
             odoTheta = dt.theta;
 
-            // Update T265 Kinematics Variables
-//            t265.sendOdometryData(odoVx, odoVy, odoTheta, odoW);
-            t265.updateCamPose();
-
-            camX = t265.getX();
-            camY = t265.getY();
-            camTheta = t265.getTheta();
-
-            // Update Robot Kinematics Variables
-            if (t265.confidence <= 1) {
-                x = covariance(odoX, camX, 0);
-                y = covariance(odoY, camY, 0);
-                theta = covariance(odoTheta, camTheta, 0);
-            } else if (t265.confidence == 2) {
-                x = covariance(odoX, camX, 60);
-                y = covariance(odoY, camY, 60);
-                theta = covariance(odoTheta, camTheta, 60);
-            } else if (t265.confidence == 3) {
-                x = covariance(odoX, camX, runTime);
-                y = covariance(odoY, camY, runTime);
-                theta = covariance(odoTheta, camTheta, runTime);
-            }
-
             // Dashboard
             drawField();
             drawDrivetrain(odoX, odoY, odoTheta, "blue");
-            drawDrivetrain(camX, camY, camTheta, t265.confidenceColor());
             drawDrivetrain(x, y, theta, "black");
             addPacket("X", x);
             addPacket("Y", y);
@@ -92,16 +65,5 @@ public class LocalizationTest extends LinearOpMode {
             sendPacket();
         }
 
-        t265.stopCam();
-    }
-
-    private double covariance(double odo, double t265, double time) {
-        if (time <= 5) {
-            return odo;
-        } else if (time >= 120) {
-            return t265;
-        } else {
-            return odo * (1 - time / 120) + t265 * time / 120;
-        }
     }
 }

@@ -78,17 +78,10 @@ public class Drivetrain {
 
     public double lastHeading;
 
-    //    private IMU imu;
-    private T265 t265;
-
     // Constructor
     public Drivetrain(LinearOpMode op, double initialX, double initialY, double initialTheta) {
         this.op = op;
         HardwareMap hardwareMap = op.hardwareMap;
-
-//        imu = new IMU(initialTheta, op);
-      //  t265 = new T265(op, initialX, initialY, initialTheta);
-        //t265.startCam();
 
         motorFrontRight = hardwareMap.get(DcMotorEx.class, "motorFrontRight");
         motorFrontLeft = hardwareMap.get(DcMotorEx.class, "motorFrontLeft");
@@ -119,8 +112,6 @@ public class Drivetrain {
     public void resetOdo(double newX, double newY, double newTheta) {
         x = newX;
         y = newY;
-       // t265.resetTheta(newTheta);
-//        imu.resetHeading(newTheta);
     }
 
     // robot centric movement
@@ -206,22 +197,6 @@ public class Drivetrain {
         setGlobalControls(0, 0, 0);
     }
 
-    public double getRawTheta() {
-        return t265.getRawTheta();
-    }
-
-    public double getThetaError() {
-        return t265.getThetaError();
-    }
-
-    public double getInitTheta() {
-        return t265.getInitTheta();
-    }
-
-    public void updateThetaError() {
-        t265.makeSureT265IsGood();
-    }
-
     // update position from odometry
     public void updatePose() {
         try {
@@ -233,26 +208,7 @@ public class Drivetrain {
             deltaPod2 = pod2 - lastPod2;
             deltaPod3 = pod3 - lastPod3;
 
-            t265.updateCamPose();
-
-            theta = t265.getTheta() % (2*PI);
-            if (theta < 0) {
-                theta += 2*PI;
-            }
-            deltaHeading = theta - lastHeading;
-
-            if (Math.abs(t265.getTheta() - lastRawHeading) > PI/4) {
-                t265.thetaError += deltaHeading;
-                Robot.log("T265 Disaster Averted " + t265.getTheta() + " " + lastRawHeading + " " + deltaHeading + " " + t265.thetaError);
-            }
-            lastRawHeading = t265.getTheta();
-//            deltaPod1 = deltaPod2 - deltaHeading * ODOMETRY_TRACK_WIDTH;
-
-//            imu.updateHeading();
-//            theta = imu.getTheta() % (2*PI);
-//            deltaHeading = imu.getDeltaHeading();
-//            deltaPod1 = deltaPod2 - deltaHeading * ODOMETRY_TRACK_WIDTH;
-
+            Log.w("auto", deltaPod1 + " " + deltaPod2 + " " + deltaPod3);
             if (!(deltaPod1 == 0 && deltaPod2 == 0 && deltaPod3 == 0)) {
                 if (deltaPod1 == 0) {
                     Log.w("pod-delta-log", "pod1 delta 0");
@@ -268,17 +224,14 @@ public class Drivetrain {
                 }
             }
 
-//            deltaHeading = (deltaPod2 - deltaPod1) / ODOMETRY_TRACK_WIDTH;
+            deltaHeading = (deltaPod1 - deltaPod2) / ODOMETRY_TRACK_WIDTH;
 
             double localX = (deltaPod1 + deltaPod2) / 2;
             double localY = deltaPod3 - deltaHeading * ODOMETRY_HORIZONTAL_OFFSET;
 
-//            Robot.log(deltaPod1 + " " + deltaPod2 + " " + deltaPod3 + " " + deltaHeading);
-
             if (deltaHeading < ODOMETRY_HEADING_THRESHOLD) {
                 x += localX * Math.cos(theta) - localY * Math.sin(theta);
                 y += localY * Math.cos(theta) + localX * Math.sin(theta);
-
             } else {
                 x += (localX * Math.sin(theta + deltaHeading) + localY * Math.cos(theta + deltaHeading)
                         - localX * Math.sin(theta) - localY * Math.cos(theta)) / deltaHeading;
@@ -286,14 +239,13 @@ public class Drivetrain {
                         - localY * Math.sin(theta) + localX * Math.cos(theta)) / deltaHeading;
             }
 
-//            theta = startTheta + (pod2 - pod1) / ODOMETRY_TRACK_WIDTH;
-//            theta = theta % (2*PI);
-//            if (theta < 0) theta += 2*PI;
+            theta += deltaHeading;
+            theta = theta % (Math.PI * 2);
+            if (theta < 0) theta += Math.PI * 2;
 
             lastPod1 = pod1;
             lastPod2 = pod2;
             lastPod3 = pod3;
-            lastHeading = theta;
         } catch (Exception e) {
             e.printStackTrace();
         }
