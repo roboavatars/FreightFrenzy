@@ -87,8 +87,8 @@ public class Drivetrain {
         HardwareMap hardwareMap = op.hardwareMap;
 
 //        imu = new IMU(initialTheta, op);
-        t265 = new T265(op, initialX, initialY, initialTheta);
-        t265.startCam();
+      //  t265 = new T265(op, initialX, initialY, initialTheta);
+        //t265.startCam();
 
         motorFrontRight = hardwareMap.get(DcMotorEx.class, "motorFrontRight");
         motorFrontLeft = hardwareMap.get(DcMotorEx.class, "motorFrontLeft");
@@ -119,7 +119,7 @@ public class Drivetrain {
     public void resetOdo(double newX, double newY, double newTheta) {
         x = newX;
         y = newY;
-        t265.resetTheta(newTheta);
+       // t265.resetTheta(newTheta);
 //        imu.resetHeading(newTheta);
     }
 
