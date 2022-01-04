@@ -23,9 +23,15 @@ public class mecanumdttest extends LinearOpMode {
         while(opModeIsActive()) {
             dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
 
+            telemetry.addData("pod1", dt.pod1);
+            telemetry.addData("pod2", dt.pod2);
+            telemetry.addData("pod3", dt.pod3);
+            telemetry.update();
 
-
-
+            addPacket("pod1", dt.pod1);
+            addPacket("pod2", dt.pod2);
+            addPacket("pod3", dt.pod3);
+            sendPacket();
         }
     }
 }

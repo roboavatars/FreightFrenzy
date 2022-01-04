@@ -51,7 +51,7 @@ public class Drivetrain {
     public static double ticksToInch1 = 0.0005268504;
     public static double ticksToInch2 = 0.0005268504;
     public static double ticksToInch3 = 0.0005292873;
-    public static double ODOMETRY_TRACK_WIDTH = 13.28;
+    public static double ODOMETRY_TRACK_WIDTH = 9.75;
     //       1 rev                  5 rev
     // cw:  13.28                  13.247 13.232
     // ccw: 13.335 13.32 13.31
