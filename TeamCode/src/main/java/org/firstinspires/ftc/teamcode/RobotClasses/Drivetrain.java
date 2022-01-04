@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
+import static java.lang.Math.PI;
+
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -8,8 +10,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import static java.lang.Math.PI;
 
 @SuppressWarnings("FieldCanBeLocal") @Config
 public class Drivetrain {
@@ -112,6 +112,7 @@ public class Drivetrain {
     public void resetOdo(double newX, double newY, double newTheta) {
         x = newX;
         y = newY;
+        theta = newTheta;
     }
 
     // robot centric movement

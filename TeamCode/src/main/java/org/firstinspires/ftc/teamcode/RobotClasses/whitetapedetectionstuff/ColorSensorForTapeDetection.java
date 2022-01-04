@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.RobotClasses.whitetapedetectionstuff;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
+@Config
 public class ColorSensorForTapeDetection {
-    private ColorSensor colorSensor;
-    public double THRESHOLD = 20;
+    public ColorSensor colorSensor;
+    public final double THRESHOLD = 20;
     private boolean hitTape;
     public boolean isNull;
 

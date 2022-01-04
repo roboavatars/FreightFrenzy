@@ -1,64 +1,63 @@
 package org.firstinspires.ftc.teamcode.RobotClasses.whitetapedetectionstuff;
 
 import static java.lang.Math.PI;
-import static java.lang.Math.asin;
+import static java.lang.Math.sin;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 
-import org.opencv.core.Mat;
-
+@Config
 public class TapeDetector {
-    private ColorSensorForTapeDetection left;
-    private ColorSensorForTapeDetection right;
+    public ColorSensorForTapeDetection left;
+    public ColorSensorForTapeDetection right;
     private boolean entering;
-    public double yOffset;
-    public double thetaOffset;
-    public double THETA_THRESHOLD = 0.1;
-    public double SENSORS_DIST = 10;
+    public final double THETA_THRESHOLD = 0.2;
+    public final double SENSORS_DIST = 10;
+    public final double SENSOR_CENTER_TO_ROBOT_CENTER = 8;
+    private boolean resetOdo = false;
 
     public TapeDetector(LinearOpMode op) {
         left = new ColorSensorForTapeDetection(op, "left");
         right = new ColorSensorForTapeDetection(op, "right");
-
-        yOffset = 0;
-        thetaOffset = 0;
     }
 
     public void entering() {
         entering = true;
         right.isNull = true;
         left.isNull = true;
+        resetOdo = false;
     }
 
     public void exiting() {
         entering = false;
         right.isNull = true;
         left.isNull = true;
+        resetOdo = false;
     }
 
-    public void update(double x, double y, double theta) {
+    public double[] update(double x, double y, double theta) {
+        double[] updatedCoords = new double[2];
+
         left.update(x, y, theta);
         right.update(x, y, theta);
 
-        if (!right.isNull && !left.isNull) {
-            if (Math.abs(left.theta - right.theta) < THETA_THRESHOLD) {
-                double correctTheta = PI/2 + Math.asin((left.y - right.y)/SENSORS_DIST);
-                while (Math.abs(correctTheta - theta) > 2*PI) {
-                    if ((correctTheta - theta) > 2 * PI) {
-                        theta += 2 * PI;
-                    } else if ((correctTheta - theta) < -2 * PI) {
-                        correctTheta += 2 * PI;
-                    }
-                }
-                thetaOffset += correctTheta - theta;
+        if (!resetOdo && !right.isNull && !left.isNull && Math.abs(left.theta - right.theta) < THETA_THRESHOLD) {
+            //Calculate robot theta
+            updatedCoords[1] = PI/2 + Math.asin((left.y - right.y)/SENSORS_DIST);
+            updatedCoords[1] %= 2*PI;
+            if (updatedCoords[1]<0) updatedCoords[1] += 2*PI;
 
-                if (entering) {
-                    yOffset += 96 - (left.y + right.y) / 2;
-                } else {
-                    yOffset += 98 - (left.y + right.y) / 2;
-                }
+            //Calculate robot Y position
+            if (entering) {
+                updatedCoords[0] = 96 - SENSOR_CENTER_TO_ROBOT_CENTER * sin(updatedCoords[1]);
+            } else {
+                updatedCoords[0] = 98 - SENSOR_CENTER_TO_ROBOT_CENTER * sin(updatedCoords[1]);
             }
+            resetOdo = true;
+        } else {
+            updatedCoords[0] = y;
+            updatedCoords[1] = theta;
         }
+        return updatedCoords;
     }
 }
