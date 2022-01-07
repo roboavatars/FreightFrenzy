@@ -2,21 +2,22 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 
 import static java.lang.Math.PI;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.Const;
-
 @SuppressWarnings("FieldCanBeLocal")
+@Config
 public class Deposit {
-    private DcMotorEx depositor;
+    private DcMotorEx depositor; ////////
     private Servo depositServo;
     private Servo teamMarkerServo;
 
     private DcMotorEx turretMotor;
-    private DcMotorEx armMotor;
+    private Servo armServo1;
+    private Servo armServo2;
     private DcMotorEx slidesMotor;
 
     private static double lastTargetPower = 0;
@@ -36,19 +37,17 @@ public class Deposit {
     private double lockTheta;
 
     private static final double TICKS_PER_RADIAN = 414.4 / PI;
-    private static final double MIN_THETA = PI/2;
-    private static final double MAX_THETA = 3*PI/2;
+    private static final double TURRET_MIN_THETA = PI/2;
+    private static final double TURRET_MAX_THETA = 3*PI/2;
+
+    private static final double SLIDES_MIN_TICKS = 0;
+    private static final double SLIDES_MAX_TICKS = 1000;
+    private static final double maxSlidesDistBeforeLoweringArm = 2;
 
     private static boolean home = true;
-    private static boolean armOverThreshold = false;
-    public static int targetArmHeight;
-    public static int overrideTargetArmHeight;
-    private boolean holdArmAtThreshold;
+    public static double targetArmPos;
 
     public int targetSlidesTicks;
-
-    private final double turretInsideBotThreshold = PI/10;
-    private final int slidesInsideBotThreshold = (int) Math.round(5 * Constants.DEPOSIT_SLIDES_INCHES_TO_TICKS);
 
     public enum DepositHeight {
         HOME, LOW, MID, TOP, CAP, UNDEFINED
@@ -62,7 +61,8 @@ public class Deposit {
         teamMarkerServo = op.hardwareMap.get(Servo.class, "teamMarkerArm");
 
         turretMotor = op.hardwareMap.get(DcMotorEx.class, "turret");
-        armMotor = op.hardwareMap.get(DcMotorEx.class, "v4b");
+        armServo1 = op.hardwareMap.get(Servo.class, "arm1");
+        armServo2 = op.hardwareMap.get(Servo.class, "arm2");
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
         initialTheta = Constants.TURRET_HOME_THETA;
 
@@ -75,10 +75,15 @@ public class Deposit {
         }
         teamMarkerServo.setPosition(Constants.TEAM_MARKER_HOME_POS);
 
-        depositor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        depositor.setTargetPosition(0);
-        depositor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        depositor.setTargetPosition(0);
+        //Reset Turret Motor Encoder
+        turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turretMotor.setTargetPosition(0);
+        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        //Reset Slides Motor Encoder
+        slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slidesMotor.setTargetPosition(0);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         op.telemetry.addData("Status", "Deposit Initialized");
     }
@@ -87,37 +92,27 @@ public class Deposit {
     public void setControlsHome (){
         home = true;
         targetTheta = Constants.TURRET_HOME_THETA;
-        targetArmHeight = Constants.DEPOSIT_ARM_HOME;
+        targetArmPos = Constants.DEPOSIT_ARM_HOME;
         targetSlidesTicks = 0;
     }
 
-    public void setControlsDepositing (double lockTheta, int targetArmHeight, double slidesDist) {
+    public void setControlsDepositing (double lockTheta, double targetArmPos, double slidesDist) {
         home = false;
         this.lockTheta = lockTheta;
-        this.targetArmHeight = targetArmHeight;
-        targetSlidesTicks = (int) Math.round(slidesDist * Constants.DEPOSIT_SLIDES_INCHES_TO_TICKS);
+        this.targetArmPos = targetArmPos;
+        targetSlidesTicks = (int) Math.round(slidesDist * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
     }
 
     public void update(double robotTheta, double commandedW){
-        armOverThreshold = armMotor.getCurrentPosition() > Constants.DEPOSIT_ARM_THRESHOLD;
-        if (!armOverThreshold){
-            if (home && !depositInsideBot(getTurretTheta(), getSlidesDist())){
-                holdArmAtThreshold = true;
-            } else if (!home && depositInsideBot(getTurretTheta(), getSlidesDist())){
-                holdArmAtThreshold = true;
-            } else {
-                holdArmAtThreshold = false;
-            }
-        } else {
-            holdArmAtThreshold = false;
-        }
-        if (holdArmAtThreshold){
-            overrideTargetArmHeight = Constants.DEPOSIT_ARM_THRESHOLD;
-        } else {
-            overrideTargetArmHeight = targetArmHeight;
-        }
-        moveArm(Constants.Deposit_ARM_POWER);
 
+        //Move Arm
+        if (home && getSlidesDistInches() > maxSlidesDistBeforeLoweringArm){
+            moveArm(Constants.DEPOSIT_ARM_OVER_MOTOR);
+        } else {
+            moveArm(targetArmPos);
+        }
+
+        //Move Turret
         if (home) {
             setTurretThetaPD(targetTheta);
         } else {
@@ -125,23 +120,16 @@ public class Deposit {
             if (targetTheta < 0) {
                 targetTheta += 2 * PI;
             }
-            if (depositInsideBot(targetTheta, getSlidesDist())){
-                if (targetTheta<Constants.TURRET_HOME_THETA){
-                    targetTheta = Constants.TURRET_HOME_THETA - turretInsideBotThreshold;
-                } else {
-                    targetTheta = Constants.TURRET_HOME_THETA + turretInsideBotThreshold;
-                }
-                targetSlidesTicks = slidesInsideBotThreshold;
-            }
             setTurretThetaPDF(targetTheta, commandedW);
         }
 
+        //Move Slides
         moveSlides(Constants.DEPOSIT_SLIDES_POWER);
     }
 
     //Turret
     public void setTurretThetaPDF(double theta, double commandedW) {
-        double clippedTargetTheta = Math.min(Math.max(theta, MIN_THETA), MAX_THETA);
+        double clippedTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
         turretTheta = getTurretTheta();
         turretErrorChange = clippedTargetTheta - turretTheta - turretError;
         turretError = clippedTargetTheta - turretTheta;
@@ -149,7 +137,7 @@ public class Deposit {
         setTurretPower(fTurret * commandedW + pTurret * turretError + dTurret * turretErrorChange);
     }
     public void setTurretThetaPD(double theta) {
-        double clippedTargetTheta = Math.min(Math.max(theta, MIN_THETA), MAX_THETA);
+        double clippedTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
         turretTheta = getTurretTheta();
         turretErrorChange = clippedTargetTheta - turretTheta - turretError;
         turretError = clippedTargetTheta - turretTheta;
@@ -175,25 +163,23 @@ public class Deposit {
         return turretMotor.getCurrentPosition() / TICKS_PER_RADIAN + initialTheta;
     }
 
-    public boolean depositInsideBot(double theta, double slidesDist){
-        return Math.abs(theta-Constants.TURRET_HOME_THETA) < turretInsideBotThreshold && slidesDist < slidesInsideBotThreshold;
-    }
-
     //Arm
-    public void moveArm(double power) {
-        armMotor.setPower(power);
-        armMotor.setTargetPosition(overrideTargetArmHeight);
+    public void moveArm(double targetArmPos) {
+        armServo1.setPosition(targetArmPos);
+        armServo2.setPosition(1 - targetArmPos + Constants.ARM_SERVO_2_OFFSET);
     }
 
     //Slides
     public void moveSlides(double power){
         slidesMotor.setPower(power);
-        slidesMotor.setTargetPosition(targetSlidesTicks);
+        slidesMotor.setTargetPosition((int) Math.min(Math.max(targetSlidesTicks, SLIDES_MIN_TICKS), SLIDES_MAX_TICKS));
     }
-    public double getSlidesDist(){
+    public double getSlidesDistTicks(){
         return slidesMotor.getCurrentPosition();
     }
-
+    public double getSlidesDistInches(){
+        return slidesMotor.getCurrentPosition() / Constants.DEPOSIT_SLIDES_TICKS_PER_INCH;
+    }
 
     // Deposit
     private void depositSetPosition(double pos) {

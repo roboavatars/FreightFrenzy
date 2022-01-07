@@ -8,10 +8,8 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.atan2;
-import static java.lang.Math.cos;
 import static java.lang.Math.hypot;
 import static java.lang.Math.sin;
-import static java.lang.Math.sqrt;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
@@ -216,26 +214,26 @@ public class Robot {
         } else {
             double lockTheta;
             double slidesDist;
+
             if (allianceHub && isRed){
                 lockTheta = atan2(y - 60, x - 96);
-                slidesDist = hypot(y - 60, x - 96) - Constants.SLIDES_EXTENSION_DIST;
+                slidesDist = hypot(y - 60, x - 96);
             } else if (allianceHub && !isRed){
                 lockTheta = atan2(y - 60, x - 48);
-                slidesDist = hypot(y - 60, x - 48) - Constants.SLIDES_EXTENSION_DIST;
+                slidesDist = hypot(y - 60, x - 48);
             } else {
                 lockTheta = atan2(y - 120, x - 72);
-                slidesDist = hypot(y - 120, x - 72) - Constants.SLIDES_EXTENSION_DIST;
+                slidesDist = hypot(y - 120, x - 72);
             }
-            if (depositTargetHeight == Deposit.DepositHeight.HOME){
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_HOME, slidesDist);
-            } else if (depositTargetHeight == Deposit.DepositHeight.LOW){
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_LOW_GOAL, slidesDist);
+
+            if (depositTargetHeight == Deposit.DepositHeight.LOW){
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_LOW_GOAL, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_LOW_GOAL);
             } else if (depositTargetHeight == Deposit.DepositHeight.MID){
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_MID_GOAL, slidesDist);
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_MID_GOAL, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_MID_GOAL);
             } else if (depositTargetHeight == Deposit.DepositHeight.TOP){
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_TOP_GOAL, slidesDist);
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_TOP_GOAL, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_TOP_GOAL);
             } else {
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_CAP, slidesDist);
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_CAP, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_CAP_GOAL);
             }
         }
         deposit.update(theta, drivetrain.commandedW);
