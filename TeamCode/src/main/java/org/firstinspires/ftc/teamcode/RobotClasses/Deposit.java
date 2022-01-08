@@ -57,33 +57,39 @@ public class Deposit {
 
     public Deposit(LinearOpMode op, boolean isAuto) {
         depositor = op.hardwareMap.get(DcMotorEx.class, "depositor");
+
+        //Deposit Servo
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
-        teamMarkerServo = op.hardwareMap.get(Servo.class, "teamMarkerArm");
-
-        turretMotor = op.hardwareMap.get(DcMotorEx.class, "turret");
-        armServo1 = op.hardwareMap.get(Servo.class, "arm1");
-        armServo2 = op.hardwareMap.get(Servo.class, "arm2");
-        slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
-        initialTheta = Constants.TURRET_HOME_THETA;
-
-        setControlsHome();
-
         if (isAuto) {
             hold();
         } else{
             close();
         }
+
+        //Team Marker Servo
+        teamMarkerServo = op.hardwareMap.get(Servo.class, "teamMarkerArm");
         teamMarkerServo.setPosition(Constants.TEAM_MARKER_HOME_POS);
 
-        //Reset Turret Motor Encoder
+        //Turret Motor
+        turretMotor = op.hardwareMap.get(DcMotorEx.class, "turret");
+        turretMotor.setDirection(DcMotorEx.Direction.REVERSE);
         turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        turretMotor.setTargetPosition(0);
-        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        //Reset Slides Motor Encoder
+        //Arm Servos
+        armServo1 = op.hardwareMap.get(Servo.class, "arm1");
+        armServo2 = op.hardwareMap.get(Servo.class, "arm2");
+
+        //Slides Motor
+        slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slidesMotor.setTargetPosition(0);
         slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        //Set Initial Turret Theta
+        initialTheta = Constants.TURRET_HOME_THETA;
+
+        setControlsHome();
 
         op.telemetry.addData("Status", "Deposit Initialized");
     }
@@ -165,8 +171,8 @@ public class Deposit {
 
     //Arm
     public void moveArm(double targetArmPos) {
-        armServo1.setPosition(targetArmPos);
-        armServo2.setPosition(1 - targetArmPos + Constants.ARM_SERVO_2_OFFSET);
+        armServo1.setPosition(Math.min(Math.max(targetArmPos, 0),1));
+        armServo2.setPosition(Math.min(Math.max(1 - targetArmPos + Constants.DEPOSIT_ARM_SERVO_OFFSET, 0),1));
     }
 
     //Slides

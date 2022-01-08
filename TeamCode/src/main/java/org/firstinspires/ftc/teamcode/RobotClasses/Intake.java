@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @SuppressWarnings("FieldCanBeLocal")
@@ -58,6 +59,12 @@ public class Intake {
     //get power
     public double getLastIntakePow(){
         return lastIntakePow;
+    }
+
+    public void checkIfStalling(){
+        if (intakeMotor.getCurrent(CurrentUnit.AMPS)>Constants.STALL_THRESHOLD){
+            off();
+        }
     }
 
     // Distance Sensor
