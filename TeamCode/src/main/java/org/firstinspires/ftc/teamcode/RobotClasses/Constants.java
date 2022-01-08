@@ -30,9 +30,9 @@ public class Constants {
     //Deposit Arm
     public static double DEPOSIT_ARM_HOME = 1;
     public static double DEPOSIT_ARM_LOW_GOAL = 0.01;
-    public static double DEPOSIT_ARM_MID_GOAL = 0.15;
-    public static double DEPOSIT_ARM_TOP_GOAL = 0.3;
-    public static double DEPOSIT_ARM_CAP = 0.35;
+    public static double DEPOSIT_ARM_MID_GOAL = 0.1;
+    public static double DEPOSIT_ARM_TOP_GOAL = 0.2;
+    public static double DEPOSIT_ARM_CAP = 0.3;
     public static double DEPOSIT_ARM_OVER_MOTOR = .9;
     public static double DEPOSIT_ARM_SERVO_OFFSET = 0.05;
 
