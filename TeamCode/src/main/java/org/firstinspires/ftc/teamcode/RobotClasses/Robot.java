@@ -216,14 +216,14 @@ public class Robot {
             double slidesDist;
 
             if (allianceHub && isRed){
-                lockTheta = atan2(y - 60, x - 96);
-                slidesDist = hypot(y - 60, x - 96);
+                lockTheta = atan2(60 - y, 96 - x);
+                slidesDist = hypot(60 - y, 96 - x);
             } else if (allianceHub && !isRed){
-                lockTheta = atan2(y - 60, x - 48);
-                slidesDist = hypot(y - 60, x - 48);
+                lockTheta = atan2(60 - y, 48 - x);
+                slidesDist = hypot(60 - y, 48 - x);
             } else {
-                lockTheta = atan2(y - 120, x - 72);
-                slidesDist = hypot(y - 120, x - 72);
+                lockTheta = atan2(120 - y, 72 - x);
+                slidesDist = hypot(120 - y, 72 - x);
             }
 
             if (depositTargetHeight == Deposit.DepositHeight.LOW){

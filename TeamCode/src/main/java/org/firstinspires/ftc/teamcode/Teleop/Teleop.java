@@ -37,19 +37,11 @@ public class Teleop extends LinearOpMode {
     private double wGain;
 
     // Toggles
-    private boolean slidesToggle = false, slidesDeposit = false, slidesCap = false;
-    private boolean markerToggle = false, markerArmDown = false;
     private boolean servoToggle = false;
-
     private int depositServoStatus = 0;
-    private double slidesPower = 1;
-
-    // Team Marker Arm Controls
-    double teamMarkerManualPos = Constants.TEAM_MARKER_UP_POS;
-    double teamMarkerArmSpeed = .001;
 
     // Cycle counter stuff
-    private ArrayList<Double> cycles = new ArrayList<>();
+    private final ArrayList<Double> cycles = new ArrayList<>();
     private boolean cycleToggle = false;
 
     // Rumbles
@@ -113,11 +105,13 @@ public class Teleop extends LinearOpMode {
                 }
             }
 
-            // Moving Slides
+            // Moving Deposit
+
+            //Move Back Home
             if (gamepad2.a && !cycleToggle) {
-                robot.deposit.close();
+                robot.deposit.open();
                 depositServoStatus = 0;
-                robot.deposit.moveSlides(slidesPower, Deposit.DepositHeight.HOME);
+                robot.setDepositToHome();
 
                 // cycle stuff
                 cycleToggle = true;
@@ -128,46 +122,28 @@ public class Teleop extends LinearOpMode {
                 cycleToggle = false;
             }
 
-            if (gamepad2.b) {
-                robot.deposit.hold();
-                depositServoStatus = 1;
-                robot.deposit.moveSlides(slidesPower, Deposit.DepositHeight.MID);
-            }
-
+            //Set Deposit to Track Alliance Hub
             if (gamepad2.x) {
-                robot.deposit.hold();
+                robot.deposit.close();
                 depositServoStatus = 1;
-                robot.deposit.moveSlides(slidesPower, Deposit.DepositHeight.TOP);
+                robot.depositTrackAllianceHub(Deposit.DepositHeight.TOP);
             }
 
-            // Capping Controls
+            //Set Deposit to Track Shared Hub
             if (gamepad2.y) {
-                robot.deposit.markerArmUp();
-                robot.deposit.moveSlides(slidesPower, Deposit.DepositHeight.CAP);
-            } else if (gamepad2.dpad_up) {
-                robot.deposit.markerArmUp();
-                teamMarkerManualPos = Constants.TEAM_MARKER_UP_POS;
-            } else if (gamepad2.dpad_down) {
-                robot.deposit.markerArmDown();
-            } else if (gamepad2.right_trigger > .1) {
-                teamMarkerManualPos += gamepad2.right_trigger * teamMarkerArmSpeed;
-                robot.deposit.markerSetPosition(teamMarkerManualPos);
-            } else if (gamepad2.left_trigger > .1) {
-                teamMarkerManualPos -= gamepad2.left_trigger * teamMarkerArmSpeed;
-                robot.deposit.markerSetPosition(teamMarkerManualPos);
+                robot.deposit.close();
+                depositServoStatus = 1;
+                robot.depositTrackSharedHub();
             }
 
             // Deposit Servo
             if (gamepad1.right_bumper && !servoToggle) {
                 if (depositServoStatus == 0) {
-                    robot.deposit.hold();
+                    robot.deposit.open();
                     depositServoStatus = 1;
                 } else if (depositServoStatus == 1) {
-                    robot.deposit.open();
-                    depositServoStatus = 2;
-                } else if (depositServoStatus == 2) {
                     robot.deposit.close();
-                    depositServoStatus = 0;
+                    depositServoStatus = 2;
                 }
                 servoToggle = true;
             } else if (!gamepad1.right_bumper && servoToggle) {
@@ -192,12 +168,6 @@ public class Teleop extends LinearOpMode {
                 wGain = 0.6;
             }
 
-            // Drivetrain Controls
-            robot.drivetrain.setControls(-gamepad1.left_stick_x * xyGain, -gamepad1.left_stick_y * xyGain, -gamepad1.right_stick_x * wGain);
-
-            // Update Robot
-            robot.update();
-
             // Rumble
             if (!teleRumble1 && 120 - (System.currentTimeMillis() - robot.startTime) / 1000 < 90) {
                 gamepad1.rumble(0.5, 0.5, 1000);
@@ -211,6 +181,12 @@ public class Teleop extends LinearOpMode {
                 gamepad1.rumble(0.5, 0.5, 1000);
                 endgameRumble = true;
             }
+
+            // Drivetrain Controls
+            robot.drivetrain.setControls(-gamepad1.left_stick_x * xyGain, -gamepad1.left_stick_y * xyGain, -gamepad1.right_stick_x * wGain);
+
+            // Update Robot
+            robot.update();
 
             // Telemetry
             for (int i = 0; i < cycles.size(); i++) {

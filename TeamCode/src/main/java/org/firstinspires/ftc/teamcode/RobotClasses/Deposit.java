@@ -13,7 +13,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Deposit {
     private DcMotorEx depositor; ////////
     private Servo depositServo;
-    private Servo teamMarkerServo;
 
     private DcMotorEx turretMotor;
     private Servo armServo1;
@@ -36,9 +35,9 @@ public class Deposit {
     private double turretErrorChange;
     private double lockTheta;
 
-    private static final double TICKS_PER_RADIAN = 414.4 / PI;
-    private static final double TURRET_MIN_THETA = PI/2;
-    private static final double TURRET_MAX_THETA = 3*PI/2;
+    private static final double TICKS_PER_RADIAN = 103.6 * 20 / (2*PI);
+    public static double TURRET_MIN_THETA = -PI/2;
+    public static double TURRET_MAX_THETA = PI/2;
 
     private static final double SLIDES_MIN_TICKS = 0;
     private static final double SLIDES_MAX_TICKS = 1000;
@@ -61,14 +60,10 @@ public class Deposit {
         //Deposit Servo
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         if (isAuto) {
-            hold();
-        } else{
             close();
+        } else{
+            open();
         }
-
-        //Team Marker Servo
-        teamMarkerServo = op.hardwareMap.get(Servo.class, "teamMarkerArm");
-        teamMarkerServo.setPosition(Constants.TEAM_MARKER_HOME_POS);
 
         //Turret Motor
         turretMotor = op.hardwareMap.get(DcMotorEx.class, "turret");
@@ -169,6 +164,10 @@ public class Deposit {
         return turretMotor.getCurrentPosition() / TICKS_PER_RADIAN + initialTheta;
     }
 
+    public double getTurretError(){
+        return turretError;
+    }
+
     //Arm
     public void moveArm(double targetArmPos) {
         armServo1.setPosition(Math.min(Math.max(targetArmPos, 0),1));
@@ -195,68 +194,11 @@ public class Deposit {
         }
     }
 
-    public void autoOpen() {
-        depositSetPosition(Constants.DEPOSIT_AUTO_OPEN_POS);
-    }
-
     public void open() {
         depositSetPosition(Constants.DEPOSIT_OPEN_POS);
-    }
-
-    public void hold() {
-        depositSetPosition(Constants.DEPOSIT_HOLD_POS);
     }
 
     public void close() {
         depositSetPosition(Constants.DEPOSIT_CLOSE_POS);
     }
-
-    // Team marker
-    public void markerSetPosition(double pos) {
-        if (pos != lastServoPos) {
-            teamMarkerServo.setPosition(pos);
-            lastServoPos = pos;
-        }
-    }
-
-    public void markerArmDown() {
-        markerSetPosition(Constants.TEAM_MARKER_DOWN_POS);
-    }
-
-    public void markerArmUp() {
-        markerSetPosition(Constants.TEAM_MARKER_UP_POS);
-    }
-
-
-
-    //////////////////////////////////////
-    public void moveSlides(double power, DepositHeight depositHeight) {
-        depositor.setPower(power);
-        if (depositHeight == depositHeight.HOME) {
-            depositor.setTargetPosition(Constants.HOME);
-            targetHeight = depositHeight.HOME;
-        } else if (depositHeight == depositHeight.LOW) {
-            depositor.setTargetPosition(Constants.LOW_GOAL);
-            targetHeight = depositHeight.LOW;
-        } else if (depositHeight == depositHeight.MID) {
-            depositor.setTargetPosition(Constants.MID_GOAL);
-            targetHeight = depositHeight.MID;
-        } else if (depositHeight == depositHeight.TOP) {
-            depositor.setTargetPosition(Constants.TOP_GOAL);
-            targetHeight = depositHeight.TOP;
-        } else if (depositHeight == depositHeight.CAP) {
-            depositor.setTargetPosition(Constants.CAP);
-            targetHeight = depositHeight.CAP;
-        } else {
-            depositor.setTargetPosition(0);
-        }
-    }
-
-    public double getSlidesHeight() {
-        return depositor.getCurrentPosition() * 0.043;
-    }
-    //////////////////////////////////////////
-
-
-
 }

@@ -75,11 +75,11 @@ public class RedAutoCarousel extends LinearOpMode {
         int barcodeCase = 0; // 0 = left, 1 = mid, 2 = right
         Robot.log("Barcode Case: " + barcodeCase);
         if (barcodeCase == 0) {
-            robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
+//            robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
         } else if (barcodeCase == 1) {
-            robot.deposit.moveSlides(1, Deposit.DepositHeight.MID);
+//            robot.deposit.moveSlides(1, Deposit.DepositHeight.MID);
         } else {
-            robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
+//            robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
         }
 
         // Paths
@@ -120,8 +120,8 @@ public class RedAutoCarousel extends LinearOpMode {
                 robot.setTargetPoint(new Target(spinCarouselPath.getRobotPose(Math.min(time.seconds(), spinCarouselTime))));
 
                 if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
-                    robot.deposit.close();
+//                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
+//                    robot.deposit.close();
                 }
 
                 if (time.seconds() > spinCarouselTime) {
@@ -133,7 +133,7 @@ public class RedAutoCarousel extends LinearOpMode {
                     if (time.seconds() > 1) {
                         robot.carousel.stop();
                     }
-                    robot.intake.on();
+//                    robot.intake.on();
 
                     Waypoint[] deliverDuckWaypoints = new Waypoint[]{
                             new Waypoint(robot.x, robot.y, 3 * PI / 4, 20, 10, 0, 0),
@@ -170,12 +170,12 @@ public class RedAutoCarousel extends LinearOpMode {
                 robot.setTargetPoint(new Target(goToWarehousePath.getRobotPose(Math.min(time.seconds(), goToWarehouseTime))));
 
                 if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
-                    robot.deposit.close();
+//                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
+//                    robot.deposit.close();
                 }
 
                 if (robot.y > 100) {
-                    robot.intake.on();
+//                    robot.intake.on();
                 }
 
                 if (time.seconds() > goToWarehouseTime) {
@@ -199,11 +199,11 @@ public class RedAutoCarousel extends LinearOpMode {
                 robot.setTargetPoint(new Target(pose).theta(pose.theta + PI));
 
                 if (robot.y < 92) {
-                    robot.intake.off();
-                    robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
-                    robot.deposit.hold();
+//                    robot.intake.off();
+//                    robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
+//                    robot.deposit.hold();
                 } else if (time.seconds() > 0.5) {
-                    robot.intake.reverse();
+//                    robot.intake.reverse();
                 }
 
                 if (time.seconds() > cycleTime) {
@@ -222,12 +222,12 @@ public class RedAutoCarousel extends LinearOpMode {
                 robot.setTargetPoint(new Target(goToWarehousePath2.getRobotPose(Math.min(time.seconds(), goToWarehouseTime))));
 
                 if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
-                    robot.deposit.close();
+//                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
+//                    robot.deposit.close();
                 }
 
                 if (robot.y > 100) {
-                    robot.intake.on();
+//                    robot.intake.on();
                 }
 
                 if (time.seconds() > goToWarehouseTime2) {

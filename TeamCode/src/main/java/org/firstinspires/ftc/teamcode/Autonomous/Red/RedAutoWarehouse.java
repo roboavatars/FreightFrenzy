@@ -80,11 +80,11 @@ public class RedAutoWarehouse extends LinearOpMode {
         Robot.log("Barcode Case: " + barcodeCase);
 
         if (barcodeCase == 0) {
-            robot.deposit.moveSlides(1, Deposit.DepositHeight.LOW);
+//            robot.deposit.moveSlides(1, Deposit.DepositHeight.LOW);
         } else if (barcodeCase == 1) {
-            robot.deposit.moveSlides(1, Deposit.DepositHeight.MID);
+//            robot.deposit.moveSlides(1, Deposit.DepositHeight.MID);
         } else {
-            robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
+//            robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
         }
         Waypoint[] preloadScoreWaypoints = new Waypoint[]{
                 new Waypoint(135, 78.5, 0, -10, -20, 0, 0),
@@ -100,7 +100,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
 
                 if (robot.isAtPose(depositX, depositY) || time.seconds() > preloadScoreTime + 0.5) {
-                    robot.deposit.autoOpen();
+//                    robot.deposit.autoOpen();
                 }
 
                 if (time.seconds() > preloadScoreTime + 1.5) {
@@ -143,12 +143,12 @@ public class RedAutoWarehouse extends LinearOpMode {
                 }
 
                 if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
-                    robot.deposit.close();
+//                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
+//                    robot.deposit.close();
                 }
 
                 if (robot.y > 100) {
-                    robot.intake.on();
+//                    robot.intake.on();
                 }
 
                 if (time.seconds() > goToWarehouseTime2 + .5) {
@@ -171,18 +171,18 @@ public class RedAutoWarehouse extends LinearOpMode {
                 }
 
                 if (robot.y < 92) {
-                    robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
-                    robot.deposit.hold();
+//                    robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
+//                    robot.deposit.hold();
                 }
 
                 if (time.seconds() > 1.5) {
-                    robot.intake.off();
+//                    robot.intake.off();
                 } else if (time.seconds() > 0.75) {
-                    robot.intake.reverse();
+//                    robot.intake.reverse();
                 }
 
                 if (robot.isAtPose(depositX, depositY, depositTh) || time.seconds() > cycleScoreTime2 + 0.75) {
-                    robot.deposit.open();
+//                    robot.deposit.open();
                 }
 
                 if (time.seconds() > cycleScoreTime2 + 1.5) {
@@ -209,8 +209,8 @@ public class RedAutoWarehouse extends LinearOpMode {
                 }
             } else if (!park) {
                 if (time.seconds() > 1) {
-                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
-                    robot.deposit.close();
+//                    robot.deposit.moveSlides(1, Deposit.DepositHeight.HOME);
+//                    robot.deposit.close();
                 }
 
                 if (time.seconds() > parkTime1){

@@ -17,7 +17,7 @@ public class Dashboard {
     }
 
     public static void drawRobot(Robot robot, String drivetrainColor) {
-        drawRobot(robot.x, robot.y, robot.theta, robot.deposit.getSlidesHeight(), drivetrainColor);
+        drawRobot(robot.x, robot.y, robot.theta, robot.deposit.getSlidesDistInches(), drivetrainColor);
     }
 
     public static void drawRobot(double robotX, double robotY, double robotTheta, double slidesPosition, String drivetrainColor) {

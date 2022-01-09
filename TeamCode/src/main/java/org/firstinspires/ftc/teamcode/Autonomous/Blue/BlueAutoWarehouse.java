@@ -81,12 +81,13 @@ public class BlueAutoWarehouse extends LinearOpMode {
         Robot.log("Barcode Case: " + barcodeCase);
 
         if (barcodeCase == 0) {
-            robot.deposit.moveSlides(1, Deposit.DepositHeight.LOW);
+//            robot.deposit.moveSlides(1, Deposit.DepositHeight.LOW);
         } else if (barcodeCase == 1) {
-            robot.deposit.moveSlides(1, Deposit.DepositHeight.MID);
+//            robot.deposit.moveSlides(1, Deposit.DepositHeight.MID);
         } else {
-            robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
+//            robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
         }
+
         Waypoint[] preloadScoreWaypoints = new Waypoint[] {
                 new Waypoint(9, 78.5, PI, -5, -5, 0, 0),
                 new Waypoint(preloadScoreCoord[barcodeCase][0], preloadScoreCoord[barcodeCase][1], preloadScoreCoord[barcodeCase][2], 40, 20, 2, preloadScoreTime)
@@ -102,9 +103,9 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
                 if (robot.isAtPose(depositX, depositY) || time.seconds() > preloadScoreTime + 0.5) {
                     if (barcodeCase != 2) {
-                        robot.deposit.autoOpen();
+//                        robot.deposit.autoOpen();
                     } else {
-                        robot.deposit.open();
+//                        robot.deposit.open();
                     }
                 }
 
@@ -141,8 +142,8 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 robot.setTargetPoint(goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime2, time.seconds())));
 
                 if (time.seconds() > 2) {
-                    robot.deposit.moveSlides(1,Deposit.DepositHeight.HOME);
-                    robot.deposit.close();
+//                    robot.deposit.moveSlides(1,Deposit.DepositHeight.HOME);
+//                    robot.deposit.close();
                 }
 
                 if (time.seconds() > goToWarehouseTime2) {
