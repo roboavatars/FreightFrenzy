@@ -35,12 +35,6 @@ public class Deposit {
     private double turretErrorChange;
     private double lockTheta;
 
-    private static final double TICKS_PER_RADIAN = 103.6 * 20 / (2*PI);
-    public static double TURRET_MIN_THETA = -PI/2;
-    public static double TURRET_MAX_THETA = PI/2;
-
-    private static final double SLIDES_MIN_TICKS = 0;
-    private static final double SLIDES_MAX_TICKS = 1000;
     private static final double maxSlidesDistBeforeLoweringArm = 2;
 
     private static boolean home = true;
@@ -128,7 +122,7 @@ public class Deposit {
 
     //Turret
     public void setTurretThetaPDF(double theta, double commandedW) {
-        double clippedTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
+        double clippedTargetTheta = Math.min(Math.max(theta, Constants.TURRET_MIN_THETA), Constants.TURRET_MAX_THETA);
         turretTheta = getTurretTheta();
         turretErrorChange = clippedTargetTheta - turretTheta - turretError;
         turretError = clippedTargetTheta - turretTheta;
@@ -136,7 +130,7 @@ public class Deposit {
         setTurretPower(fTurret * commandedW + pTurret * turretError + dTurret * turretErrorChange);
     }
     public void setTurretThetaPD(double theta) {
-        double clippedTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
+        double clippedTargetTheta = Math.min(Math.max(theta, Constants.TURRET_MIN_THETA), Constants.TURRET_MAX_THETA);
         turretTheta = getTurretTheta();
         turretErrorChange = clippedTargetTheta - turretTheta - turretError;
         turretError = clippedTargetTheta - turretTheta;
@@ -159,7 +153,7 @@ public class Deposit {
     }
 
     public double getTurretTheta() {
-        return turretMotor.getCurrentPosition() / TICKS_PER_RADIAN + initialTheta;
+        return turretMotor.getCurrentPosition() / Constants.TURRET_TICKS_PER_RADIAN + initialTheta;
     }
 
     public double getTurretError(){
@@ -175,7 +169,7 @@ public class Deposit {
     //Slides
     public void moveSlides(double power){
         slidesMotor.setPower(power);
-        slidesMotor.setTargetPosition((int) Math.min(Math.max(targetSlidesTicks, SLIDES_MIN_TICKS), SLIDES_MAX_TICKS));
+        slidesMotor.setTargetPosition((int) Math.min(Math.max(targetSlidesTicks, Constants.DEPOSIT_SLIDES_MIN_TICKS), Constants.DEPOSIT_SLIDES_MAX_TICKS));
     }
     public double getSlidesDistTicks(){
         return slidesMotor.getCurrentPosition();

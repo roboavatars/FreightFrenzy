@@ -26,6 +26,10 @@ public class Constants {
     //Deposit Turret
     public static double MAX_TURRET_POWER = 1;
     public static double TURRET_HOME_THETA = 0;
+    public static double TURRET_MIN_THETA = -PI/2;
+    public static double TURRET_MAX_THETA = PI/2;
+    public static double TURRET_TICKS_PER_RADIAN = 103.6 * 20 / (2*PI);
+    public static double TURRET_CENTER_TO_ROBOT_CENTER_DIST = 2.06066;
 
     //Deposit Arm
     public static double DEPOSIT_ARM_HOME = 1;
@@ -43,6 +47,8 @@ public class Constants {
     public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_MID_GOAL = 33;
     public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_TOP_GOAL = 30;
     public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_CAP_GOAL = 27;
+    public static double DEPOSIT_SLIDES_MIN_TICKS = 0;
+    public static double DEPOSIT_SLIDES_MAX_TICKS = 1000;
 
     //Intake Stalling
     public static double STALL_THRESHOLD = 7;

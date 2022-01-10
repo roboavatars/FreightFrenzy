@@ -215,15 +215,21 @@ public class Robot {
             double lockTheta;
             double slidesDist;
 
+            //Calculating the Coords of the Turret Center
+            double[] turretCenter = new double[2];
+            turretCenter[0] = x + Math.cos(theta) * Constants.TURRET_CENTER_TO_ROBOT_CENTER_DIST;
+            turretCenter[1] = y + Math.sin(theta) * Constants.TURRET_CENTER_TO_ROBOT_CENTER_DIST;
+
+
             if (allianceHub && isRed){
-                lockTheta = atan2(60 - y, 96 - x);
-                slidesDist = hypot(60 - y, 96 - x);
+                lockTheta = atan2(60 - turretCenter[1], 96 - turretCenter[0]);
+                slidesDist = hypot(60 - turretCenter[1], 96 - turretCenter[0]);
             } else if (allianceHub && !isRed){
-                lockTheta = atan2(60 - y, 48 - x);
-                slidesDist = hypot(60 - y, 48 - x);
+                lockTheta = atan2(60 - turretCenter[1], 48 - turretCenter[0]);
+                slidesDist = hypot(60 - turretCenter[1], 48 - turretCenter[0]);
             } else {
-                lockTheta = atan2(120 - y, 72 - x);
-                slidesDist = hypot(120 - y, 72 - x);
+                lockTheta = atan2(120 - turretCenter[1], 72 - turretCenter[0]);
+                slidesDist = hypot(120 - turretCenter[1], 72 - turretCenter[0]);
             }
 
             if (depositTargetHeight == Deposit.DepositHeight.LOW){
