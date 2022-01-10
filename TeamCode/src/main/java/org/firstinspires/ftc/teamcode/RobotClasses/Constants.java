@@ -48,7 +48,7 @@ public class Constants {
     public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_TOP_GOAL = 30;
     public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_CAP_GOAL = 27;
     public static double DEPOSIT_SLIDES_MIN_TICKS = 0;
-    public static double DEPOSIT_SLIDES_MAX_TICKS = 1000;
+    public static double DEPOSIT_SLIDES_MAX_TICKS = 290;
 
     //Intake Stalling
     public static double STALL_THRESHOLD = 7;

@@ -37,7 +37,7 @@ public class TurretPDFTuning extends LinearOpMode {
             if (targetTheta < 0) {
                 targetTheta += 2 * PI;
             }
-            deposit.setTurretThetaPDF(targetTheta, dt.commandedW);
+            deposit.setTurretThetaPDFF(targetTheta, dt.commandedW);
 
             addPacket("lock theta", lockTheta);
             addPacket("target theta", targetTheta);
