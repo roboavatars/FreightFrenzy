@@ -55,8 +55,6 @@ public class Deposit {
     public DepositHeight targetHeight = DepositHeight.HOME;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
-        depositor = op.hardwareMap.get(DcMotorEx.class, "depositor");
-
         //Deposit Servo
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         if (isAuto) {

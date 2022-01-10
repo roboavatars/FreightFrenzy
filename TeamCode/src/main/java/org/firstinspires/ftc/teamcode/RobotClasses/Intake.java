@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -12,18 +13,39 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @SuppressWarnings("FieldCanBeLocal")
 public class Intake {
     private DcMotorEx intakeMotor;
-    private Servo blockerServo;
+    private DcMotorEx slidesMotor;
+    private Servo intakeServo;
     private DistanceSensor intakeSensor;
 
     private double lastIntakePow = 0;
     private double lastBlockerPos = 0;
 
-    public Intake(LinearOpMode op) {
+    public Intake(LinearOpMode op, boolean isAuto) {
+        //Intake Motor
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
-        // blockerServo = op.hardwareMap.get(Servo.class, "blocker");
-        // intakeSensor = op.hardwareMap.get(DistanceSensor.class, "intakeSensor");
+        off();
 
-        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        //Slides Motor
+        slidesMotor = op.hardwareMap.get(DcMotorEx.class, "intakeSlides");
+        slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if (isAuto){
+            slidesMotor.setTargetPosition(Constants.INTAKE_HOME_TICKS);
+        } else {
+            slidesMotor.setTargetPosition(Constants.INTAKE_EXTEND_TICKS);
+        }
+        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        //Intake Servo
+        intakeServo = op.hardwareMap.get(Servo.class, "intakeServo");
+        if (isAuto){
+            up();
+        } else {
+            down();
+        }
+
+        //Intake Sensor
+        intakeSensor = op.hardwareMap.get(DistanceSensor.class, "intakeSensor");
+
         op.telemetry.addData("Status", "Intake Initialized");
     }
 
@@ -47,16 +69,26 @@ public class Intake {
         }
     }
 
-    // Blocker
-
-    private void setBlockerPos (double pos) {
-        if (pos != lastBlockerPos) {
-            blockerServo.setPosition(pos);
-            lastBlockerPos = pos;
-        }
+    //Intake Slides
+    public void extend (){
+        slidesMotor.setPower(Constants.INTAKE_SLIDES_POWER);
+        slidesMotor.setTargetPosition(Constants.INTAKE_EXTEND_TICKS);
+    }
+    public void retract (){
+        slidesMotor.setPower(Constants.INTAKE_SLIDES_POWER);
+        slidesMotor.setTargetPosition(Constants.INTAKE_HOME_TICKS);
     }
 
-    //get power
+    //Intake Servo
+    public void up (){
+        intakeServo.setPosition(Constants.INTAKE_UP_POS);
+    }
+
+    public void down (){
+        intakeServo.setPosition(Constants.INTAKE_DOWN_POS);
+    }
+
+    //Get Power
     public double getLastIntakePow(){
         return lastIntakePow;
     }

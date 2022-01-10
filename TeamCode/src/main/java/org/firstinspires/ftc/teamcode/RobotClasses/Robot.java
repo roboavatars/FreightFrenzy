@@ -100,7 +100,7 @@ public class Robot {
         this.isRed = isRed;
 
         drivetrain = new Drivetrain(op, x, y, theta);
-        intake = new Intake(op);
+        intake = new Intake(op, isAuto);
         deposit = new Deposit(op, isAuto);
         carousel = new Carousel(op);
         logger = new Logger();
