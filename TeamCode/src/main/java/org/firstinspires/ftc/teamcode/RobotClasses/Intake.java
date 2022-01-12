@@ -79,6 +79,14 @@ public class Intake {
         slidesMotor.setTargetPosition(Constants.INTAKE_HOME_TICKS);
     }
 
+    public boolean slidesIsHome (){
+        return slidesMotor.getCurrentPosition() < Constants.INTAKE_SLIDES_HOME_THRESHOLD;
+    }
+
+    public int getSlidesTicks (){
+        return slidesMotor.getCurrentPosition();
+    }
+
     //Intake Servo
     public void up (){
         intakeServo.setPosition(Constants.INTAKE_UP_POS);

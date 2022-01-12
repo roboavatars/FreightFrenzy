@@ -32,13 +32,11 @@ public class Constants {
     public static double TURRET_CENTER_TO_ROBOT_CENTER_DIST = 2.06066;
 
     //Deposit Arm
-    public static double DEPOSIT_ARM_HOME = 1;
-    public static double DEPOSIT_ARM_LOW_GOAL = 0.01;
-    public static double DEPOSIT_ARM_MID_GOAL = 0.1;
-    public static double DEPOSIT_ARM_TOP_GOAL = 0.2;
-    public static double DEPOSIT_ARM_CAP = 0.3;
-    public static double DEPOSIT_ARM_OVER_MOTOR = .9;
-    public static double DEPOSIT_ARM_SERVO_OFFSET = 0.05;
+    public static double DEPOSIT_ARM_HOME_TICKS = 0;
+    public static double DEPOSIT_ARM_LOW_GOAL_TICKS = 500;
+    public static double DEPOSIT_ARM_MID_GOAL_TICKS = 400;
+    public static double DEPOSIT_ARM_TOP_GOAL_TICKS = 300;
+    public static double DEPOSIT_ARM_OVER_MOTOR = 100;
 
     //Deposit Slides
     public static double DEPOSIT_SLIDES_TICKS_PER_INCH = 103.6 / (PI * 1.2);
@@ -55,11 +53,12 @@ public class Constants {
 
     //Intake Slides
     public static double INTAKE_SLIDES_POWER = 1;
-    public static int INTAKE_EXTEND_TICKS = 1000;
+    public static int INTAKE_EXTEND_TICKS = 100;
     public static int INTAKE_HOME_TICKS = 0;
-
+    public static int INTAKE_SLIDES_HOME_THRESHOLD = 10;
+    public static double TRANSFER_TIME = 1000;
 
     //Intake Servo
-    public static double INTAKE_UP_POS = 1;
-    public static double INTAKE_DOWN_POS = 0;
+    public static double INTAKE_UP_POS = 0;
+    public static double INTAKE_DOWN_POS = 0.8;
 }

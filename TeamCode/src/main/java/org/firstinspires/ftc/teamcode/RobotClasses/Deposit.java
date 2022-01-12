@@ -15,15 +15,12 @@ public class Deposit {
     private Servo depositServo;
 
     private DcMotorEx turretMotor;
-    private Servo armServo1;
-    private Servo armServo2;
     private DcMotorEx slidesMotor;
+    private DcMotorEx armMotor;
 
-    private static double lastTargetPower = 0;
-    private static int lastTargetPos = 0;
     private static double lastServoPos = 0;
-    private static int offset = 0;
 
+    //Turret PD and PDFF
     public static double pTurret = 2.25;
     public static double dTurret = 5.5;
     public static double fwTurret = -0.3;
@@ -32,27 +29,32 @@ public class Deposit {
 
     private double turretTargetTheta;
     private double turretTheta;
-    private double turretError;
+    private double turretError = 0;
     private double turretErrorChange;
     private double turretLockTheta;
 
+    //Slides PD
     public static double pSlides = 0.2;
     public static double dSlides = 0;
 
-    private double slidesTargetTicks;
-    private double slidesCurrentTicks;
-    private double slidesError;
+    private int targetSlidesTicks;
+    private double slidesError = 0;
     private double slidesErrorChange;
+
+    //Arm PD
+    public static double pArm = 0.07;
+    public static double dArm = 0;
+
+    private double armError = 0;
+    private double armErrorChange;
 
     private static final double maxSlidesDistBeforeLoweringArm = 2;
 
     private static boolean home = true;
     public static double targetArmPos;
 
-    public int targetSlidesTicks;
-
     public enum DepositHeight {
-        HOME, LOW, MID, TOP, CAP, UNDEFINED
+        HOME, LOW, MID, TOP
     }
 
     public DepositHeight targetHeight = DepositHeight.HOME;
@@ -73,8 +75,7 @@ public class Deposit {
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //Arm Servos
-        armServo1 = op.hardwareMap.get(Servo.class, "arm1");
-        armServo2 = op.hardwareMap.get(Servo.class, "arm2");
+        armMotor = op.hardwareMap.get(DcMotorEx.class, "arm1");
 
         //Slides Motor
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
@@ -93,7 +94,7 @@ public class Deposit {
     public void setControlsHome (){
         home = true;
         turretTargetTheta = Constants.TURRET_HOME_THETA;
-        targetArmPos = Constants.DEPOSIT_ARM_HOME;
+        targetArmPos = Constants.DEPOSIT_ARM_HOME_TICKS;
         targetSlidesTicks = 0;
     }
 
@@ -170,8 +171,16 @@ public class Deposit {
 
     //Arm
     public void moveArm(double targetArmPos) {
-        armServo1.setPosition(Math.min(Math.max(targetArmPos, 0),1));
-        armServo2.setPosition(Math.min(Math.max(1 - targetArmPos + Constants.DEPOSIT_ARM_SERVO_OFFSET, 0),1));
+        double targetTicks = (int) Math.min(Math.max(targetArmPos, Constants.DEPOSIT_ARM_HOME_TICKS), Constants.DEPOSIT_ARM_LOW_GOAL_TICKS);
+        double currentTicks = getArmTicks();
+        armErrorChange = targetTicks - currentTicks - armError;
+        armError = targetTicks - currentTicks;
+
+        armMotor.setPower(-(pArm * armError + dArm * armErrorChange));
+    }
+
+    public double getArmTicks(){
+        return armMotor.getCurrentPosition();
     }
 
     //Slides

@@ -6,6 +6,8 @@ import static java.lang.Math.sin;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
+
 @Config
 public class TapeDetector {
     public ColorSensorForTapeDetection left;
@@ -36,14 +38,14 @@ public class TapeDetector {
     }
 
     public double[] update(double x, double y, double theta) {
-        double[] updatedCoords = new double[2];
+        double[] updatedCoords = new double[2]; //[0] = y; [1] = theta
 
         left.update(x, y, theta);
         right.update(x, y, theta);
 
         if (!resetOdo && !right.isNull && !left.isNull && Math.abs(left.theta - right.theta) < THETA_THRESHOLD) {
             //Calculate robot theta
-            updatedCoords[1] = PI/2 + Math.asin((left.y - right.y)/SENSORS_DIST);
+            updatedCoords[1] = PI/2 + Math.asin(Math.min(Math.max(((left.y - right.y)/SENSORS_DIST), -1), 1)); //asin(x), where x is restricted to [-1,1]
             updatedCoords[1] %= 2*PI;
             if (updatedCoords[1]<0) updatedCoords[1] += 2*PI;
 

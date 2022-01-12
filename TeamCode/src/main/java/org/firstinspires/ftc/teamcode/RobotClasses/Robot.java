@@ -61,23 +61,28 @@ public class Robot {
     public double lastCycleTime;
     public double longestCycle = 0;
 
+    private boolean intaking = false;
+    public boolean intakeSlidesHome;
+
     public boolean slidesMoving = false;
     public boolean intakeFull = false;
-    public Deposit.DepositHeight depositHeight = Deposit.DepositHeight.HOME;
-    public double intakePower = 0;
+    public double turretTheta = Constants.TURRET_HOME_THETA;
+    public double depositSlidesDist = 0;
+    private double intakePower = 0;
     private double[] scoringPos;
 
-    public boolean depositToHome;
-    public Deposit.DepositHeight depositTargetHeight;
+    private boolean depositToHome;
+    private Deposit.DepositHeight depositTargetHeight;
     public boolean allianceHub;
 
     private boolean depositReadyToScore = false;
     private boolean depositReadyToReturn = false;
-    public Deposit.DepositHeight depositMoveApproval = Deposit.DepositHeight.UNDEFINED;
+    public Deposit.DepositHeight depositMoveApproval = Deposit.DepositHeight.HOME;
     public boolean depositScoreApproval = false;
 
     // Time and Delay Variables
     public double curTime;
+    private double intakeGetHomeTime = -1;
 
     // Motion Variables
     public double x, y, theta, vx, vy, w;
@@ -148,13 +153,15 @@ public class Robot {
             firstLoop = false;
         }
 
-        /*if (loopCounter % sensorUpdatePeriod == 0){
-            slidesMoving = deposit.slidesMoving();
-            intakeFull = intake.intakeFull();
-            depositHeight = deposit.getTargetHeight();
+        if (loopCounter % sensorUpdatePeriod == 0){
+            intakeSlidesHome = intake.slidesIsHome();
             intakePower = intake.getLastIntakePow();
+            intakeFull = intake.intakeFull();
+            turretTheta = deposit.getTurretTheta();
+            depositSlidesDist = deposit.getSlidesDistInches();
         }
 
+        /*
         //State Controller
         if (depositHeight == depositHeight.HOME && !slidesMoving && !intakeFull){
             if(isAuto){
@@ -184,6 +191,23 @@ public class Robot {
             deposit.close();
             deposit.moveSlides(1, Deposit.deposit_height.HOME);
         }*/
+        if (intaking){
+            intake.extend();
+            intake.on();
+            intake.down();
+            intake.checkIfStalling();
+        } else {
+            intake.retract();
+            intake.up();
+            if (intakeGetHomeTime == -1 && intakeSlidesHome){
+                intakeGetHomeTime = curTime;
+                intake.reverse();
+            } else if (intakeGetHomeTime != -1 && curTime - intakeGetHomeTime < Constants.TRANSFER_TIME){
+                intake.reverse();
+            } else {
+                intake.off();
+            }
+        }
 
         // Update Position
         drivetrain.updatePose();
@@ -233,13 +257,13 @@ public class Robot {
             }
 
             if (depositTargetHeight == Deposit.DepositHeight.LOW){
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_LOW_GOAL, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_LOW_GOAL);
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_LOW_GOAL_TICKS, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_LOW_GOAL);
             } else if (depositTargetHeight == Deposit.DepositHeight.MID){
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_MID_GOAL, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_MID_GOAL);
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_MID_GOAL_TICKS, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_MID_GOAL);
             } else if (depositTargetHeight == Deposit.DepositHeight.TOP){
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_TOP_GOAL, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_TOP_GOAL);
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_TOP_GOAL_TICKS, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_TOP_GOAL);
             } else {
-                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_CAP, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_CAP_GOAL);
+                deposit.setControlsDepositing(lockTheta, Constants.DEPOSIT_ARM_HOME_TICKS, slidesDist);
             }
         }
         deposit.update(theta, drivetrain.commandedW);
@@ -409,4 +433,12 @@ public class Robot {
         this.depositTargetHeight = Deposit.DepositHeight.LOW;
     }
 
+    //Set Intake Controls
+    public void intake(){
+        intaking = true;
+        intakeGetHomeTime = -1;
+    }
+    public void intakeHome(){
+        intaking = false;
+    }
 }

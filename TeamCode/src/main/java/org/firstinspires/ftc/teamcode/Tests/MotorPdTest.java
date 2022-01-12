@@ -13,10 +13,10 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 
 @TeleOp
 @Config
-public class SlidesTest extends LinearOpMode {
+public class MotorPdTest extends LinearOpMode {
     public static boolean move = false;
     public static int targetTicks = 0;
-    public static String motorName = "slides";
+    public static String motorName = "motor";
 
     public static double Kp = 2.25;
     public static double Kd = 5.5;
@@ -27,13 +27,13 @@ public class SlidesTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        DcMotorEx slides = hardwareMap.get(DcMotorEx.class, motorName);
-        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        DcMotorEx motor = hardwareMap.get(DcMotorEx.class, motorName);
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         waitForStart();
         while (opModeIsActive()) {
             if (move) {
-                double currentTicks = slides.getCurrentPosition();
+                double currentTicks = motor.getCurrentPosition();
                 errorChange = targetTicks - currentTicks - error;
                 error = targetTicks - currentTicks;
 
@@ -41,9 +41,9 @@ public class SlidesTest extends LinearOpMode {
             } else {
                 power = 0;
             }
-            slides.setPower(-power);
+            motor.setPower(power);
 
-            addPacket("ticks", slides.getCurrentPosition());
+            addPacket("ticks", motor.getCurrentPosition());
             addPacket("error", error);
             addPacket("error change", errorChange);
             addPacket("power", power);
