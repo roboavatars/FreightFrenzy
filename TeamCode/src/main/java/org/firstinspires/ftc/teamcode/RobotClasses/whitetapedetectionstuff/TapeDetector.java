@@ -13,9 +13,6 @@ public class TapeDetector {
     public ColorSensorForTapeDetection left;
     public ColorSensorForTapeDetection right;
     private boolean entering;
-    public final double THETA_THRESHOLD = 0.2;
-    public final double SENSORS_DIST = 10;
-    public final double SENSOR_CENTER_TO_ROBOT_CENTER = 8;
     private boolean resetOdo = false;
 
     public TapeDetector(LinearOpMode op) {
@@ -43,17 +40,17 @@ public class TapeDetector {
         left.update(x, y, theta);
         right.update(x, y, theta);
 
-        if (!resetOdo && !right.isNull && !left.isNull && Math.abs(left.theta - right.theta) < THETA_THRESHOLD) {
+        if (!resetOdo && !right.isNull && !left.isNull && Math.abs(left.theta - right.theta) < Constants.TAPE_THETA_THRESHOLD) {
             //Calculate robot theta
-            updatedCoords[1] = PI/2 + Math.asin(Math.min(Math.max(((left.y - right.y)/SENSORS_DIST), -1), 1)); //asin(x), where x is restricted to [-1,1]
+            updatedCoords[1] = PI/2 + Math.asin(Math.min(Math.max(((left.y - right.y)/Constants.TAPE_SENSORS_DIST), -1), 1)); //asin(x), where x is restricted to [-1,1]
             updatedCoords[1] %= 2*PI;
             if (updatedCoords[1]<0) updatedCoords[1] += 2*PI;
 
             //Calculate robot Y position
             if (entering) {
-                updatedCoords[0] = 96 - SENSOR_CENTER_TO_ROBOT_CENTER * sin(updatedCoords[1]);
+                updatedCoords[0] = 96 - Constants.TAPE_SENSOR_CENTER_TO_ROBOT_CENTER * sin(updatedCoords[1]);
             } else {
-                updatedCoords[0] = 98 - SENSOR_CENTER_TO_ROBOT_CENTER * sin(updatedCoords[1]);
+                updatedCoords[0] = 98 - Constants.TAPE_SENSOR_CENTER_TO_ROBOT_CENTER * sin(updatedCoords[1]);
             }
             resetOdo = true;
         } else {

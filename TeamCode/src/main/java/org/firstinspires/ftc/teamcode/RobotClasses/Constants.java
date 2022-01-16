@@ -65,4 +65,10 @@ public class Constants {
     //Anti-Tip
     public static double TIP_THRESHOLD = PI/6;
     public static double TIP_CONTROLS_GAIN = PI/6;
+
+    //Tape Detector
+    public static double COLOR_SENSOR_THRESHOLD = 140;
+    public static double TAPE_THETA_THRESHOLD = 0.2;
+    public static double TAPE_SENSORS_DIST = 10;
+    public static double TAPE_SENSOR_CENTER_TO_ROBOT_CENTER = 8;
 }

@@ -4,10 +4,11 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
+import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
+
 @Config
 public class ColorSensorForTapeDetection {
     public ColorSensor colorSensor;
-    public final double THRESHOLD = 20;
     private boolean hitTape;
     public boolean isNull;
 
@@ -32,6 +33,6 @@ public class ColorSensorForTapeDetection {
     }
 
     private boolean white(){
-        return colorSensor.alpha()>THRESHOLD;
+        return colorSensor.alpha()> Constants.COLOR_SENSOR_THRESHOLD;
     }
 }
