@@ -43,7 +43,7 @@ public class IntakeTest extends LinearOpMode {
                 intake.checkIfStalling();
                 firstReturnLoop = false;
             } else {
-                intake.retract();
+                intake.home();
                 intake.up();
                 if (!firstReturnLoop){
                     intakeGetHomeTime = -1;
@@ -58,7 +58,6 @@ public class IntakeTest extends LinearOpMode {
                     intake.off();
                 }
 
-                addPacket("slides ticks", intake.getSlidesTicks());
                 addPacket("intake get home time", intakeGetHomeTime);
                 addPacket("current time", curTime);
                 sendPacket();

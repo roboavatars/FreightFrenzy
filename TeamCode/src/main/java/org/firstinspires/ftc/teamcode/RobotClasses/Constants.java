@@ -30,6 +30,7 @@ public class Constants {
     public static double TURRET_MAX_THETA = PI/2;
     public static double TURRET_TICKS_PER_RADIAN = 103.6 * 20 / (2*PI);
     public static double TURRET_CENTER_TO_ROBOT_CENTER_DIST = 2.06066;
+    public static double TURRET_ERROR_THRESHOLD = PI/40;
 
     //Deposit Arm
     public static double DEPOSIT_ARM_HOME_TICKS = 0;
@@ -37,6 +38,7 @@ public class Constants {
     public static double DEPOSIT_ARM_MID_GOAL_TICKS = 400;
     public static double DEPOSIT_ARM_TOP_GOAL_TICKS = 300;
     public static double DEPOSIT_ARM_OVER_MOTOR = 100;
+    public static int DEPOSIT_ARM_ERROR_THRESHOLD = 5;
 
     //Deposit Slides
     public static double DEPOSIT_SLIDES_TICKS_PER_INCH = 103.6 / (PI * 1.2);
@@ -47,15 +49,14 @@ public class Constants {
     public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_CAP_GOAL = 27;
     public static double DEPOSIT_SLIDES_MIN_TICKS = 0;
     public static double DEPOSIT_SLIDES_MAX_TICKS = 290;
+    public static int DEPOSIT_SLIDES_ERROR_THRESHOLD = 5;
 
     //Intake Stalling
     public static double STALL_THRESHOLD = 7;
 
     //Intake Slides
-    public static double INTAKE_SLIDES_POWER = 1;
-    public static int INTAKE_EXTEND_TICKS = 100;
-    public static int INTAKE_HOME_TICKS = 0;
-    public static int INTAKE_SLIDES_HOME_THRESHOLD = 10;
+    public static int INTAKE_EXTEND_POS = 100;
+    public static int INTAKE_HOME_POS = 0;
     public static double TRANSFER_TIME = 1000;
 
     //Intake Servo

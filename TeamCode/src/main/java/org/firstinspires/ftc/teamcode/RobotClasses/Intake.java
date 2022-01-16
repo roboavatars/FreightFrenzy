@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -13,12 +12,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @SuppressWarnings("FieldCanBeLocal")
 public class Intake {
     private DcMotorEx intakeMotor;
-    private DcMotorEx slidesMotor;
+    private Servo slidesServo;
     private Servo intakeServo;
     private DistanceSensor intakeSensor;
+    private TouchSensor slidesSensor;
 
     private double lastIntakePow = 0;
     private double lastBlockerPos = 0;
+
+    private double startRetractTime = -1;
 
     public Intake(LinearOpMode op, boolean isAuto) {
         //Intake Motor
@@ -26,14 +28,12 @@ public class Intake {
         off();
 
         //Slides Motor
-        slidesMotor = op.hardwareMap.get(DcMotorEx.class, "intakeSlides");
-        slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slidesServo = op.hardwareMap.get(Servo.class, "intakeSlides");
         if (isAuto){
-            slidesMotor.setTargetPosition(Constants.INTAKE_HOME_TICKS);
+            home();
         } else {
-            slidesMotor.setTargetPosition(Constants.INTAKE_EXTEND_TICKS);
+            extend();
         }
-        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         //Intake Servo
         intakeServo = op.hardwareMap.get(Servo.class, "intakeServo");
@@ -43,8 +43,11 @@ public class Intake {
             down();
         }
 
-        //Intake Sensor
+        //Intake Distance Sensor
         intakeSensor = op.hardwareMap.get(DistanceSensor.class, "intakeSensor");
+
+        //Intake Slides Limit Switch
+        slidesSensor = op.hardwareMap.get(TouchSensor.class, "intakeSlidesLimit");
 
         op.telemetry.addData("Status", "Intake Initialized");
     }
@@ -71,20 +74,13 @@ public class Intake {
 
     //Intake Slides
     public void extend (){
-        slidesMotor.setPower(Constants.INTAKE_SLIDES_POWER);
-        slidesMotor.setTargetPosition(Constants.INTAKE_EXTEND_TICKS);
+        slidesServo.setPosition(Constants.INTAKE_EXTEND_POS);
     }
-    public void retract (){
-        slidesMotor.setPower(Constants.INTAKE_SLIDES_POWER);
-        slidesMotor.setTargetPosition(Constants.INTAKE_HOME_TICKS);
+    public void home(){
+        slidesServo.setPosition(Constants.INTAKE_HOME_POS);
     }
-
-    public boolean slidesIsHome (){
-        return slidesMotor.getCurrentPosition() < Constants.INTAKE_SLIDES_HOME_THRESHOLD;
-    }
-
-    public int getSlidesTicks (){
-        return slidesMotor.getCurrentPosition();
+    public boolean slidesIsHome(){
+        return slidesSensor.isPressed();
     }
 
     //Intake Servo

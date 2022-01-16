@@ -191,13 +191,14 @@ public class Robot {
             deposit.close();
             deposit.moveSlides(1, Deposit.deposit_height.HOME);
         }*/
+
         if (intaking){
             intake.extend();
             intake.on();
             intake.down();
             intake.checkIfStalling();
         } else {
-            intake.retract();
+            intake.home();
             intake.up();
             if (intakeGetHomeTime == -1 && intakeSlidesHome){
                 intakeGetHomeTime = curTime;

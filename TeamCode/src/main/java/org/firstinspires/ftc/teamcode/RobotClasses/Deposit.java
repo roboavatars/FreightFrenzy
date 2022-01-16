@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.opencv.core.Mat;
+
 @SuppressWarnings("FieldCanBeLocal")
 @Config
 public class Deposit {
@@ -169,6 +171,10 @@ public class Deposit {
         return turretError;
     }
 
+    public boolean turretAtPos(){
+        return Math.abs(turretError) < Constants.TURRET_ERROR_THRESHOLD;
+    }
+
     //Arm
     public void moveArm(double targetArmPos) {
         double targetTicks = (int) Math.min(Math.max(targetArmPos, Constants.DEPOSIT_ARM_HOME_TICKS), Constants.DEPOSIT_ARM_LOW_GOAL_TICKS);
@@ -181,6 +187,10 @@ public class Deposit {
 
     public double getArmTicks(){
         return armMotor.getCurrentPosition();
+    }
+
+    public boolean armAtPos(){
+        return Math.abs(armError) < Constants.DEPOSIT_ARM_ERROR_THRESHOLD;
     }
 
     //Slides
@@ -200,6 +210,10 @@ public class Deposit {
         return slidesMotor.getCurrentPosition() / Constants.DEPOSIT_SLIDES_TICKS_PER_INCH;
     }
 
+    public boolean slidesAtPos(){
+        return Math.abs(slidesError) < Constants.DEPOSIT_SLIDES_ERROR_THRESHOLD;
+    }
+
     // Deposit
     private void depositSetPosition(double pos) {
         if (pos != lastServoPos) {
@@ -214,5 +228,9 @@ public class Deposit {
 
     public void close() {
         depositSetPosition(Constants.DEPOSIT_CLOSE_POS);
+    }
+
+    public boolean atPose(){
+        return turretAtPos() && armAtPos() && slidesAtPos();
     }
 }
