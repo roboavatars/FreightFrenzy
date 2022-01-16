@@ -9,11 +9,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
-
 @TeleOp
 @Config
-public class MotorPdTest extends LinearOpMode {
+public class MotorPDTest extends LinearOpMode {
     public static boolean move = false;
     public static int targetTicks = 0;
     public static String motorName = "motor";

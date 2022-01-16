@@ -6,8 +6,7 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.RobotClasses.AntiTip;
-import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
+import org.firstinspires.ftc.teamcode.Localization.AntiTip;
 
 //Config in Constants.java
 @TeleOp(name = "Anti Test")

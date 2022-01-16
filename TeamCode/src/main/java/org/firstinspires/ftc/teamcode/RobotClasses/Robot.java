@@ -20,9 +20,9 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
+import org.firstinspires.ftc.teamcode.Localization.TapeDetector.TapeDetector;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
-import org.firstinspires.ftc.teamcode.RobotClasses.whitetapedetectionstuff.TapeDetector;
 
 import java.util.List;
 

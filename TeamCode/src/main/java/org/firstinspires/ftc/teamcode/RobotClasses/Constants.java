@@ -43,7 +43,8 @@ public class Constants {
     //Deposit Slides
     public static double DEPOSIT_SLIDES_TICKS_PER_INCH = 103.6 / (PI * 1.2);
     public static double DEPOSIT_SLIDES_POWER = 1;
-    public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_LOW_GOAL = 36; //So if the center of the robot is Xft away from the shipping hub, the slides don't need to extend Xft, since there is some distance between the end of the slides and the center of the robot, as well as the length of the arm. This is that distance combined (it's different for ever level of the shipping hub since the arm will be extended different amounts for each level)
+    //So if the center of the robot is Xft away from the shipping hub, the slides don't need to extend Xft, since there is some distance between the end of the slides and the center of the robot, as well as the length of the arm. This is that distance combined (it's different for ever level of the shipping hub since the arm will be extended different amounts for each level)
+    public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_LOW_GOAL = 36;
     public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_MID_GOAL = 33;
     public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_TOP_GOAL = 30;
     public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_CAP_GOAL = 27;

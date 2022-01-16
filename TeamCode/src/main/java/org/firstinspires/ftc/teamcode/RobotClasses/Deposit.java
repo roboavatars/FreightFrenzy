@@ -8,17 +8,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.opencv.core.Mat;
-
 @SuppressWarnings("FieldCanBeLocal")
 @Config
 public class Deposit {
-    private DcMotorEx depositor; ////////
-    private Servo depositServo;
 
     private DcMotorEx turretMotor;
     private DcMotorEx slidesMotor;
     private DcMotorEx armMotor;
+    private Servo depositServo;
 
     private static double lastServoPos = 0;
 
@@ -66,7 +63,7 @@ public class Deposit {
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         if (isAuto) {
             close();
-        } else{
+        } else {
             open();
         }
 
@@ -93,24 +90,24 @@ public class Deposit {
     }
 
     // Turret + Arm
-    public void setControlsHome (){
+    public void setControlsHome() {
         home = true;
         turretTargetTheta = Constants.TURRET_HOME_THETA;
         targetArmPos = Constants.DEPOSIT_ARM_HOME_TICKS;
         targetSlidesTicks = 0;
     }
 
-    public void setControlsDepositing (double lockTheta, double targetArmPos, double slidesDist) {
+    public void setControlsDepositing(double lockTheta, double targetArmPos, double slidesDist) {
         home = false;
         this.turretLockTheta = lockTheta;
         this.targetArmPos = targetArmPos;
         targetSlidesTicks = (int) Math.round(slidesDist * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
     }
 
-    public void update(double robotTheta, double commandedW){
+    public void update(double robotTheta, double commandedW) {
 
         //Move Arm
-        if (home && getSlidesDistInches() > maxSlidesDistBeforeLoweringArm){
+        if (home && getSlidesDistInches() > maxSlidesDistBeforeLoweringArm) {
             moveArm(Constants.DEPOSIT_ARM_OVER_MOTOR);
         } else {
             moveArm(targetArmPos);
@@ -140,6 +137,7 @@ public class Deposit {
 
         setTurretPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * commandedW + fmoiTurret * getSlidesDistTicks());
     }
+
     public void setTurretThetaPD(double theta) {
         double clippedTargetTheta = Math.min(Math.max(theta, Constants.TURRET_MIN_THETA), Constants.TURRET_MAX_THETA);
         turretTheta = getTurretTheta();
@@ -167,11 +165,11 @@ public class Deposit {
         return turretMotor.getCurrentPosition() / Constants.TURRET_TICKS_PER_RADIAN + initialTheta;
     }
 
-    public double getTurretError(){
+    public double getTurretError() {
         return turretError;
     }
 
-    public boolean turretAtPos(){
+    public boolean turretAtPos() {
         return Math.abs(turretError) < Constants.TURRET_ERROR_THRESHOLD;
     }
 
@@ -185,16 +183,16 @@ public class Deposit {
         armMotor.setPower(-(pArm * armError + dArm * armErrorChange));
     }
 
-    public double getArmTicks(){
+    public double getArmTicks() {
         return armMotor.getCurrentPosition();
     }
 
-    public boolean armAtPos(){
+    public boolean armAtPos() {
         return Math.abs(armError) < Constants.DEPOSIT_ARM_ERROR_THRESHOLD;
     }
 
     //Slides
-    public void slidesPD(double power){
+    public void slidesPD(double power) {
         double targetTicks = (int) Math.min(Math.max(targetSlidesTicks, Constants.DEPOSIT_SLIDES_MIN_TICKS), Constants.DEPOSIT_SLIDES_MAX_TICKS);
         double currentTicks = getSlidesDistTicks();
         slidesErrorChange = targetTicks - currentTicks - slidesError;
@@ -202,15 +200,16 @@ public class Deposit {
 
         slidesMotor.setPower(-(pSlides * slidesError + dSlides * slidesErrorChange)); //Power is negative because of the inversed turret slides motor wiring
     }
-    public double getSlidesDistTicks(){
+
+    public double getSlidesDistTicks() {
         return slidesMotor.getCurrentPosition();
     }
 
-    public double getSlidesDistInches(){
+    public double getSlidesDistInches() {
         return slidesMotor.getCurrentPosition() / Constants.DEPOSIT_SLIDES_TICKS_PER_INCH;
     }
 
-    public boolean slidesAtPos(){
+    public boolean slidesAtPos() {
         return Math.abs(slidesError) < Constants.DEPOSIT_SLIDES_ERROR_THRESHOLD;
     }
 
@@ -230,7 +229,7 @@ public class Deposit {
         depositSetPosition(Constants.DEPOSIT_CLOSE_POS);
     }
 
-    public boolean atPose(){
+    public boolean atPose() {
         return turretAtPos() && armAtPos() && slidesAtPos();
     }
 }

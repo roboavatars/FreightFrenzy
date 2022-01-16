@@ -40,6 +40,6 @@ public class IntakeTestNoSlides extends LinearOpMode {
 
             intake.setPower(intakePower);
             intakeServo.setPosition(servoPos);
-            }
         }
     }
+}

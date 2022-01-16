@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode.RobotClasses;
+package org.firstinspires.ftc.teamcode.Localization;
+
+import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -7,8 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-
-import static java.lang.Math.PI;
 
 @Config
 public class IMU {
