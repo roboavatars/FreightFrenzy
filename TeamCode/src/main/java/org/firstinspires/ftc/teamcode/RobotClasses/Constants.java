@@ -61,4 +61,8 @@ public class Constants {
     //Intake Servo
     public static double INTAKE_UP_POS = 0;
     public static double INTAKE_DOWN_POS = 0.8;
+
+    //Anti-Tip
+    public static double TIP_THRESHOLD = PI/6;
+    public static double TIP_CONTROLS_GAIN = PI/6;
 }
