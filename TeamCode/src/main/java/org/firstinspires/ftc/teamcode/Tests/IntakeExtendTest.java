@@ -30,12 +30,12 @@ public class IntakeExtendTest extends LinearOpMode {
             if (intaking) {
                 intake.extend();
                 intake.on();
-                intake.down();
+                intake.flipDown();
                 intake.checkIfStalling();
                 firstReturnLoop = false;
             } else {
                 intake.home();
-                intake.up();
+                intake.flipUp();
                 if (!firstReturnLoop){
                     intakeGetHomeTime = -1;
                     firstReturnLoop = true;

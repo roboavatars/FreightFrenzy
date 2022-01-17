@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
-import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
@@ -126,7 +125,7 @@ public class Teleop extends LinearOpMode {
             if (gamepad2.x) {
                 robot.deposit.close();
                 depositServoStatus = 1;
-                robot.depositTrackAllianceHub(Deposit.DepositHeight.TOP);
+                robot.depositAllianceHub(Deposit.DepositHeight.HIGH);
             }
 
             //Set Deposit to Track Shared Hub

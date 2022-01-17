@@ -33,8 +33,8 @@ public class IntakeTestNoSlides extends LinearOpMode {
 
         while (opModeIsActive()) {
             double currentTicks = armMotor.getCurrentPosition();
-            errorChange = Constants.DEPOSIT_ARM_HOME_TICKS - currentTicks - error;
-            error = Constants.DEPOSIT_ARM_HOME_TICKS - currentTicks;
+            errorChange = Constants.DEPOSIT_ARM_HOME - currentTicks - error;
+            error = Constants.DEPOSIT_ARM_HOME - currentTicks;
 
             armMotor.setPower(Deposit.pArm * error + Deposit.dArm * errorChange);
 

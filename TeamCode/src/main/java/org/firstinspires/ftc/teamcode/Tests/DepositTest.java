@@ -22,7 +22,7 @@ public class DepositTest extends LinearOpMode {
             if (home) {
                 deposit.setControlsHome();
             } else {
-                deposit.setControlsDepositing(theta, Constants.DEPOSIT_ARM_TOP_GOAL_TICKS, slidesInches);
+                deposit.setDepositingControls(theta, Constants.DEPOSIT_ARM_HIGH, slidesInches);
             }
             deposit.update(0,0);
         }

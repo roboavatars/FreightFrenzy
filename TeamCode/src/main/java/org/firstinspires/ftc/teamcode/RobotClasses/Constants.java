@@ -33,11 +33,11 @@ public class Constants {
     public static double TURRET_ERROR_THRESHOLD = PI/40;
 
     //Deposit Arm
-    public static double DEPOSIT_ARM_HOME_TICKS = 0;
-    public static double DEPOSIT_ARM_LOW_GOAL_TICKS = 500;
-    public static double DEPOSIT_ARM_MID_GOAL_TICKS = 400;
-    public static double DEPOSIT_ARM_TOP_GOAL_TICKS = 300;
-    public static double DEPOSIT_ARM_OVER_MOTOR = 100;
+    public static double DEPOSIT_ARM_HOME = 0;
+    public static double DEPOSIT_ARM_LOW = 500;
+    public static double DEPOSIT_ARM_MID = 400;
+    public static double DEPOSIT_ARM_HIGH = 300;
+    public static double DEPOSIT_ARM_TRANSFER = 100;
     public static int DEPOSIT_ARM_ERROR_THRESHOLD = 5;
 
     //Deposit Slides

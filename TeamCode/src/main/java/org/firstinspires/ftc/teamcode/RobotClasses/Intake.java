@@ -18,35 +18,34 @@ public class Intake {
     private TouchSensor slidesSensor;
 
     private double lastIntakePow = 0;
-    private double lastBlockerPos = 0;
 
     private double startRetractTime = -1;
 
     public Intake(LinearOpMode op, boolean isAuto) {
-        //Intake Motor
+        // Intake Motor
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
         off();
 
-        //Slides Motor
+        // Slides Motor
         slidesServo = op.hardwareMap.get(Servo.class, "intakeSlides");
-        if (isAuto){
+        if (isAuto) {
             home();
         } else {
             extend();
         }
 
-        //Intake Servo
+        // Intake Servo
         intakeServo = op.hardwareMap.get(Servo.class, "intakeServo");
-        if (isAuto){
-            up();
+        if (isAuto) {
+            flipUp();
         } else {
-            down();
+            flipDown();
         }
 
-        //Intake Distance Sensor
+        // Intake Distance Sensor
         intakeSensor = op.hardwareMap.get(DistanceSensor.class, "intakeSensor");
 
-        //Intake Slides Limit Switch
+        // Intake Slides Limit Switch
         slidesSensor = op.hardwareMap.get(TouchSensor.class, "intakeSlidesLimit");
 
         op.telemetry.addData("Status", "Intake Initialized");
@@ -72,35 +71,32 @@ public class Intake {
         }
     }
 
-    //Intake Slides
-    public void extend (){
+    public void checkIfStalling() {
+        if (intakeMotor.getCurrent(CurrentUnit.AMPS) > Constants.STALL_THRESHOLD) {
+            off();
+        }
+    }
+
+    // Intake Slides
+    public void extend() {
         slidesServo.setPosition(Constants.INTAKE_EXTEND_POS);
     }
-    public void home(){
+
+    public void home() {
         slidesServo.setPosition(Constants.INTAKE_HOME_POS);
     }
-    public boolean slidesIsHome(){
+
+    public boolean slidesIsHome() {
         return slidesSensor.isPressed();
     }
 
-    //Intake Servo
-    public void up (){
+    // Intake Servo
+    public void flipUp() {
         intakeServo.setPosition(Constants.INTAKE_UP_POS);
     }
 
-    public void down (){
+    public void flipDown() {
         intakeServo.setPosition(Constants.INTAKE_DOWN_POS);
-    }
-
-    //Get Power
-    public double getLastIntakePow(){
-        return lastIntakePow;
-    }
-
-    public void checkIfStalling(){
-        if (intakeMotor.getCurrent(CurrentUnit.AMPS)>Constants.STALL_THRESHOLD){
-            off();
-        }
     }
 
     // Distance Sensor
