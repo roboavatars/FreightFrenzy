@@ -7,11 +7,11 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Carousel {
-    private DcMotorEx carouselMotor;
+    private CRServo carouselMotor;
     private double lastPower = 0;
 
     public Carousel(LinearOpMode op) {
-        carouselMotor = op.hardwareMap.get(DcMotorEx.class, "carousel");
+        carouselMotor = op.hardwareMap.get(CRServo.class, "carousel");
 
         op.telemetry.addData("Status", "Carousel Initialized");
     }

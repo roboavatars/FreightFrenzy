@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 @SuppressWarnings("FieldCanBeLocal")
 @Config
 public class Deposit {
-
     private DcMotorEx turretMotor;
     private DcMotorEx slidesMotor;
     private DcMotorEx armMotor;
@@ -74,7 +73,7 @@ public class Deposit {
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Arm Servos
-        armMotor = op.hardwareMap.get(DcMotorEx.class, "arm1");
+        armMotor = op.hardwareMap.get(DcMotorEx.class, "arm");
 
         // Slides Motor
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");

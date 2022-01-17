@@ -23,7 +23,7 @@ public class Intake {
 
     public Intake(LinearOpMode op, boolean isAuto) {
         // Intake Motor
-        intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
+        intakeMotor = null;//op.hardwareMap.get(DcMotorEx.class, "intake");
         off();
 
         // Slides Motor
