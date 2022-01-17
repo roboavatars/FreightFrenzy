@@ -18,6 +18,7 @@ public class TapeDetectorTest extends LinearOpMode {
     double x, y, theta;
     public static boolean entering = false;
     public static boolean exiting = false;
+    private double lastTime;
     @Override
     public void runOpMode() throws InterruptedException {
         Drivetrain drivetrain = new Drivetrain(this, 0, 0, 0);
@@ -39,8 +40,7 @@ public class TapeDetectorTest extends LinearOpMode {
                 exiting = false;
                 tapeDetector.exiting();
             }
-
-            double[] resetOdoCoords = tapeDetector.update(drivetrain.x, drivetrain.y, drivetrain.theta);
+            double[] resetOdoCoords = tapeDetector.update(x, y, theta);
             drivetrain.resetOdo(drivetrain.x, resetOdoCoords[0], resetOdoCoords[1]);
 
             telemetry.addData("leftAlpha", tapeDetector.left.colorSensor.alpha());
@@ -50,14 +50,19 @@ public class TapeDetectorTest extends LinearOpMode {
             telemetry.addData("theta", theta);
             telemetry.update();
 
-            addPacket("leftAlpha", tapeDetector.left.colorSensor.alpha());
-            addPacket("rightAlpha", tapeDetector.right.colorSensor.alpha());
-            addPacket("x", x);
-            addPacket("y", y);
-            addPacket("theta", theta);
+            addPacket("4 leftAlpha", tapeDetector.left.colorSensor.alpha());
+            addPacket("4 rightAlpha", tapeDetector.right.colorSensor.alpha());
+            addPacket("5 reset y", resetOdoCoords[0]);
+            addPacket("5 reset theta", resetOdoCoords[1]);
+            addPacket("6 x", x);
+            addPacket("6 y", y);
+            addPacket("6 theta", theta);
             drawField();
             drawRobot(x, y, theta, 0, "grey");
-            sendPacket();
+
+            addPacket("7 loop time", 1/(System.currentTimeMillis() - lastTime));
+            lastTime = System.currentTimeMillis();
+
             sendPacket();
         }
     }

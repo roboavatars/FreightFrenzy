@@ -64,12 +64,18 @@ public class Robot {
     private boolean intaking = false;
     public boolean intakeSlidesHome;
 
-    public boolean slidesMoving = false;
     public boolean intakeFull = false;
     public double turretTheta = Constants.TURRET_HOME_THETA;
     public double depositSlidesDist = 0;
-    private double intakePower = 0;
-    private double[] scoringPos;
+
+    public boolean intaked = false;
+    public boolean intakeHome = false;
+    public boolean tranferred = false;
+    public boolean depositStartExtending = false;
+    public boolean depositExtended = false;
+    public boolean depositOpened = false;
+    public boolean freightReleased = false;
+    public boolean depositStartHome = false;
 
     private boolean depositToHome;
     private Deposit.DepositHeight depositTargetHeight;
@@ -93,7 +99,7 @@ public class Robot {
     private LinearOpMode op;
 
     //Config
-    public boolean useTapeDetector;
+    public boolean useTapeDetector = false; /*** no ***/
 
     // Constructor
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed) {
@@ -110,8 +116,6 @@ public class Robot {
         carousel = new Carousel(op);
         logger = new Logger();
         tapeDetector = new TapeDetector(op);
-
-        useTapeDetector = isAuto;
 
         profiler = new ElapsedTime();
 
@@ -155,42 +159,11 @@ public class Robot {
 
         if (loopCounter % sensorUpdatePeriod == 0){
             intakeSlidesHome = intake.slidesIsHome();
-            intakePower = intake.getLastIntakePow();
             intakeFull = intake.intakeFull();
             turretTheta = deposit.getTurretTheta();
             depositSlidesDist = deposit.getSlidesDistInches();
         }
 
-        /*
-        //State Controller
-        if (depositHeight == depositHeight.HOME && !slidesMoving && !intakeFull){
-            if(isAuto){
-                intake.on();
-            }
-        }
-        else if (depositHeight == depositHeight.HOME && intakeFull){
-            intake.off();
-            deposit.hold();
-            if (depositMoveApproval != Deposit.deposit_height.UNDEFINED) {
-                deposit.moveSlides(1, depositMoveApproval);
-                depositMoveApproval = Deposit.deposit_height.UNDEFINED;
-                depositReadyToScore = true;
-            }
-        }
-        else if (depositReadyToScore && depositScoreApproval && depositHeight != Deposit.deposit_height.CAP && !slidesMoving && intakeFull){
-            depositReadyToScore = false;
-            depositScoreApproval = false;
-            deposit.open();
-            depositReadyToReturn = true;
-            scoringPos[0] = x;
-            scoringPos[1] = y;
-
-        }
-        else if (depositReadyToReturn && !slidesMoving && Math.sqrt(Math.pow(x-scoringPos[0],2)+Math.pow(y-scoringPos[1],2))>slidesRetractMinDist){
-            depositReadyToReturn = false;
-            deposit.close();
-            deposit.moveSlides(1, Deposit.deposit_height.HOME);
-        }*/
 
         /* automation planning
         if passing white line going toward warehouse:
