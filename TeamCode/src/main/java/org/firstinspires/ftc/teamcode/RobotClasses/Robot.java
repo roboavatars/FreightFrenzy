@@ -192,6 +192,40 @@ public class Robot {
             deposit.moveSlides(1, Deposit.deposit_height.HOME);
         }*/
 
+        /* automation planning
+        if passing white line going toward warehouse:
+        extend intake slides
+        intake on
+
+        if intake slides out, distance sensor thresh met:
+        intake off
+        retract slides
+
+        if intake slides home, turret/arm/slides home:
+        flip intake up
+
+        if intake up, turret/arm/slides home, x ms after flip up:
+        deposit servo down
+        flip intake down
+        auto-align turret
+
+        if turret and robit at pos, arm/slides home:
+        extend deposit slides
+
+        if at pose, past slides thresh:
+        extend arm
+
+        if at pose, arm and slides at pos + driver approval:
+        deposit servo up
+
+        x ms after deposit:
+        arm home
+        retract slides
+
+        after slides home:
+        turret home
+         */
+
         if (intaking){
             intake.extend();
             intake.on();
