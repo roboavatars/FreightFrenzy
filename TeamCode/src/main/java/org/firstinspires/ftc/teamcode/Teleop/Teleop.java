@@ -110,7 +110,7 @@ public class Teleop extends LinearOpMode {
             if (gamepad2.a && !cycleToggle) {
                 robot.deposit.open();
                 depositServoStatus = 0;
-                robot.setDepositToHome();
+                robot.depositHome();
 
                 // cycle stuff
                 cycleToggle = true;

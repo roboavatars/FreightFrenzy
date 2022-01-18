@@ -73,6 +73,7 @@ public class Robot {
     public boolean enteredWarehouse = false;
     public boolean intakeTransfer = false;
     public boolean depositFreight = false;
+    public boolean depositDone = false;
 
     public boolean intakeHome = false;
     public boolean tranferred = false;
@@ -82,13 +83,9 @@ public class Robot {
     public boolean freightReleased = false;
     public boolean depositStartHome = false;
 
-    private boolean depositHome;
+    public boolean turretHome = false;
     private Deposit.DepositHeight depositTargetHeight;
     public boolean allianceHub;
-
-    private boolean depositReadyToScore = false;
-    private boolean depositReadyToReturn = false;
-    public Deposit.DepositHeight depositMoveApproval = Deposit.DepositHeight.HOME;
     public boolean depositApproval = false;
 
     // Time and Delay Variables
@@ -194,8 +191,6 @@ public class Robot {
 
         if turret and robit at pos, arm/slides home:
         extend deposit slides
-
-        if at pose, past slides thresh:
         extend arm
 
         if at pose, arm and slides at pos + driver approval:
@@ -214,45 +209,52 @@ public class Robot {
                 intake.extend();
                 intake.on();
                 enteredWarehouse = true;
-            } else if (enteredWarehouse && !intake.slidesIsHome() && intakeFull) {
+            } else if (enteredWarehouse && intakeFull && !intake.slidesIsHome()) {
                 intake.off();
                 intake.home();
-            } else if (enteredWarehouse && intake.slidesIsHome() && intakeFull) {
+            } else if (enteredWarehouse && intakeFull && intake.slidesIsHome() && intakeFlipTime == -1) {
                 intake.flipUp();
-                // intake.reverse();
+                intake.setPower(-0.3);
                 intakeFlipTime = curTime;
-            } else if (enteredWarehouse && intake.slidesIsHome() && curTime - intakeFlipTime > transferThreshold) {
+            } else if (enteredWarehouse && intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > transferThreshold) {
                 deposit.close();
-                // intake.off();
+                intake.off();
                 intake.flipDown();
-                // deposit.setTurretTheta(tempTurretTheta);
-                // ^ need way to only lock turret, a lock mode
+                turretHome = false;
+
+                intakeFlipTime = -1;
                 intakeTransfer = true;
                 enteredWarehouse = false;
+                depositFreight = false;
             }
         }
 
         if (intakeTransfer && !depositFreight) {
-            if (isAtPose(x, 87) && isAtPoseTurret(deposit.getTurretTheta(), 0.05)) {
-                /// ^ add slides + arm at home
-                depositAllianceHub(Deposit.DepositHeight.HIGH);
-            } else if (deposit.slidesAtPos() && deposit.armAtPos()) {
-                deposit.open();
-                depositOpenTime = curTime;
-            } else if (deposit.slidesAtPos() && deposit.armAtPos() && curTime - depositOpenTime > releaseThreshold && depositApproval) {
-                setDepositToHome();
-                // ^ change so only slides + arm home
+            if (isAtPose(x, 87) && deposit.turretAtPos() && !depositDone) {
+                if (deposit.armSlidesHome()) {
+                    depositAllianceHub(Deposit.DepositHeight.HIGH);
+                } else if (deposit.armSlidesAtPose() && depositOpenTime == -1) {
+                    deposit.open();
+                    depositOpenTime = curTime;
+                } else if (deposit.armSlidesAtPose() && curTime - depositOpenTime > releaseThreshold && depositApproval) {
+                    depositHome();
+                    depositDone = true;
+                }
+            } else if (depositDone && deposit.armSlidesHome()) {
+                turretHome = true;
+
+                depositOpenTime = -1;
+                intakeTransfer = false;
+                depositFreight = true;
             }
         }
 
-        // Update depositor (arm + turret)
-        //
-        if (depositHome) {
-            deposit.setControlsHome();
+        // Update turret
+        if (turretHome) {
+            deposit.turretHome();
         } else {
             updateTurret();
         }
-        //
         deposit.update(theta, drivetrain.commandedW);
         turretGlobalTheta = deposit.getTurretTheta() + theta - PI/2;
 
@@ -336,32 +338,35 @@ public class Robot {
             lockTheta = atan2(120 - turretCenter[1], 72 - turretCenter[0]);
             slidesDist = hypot(120 - turretCenter[1], 72 - turretCenter[0]);
         }
-
-        if (depositTargetHeight == Deposit.DepositHeight.LOW) {
-            deposit.setDepositingControls(lockTheta, Constants.DEPOSIT_ARM_LOW, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_LOW_GOAL);
-        } else if (depositTargetHeight == Deposit.DepositHeight.MID) {
-            deposit.setDepositingControls(lockTheta, Constants.DEPOSIT_ARM_MID, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_MID_GOAL);
-        } else if (depositTargetHeight == Deposit.DepositHeight.HIGH) {
-            deposit.setDepositingControls(lockTheta, Constants.DEPOSIT_ARM_HIGH, slidesDist - Constants.ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_TOP_GOAL);
-        }
+        deposit.setTurretLockTheta(lockTheta);
     }
 
     // Set Depositor Controls
-    public void setDepositToHome() {
-        depositHome = true;
-        this.depositTargetHeight = Deposit.DepositHeight.HOME;
+    public void depositHome() {
+       deposit(Deposit.DepositHeight.HOME);
     }
 
     public void depositAllianceHub(Deposit.DepositHeight depositTargetHeight) {
-        depositHome = false;
         allianceHub = true;
-        this.depositTargetHeight = depositTargetHeight;
+        deposit(depositTargetHeight);
     }
 
     public void depositTrackSharedHub() {
-        depositHome = false;
         allianceHub = false;
-        this.depositTargetHeight = Deposit.DepositHeight.LOW;
+        deposit(Deposit.DepositHeight.LOW);
+    }
+
+    public void deposit(Deposit.DepositHeight depositTargetHeight) {
+        this.depositTargetHeight = depositTargetHeight;
+        if (depositTargetHeight == Deposit.DepositHeight.LOW) {
+            deposit.setDepositingControls(Constants.DEPOSIT_ARM_LOW, slidesDist - Constants.ARM_DISTANCE_LOW);
+        } else if (depositTargetHeight == Deposit.DepositHeight.MID) {
+            deposit.setDepositingControls(Constants.DEPOSIT_ARM_MID, slidesDist - Constants.ARM_DISTANCE_MID);
+        } else if (depositTargetHeight == Deposit.DepositHeight.HIGH) {
+            deposit.setDepositingControls(Constants.DEPOSIT_ARM_HIGH, slidesDist - Constants.ARM_DISTANCE_HIGH);
+        }  else { // Home
+            deposit.setDepositingControls(Constants.DEPOSIT_ARM_TRANSFER, slidesDist);
+        }
     }
 
     public void markCycle() {
