@@ -58,7 +58,7 @@ public class TapeDetectorTest extends LinearOpMode {
             addPacket("6 y", y);
             addPacket("6 theta", theta);
             drawField();
-            drawRobot(x, y, theta, 0, "grey");
+            drawRobot(x, y, theta, false, 0, theta, "grey");
 
             addPacket("7 loop time", 1/(System.currentTimeMillis() - lastTime));
             lastTime = System.currentTimeMillis();
