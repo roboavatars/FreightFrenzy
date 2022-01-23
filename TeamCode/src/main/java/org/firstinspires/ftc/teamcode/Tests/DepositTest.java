@@ -20,7 +20,7 @@ public class DepositTest extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             if (home) {
-                deposit.setControlsHome();
+                deposit.setDepositingHome();
             } else {
                 deposit.setDepositingControls(Constants.DEPOSIT_ARM_HIGH, slidesInches);
             }

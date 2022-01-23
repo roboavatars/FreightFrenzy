@@ -83,17 +83,15 @@ public class Deposit {
         // Set Initial Turret Theta
         initialTheta = Constants.TURRET_HOME_THETA;
 
-        setControlsHome();
+        setDepositingHome();
 
         op.telemetry.addData("Status", "Deposit Initialized");
     }
 
-
-    // Turret + Arm
-    public void setControlsHome() {
+    // Slides + Arm
+    public void setDepositingHome() {
         home = true;
-        turretTargetTheta = Constants.TURRET_HOME_THETA;
-        targetArmPos = Constants.DEPOSIT_ARM_HOME;
+        targetArmPos = Constants.DEPOSIT_ARM_TRANSFER;
         targetSlidesTicks = 0;
     }
 
@@ -249,5 +247,11 @@ public class Deposit {
 
     public boolean atPose() {
         return turretAtPos() && armAtPos() && slidesAtPos();
+    public boolean armSlidesAtPose() {
+        return armAtPos() && slidesAtPos();
+    }
+
+    public boolean armSlidesHome() {
+        return armHome() && slidesHome();
     }
 }

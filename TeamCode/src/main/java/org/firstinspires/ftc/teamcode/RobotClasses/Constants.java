@@ -35,9 +35,9 @@ public class Constants {
 
     //Deposit Arm
     public static double DEPOSIT_ARM_HOME = 0;
-    public static double DEPOSIT_ARM_LOW = 500;
-    public static double DEPOSIT_ARM_MID = 400;
-    public static double DEPOSIT_ARM_HIGH = 300;
+    public static double DEPOSIT_ARM_LOW = -500;
+    public static double DEPOSIT_ARM_MID = -400;
+    public static double DEPOSIT_ARM_HIGH = -300;
     public static double DEPOSIT_ARM_TRANSFER = 100;
     public static double DEPOSIT_ARM_MAX_POWER = 0.25;
     public static int DEPOSIT_ARM_ERROR_THRESHOLD = 5;
@@ -46,10 +46,10 @@ public class Constants {
     public static double DEPOSIT_SLIDES_TICKS_PER_INCH = 103.6 / (PI * 1.2);
     public static double DEPOSIT_SLIDES_POWER = 1;
     //So if the center of the robot is Xft away from the shipping hub, the slides don't need to extend Xft, since there is some distance between the end of the slides and the center of the robot, as well as the length of the arm. This is that distance combined (it's different for ever level of the shipping hub since the arm will be extended different amounts for each level)
-    public static double ARM_DISTANCE_LOW = 36;
-    public static double ARM_DISTANCE_MID = 33;
-    public static double ARM_DISTANCE_HIGH = 30;
-    public static double ARM_DISTANCE_CAP = 27;
+    public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_LOW_GOAL = 36;
+    public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_MID_GOAL = 33;
+    public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_TOP_GOAL = 30;
+    public static double ARM_DIST_PLUS_DIST_FROM_END_OF_SLIDES_TO_ROBOT_CENTER_CAP_GOAL = 27;
     public static double DEPOSIT_SLIDES_MIN_TICKS = 0;
     public static double DEPOSIT_SLIDES_MAX_TICKS = 290;
     public static int DEPOSIT_SLIDES_ERROR_THRESHOLD = 5;
