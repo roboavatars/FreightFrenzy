@@ -14,10 +14,12 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 public class IntakeTestNoSlides extends LinearOpMode {
     private DcMotorEx armMotor;
     private Servo intakeServo;
+    private Servo intakeSlides;
     private DcMotorEx intake;
 
     public static double servoPos;
     public static double intakePower;
+    public static double intakeSlidesPos;
 
     private double error;
     private double errorChange;
@@ -28,6 +30,7 @@ public class IntakeTestNoSlides extends LinearOpMode {
         armMotor = hardwareMap.get(DcMotorEx.class, "arm");
         intakeServo = hardwareMap.get(Servo.class, "intakeServo");
         intake = hardwareMap.get(DcMotorEx.class, "intake");
+        intakeSlides = hardwareMap.get(Servo.class, "intakeSlides");
 
         waitForStart();
 
@@ -40,6 +43,7 @@ public class IntakeTestNoSlides extends LinearOpMode {
 
             intake.setPower(intakePower);
             intakeServo.setPosition(servoPos);
+            intakeSlides.setPosition(intakeSlidesPos);
         }
     }
 }

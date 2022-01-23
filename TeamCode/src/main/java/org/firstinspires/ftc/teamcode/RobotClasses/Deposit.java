@@ -123,7 +123,7 @@ public class Deposit {
         }
 
         // Move Slides
-        setSlidesControls(Constants.DEPOSIT_SLIDES_POWER);
+        setSlidesControls(targetSlidesTicks);
     }
 
     // Turret
@@ -178,7 +178,7 @@ public class Deposit {
         armErrorChange = targetTicks - currentTicks - armError;
         armError = targetTicks - currentTicks;
 
-        armMotor.setPower(-(pArm * armError + dArm * armErrorChange));
+        armMotor.setPower(Constants.constrainToRange((pArm * armError + dArm * armErrorChange), -Constants.DEPOSIT_ARM_MAX_POWER, Constants.DEPOSIT_ARM_MAX_POWER) );
     }
 
     public double getArmPosition() {
@@ -190,8 +190,8 @@ public class Deposit {
     }
 
     // Slides
-    public void setSlidesControls(double power) {
-        double targetTicks = (int) Math.min(Math.max(targetSlidesTicks, Constants.DEPOSIT_SLIDES_MIN_TICKS), Constants.DEPOSIT_SLIDES_MAX_TICKS);
+    public void setSlidesControls(double targetSlidesPos) {
+        double targetTicks = (int) Math.min(Math.max(targetSlidesPos, Constants.DEPOSIT_SLIDES_MIN_TICKS), Constants.DEPOSIT_SLIDES_MAX_TICKS);
         double currentTicks = getSlidesPosition();
         slidesErrorChange = targetTicks - currentTicks - slidesError;
         slidesError = targetTicks - currentTicks;
@@ -225,6 +225,10 @@ public class Deposit {
 
     public void close() {
         setServoPosition(Constants.DEPOSIT_CLOSE_POS);
+    }
+
+    public void hold() {
+        setServoPosition(Constants.DEPOSIT_HOLD_POS);
     }
 
     public boolean atPose() {

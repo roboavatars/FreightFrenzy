@@ -27,8 +27,10 @@ public class AntiTip {
         if (Math.abs(currentOrientation[0] - initialOrientation[0]) > Constants.TIP_THRESHOLD ||
                 Math.abs(currentOrientation[1] - initialOrientation[1]) > Constants.TIP_THRESHOLD) {
             tipping = true;
-            adjustedControls[0] = (currentOrientation[0] - initialOrientation[0]) * Constants.TIP_CONTROLS_GAIN;
-            adjustedControls[1] = (currentOrientation[1] - initialOrientation[1]) * Constants.TIP_CONTROLS_GAIN;
+            //Adjusted X Controls
+            adjustedControls[0] = -(currentOrientation[0] - initialOrientation[0]) * Constants.TIP_CONTROLS_GAIN;
+            //Adjusted Y Controls
+            adjustedControls[1] = -(currentOrientation[1] - initialOrientation[1]) * Constants.TIP_CONTROLS_GAIN;
         } else {
             tipping = false;
             adjustedControls[0] = 0;
