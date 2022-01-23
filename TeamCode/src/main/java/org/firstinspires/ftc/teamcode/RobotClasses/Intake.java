@@ -19,12 +19,9 @@ public class Intake {
 
     private double lastIntakePow = 0;
 
-    private double startRetractTime = -1;
-
     public Intake(LinearOpMode op, boolean isAuto) {
         // Intake Motor
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
-        off();
 
         // Slides Motor
         slidesServo = op.hardwareMap.get(Servo.class, "intakeSlides");

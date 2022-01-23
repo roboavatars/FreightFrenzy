@@ -72,7 +72,7 @@ public class Deposit {
         turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        // Arm Servos
+        // Arm Motor
         armMotor = op.hardwareMap.get(DcMotorEx.class, "arm");
 
         // Slides Motor
@@ -83,24 +83,30 @@ public class Deposit {
         // Set Initial Turret Theta
         initialTheta = Constants.TURRET_HOME_THETA;
 
-        setControlsHome();
+        setDepositingHome();
 
         op.telemetry.addData("Status", "Deposit Initialized");
     }
 
-    // Turret + Arm
-    public void setControlsHome() {
+    // Slides + Arm
+    public void setDepositingHome() {
         home = true;
-        turretTargetTheta = Constants.TURRET_HOME_THETA;
-        targetArmPos = Constants.DEPOSIT_ARM_HOME;
+        targetArmPos = Constants.DEPOSIT_ARM_TRANSFER;
         targetSlidesTicks = 0;
     }
 
-    public void setDepositingControls(double lockTheta, double targetArmPos, double slidesDist) {
+    public void setDepositingControls(double targetArmPos, double slidesDist) {
         home = false;
-        this.turretLockTheta = lockTheta;
         this.targetArmPos = targetArmPos;
         targetSlidesTicks = (int) Math.round(slidesDist * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
+    }
+
+    public void setTurretLockTheta(double lockTheta) {
+        turretLockTheta = lockTheta;
+    }
+
+    public void turretHome() {
+        turretTargetTheta = Constants.TURRET_HOME_THETA;
     }
 
     public void update(double robotTheta, double commandedW) {
@@ -189,6 +195,10 @@ public class Deposit {
         return Math.abs(armError) < Constants.DEPOSIT_ARM_ERROR_THRESHOLD;
     }
 
+    public boolean armHome() {
+        return Math.abs(getArmPosition() - Constants.DEPOSIT_ARM_TRANSFER) < Constants.DEPOSIT_ARM_ERROR_THRESHOLD;
+    }
+
     // Slides
     public void setSlidesControls(double targetSlidesPos) {
         double targetTicks = (int) Math.min(Math.max(targetSlidesPos, Constants.DEPOSIT_SLIDES_MIN_TICKS), Constants.DEPOSIT_SLIDES_MAX_TICKS);
@@ -209,6 +219,10 @@ public class Deposit {
 
     public boolean slidesAtPos() {
         return Math.abs(slidesError) < Constants.DEPOSIT_SLIDES_ERROR_THRESHOLD;
+    }
+
+    public boolean slidesHome() {
+        return Math.abs(getSlidesPosition()) < Constants.DEPOSIT_SLIDES_ERROR_THRESHOLD;
     }
 
     // Deposit
@@ -233,5 +247,11 @@ public class Deposit {
 
     public boolean atPose() {
         return turretAtPos() && armAtPos() && slidesAtPos();
+    public boolean armSlidesAtPose() {
+        return armAtPos() && slidesAtPos();
+    }
+
+    public boolean armSlidesHome() {
+        return armHome() && slidesHome();
     }
 }
