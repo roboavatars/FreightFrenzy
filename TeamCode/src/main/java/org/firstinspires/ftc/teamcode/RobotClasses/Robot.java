@@ -42,14 +42,12 @@ public class Robot {
     private VoltageSensor battery;
     private boolean startVoltTooLow = false;
 
-
     // Class Constants
     private final int loggerUpdatePeriod = 2;
     private final int sensorUpdatePeriod = 3;
     private final double xyTolerance = 1;
     private final double thetaTolerance = PI/35;
     private final double turretTolerance = PI/50;
-    private final double slidesRetractMinDist = 6;
     public final static double[] cameraRelativeToRobot = new double[]{1, 3};
 
     // State Variables
@@ -58,38 +56,24 @@ public class Robot {
     private boolean firstLoop = true;
     private int loopCounter = 0;
 
+    public boolean intakeTransfer = false;
+    public boolean depositingFreight = false;
+    public boolean depositDone = false;
+    public boolean intakeSlidesHome;
+    public boolean intakeFull;
+
     // Cycle Tracker
     public int cycles = 0;
     public double cycleTotal;
     public double lastCycleTime;
     public double longestCycle = 0;
 
-    private boolean intaking = false;
-    public boolean intakeSlidesHome;
-
-    public boolean intakeFull = false;
     public double turretTheta = Constants.TURRET_HOME_THETA;
     public double depositSlidesDist = 0;
 
-    public boolean enteredWarehouse = false;
-    public boolean intakeTransfer = false;
-    public boolean depositFreight = false;
-
-    public boolean intakeHome = false;
-    public boolean tranferred = false;
-    public boolean depositStartExtending = false;
-    public boolean depositExtended = false;
-    public boolean depositOpened = false;
-    public boolean freightReleased = false;
-    public boolean depositStartHome = false;
-
-    private boolean depositHome;
+    public boolean turretHome = false;
     private Deposit.DepositHeight depositTargetHeight;
     public boolean allianceHub;
-
-    private boolean depositReadyToScore = false;
-    private boolean depositReadyToReturn = false;
-    public Deposit.DepositHeight depositMoveApproval = Deposit.DepositHeight.HOME;
     public boolean depositApproval = false;
 
     public double turretGlobalTheta;
@@ -211,50 +195,69 @@ public class Robot {
         turret home
          */
 
-        if (!intakeTransfer && !depositFreight) {
-            if (!enteredWarehouse && intake.slidesIsHome() && y > 105) {
-                intake.extend();
-                intake.on();
-                enteredWarehouse = true;
-            } else if (enteredWarehouse && !intake.slidesIsHome() && intakeFull) {
+        if (!intakeTransfer && intake.slidesIsHome() && y > 105) {
+            intake.extend();
+            intake.on();
+            intakeTransfer = true;
+            automationStep("Intake Extend/On");
+        } else if (intakeTransfer) {
+            if (intakeFull && !intake.slidesIsHome() && intakeFlipTime == -1) {
                 intake.off();
                 intake.home();
-            } else if (enteredWarehouse && intake.slidesIsHome() && intakeFull) {
+                automationStep("Intake Home/Off");
+            } else if (intakeFull && intake.slidesIsHome() && intakeFlipTime == -1) {
                 intake.flipUp();
-                // intake.reverse();
+                intake.setPower(-0.3);
                 intakeFlipTime = curTime;
-            } else if (enteredWarehouse && intake.slidesIsHome() && curTime - intakeFlipTime > transferThreshold) {
+                automationStep("Intake Flip Up");
+            } else if (!intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > transferThreshold) {
                 deposit.close();
-                // intake.off();
+                intake.off();
                 intake.flipDown();
-                // deposit.setTurretTheta(tempTurretTheta);
-                // ^ need way to only lock turret, a lock mode
-                intakeTransfer = true;
-                enteredWarehouse = false;
+                turretHome = false;
+                automationStep("Intake Transfer Done");
+
+                intakeFlipTime = -1;
+                depositingFreight = true;
             }
         }
 
-        if (intakeTransfer && !depositFreight) {
-            if (isAtPose(x, 87) && isAtPoseTurret(deposit.getTurretTheta(), 0.05)) {
-                /// ^ add slides + arm at home
-                depositAllianceHub(Deposit.DepositHeight.HIGH);
-            } else if (deposit.slidesAtPos() && deposit.armAtPos()) {
-                deposit.open();
-                depositOpenTime = curTime;
-            } else if (deposit.slidesAtPos() && deposit.armAtPos() && curTime - depositOpenTime > releaseThreshold && depositApproval) {
-                deposit.setControlsHome();
-                // ^ change so only slides + arm home
+        if (depositingFreight) {
+            if (!depositDone && isAtPose(x, 87) && deposit.turretAtPos()) {
+                if (deposit.armSlidesHome()) {
+                    depositAllianceHub(Deposit.DepositHeight.HIGH);
+                    automationStep("Extend Slides/Arm");
+                } else if (deposit.armSlidesAtPose() && depositOpenTime == -1) {
+                    deposit.open();
+                    depositOpenTime = curTime;
+                    automationStep("Score Freight");
+                } else if (deposit.armSlidesAtPose() && curTime - depositOpenTime > releaseThreshold && depositApproval) {
+                    depositHome();
+                    depositDone = true;
+                    automationStep("Home Slides/Arm");
+                }
+            } else if (depositDone && deposit.armSlidesHome()) {
+                turretHome = true;
+                markCycle();
+                automationStep("Deposit Cycle Done");
+
+                depositOpenTime = -1;
+                intakeTransfer = false;
+                depositingFreight = false;
+            } else {
+                if (!depositDone) {
+                    if (!isAtPose(x, 87)) log("Waiting for dt pose");
+                    else if (!deposit.turretAtPos()) log("Waiting for turret align");
+                }
             }
         }
 
-        // Update depositor (arm + turret)
-        //
-        if (depositHome) {
-            deposit.setControlsHome();
+        // Update turret
+        if (turretHome) {
+            deposit.turretHome();
         } else {
             updateTurret();
         }
-        //
         deposit.update(theta, drivetrain.commandedW);
         turretGlobalTheta = deposit.getTurretTheta() + theta - PI/2;
 

@@ -247,6 +247,8 @@ public class Deposit {
 
     public boolean atPose() {
         return turretAtPos() && armAtPos() && slidesAtPos();
+    }
+
     public boolean armSlidesAtPose() {
         return armAtPos() && slidesAtPos();
     }
