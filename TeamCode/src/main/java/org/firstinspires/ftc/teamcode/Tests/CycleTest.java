@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @TeleOp
 @Config
 public class CycleTest extends LinearOpMode {
-    public static double slidesExtendDist = 0;
+    public static int slidesExtendDist = 0;
     public static double turretTheta = 0;
 
     private boolean armHome = true;
@@ -36,6 +36,11 @@ public class CycleTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            addPacket("arm pos", robot.deposit.getArmPosition());
+            addPacket("turret theta", robot.deposit.getTurretTheta());
+            addPacket("slides pos", robot.deposit.getSlidesPosition());
+            sendPacket();
+
             if (gamepad1.a) {
                 robot.intake.extend();
                 robot.intake.on();

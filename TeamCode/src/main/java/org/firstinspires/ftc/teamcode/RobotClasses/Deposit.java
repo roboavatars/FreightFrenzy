@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @SuppressWarnings("FieldCanBeLocal")
@@ -32,7 +33,7 @@ public class Deposit {
     private double turretLockTheta;
 
     //Slides PD
-    public static double pSlides = 0.2;
+    public static double pSlides = -0.2;
     public static double dSlides = 0;
 
     private int targetSlidesTicks;
@@ -40,8 +41,8 @@ public class Deposit {
     private double slidesErrorChange;
 
     //Arm PD
-    public static double pArm = 0.07;
-    public static double dArm = 0;
+    public static double pArm = 0.05;
+    public static double dArm = 0.001;
 
     private double armError = 0;
     private double armErrorChange;
@@ -49,7 +50,7 @@ public class Deposit {
     private static final double maxSlidesDistBeforeLoweringArm = 2;
 
     private boolean home = true;
-    public double targetArmPos;
+    public int targetArmPos;
 
     public enum DepositHeight {
         HOME, LOW, MID, HIGH
@@ -74,11 +75,16 @@ public class Deposit {
 
         // Arm Motor
         armMotor = op.hardwareMap.get(DcMotorEx.class, "arm");
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setTargetPosition(0);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // Slides Motor
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        slidesMotor.setTargetPosition(0);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slidesMotor.setPositionPIDFCoefficients(pSlides);
 
         // Set Initial Turret Theta
         initialTheta = Constants.TURRET_HOME_THETA;
@@ -95,7 +101,7 @@ public class Deposit {
         targetSlidesTicks = 0;
     }
 
-    public void setDepositingControls(double targetArmPos, double slidesDist) {
+    public void setDepositingControls(int targetArmPos, double slidesDist) {
         home = false;
         this.targetArmPos = targetArmPos;
         targetSlidesTicks = (int) Math.round(slidesDist * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
@@ -178,13 +184,9 @@ public class Deposit {
     }
 
     // Arm
-    public void setArmControls(double targetArmPos) {
-        double targetTicks = (int) Math.min(Math.max(targetArmPos, Constants.DEPOSIT_ARM_HOME), Constants.DEPOSIT_ARM_LOW);
-        double currentTicks = getArmPosition();
-        armErrorChange = targetTicks - currentTicks - armError;
-        armError = targetTicks - currentTicks;
-
-        armMotor.setPower(Constants.constrainToRange((pArm * armError + dArm * armErrorChange), -Constants.DEPOSIT_ARM_MAX_POWER, Constants.DEPOSIT_ARM_MAX_POWER) );
+    public void setArmControls(int targetArmPos) {
+        armMotor.setTargetPosition(targetArmPos);
+        armMotor.setPower(Constants.DEPOSIT_ARM_MAX_POWER);
     }
 
     public double getArmPosition() {
@@ -200,13 +202,9 @@ public class Deposit {
     }
 
     // Slides
-    public void setSlidesControls(double targetSlidesPos) {
-        double targetTicks = (int) Math.min(Math.max(targetSlidesPos, Constants.DEPOSIT_SLIDES_MIN_TICKS), Constants.DEPOSIT_SLIDES_MAX_TICKS);
-        double currentTicks = getSlidesPosition();
-        slidesErrorChange = targetTicks - currentTicks - slidesError;
-        slidesError = targetTicks - currentTicks;
-
-        slidesMotor.setPower(-(pSlides * slidesError + dSlides * slidesErrorChange)); //Power is negative because of the inversed turret slides motor wiring
+    public void setSlidesControls(int targetSlidesPos) {
+        slidesMotor.setTargetPosition(targetSlidesPos);
+        slidesMotor.setPower(Constants.DEPOSIT_SLIDES_POWER);
     }
 
     public double getSlidesPosition() {
@@ -218,7 +216,7 @@ public class Deposit {
     }
 
     public boolean slidesAtPos() {
-        return Math.abs(slidesError) < Constants.DEPOSIT_SLIDES_ERROR_THRESHOLD;
+        return Math.abs(getSlidesPosition()) < Constants.DEPOSIT_SLIDES_ERROR_THRESHOLD;
     }
 
     public boolean slidesHome() {
