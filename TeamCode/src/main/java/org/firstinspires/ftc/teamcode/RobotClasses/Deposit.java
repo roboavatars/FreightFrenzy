@@ -75,12 +75,14 @@ public class Deposit {
 
         // Arm Motor
         armMotor = op.hardwareMap.get(DcMotorEx.class, "arm");
+        armMotor.setDirection(DcMotorEx.Direction.REVERSE);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setTargetPosition(0);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // Slides Motor
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
+        slidesMotor.setDirection(DcMotorEx.Direction.REVERSE);
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slidesMotor.setTargetPosition(0);
         slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -120,7 +122,7 @@ public class Deposit {
         if (home && getSlidesDistInches() > maxSlidesDistBeforeLoweringArm) {
             setArmControls(Constants.DEPOSIT_ARM_TRANSFER);
         } else {
-            setArmControls(targetArmPos);
+            setArmControls();
         }
 
         // Move Turret
@@ -135,7 +137,7 @@ public class Deposit {
         }
 
         // Move Slides
-        setSlidesControls(targetSlidesTicks);
+        setSlidesControls();
     }
 
     // Turret
@@ -189,6 +191,10 @@ public class Deposit {
         armMotor.setPower(Constants.DEPOSIT_ARM_MAX_POWER);
     }
 
+    public void setArmControls() {
+        setArmControls(targetArmPos);
+    }
+
     public double getArmPosition() {
         return armMotor.getCurrentPosition();
     }
@@ -207,16 +213,20 @@ public class Deposit {
         slidesMotor.setPower(Constants.DEPOSIT_SLIDES_POWER);
     }
 
+    public void setSlidesControls() {
+        setSlidesControls(targetSlidesTicks);
+    }
+
     public double getSlidesPosition() {
         return slidesMotor.getCurrentPosition();
     }
 
     public double getSlidesDistInches() {
-        return slidesMotor.getCurrentPosition() / Constants.DEPOSIT_SLIDES_TICKS_PER_INCH;
+        return getSlidesPosition() / Constants.DEPOSIT_SLIDES_TICKS_PER_INCH;
     }
 
     public boolean slidesAtPos() {
-        return Math.abs(getSlidesPosition()) < Constants.DEPOSIT_SLIDES_ERROR_THRESHOLD;
+        return Math.abs(getSlidesPosition() - targetSlidesTicks) < Constants.DEPOSIT_SLIDES_ERROR_THRESHOLD;
     }
 
     public boolean slidesHome() {

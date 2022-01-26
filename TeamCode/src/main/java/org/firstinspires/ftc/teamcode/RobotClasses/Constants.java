@@ -35,9 +35,9 @@ public class Constants {
 
     //Deposit Arm
     public static int DEPOSIT_ARM_HOME = 0;
-    public static int DEPOSIT_ARM_LOW = -750;
-    public static int DEPOSIT_ARM_MID = -600;
-    public static int DEPOSIT_ARM_HIGH = -350;
+    public static int DEPOSIT_ARM_LOW = 750;
+    public static int DEPOSIT_ARM_MID = 600;
+    public static int DEPOSIT_ARM_HIGH = 350;
     public static int DEPOSIT_ARM_TRANSFER = 100;
     public static double DEPOSIT_ARM_MAX_POWER = 0.25;
     public static int DEPOSIT_ARM_ERROR_THRESHOLD = 5;

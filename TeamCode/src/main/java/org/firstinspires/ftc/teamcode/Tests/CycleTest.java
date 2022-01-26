@@ -36,10 +36,6 @@ public class CycleTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            addPacket("arm pos", robot.deposit.getArmPosition());
-            addPacket("turret theta", robot.deposit.getTurretTheta());
-            addPacket("slides pos", robot.deposit.getSlidesPosition());
-            sendPacket();
 
             if (gamepad1.a) {
                 robot.intake.extend();
@@ -96,6 +92,14 @@ public class CycleTest extends LinearOpMode {
             if (!gamepad1.b){
                 depositToggle = false;
             }
+
+            addPacket("arm target home", armHome);
+            addPacket("slides target home", slidesHome);
+            addPacket("arm pos", robot.deposit.getArmPosition());
+            addPacket("turret theta", robot.deposit.getTurretTheta());
+            addPacket("slides pos", robot.deposit.getSlidesPosition());
+            sendPacket();
+
         }
     }
 }
