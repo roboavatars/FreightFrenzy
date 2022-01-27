@@ -258,7 +258,7 @@ public class Robot {
         } else {
             updateTurret();
         }
-        deposit.update(theta, drivetrain.commandedW);
+        deposit.update(theta, w + (x * vy - vx * y)/(Math.pow(x, 2) + Math.pow(y, 2))); //calculates feedforward term for turret control (w + atan dot)
         turretGlobalTheta = deposit.getTurretTheta() + theta - PI/2;
 
         // Update Position

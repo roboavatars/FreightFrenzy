@@ -123,7 +123,7 @@ public class Deposit {
         turretTargetTheta = initialTheta;
     }
 
-    public void update(double robotTheta, double commandedW) {
+    public void update(double robotTheta, double turretFF) {
         // Move Arm
         if (home && getSlidesDistInches() > maxSlidesDistBeforeLoweringArm) {
             setArmControls(Constants.DEPOSIT_ARM_TRANSFER);
@@ -132,13 +132,13 @@ public class Deposit {
         }
 
         // Move Turret
-        updateTurret(robotTheta, commandedW);
+        updateTurret(robotTheta, turretFF);
 
         // Move Slides
         setSlidesControls();
     }
 
-    public void updateTurret(double robotTheta, double commandedW) {
+    public void updateTurret(double robotTheta, double turretFF) {
         turretTargetTheta = (turretLockTheta - robotTheta) % (2 * PI);
         if (turretTargetTheta < 0) {
             turretTargetTheta += 2 * PI;
@@ -148,17 +148,17 @@ public class Deposit {
         if (turretTargetTheta > 3*PI/2) {
             turretTargetTheta -= 2*PI;
         }
-        setTurretThetaFF(turretTargetTheta, commandedW);
+        setTurretThetaFF(turretTargetTheta, turretFF);
     }
 
     // Turret
-    public void setTurretThetaFF(double theta, double commandedW) {
+    public void setTurretThetaFF(double theta, double ff) {
         double clippedTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
         turretTheta = getTurretTheta();
         turretErrorChange = clippedTargetTheta - turretTheta - turretError;
         turretError = clippedTargetTheta - turretTheta;
 
-        setTurretPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * commandedW/* + fmoiTurret * getSlidesPosition()*/);
+        setTurretPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * ff/* + fmoiTurret * getSlidesPosition()*/);
     }
 
     public void setTurretTheta(double theta) { // TODO: make private method
