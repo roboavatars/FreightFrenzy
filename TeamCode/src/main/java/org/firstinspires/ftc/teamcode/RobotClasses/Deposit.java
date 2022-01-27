@@ -18,10 +18,17 @@ public class Deposit {
 
     private static double lastServoPos = 0;
 
-    //Turret PD and PDFF
-    public static double pTurret = 2;
-    public static double dTurret = 0;
-    public static double fwTurret = -0.3;
+    public double MAX_TURRET_POWER = 1;
+    public double TURRET_MIN_THETA = 0;
+    public double TURRET_MAX_THETA = PI;
+    public double TURRET_TICKS_PER_RADIAN = 103.6 * 20 / (2*PI);
+    public static double TURRET_Y_OFFSET = 2.06066;
+    public double TURRET_ERROR_THRESHOLD = PI/40;
+
+    // Turret PD and PDFF
+    public static double pTurret = 2.25;
+    public static double dTurret = 5.5;
+    public static double fwTurret = -0.4;
     public static double fmoiTurret = 0;
     public double initialTheta;
 
@@ -31,7 +38,7 @@ public class Deposit {
     private double turretErrorChange;
     private double turretLockTheta;
 
-    //Slides PD
+    // Slides PD
     public static double pSlides = -0.2;
     public static double dSlides = 0;
 
@@ -39,12 +46,9 @@ public class Deposit {
     private double slidesError = 0;
     private double slidesErrorChange;
 
-    //Arm PD
+    // Arm PD
     public static double pArm = 0.05;
     public static double dArm = 0.001;
-
-    private double armError = 0;
-    private double armErrorChange;
 
     private static final double maxSlidesDistBeforeLoweringArm = 2;
 
@@ -58,7 +62,7 @@ public class Deposit {
     public DepositHeight targetHeight = DepositHeight.HOME;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
-        this(op, isAuto, 0);
+        this(op, isAuto, PI/2);
     }
 
     public Deposit(LinearOpMode op, boolean isAuto, double initialRobotTheta) {
@@ -86,9 +90,9 @@ public class Deposit {
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
         slidesMotor.setDirection(DcMotorEx.Direction.REVERSE);
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slidesMotor.setTargetPosition(0);
-        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slidesMotor.setPositionPIDFCoefficients(pSlides);
+//        slidesMotor.setTargetPosition(0);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        slidesMotor.setPositionPIDFCoefficients(pSlides);
 
         // Set Initial Turret Theta
         initialTheta = initialRobotTheta;
@@ -135,30 +139,30 @@ public class Deposit {
     }
 
     public void updateTurret(double robotTheta, double commandedW) {
-        if (home) {
-            setTurretTheta(turretTargetTheta);
-        } else {
-            turretTargetTheta = (turretLockTheta - robotTheta) % (2 * PI);
-            if (turretTargetTheta < 0) {
-                turretTargetTheta += 2 * PI;
-            }
-            setTurretTheta(turretTargetTheta);
-//            setTurretThetaFF(turretTargetTheta, commandedW);
+        turretTargetTheta = (turretLockTheta - robotTheta) % (2 * PI);
+        if (turretTargetTheta < 0) {
+            turretTargetTheta += 2 * PI;
         }
+        // prevents wrap from 0 to 2pi from screwing things up
+        // now wrap is from -pi/2 to 3pi/2 (which the turret will never reach)
+        if (turretTargetTheta > 3*PI/2) {
+            turretTargetTheta -= 2*PI;
+        }
+        setTurretThetaFF(turretTargetTheta, commandedW);
     }
 
     // Turret
     public void setTurretThetaFF(double theta, double commandedW) {
-        double clippedTargetTheta = Math.min(Math.max(theta, Constants.TURRET_MIN_THETA), Constants.TURRET_MAX_THETA);
+        double clippedTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
         turretTheta = getTurretTheta();
         turretErrorChange = clippedTargetTheta - turretTheta - turretError;
         turretError = clippedTargetTheta - turretTheta;
 
-        setTurretPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * commandedW + fmoiTurret * getSlidesPosition());
+        setTurretPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * commandedW/* + fmoiTurret * getSlidesPosition()*/);
     }
 
     public void setTurretTheta(double theta) { // TODO: make private method
-        double clippedTargetTheta = Math.min(Math.max(theta, Constants.TURRET_MIN_THETA), Constants.TURRET_MAX_THETA);
+        double clippedTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
         turretTheta = getTurretTheta();
         turretErrorChange = clippedTargetTheta - turretTheta - turretError;
         turretError = clippedTargetTheta - turretTheta;
@@ -167,7 +171,7 @@ public class Deposit {
     }
 
     public void setTurretPower(double power) {
-        turretMotor.setPower(Math.max(Math.min(power, Constants.MAX_TURRET_POWER), -Constants.MAX_TURRET_POWER));
+        turretMotor.setPower(Math.max(Math.min(power, MAX_TURRET_POWER), -MAX_TURRET_POWER));
     }
 
     public void resetTurret(double resetTheta) {
@@ -181,7 +185,7 @@ public class Deposit {
     }
 
     public double getTurretTheta() {
-        return turretMotor.getCurrentPosition() / Constants.TURRET_TICKS_PER_RADIAN + initialTheta;
+        return turretMotor.getCurrentPosition() / TURRET_TICKS_PER_RADIAN + initialTheta;
     }
 
     public double getTurretError() {
@@ -189,7 +193,7 @@ public class Deposit {
     }
 
     public boolean turretAtPos() {
-        return Math.abs(turretError) < Constants.TURRET_ERROR_THRESHOLD;
+        return Math.abs(turretError) < TURRET_ERROR_THRESHOLD;
     }
 
     // Arm
@@ -207,7 +211,7 @@ public class Deposit {
     }
 
     public boolean armAtPos() {
-        return Math.abs(armError) < Constants.DEPOSIT_ARM_ERROR_THRESHOLD;
+        return Math.abs(getArmPosition() - targetArmPos) < Constants.DEPOSIT_ARM_ERROR_THRESHOLD;
     }
 
     public boolean armHome() {
@@ -216,8 +220,13 @@ public class Deposit {
 
     // Slides
     public void setSlidesControls(int targetSlidesPos) {
-        slidesMotor.setTargetPosition(targetSlidesPos);
-        slidesMotor.setPower(Constants.DEPOSIT_SLIDES_POWER);
+        double targetTicks = (int) Math.min(Math.max(targetSlidesPos, Constants.DEPOSIT_SLIDES_MIN_TICKS), Constants.DEPOSIT_SLIDES_MAX_TICKS);
+        double currentTicks = getSlidesPosition();
+        slidesErrorChange = targetTicks - currentTicks - slidesError;
+        slidesError = targetTicks - currentTicks;
+
+        slidesMotor.setPower(-(pSlides * slidesError + dSlides * slidesErrorChange)); //Power is negative because of the inversed turret slides motor wiring
+
     }
 
     public void setSlidesControls() {
@@ -237,7 +246,7 @@ public class Deposit {
     }
 
     public boolean slidesHome() {
-        return Math.abs(getSlidesPosition()) < Constants.DEPOSIT_SLIDES_ERROR_THRESHOLD;
+        return Math.abs(getSlidesPosition()) < 0;
     }
 
     // Deposit

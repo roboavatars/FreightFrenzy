@@ -328,8 +328,8 @@ public class Robot {
     public void updateTurret() {
         // Calculating the Coords of the Turret Center
         double[] turretCenter = new double[2];
-        turretCenter[0] = x + Math.cos(theta) * Constants.TURRET_Y_OFFSET;
-        turretCenter[1] = y + Math.sin(theta) * Constants.TURRET_Y_OFFSET;
+        turretCenter[0] = x + Math.cos(theta) * Deposit.TURRET_Y_OFFSET;
+        turretCenter[1] = y + Math.sin(theta) * Deposit.TURRET_Y_OFFSET;
 
         if (allianceHub && isRed) { // red
             lockTheta = atan2(60 - turretCenter[1], 96 - turretCenter[0]);

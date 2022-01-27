@@ -1,13 +1,13 @@
 package org.firstinspires.ftc.teamcode.Debug;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 
-import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
+import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
-
-import static java.lang.Math.sin;
-import static java.lang.Math.cos;
 
 public class Dashboard {
     public static FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -59,8 +59,8 @@ public class Dashboard {
     public static void drawDepositTurretSlides(double x, double y, double robotTheta, double turretTheta, double slidesDist) {
         double extendedPos = 11.5 + slidesDist;
         double theta = robotTheta + turretTheta;
-        double turretCenterX = x + Constants.TURRET_Y_OFFSET * cos(robotTheta);
-        double turretCenterY = y + Constants.TURRET_Y_OFFSET * sin(robotTheta);
+        double turretCenterX = x + Deposit.TURRET_Y_OFFSET * cos(robotTheta);
+        double turretCenterY = y + Deposit.TURRET_Y_OFFSET * sin(robotTheta);
 
         double[] leftSlidesX = {-2 * cos(theta) - -4.5 * sin(theta) + turretCenterX, -2 * cos(theta) - extendedPos * sin(theta) + turretCenterX, -3.5 * cos(theta) - extendedPos * sin(theta) + turretCenterX, -3.5 * cos(theta) - -4.5 * sin(theta) + turretCenterX};
         double[] leftSlidesY = {-2 * sin(theta) + -4.5 * cos(theta) + turretCenterY, -2 * sin(theta) + extendedPos * cos(theta) + turretCenterY, -3.5 * sin(theta) + extendedPos * cos(theta) + turretCenterY, -3.5 * sin(theta) + -4.5 * cos(theta) + turretCenterY};

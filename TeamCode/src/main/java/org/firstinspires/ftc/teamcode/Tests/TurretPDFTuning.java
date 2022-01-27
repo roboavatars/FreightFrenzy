@@ -19,7 +19,7 @@ public class TurretPDFTuning extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Deposit deposit = new Deposit(this, false);
+        Deposit deposit = new Deposit(this, false, PI/2);
         Drivetrain dt = new Drivetrain(this, 0, 0, PI/2);
 
         waitForStart();
@@ -27,7 +27,7 @@ public class TurretPDFTuning extends LinearOpMode {
         double targetTheta = 0;
 
         while (opModeIsActive()) {
-            dt.setControls(0, 0, -gamepad1.right_stick_x);
+            dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
             dt.updatePose();
 
             if (enabled) {
@@ -35,17 +35,22 @@ public class TurretPDFTuning extends LinearOpMode {
                 if (targetTheta < 0) {
                     targetTheta += 2 * PI;
                 }
-                deposit.setTurretTheta(targetTheta);
-//                deposit.setTurretThetaFF(targetTheta, dt.commandedW);
+                // prevents wrap from 0 to 2pi from screwing things up
+                // now wrap is from -pi/2 to 3pi/2 (which the turret will never reach)
+                if (targetTheta > 3*PI/2) {
+                    targetTheta -= 2*PI;
+                }
+//                deposit.setTurretTheta(targetTheta);
+                deposit.setTurretThetaFF(targetTheta, dt.commandedW);
             } else {
                 deposit.setTurretPower(0);
             }
 
-            addPacket("dt theta", dt.theta);
-            addPacket("lock theta", lockTheta * PI);
-            addPacket("global current theta", dt.theta + deposit.getTurretTheta() - PI/2);
-            addPacket("current theta", deposit.getTurretTheta());
-            addPacket("target theta", targetTheta);
+            addPacket("1 dt theta", dt.theta);
+            addPacket("2 lock theta", lockTheta * PI);
+            addPacket("3 global current theta", dt.theta + deposit.getTurretTheta() - PI/2);
+            addPacket("4 current theta", deposit.getTurretTheta());
+            addPacket("5 target theta", targetTheta);
             sendPacket();
         }
     }

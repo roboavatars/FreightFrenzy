@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
+import static java.lang.Math.PI;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -12,11 +14,10 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 public class DepositTest extends LinearOpMode {
     public static boolean home = true;
     public static double slidesInches = 0;
-    public static double theta = 0;
 
     @Override
     public void runOpMode(){
-        Deposit deposit = new Deposit(this, false);
+        Deposit deposit = new Deposit(this, false, PI/2);
         waitForStart();
         while (opModeIsActive()) {
             if (home) {
@@ -24,7 +25,7 @@ public class DepositTest extends LinearOpMode {
             } else {
                 deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, slidesInches);
             }
-            deposit.update(0,0);
+            deposit.update(PI/2,0);
         }
     }
 }

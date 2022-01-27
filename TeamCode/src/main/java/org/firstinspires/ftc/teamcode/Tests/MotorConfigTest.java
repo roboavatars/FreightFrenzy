@@ -9,11 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
-import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
-
 
 @TeleOp
 @Config
@@ -27,6 +22,7 @@ public class MotorConfigTest extends LinearOpMode {
     public static boolean motorFrontLeftSpinning = false;
     public static boolean motorBackRightSpinning = false;
     public static boolean motorBackLeftSpinning = false;
+    public static double motorPower = 0.25;
 
     @Override
     public void runOpMode() {
@@ -46,24 +42,16 @@ public class MotorConfigTest extends LinearOpMode {
         motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         waitForStart();
 
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
 
-            if(motorFrontLeftSpinning){
-                motorFrontLeft.setPower(1);
-            }
-            if(motorFrontRightSpinning){
-                motorFrontRight.setPower(1);
-            }
-            if(motorBackLeftSpinning){
-                motorBackLeft.setPower(1);
-            }
-            if(motorBackRightSpinning){
-                motorBackRight.setPower(1);
-            }
+            motorFrontLeft.setPower(motorFrontLeftSpinning ? motorPower : 0);
+            motorFrontRight.setPower(motorFrontRightSpinning ? motorPower : 0);
+            motorBackLeft.setPower(motorBackLeftSpinning ? motorPower : 0);
+            motorBackRight.setPower(motorBackRightSpinning ? motorPower : 0);
 
             addPacket("Front Left", motorFrontLeft.getVelocity());
             addPacket("Front Right", motorFrontRight.getVelocity());

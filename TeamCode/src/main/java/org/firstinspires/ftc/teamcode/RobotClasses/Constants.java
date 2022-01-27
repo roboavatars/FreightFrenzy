@@ -24,15 +24,6 @@ public class Constants {
     //Carousel
     public static double CAROUSEL_POWER = 0.55;
 
-    //Deposit Turret
-    public static double MAX_TURRET_POWER = 1;
-    public static double TURRET_HOME_THETA = 0;
-    public static double TURRET_MIN_THETA = 0;
-    public static double TURRET_MAX_THETA = PI;
-    public static double TURRET_TICKS_PER_RADIAN = 103.6 * 20 / (2*PI);
-    public static double TURRET_Y_OFFSET = 2.06066;
-    public static double TURRET_ERROR_THRESHOLD = PI/40;
-
     //Deposit Arm
     public static int DEPOSIT_ARM_HOME = 0;
     public static int DEPOSIT_ARM_LOW = 750;
