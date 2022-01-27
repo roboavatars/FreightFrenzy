@@ -6,7 +6,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @SuppressWarnings("FieldCanBeLocal")
@@ -20,14 +19,14 @@ public class Deposit {
     private static double lastServoPos = 0;
 
     //Turret PD and PDFF
-    public static double pTurret = 2.25;
-    public static double dTurret = 5.5;
+    public static double pTurret = 2;
+    public static double dTurret = 0;
     public static double fwTurret = -0.3;
     public static double fmoiTurret = 0;
     public double initialTheta;
 
     private double turretTargetTheta;
-    private double turretTheta;
+    public double turretTheta;
     private double turretError = 0;
     private double turretErrorChange;
     private double turretLockTheta;
@@ -49,7 +48,7 @@ public class Deposit {
 
     private static final double maxSlidesDistBeforeLoweringArm = 2;
 
-    private boolean home = true;
+    public boolean home = true;
     public int targetArmPos;
 
     public enum DepositHeight {
@@ -59,6 +58,10 @@ public class Deposit {
     public DepositHeight targetHeight = DepositHeight.HOME;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
+        this(op, isAuto, 0);
+    }
+
+    public Deposit(LinearOpMode op, boolean isAuto, double initialRobotTheta) {
         // Deposit Servo
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         if (isAuto) {
@@ -69,7 +72,6 @@ public class Deposit {
 
         // Turret Motor
         turretMotor = op.hardwareMap.get(DcMotorEx.class, "turret");
-        turretMotor.setDirection(DcMotorEx.Direction.REVERSE);
         turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -89,21 +91,21 @@ public class Deposit {
         slidesMotor.setPositionPIDFCoefficients(pSlides);
 
         // Set Initial Turret Theta
-        initialTheta = Constants.TURRET_HOME_THETA;
+        initialTheta = initialRobotTheta;
 
-        setDepositingHome();
+        setDepositHome();
 
         op.telemetry.addData("Status", "Deposit Initialized");
     }
 
     // Slides + Arm
-    public void setDepositingHome() {
+    public void setDepositHome() {
         home = true;
         targetArmPos = Constants.DEPOSIT_ARM_TRANSFER;
         targetSlidesTicks = 0;
     }
 
-    public void setDepositingControls(int targetArmPos, double slidesDist) {
+    public void setDepositControls(int targetArmPos, double slidesDist) {
         home = false;
         this.targetArmPos = targetArmPos;
         targetSlidesTicks = (int) Math.round(slidesDist * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
@@ -114,7 +116,7 @@ public class Deposit {
     }
 
     public void turretHome() {
-        turretTargetTheta = Constants.TURRET_HOME_THETA;
+        turretTargetTheta = initialTheta;
     }
 
     public void update(double robotTheta, double commandedW) {
@@ -126,6 +128,13 @@ public class Deposit {
         }
 
         // Move Turret
+        updateTurret(robotTheta, commandedW);
+
+        // Move Slides
+        setSlidesControls();
+    }
+
+    public void updateTurret(double robotTheta, double commandedW) {
         if (home) {
             setTurretTheta(turretTargetTheta);
         } else {
@@ -133,11 +142,9 @@ public class Deposit {
             if (turretTargetTheta < 0) {
                 turretTargetTheta += 2 * PI;
             }
-            setTurretThetaFF(turretTargetTheta, commandedW);
+            setTurretTheta(turretTargetTheta);
+//            setTurretThetaFF(turretTargetTheta, commandedW);
         }
-
-        // Move Slides
-        setSlidesControls();
     }
 
     // Turret
@@ -150,7 +157,7 @@ public class Deposit {
         setTurretPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * commandedW + fmoiTurret * getSlidesPosition());
     }
 
-    public void setTurretTheta(double theta) {
+    public void setTurretTheta(double theta) { // TODO: make private method
         double clippedTargetTheta = Math.min(Math.max(theta, Constants.TURRET_MIN_THETA), Constants.TURRET_MAX_THETA);
         turretTheta = getTurretTheta();
         turretErrorChange = clippedTargetTheta - turretTheta - turretError;

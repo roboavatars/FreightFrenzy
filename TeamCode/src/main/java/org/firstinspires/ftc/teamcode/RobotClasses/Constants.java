@@ -27,10 +27,10 @@ public class Constants {
     //Deposit Turret
     public static double MAX_TURRET_POWER = 1;
     public static double TURRET_HOME_THETA = 0;
-    public static double TURRET_MIN_THETA = -PI/2;
-    public static double TURRET_MAX_THETA = PI/2;
+    public static double TURRET_MIN_THETA = 0;
+    public static double TURRET_MAX_THETA = PI;
     public static double TURRET_TICKS_PER_RADIAN = 103.6 * 20 / (2*PI);
-    public static double TURRET_CENTER_TO_ROBOT_CENTER_DIST = 2.06066;
+    public static double TURRET_Y_OFFSET = 2.06066;
     public static double TURRET_ERROR_THRESHOLD = PI/40;
 
     //Deposit Arm

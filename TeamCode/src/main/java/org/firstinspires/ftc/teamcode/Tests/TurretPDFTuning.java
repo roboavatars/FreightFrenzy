@@ -11,40 +11,42 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 
-//Tune constants Kp, Kd, and Kf through dashboard in the Deposit class config
-
-@TeleOp
+@TeleOp(name = "0 0 turret tuning")
 @Config
 public class TurretPDFTuning extends LinearOpMode {
-    public static double initialTheta = 0;
-    double lockTheta;
-    double targetTheta;
+    public static boolean enabled = true;
+    public static double lockTheta = 0.5;
 
     @Override
     public void runOpMode() {
         Deposit deposit = new Deposit(this, false);
-        Drivetrain dt = new Drivetrain(this, 0, 0, PI / 2);
-
+        Drivetrain dt = new Drivetrain(this, 0, 0, PI/2);
 
         waitForStart();
 
+        double targetTheta = 0;
+
         while (opModeIsActive()) {
-            dt.setControls(-gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
+            dt.setControls(0, 0, -gamepad1.right_stick_x);
             dt.updatePose();
 
-            lockTheta = Math.atan2(-dt.y, -dt.x);
-            targetTheta = (lockTheta - dt.theta) % (2 * PI);
-            if (targetTheta < 0) {
-                targetTheta += 2 * PI;
+            if (enabled) {
+                targetTheta = (lockTheta * PI - dt.theta + PI/2) % (2 * PI);
+                if (targetTheta < 0) {
+                    targetTheta += 2 * PI;
+                }
+                deposit.setTurretTheta(targetTheta);
+//                deposit.setTurretThetaFF(targetTheta, dt.commandedW);
+            } else {
+                deposit.setTurretPower(0);
             }
-            deposit.setTurretThetaFF(targetTheta, dt.commandedW);
 
-            addPacket("lock theta", lockTheta);
+            addPacket("dt theta", dt.theta);
+            addPacket("lock theta", lockTheta * PI);
+            addPacket("global current theta", dt.theta + deposit.getTurretTheta() - PI/2);
+            addPacket("current theta", deposit.getTurretTheta());
             addPacket("target theta", targetTheta);
-            addPacket("theta", deposit.getTurretTheta());
-            addPacket("error", deposit.getTurretError());
             sendPacket();
-
         }
     }
 }

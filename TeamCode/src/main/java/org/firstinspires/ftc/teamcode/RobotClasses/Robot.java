@@ -68,7 +68,7 @@ public class Robot {
     public double lastCycleTime;
     public double longestCycle = 0;
 
-    public double turretTheta = Constants.TURRET_HOME_THETA;
+    public double turretTheta;
     public double depositSlidesDist = 0;
 
     public boolean turretHome = false;
@@ -111,7 +111,7 @@ public class Robot {
 
         drivetrain = new Drivetrain(op, x, y, theta);
         intake = new Intake(op, isAuto);
-        deposit = new Deposit(op, isAuto);
+        deposit = new Deposit(op, isAuto, theta);
         carousel = new Carousel(op);
         logger = new Logger();
         tapeDetector = new TapeDetector(op);
@@ -328,8 +328,8 @@ public class Robot {
     public void updateTurret() {
         // Calculating the Coords of the Turret Center
         double[] turretCenter = new double[2];
-        turretCenter[0] = x + Math.cos(theta) * Constants.TURRET_CENTER_TO_ROBOT_CENTER_DIST;
-        turretCenter[1] = y + Math.sin(theta) * Constants.TURRET_CENTER_TO_ROBOT_CENTER_DIST;
+        turretCenter[0] = x + Math.cos(theta) * Constants.TURRET_Y_OFFSET;
+        turretCenter[1] = y + Math.sin(theta) * Constants.TURRET_Y_OFFSET;
 
         if (allianceHub && isRed) { // red
             lockTheta = atan2(60 - turretCenter[1], 96 - turretCenter[0]);
@@ -362,13 +362,13 @@ public class Robot {
     public void deposit(Deposit.DepositHeight depositTargetHeight) {
         this.depositTargetHeight = depositTargetHeight;
         if (depositTargetHeight == Deposit.DepositHeight.LOW) {
-            deposit.setDepositingControls(Constants.DEPOSIT_ARM_LOW, slidesDist - Constants.ARM_DISTANCE_LOW);
+            deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, slidesDist - Constants.ARM_DISTANCE_LOW);
         } else if (depositTargetHeight == Deposit.DepositHeight.MID) {
-            deposit.setDepositingControls(Constants.DEPOSIT_ARM_MID, slidesDist - Constants.ARM_DISTANCE_MID);
+            deposit.setDepositControls(Constants.DEPOSIT_ARM_MID, slidesDist - Constants.ARM_DISTANCE_MID);
         } else if (depositTargetHeight == Deposit.DepositHeight.HIGH) {
-            deposit.setDepositingControls(Constants.DEPOSIT_ARM_HIGH, slidesDist - Constants.ARM_DISTANCE_HIGH);
+            deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, slidesDist - Constants.ARM_DISTANCE_HIGH);
         }  else { // Home
-            deposit.setDepositingControls(Constants.DEPOSIT_ARM_TRANSFER, slidesDist);
+            deposit.setDepositControls(Constants.DEPOSIT_ARM_TRANSFER, slidesDist);
         }
     }
 
