@@ -3,7 +3,10 @@ package org.firstinspires.ftc.teamcode.Tests;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
+import static java.lang.Math.PI;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -12,11 +15,12 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Intake;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
+@Disabled
 @TeleOp
 @Config
 public class CycleTest extends LinearOpMode {
     public static int slidesExtendDist = 0;
-    public static double turretTheta = 0;
+    public static double lockTheta = 0.5;
 
     private boolean armHome = true;
     private boolean slidesHome = true;
@@ -35,7 +39,10 @@ public class CycleTest extends LinearOpMode {
 
         waitForStart();
 
+        double targetTheta = 0;
+
         while (opModeIsActive()) {
+            robot.drivetrain.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);robot.drivetrain.updatePose();
 
             if (gamepad1.a) {
                 robot.intake.extend();
@@ -74,7 +81,17 @@ public class CycleTest extends LinearOpMode {
                 robot.deposit.setSlidesControls(slidesExtendDist);
             }
 
-            robot.deposit.setTurretTheta(turretTheta);
+            targetTheta = (lockTheta * PI -robot.drivetrain.theta + PI/2) % (2 * PI);
+            if (targetTheta < 0) {
+                targetTheta += 2 * PI;
+            }
+            // prevents wrap from 0 to 2pi from screwing things up
+            // now wrap is from -pi/2 to 3pi/2 (which the turret will never reach)
+            if (targetTheta > 3*PI/2) {
+                targetTheta -= 2*PI;
+            }
+//                deposit.setTurretTheta(targetTheta);
+            robot.deposit.setTurretThetaFF(targetTheta,robot.drivetrain.commandedW);
 
             if (gamepad1.b && depositToggle == false){
                 depositToggle = true;

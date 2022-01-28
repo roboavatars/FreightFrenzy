@@ -39,7 +39,7 @@ public class Deposit {
     private double turretLockTheta;
 
     // Slides PD
-    public static double pSlides = -0.2;
+    public static double pSlides = 0.02;
     public static double dSlides = 0;
 
     private int targetSlidesTicks;

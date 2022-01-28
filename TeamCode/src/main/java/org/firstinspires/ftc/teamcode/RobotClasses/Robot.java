@@ -49,6 +49,9 @@ public class Robot {
     private final double thetaTolerance = PI/35;
     private final double turretTolerance = PI/50;
     public final static double[] cameraRelativeToRobot = new double[]{1, 3};
+    public static double[] redGoalCoords = new double[]{96, 60};
+    public static double[] blueGoalCoords = new double[]{48, 60};
+    public static double[] neutGoalCoords = new double[]{72, 120};
 
     // State Variables
     private final boolean isAuto;
@@ -253,12 +256,14 @@ public class Robot {
         }
 
         // Update turret
+        double turretFF = 0;
         if (turretHome) {
             deposit.turretHome();
         } else {
-            updateTurret();
+            turretFF = updateTurret();
         }
-        deposit.update(theta, w + (x * vy - vx * y) / (x * x + y * y)); // calculates ff for turret control (w + atan dot)
+
+        deposit.update(theta, turretFF);
         turretGlobalTheta = deposit.getTurretTheta() + theta - PI/2;
 
         // Update Position
@@ -325,23 +330,33 @@ public class Robot {
         profile(3);
     }
 
-    public void updateTurret() {
+    public double updateTurret() {
         // Calculating the Coords of the Turret Center
         double[] turretCenter = new double[2];
         turretCenter[0] = x + Math.cos(theta) * Deposit.TURRET_Y_OFFSET;
         turretCenter[1] = y + Math.sin(theta) * Deposit.TURRET_Y_OFFSET;
 
+        double turretFF;
         if (allianceHub && isRed) { // red
-            lockTheta = atan2(60 - turretCenter[1], 96 - turretCenter[0]);
-            slidesDist = hypot(60 - turretCenter[1], 96 - turretCenter[0]);
+            lockTheta = PI + atan2(redGoalCoords[1] - turretCenter[1], redGoalCoords[0] - turretCenter[0]);
+            slidesDist = hypot(redGoalCoords[1] - turretCenter[1], redGoalCoords[0] - turretCenter[0]);
+            // calculates ff for turret control (w + atan dot)
+            turretFF = w + ((redGoalCoords[0] - x) * vy - vx * (redGoalCoords[1] - y)) / ((redGoalCoords[0] - x) * (redGoalCoords[0] - x) + (redGoalCoords[1] - y) * (redGoalCoords[1] - y));
         } else if (allianceHub) { // blue
-            lockTheta = atan2(60 - turretCenter[1], 48 - turretCenter[0]);
-            slidesDist = hypot(60 - turretCenter[1], 48 - turretCenter[0]);
+            lockTheta = PI + atan2(blueGoalCoords[1] - turretCenter[1], blueGoalCoords[0] - turretCenter[0]);
+            slidesDist = hypot(blueGoalCoords[1] - turretCenter[1], blueGoalCoords[0] - turretCenter[0]);
+            // calculates ff for turret control (w + atan dot)
+            turretFF = w + ((blueGoalCoords[0] - x) * vy - vx * (blueGoalCoords[1] - y)) / ((blueGoalCoords[0] - x) * (blueGoalCoords[0] - x) + (blueGoalCoords[1] - y) * (blueGoalCoords[1] - y));
         } else {
-            lockTheta = atan2(120 - turretCenter[1], 72 - turretCenter[0]);
-            slidesDist = hypot(120 - turretCenter[1], 72 - turretCenter[0]);
+            lockTheta = PI + atan2(neutGoalCoords[1] - turretCenter[1], neutGoalCoords[0] - turretCenter[0]);
+            slidesDist = hypot(neutGoalCoords[1] - turretCenter[1], neutGoalCoords[0] - turretCenter[0]);
+            // calculates ff for turret control (w + atan dot)
+            turretFF = w + ((neutGoalCoords[0] - x) * vy - vx * (neutGoalCoords[1] - y)) / ((neutGoalCoords[0] - x) * (neutGoalCoords[0] - x) + (neutGoalCoords[1] - y) * (neutGoalCoords[1] - y));
         }
+
         deposit.setTurretLockTheta(lockTheta);
+
+        return turretFF;
     }
 
     // Set Depositor Controls
