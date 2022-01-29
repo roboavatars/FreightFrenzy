@@ -95,6 +95,24 @@ public class CycleTest2 extends LinearOpMode {
                 deposit.setTurretPower(0);
             }
 
+            if (gamepad1.b && depositToggle == false){
+                depositToggle = true;
+                if (depositGatePos == 0){
+                    deposit.close();
+                    depositGatePos ++;
+                } else if (depositGatePos == 1){
+                    deposit.hold();
+                    depositGatePos ++;
+                } else if (depositGatePos == 2){
+                    deposit.open();
+                    depositGatePos = 0;
+                }
+            }
+            if (!gamepad1.b){
+                depositToggle = false;
+            }
+
+
             addPacket("1 arm ticks", deposit.getArmPosition());
             addPacket("2 slide inches", deposit.getSlidesDistInches());
             addPacket("2 slide ticks", deposit.getSlidesPosition());

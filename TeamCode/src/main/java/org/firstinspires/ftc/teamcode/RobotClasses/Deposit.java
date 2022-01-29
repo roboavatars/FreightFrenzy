@@ -40,7 +40,7 @@ public class Deposit {
 
     // Slides PD
     public static double pSlides = 0.02;
-    public static double dSlides = 0;
+    public static double dSlides = 0.05;
 
     private int targetSlidesTicks;
     private double slidesError = 0;
