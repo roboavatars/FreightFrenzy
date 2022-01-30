@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Intake;
 public class CycleTest2 extends LinearOpMode {
     public static boolean enabled = true;
     public static double lockTheta = 0.5;
+    public static double turretMovingAngle = 0.25;
 
     public static double pArmGoingUp = Deposit.pArmGoingUp;
     public static double pArmGoingDown = Deposit.pArmGoingDown;
@@ -27,7 +28,7 @@ public class CycleTest2 extends LinearOpMode {
     public static double pSlidesRetract = 0.02;
     public static double dSlidesRetract = 0.05;
 
-    public static int slidesExtendDist = 0;
+    public static int slidesExtendDist = 25;
 
     private boolean armHome = true;
     private boolean slidesHome = true;
@@ -48,6 +49,12 @@ public class CycleTest2 extends LinearOpMode {
         while (opModeIsActive()) {
             dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
             dt.updatePose();
+
+            if(gamepad1.start){
+                slidesHome = false;
+                armHome = false;
+                lockTheta = turretMovingAngle;
+            }
 
             if (gamepad1.a) {
                 intake.extend();
@@ -84,10 +91,10 @@ public class CycleTest2 extends LinearOpMode {
             }
 
             if (slidesHome){
-                deposit.setSlidesPD(pSlidesRetract, dSlidesRetract);
+                deposit.setSlidesPDConstants(pSlidesRetract, dSlidesRetract);
                 deposit.setSlidesControls(0);
             } else {
-                deposit.setSlidesPD(pSlidesExtend, dSlidesExtend);
+                deposit.setSlidesPDConstants(pSlidesExtend, dSlidesExtend);
                 deposit.setSlidesControls(slidesExtendDist * (int) Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
             }
 

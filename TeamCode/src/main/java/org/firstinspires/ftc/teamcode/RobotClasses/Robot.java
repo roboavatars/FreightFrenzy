@@ -386,7 +386,7 @@ public class Robot {
         } else if (depositTargetHeight == Deposit.DepositHeight.HIGH) {
             deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, slidesDist - Constants.ARM_DISTANCE_HIGH);
         }  else { // Home
-            deposit.setDepositControls(Constants.DEPOSIT_ARM_TRANSFER, slidesDist);
+            deposit.setDepositControls(Constants.DEPOSIT_ARM_OVER_SLIDES_MOTOR, slidesDist);
         }
     }
 

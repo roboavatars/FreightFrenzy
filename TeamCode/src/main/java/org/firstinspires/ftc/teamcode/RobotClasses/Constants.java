@@ -29,19 +29,20 @@ public class Constants {
     public static int DEPOSIT_ARM_LOW = 750;
     public static int DEPOSIT_ARM_MID = 600;
     public static int DEPOSIT_ARM_HIGH = 525;
-    public static int DEPOSIT_ARM_TRANSFER = 100;
+    public static int DEPOSIT_ARM_OVER_SLIDES_MOTOR = 100;
     public static double DEPOSIT_ARM_MAX_POWER = 0.7;
     public static int DEPOSIT_ARM_ERROR_THRESHOLD = 5;
 
     // Deposit Slides
-    public static double DEPOSIT_SLIDES_TICKS_PER_INCH = 5.017543859649122; // 103.6 / (PI * 2.2);
+    public static double DEPOSIT_SLIDES_TICKS_PER_INCH = 6; // 103.6 / (PI * 2.2);
     public static double DEPOSIT_SLIDES_POWER = 1;
     public static double ARM_DISTANCE_LOW = 36;
     public static double ARM_DISTANCE_MID = 33;
     public static double ARM_DISTANCE_HIGH = 30;
     public static double ARM_DISTANCE_CAP = 27;
     public static double DEPOSIT_SLIDES_MIN_TICKS = 0;
-    public static double DEPOSIT_SLIDES_MAX_TICKS = 290;
+    public static double DEPOSIT_SLIDES_MAX_TICKS = 135;
+    public static double DEPOSIT_SLIDES_SIDE_EXTENSION_LIMIT_IN = 15;
     public static int DEPOSIT_SLIDES_ERROR_THRESHOLD = 5;
 
     // Intake Stalling

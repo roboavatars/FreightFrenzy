@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -111,10 +110,10 @@ public class Deposit {
     // Slides + Arm
     public void setDepositHome() {
         home = true;
-        targetArmPos = Constants.DEPOSIT_ARM_TRANSFER;
+        targetArmPos = Constants.DEPOSIT_ARM_OVER_SLIDES_MOTOR;
         armMotor.setPositionPIDFCoefficients(pArmGoingDown);
         targetSlidesTicks = 0;
-        setSlidesPD(pSlidesRetract, dSlidesRetract);
+        setSlidesPDConstants(pSlidesRetract, dSlidesRetract);
     }
 
     public void setDepositControls(int targetArmPos, double slidesDist) {
@@ -122,7 +121,7 @@ public class Deposit {
         this.targetArmPos = targetArmPos;
         armMotor.setPositionPIDFCoefficients(pArmGoingUp);
         targetSlidesTicks = (int) Math.round(slidesDist * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
-        setSlidesPD(pSlidesExtend, dSlidesExtend);
+        setSlidesPDConstants(pSlidesExtend, dSlidesExtend);
     }
 
     public void setTurretLockTheta(double lockTheta) {
@@ -136,7 +135,7 @@ public class Deposit {
     public void update(double robotTheta, double turretFF) {
         // Move Arm
         if (home && getSlidesDistInches() > maxSlidesDistBeforeLoweringArm) {
-            setArmControls(Constants.DEPOSIT_ARM_TRANSFER);
+            setArmControls(Constants.DEPOSIT_ARM_OVER_SLIDES_MOTOR);
         } else {
             setArmControls();
         }
@@ -145,6 +144,9 @@ public class Deposit {
         updateTurret(robotTheta, turretFF);
 
         // Move Slides
+        //Cap Slides Extension Distance When Extending to the Side to Prevent Tipping
+        targetSlidesTicks = (int) Math.min(targetSlidesTicks, Constants.DEPOSIT_SLIDES_SIDE_EXTENSION_LIMIT_IN * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH * Math.abs(1/Math.cos(getTurretTheta())));
+
         setSlidesControls();
     }
 
@@ -225,7 +227,7 @@ public class Deposit {
     }
 
     public boolean armHome() {
-        return Math.abs(getArmPosition() - Constants.DEPOSIT_ARM_TRANSFER) < Constants.DEPOSIT_ARM_ERROR_THRESHOLD;
+        return Math.abs(getArmPosition() - Constants.DEPOSIT_ARM_OVER_SLIDES_MOTOR) < Constants.DEPOSIT_ARM_ERROR_THRESHOLD;
     }
 
     public void setArmPIDCoefficients(double p){
@@ -263,7 +265,7 @@ public class Deposit {
         return Math.abs(getSlidesPosition()) < 0;
     }
 
-    public void setSlidesPD(double p, double d){
+    public void setSlidesPDConstants(double p, double d){
         pSlides = p;
         dSlides = d;
     }
