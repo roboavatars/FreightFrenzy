@@ -12,13 +12,20 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.RobotClasses.Intake;
-import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @TeleOp(name = "0 0 cycle test 2")
 @Config
 public class CycleTest2 extends LinearOpMode {
     public static boolean enabled = true;
     public static double lockTheta = 0.5;
+
+    public static double pArmGoingUp = Deposit.pArmGoingUp;
+    public static double pArmGoingDown = Deposit.pArmGoingDown;
+
+    public static double pSlidesExtend = 0.06;
+    public static double dSlidesExtend = 0.05;
+    public static double pSlidesRetract = 0.02;
+    public static double dSlidesRetract = 0.05;
 
     public static int slidesExtendDist = 0;
 
@@ -67,15 +74,20 @@ public class CycleTest2 extends LinearOpMode {
                 slidesHome = true;
             }
 
+
             if (armHome){
+                deposit.setArmPIDCoefficients(pArmGoingDown);
                 deposit.setArmControls(Constants.DEPOSIT_ARM_HOME);
             } else {
+                deposit.setArmPIDCoefficients(pArmGoingUp);
                 deposit.setArmControls(Constants.DEPOSIT_ARM_HIGH);
             }
 
             if (slidesHome){
+                deposit.setSlidesPD(pSlidesRetract, dSlidesRetract);
                 deposit.setSlidesControls(0);
             } else {
+                deposit.setSlidesPD(pSlidesExtend, dSlidesExtend);
                 deposit.setSlidesControls(slidesExtendDist * (int) Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
             }
 
