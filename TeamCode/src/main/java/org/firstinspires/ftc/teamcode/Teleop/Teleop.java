@@ -78,7 +78,8 @@ public class Teleop extends LinearOpMode {
             robot = new Robot(this, initialData[1], initialData[2], initialData[3], false, initialData[0] == 1);
             robot.logger.startLogging(false, initialData[0] == 1);
         } else {
-            robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
+//            robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
+            robot = new Robot(this, 138,60,0, false, true);
             robot.logger.startLogging(false, isRed);
         }
 
@@ -92,18 +93,17 @@ public class Teleop extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Intake On / Rev / Off
-            if (gamepad2.left_trigger > 0.1) {
+            if (gamepad1.a) {
+                robot.intake.extend();
+                robot.intake.on();
+                robot.intake.flipDown();
+            } else if (gamepad1.right_trigger > .1){
                 robot.intake.reverse();
             } else {
-                if (gamepad1.right_trigger > 0.1) {
-                    robot.intake.setPower(gamepad1.right_trigger);
-                } else if (gamepad1.left_trigger > 0.1) {
-                    robot.intake.setPower(-gamepad1.left_trigger);
-                } else {
-                    robot.intake.off();
-                }
+                robot.intake.home();
+                robot.intake.flipUp();
+                robot.intake.off();
             }
-
             // Moving Deposit
 
             //Move Back Home

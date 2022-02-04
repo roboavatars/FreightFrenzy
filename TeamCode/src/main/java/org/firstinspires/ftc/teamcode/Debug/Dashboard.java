@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Debug;
 
+import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
@@ -58,7 +59,7 @@ public class Dashboard {
 
     public static void drawDepositTurretSlides(double x, double y, double robotTheta, double turretTheta, double slidesDist) {
         double extendedPos = 11.5 + slidesDist;
-        double theta = robotTheta + turretTheta;
+        double theta = robotTheta + turretTheta + PI;
         double turretCenterX = x + Deposit.TURRET_Y_OFFSET * cos(robotTheta);
         double turretCenterY = y + Deposit.TURRET_Y_OFFSET * sin(robotTheta);
 

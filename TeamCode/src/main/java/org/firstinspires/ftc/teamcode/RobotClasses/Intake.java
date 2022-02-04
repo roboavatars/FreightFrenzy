@@ -18,6 +18,7 @@ public class Intake {
     private TouchSensor slidesSensor;
 
     private double lastIntakePow = 0;
+    private boolean slidesHome;
 
     public Intake(LinearOpMode op, boolean isAuto) {
         // Intake Motor
@@ -76,15 +77,18 @@ public class Intake {
 
     // Intake Slides
     public void extend() {
+        slidesHome = false;
         slidesServo.setPosition(Constants.INTAKE_EXTEND_POS);
     }
 
     public void home() {
+        slidesHome = true;
         slidesServo.setPosition(Constants.INTAKE_HOME_POS);
     }
 
     public boolean slidesIsHome() {
-        return slidesSensor.isPressed();
+//        return slidesSensor.isPressed();
+        return slidesHome;
     }
 
     // Intake Servo

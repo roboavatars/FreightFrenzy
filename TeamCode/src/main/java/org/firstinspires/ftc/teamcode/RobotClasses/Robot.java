@@ -261,6 +261,7 @@ public class Robot {
             deposit.turretHome();
         } else {
             turretFF = updateTurret();
+            addPacket("turret FF", turretFF);
         }
 
         deposit.update(theta, turretFF);
@@ -355,24 +356,33 @@ public class Robot {
         lockTheta = PI + atan2(goalY, goalX);
         slidesDist = hypot(goalX, goalY);
         // calculates ff for turret control (w + atan dot)
-        turretFF = w + (goalX * vy - vx * goalY) / (goalX * goalX + goalY * goalY);
+        turretFF = 0; //w + (goalX * vy - vx * goalY) / (goalX * goalX + goalY * goalY);
+
+        lockTheta %= 2*PI;
+        if (lockTheta < 0) {
+            lockTheta += 2*PI;
+        }
 
         deposit.setTurretLockTheta(lockTheta);
+        addPacket("4 lock theta", lockTheta);
 
         return turretFF;
     }
 
     // Set Depositor Controls
     public void depositHome() {
-       deposit(Deposit.DepositHeight.HOME);
+        turretHome = true;
+        deposit(Deposit.DepositHeight.HOME);
     }
 
     public void depositAllianceHub(Deposit.DepositHeight depositTargetHeight) {
+        turretHome = false;
         allianceHub = true;
         deposit(depositTargetHeight);
     }
 
     public void depositTrackSharedHub() {
+        turretHome = false;
         allianceHub = false;
         deposit(Deposit.DepositHeight.LOW);
     }
@@ -386,7 +396,7 @@ public class Robot {
         } else if (depositTargetHeight == Deposit.DepositHeight.HIGH) {
             deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, slidesDist - Constants.ARM_DISTANCE_HIGH);
         }  else { // Home
-            deposit.setDepositControls(Constants.DEPOSIT_ARM_OVER_SLIDES_MOTOR, slidesDist);
+            deposit.setDepositHome();
         }
     }
 

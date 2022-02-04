@@ -38,7 +38,7 @@ public class Constants {
     public static double DEPOSIT_SLIDES_POWER = 1;
     public static double ARM_DISTANCE_LOW = 36;
     public static double ARM_DISTANCE_MID = 33;
-    public static double ARM_DISTANCE_HIGH = 30;
+    public static double ARM_DISTANCE_HIGH = 24;
     public static double ARM_DISTANCE_CAP = 27;
     public static double DEPOSIT_SLIDES_MIN_TICKS = 0;
     public static double DEPOSIT_SLIDES_MAX_TICKS = 135;
