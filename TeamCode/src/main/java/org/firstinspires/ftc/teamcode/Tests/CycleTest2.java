@@ -91,10 +91,10 @@ public class CycleTest2 extends LinearOpMode {
             }
 
             if (slidesHome){
-                deposit.setSlidesPDConstants(pSlidesRetract, dSlidesRetract);
+                deposit.setSlidesPIDCoefficients(pSlidesRetract);
                 deposit.setSlidesControls(0);
             } else {
-                deposit.setSlidesPDConstants(pSlidesExtend, dSlidesExtend);
+                deposit.setSlidesPIDCoefficients(pSlidesExtend);
                 deposit.setSlidesControls(slidesExtendDist * (int) Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
             }
 

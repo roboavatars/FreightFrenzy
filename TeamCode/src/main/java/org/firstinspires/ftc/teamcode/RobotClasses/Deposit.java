@@ -95,9 +95,8 @@ public class Deposit {
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
         slidesMotor.setDirection(DcMotorEx.Direction.REVERSE);
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        slidesMotor.setTargetPosition(0);
-        slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        slidesMotor.setPositionPIDFCoefficients(pSlides);
+        slidesMotor.setTargetPosition(0);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // Set Initial Turret Theta
         initialTheta = initialRobotTheta;
@@ -111,17 +110,17 @@ public class Deposit {
     public void setDepositHome() {
         home = true;
         targetArmPos = Constants.DEPOSIT_ARM_OVER_SLIDES_MOTOR;
-        armMotor.setPositionPIDFCoefficients(pArmGoingDown);
+        setArmPIDCoefficients(pArmGoingDown);
         targetSlidesTicks = 0;
-        setSlidesPDConstants(pSlidesRetract, dSlidesRetract);
+        setSlidesPIDCoefficients(pSlidesRetract);
     }
 
     public void setDepositControls(int targetArmPos, double slidesDist) {
         home = false;
         this.targetArmPos = targetArmPos;
-        armMotor.setPositionPIDFCoefficients(pArmGoingUp);
+        setArmPIDCoefficients(pArmGoingUp);
         targetSlidesTicks = (int) Math.round(slidesDist * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
-        setSlidesPDConstants(pSlidesExtend, dSlidesExtend);
+        setSlidesPIDCoefficients(pSlidesExtend);
     }
 
     public void setTurretLockTheta(double lockTheta) {
@@ -236,12 +235,8 @@ public class Deposit {
 
     // Slides
     public void setSlidesControls(int targetSlidesPos) {
-        double targetTicks = (int) Math.min(Math.max(targetSlidesPos, Constants.DEPOSIT_SLIDES_MIN_TICKS), Constants.DEPOSIT_SLIDES_MAX_TICKS);
-        double currentTicks = getSlidesPosition();
-        slidesErrorChange = targetTicks - currentTicks - slidesError;
-        slidesError = targetTicks - currentTicks;
-
-        slidesMotor.setPower(-(pSlides * slidesError + dSlides * slidesErrorChange)); //Power is negative because of the inversed turret slides motor wiring
+        slidesMotor.setTargetPosition(targetArmPos);
+        slidesMotor.setPower(Constants.DEPOSIT_ARM_MAX_POWER);
 
     }
 
@@ -265,9 +260,8 @@ public class Deposit {
         return Math.abs(getSlidesPosition()) < 0;
     }
 
-    public void setSlidesPDConstants(double p, double d){
-        pSlides = p;
-        dSlides = d;
+    public void setSlidesPIDCoefficients(double p){
+        slidesMotor.setPositionPIDFCoefficients(p);
     }
 
     // Deposit
