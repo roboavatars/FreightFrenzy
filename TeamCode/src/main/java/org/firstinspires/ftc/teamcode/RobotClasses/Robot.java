@@ -62,7 +62,6 @@ public class Robot {
     public boolean intakeTransfer = false;
     public boolean depositingFreight = false;
     public boolean depositDone = false;
-    public boolean intakeSlidesHome;
     public boolean intakeFull;
 
     // Cycle Tracker
@@ -160,7 +159,6 @@ public class Robot {
         }
 
         if (loopCounter % sensorUpdatePeriod == 0) {
-            intakeSlidesHome = intake.slidesIsHome();
             intakeFull = intake.intakeFull();
             turretTheta = deposit.getTurretTheta();
             depositSlidesDist = deposit.getSlidesDistInches();
@@ -295,7 +293,7 @@ public class Robot {
         // Log Data
         if (loopCounter % loggerUpdatePeriod == 0) {
             logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a,
-                    turretGlobalTheta, slidesDist, depositTargetHeight, intakeSlidesHome, cycles, cycleTotal / cycles);
+                    turretGlobalTheta, slidesDist, depositTargetHeight, intake.slidesIsHome(), cycles, cycleTotal / cycles);
         }
 
         profile(2);

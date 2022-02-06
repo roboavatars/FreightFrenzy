@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
+import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
@@ -92,21 +93,36 @@ public class Teleop extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            // Intake On / Rev / Off
-            if (gamepad1.a) {
+            // Intake On / Off / Transfer
+            if (gamepad1.right_bumper) {
                 robot.intake.extend();
                 robot.intake.on();
                 robot.intake.flipDown();
-            } else if (gamepad1.right_trigger > .1){
-                robot.intake.reverse();
-            } else {
+            } else if (gamepad1.left_bumper) {
                 robot.intake.home();
                 robot.intake.flipUp();
                 robot.intake.off();
+            } else if (gamepad1.a) {
+                robot.deposit.open();
+                robot.intake.reverse();
+            } else {
+                robot.intake.off();
             }
-            // Moving Deposit
 
-            //Move Back Home
+            // Deposit Controls
+            if (gamepad1.x) {
+                robot.deposit.hold();
+                robot.deposit.setArmControls(Constants.DEPOSIT_ARM_HIGH);
+                robot.deposit.setSlidesControls(25 * (int) Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
+                robot.deposit.home = false;
+            } else if (gamepad1.y) {
+                robot.deposit.open();
+            } else if (gamepad1.b) {
+                robot.deposit.setArmControls(0);
+                robot.deposit.setSlidesControls(0);
+            }
+
+            // Move Back Home
             if (gamepad2.a && !cycleToggle) {
                 robot.deposit.open();
                 depositServoStatus = 0;
@@ -121,32 +137,18 @@ public class Teleop extends LinearOpMode {
                 cycleToggle = false;
             }
 
-            //Set Deposit to Track Alliance Hub
+            // Set Deposit to Track Alliance Hub
             if (gamepad2.x) {
                 robot.deposit.close();
                 depositServoStatus = 1;
                 robot.depositAllianceHub(Deposit.DepositHeight.HIGH);
             }
 
-            //Set Deposit to Track Shared Hub
+            // Set Deposit to Track Shared Hub
             if (gamepad2.y) {
                 robot.deposit.close();
                 depositServoStatus = 1;
                 robot.depositTrackSharedHub();
-            }
-
-            // Deposit Servo
-            if (gamepad1.right_bumper && !servoToggle) {
-                if (depositServoStatus == 0) {
-                    robot.deposit.open();
-                    depositServoStatus = 1;
-                } else if (depositServoStatus == 1) {
-                    robot.deposit.close();
-                    depositServoStatus = 2;
-                }
-                servoToggle = true;
-            } else if (!gamepad1.right_bumper && servoToggle) {
-                servoToggle = false;
             }
 
             // Carousel

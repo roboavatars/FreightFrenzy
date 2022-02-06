@@ -26,31 +26,29 @@ public class DepositTrackingTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot = new Robot(this, 138,60,0, false, true);
+        robot = new Robot(this, 102, 9, 0, false, true);
         robot.intake.home();
 
         waitForStart();
 
-        double targetTheta = 0;
-
         while (opModeIsActive()) {
             robot.depositAllianceHub(Deposit.DepositHeight.HIGH);
 
-            //Deposit Gate
-            if (gamepad1.b && depositToggle == false){
+            // Deposit Gate
+            if (gamepad1.b && depositToggle == false) {
                 depositToggle = true;
-                if (depositGatePos == 0){
+                if (depositGatePos == 0) {
                     robot.deposit.close();
                     depositGatePos ++;
-                } else if (depositGatePos == 1){
+                } else if (depositGatePos == 1) {
                     robot.deposit.hold();
                     depositGatePos ++;
-                } else if (depositGatePos == 2){
+                } else if (depositGatePos == 2) {
                     robot.deposit.open();
                     depositGatePos = 0;
                 }
             }
-            if (!gamepad1.b){
+            if (!gamepad1.b) {
                 depositToggle = false;
             }
 
@@ -59,10 +57,11 @@ public class DepositTrackingTest extends LinearOpMode {
 
             addPacket("1 arm ticks", robot.deposit.getArmPosition());
             addPacket("2 slide inches", robot.deposit.getSlidesDistInches());
-            addPacket("2 slide ticks", robot.deposit.getSlidesPosition());
-            addPacket("arm home", armHome);
-            addPacket("slide home", slidesHome);
-            addPacket("5 current theta", robot.deposit.getTurretTheta());
+            addPacket("3 slide ticks", robot.deposit.getSlidesPosition());
+            addPacket("4 slides target ticks", robot.deposit.targetSlidesTicks);
+            addPacket("5 arm home", armHome);
+            addPacket("6 slide home", slidesHome);
+            addPacket("7 current theta", robot.deposit.getTurretTheta());
         }
     }
 }

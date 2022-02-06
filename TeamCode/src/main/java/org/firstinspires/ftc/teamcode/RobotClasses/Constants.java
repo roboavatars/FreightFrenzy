@@ -34,7 +34,7 @@ public class Constants {
     public static int DEPOSIT_ARM_ERROR_THRESHOLD = 5;
 
     // Deposit Slides
-    public static double DEPOSIT_SLIDES_TICKS_PER_INCH = 6; // 103.6 / (PI * 2.2);
+    public static double DEPOSIT_SLIDES_TICKS_PER_INCH = 74; // 103.6 / (PI * 2.2);
     public static double DEPOSIT_SLIDES_POWER = 1;
     public static double ARM_DISTANCE_LOW = 36;
     public static double ARM_DISTANCE_MID = 33;

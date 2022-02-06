@@ -40,16 +40,10 @@ public class Deposit {
 
     // Slides PD
     public static double pSlidesExtend = 0.06;
-    public static double dSlidesExtend = 0.05;
     public static double pSlidesRetract = 0.02;
-    public static double dSlidesRetract = 0.05;
 
-    public static double pSlides = pSlidesRetract;
-    public static double dSlides = dSlidesRetract;
-
-    private int targetSlidesTicks;
+    public int targetSlidesTicks;
     private double slidesError = 0;
-    private double slidesErrorChange;
 
     // Arm PD
     public static double pArmGoingUp = 6;
@@ -93,7 +87,7 @@ public class Deposit {
 
         // Slides Motor
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
-        slidesMotor.setDirection(DcMotorEx.Direction.REVERSE);
+//        slidesMotor.setDirection(DcMotorEx.Direction.REVERSE);
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slidesMotor.setTargetPosition(0);
         slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -143,8 +137,8 @@ public class Deposit {
         updateTurret(robotTheta, turretFF);
 
         // Move Slides
-        //Cap Slides Extension Distance When Extending to the Side to Prevent Tipping
-        targetSlidesTicks = (int) Math.min(targetSlidesTicks, Constants.DEPOSIT_SLIDES_SIDE_EXTENSION_LIMIT_IN * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH * Math.abs(1/Math.cos(getTurretTheta())));
+        // Cap Slides Extension Distance When Extending to the Side to Prevent Tipping
+//        targetSlidesTicks = (int) Math.min(targetSlidesTicks, Constants.DEPOSIT_SLIDES_SIDE_EXTENSION_LIMIT_IN * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH * Math.abs(1/Math.cos(getTurretTheta())));
 
         setSlidesControls();
     }
@@ -235,9 +229,8 @@ public class Deposit {
 
     // Slides
     public void setSlidesControls(int targetSlidesPos) {
-        slidesMotor.setTargetPosition(targetArmPos);
+        slidesMotor.setTargetPosition(targetSlidesPos);
         slidesMotor.setPower(Constants.DEPOSIT_ARM_MAX_POWER);
-
     }
 
     public void setSlidesControls() {
@@ -260,7 +253,7 @@ public class Deposit {
         return Math.abs(getSlidesPosition()) < 0;
     }
 
-    public void setSlidesPIDCoefficients(double p){
+    public void setSlidesPIDCoefficients(double p) {
         slidesMotor.setPositionPIDFCoefficients(p);
     }
 
