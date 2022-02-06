@@ -18,15 +18,17 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Intake;
 public class CycleTest2 extends LinearOpMode {
     public static boolean enabled = true;
     public static double lockTheta = 0.5;
-    public static double turretMovingAngle = 0.25;
+    public static double turretMovingAngle = .2;
 
     public static double pArmGoingUp = Deposit.pArmGoingUp;
     public static double pArmGoingDown = Deposit.pArmGoingDown;
 
-    public static double pSlidesExtend = 35;
+    public static double pSlidesExtend = 30;
     public static double pSlidesRetract = 20;
 
-    public static int slidesExtendDist = 25;
+    public static int slidesExtendDist = 16;
+
+    public static boolean home = true;
 
     private boolean depositToggle = false;
     private int depositGatePos = 0;
@@ -64,20 +66,32 @@ public class CycleTest2 extends LinearOpMode {
 
             if (gamepad1.x) {
                 deposit.hold();
+                home = false;
+            } else if (gamepad1.y) {
+                deposit.open();
+            } else if (gamepad1.b) {
+                home = true;
+            }
+
+            if (home){
+                deposit.setTurretTheta(PI/2);
+
+                if (deposit.slidesHome()){
+                    deposit.setArmPIDCoefficients(pArmGoingDown);
+                    deposit.setArmControls(Constants.DEPOSIT_ARM_HOME);
+                }
+
+                deposit.setSlidesPIDCoefficients(pSlidesRetract);
+                deposit.setSlidesControls(0);
+
+            } else {
+                deposit.setTurretTheta(turretMovingAngle * PI);
 
                 deposit.setArmPIDCoefficients(pArmGoingUp);
                 deposit.setArmControls(Constants.DEPOSIT_ARM_HIGH);
 
                 deposit.setSlidesPIDCoefficients(pSlidesExtend);
                 deposit.setSlidesControls(slidesExtendDist * (int) Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
-            } else if (gamepad1.y) {
-                deposit.open();
-            } else if (gamepad1.b) {
-                deposit.setArmPIDCoefficients(pArmGoingDown);
-                deposit.setArmControls(Constants.DEPOSIT_ARM_HOME);
-
-                deposit.setSlidesPIDCoefficients(pSlidesRetract);
-                deposit.setSlidesControls(0);
             }
 
 //            if (enabled) {

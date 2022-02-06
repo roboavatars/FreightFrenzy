@@ -28,8 +28,8 @@ public class Constants {
     public static int DEPOSIT_ARM_HOME = 0;
     public static int DEPOSIT_ARM_LOW = 750;
     public static int DEPOSIT_ARM_MID = 600;
-    public static int DEPOSIT_ARM_HIGH = 525;
-    public static int DEPOSIT_ARM_OVER_SLIDES_MOTOR = 100;
+    public static int DEPOSIT_ARM_HIGH = 575;
+    public static int DEPOSIT_ARM_OVER_SLIDES_MOTOR = 30;
     public static double DEPOSIT_ARM_MAX_POWER = 0.7;
     public static int DEPOSIT_ARM_ERROR_THRESHOLD = 5;
 

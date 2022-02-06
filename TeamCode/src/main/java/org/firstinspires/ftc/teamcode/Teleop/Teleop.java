@@ -39,6 +39,7 @@ public class Teleop extends LinearOpMode {
     // Toggles
     private boolean servoToggle = false;
     private int depositServoStatus = 0;
+    private boolean turretHome = true;
 
     // Cycle counter stuff
     private final ArrayList<Double> cycles = new ArrayList<>();
@@ -72,6 +73,7 @@ public class Teleop extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        /*
         if (useAutoPos) {
             double[] initialData = Logger.readPos();
             telemetry.addData("Starting Position", Arrays.toString(initialData));
@@ -83,8 +85,9 @@ public class Teleop extends LinearOpMode {
             robot = new Robot(this, 138,60,0, false, true);
             robot.logger.startLogging(false, isRed);
         }
+         */
 
-        robot.deposit.close();
+        robot = new Robot(this, 138,60,0, false, true);
 
         waitForStart();
 
@@ -113,14 +116,23 @@ public class Teleop extends LinearOpMode {
             if (gamepad1.x) {
                 robot.deposit.hold();
                 robot.deposit.setArmControls(Constants.DEPOSIT_ARM_HIGH);
-                robot.deposit.setSlidesControls(25 * (int) Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
-                robot.deposit.home = false;
+                robot.deposit.setSlidesControls((int) (24.9 * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH));
+                turretHome = false;
             } else if (gamepad1.y) {
                 robot.deposit.open();
             } else if (gamepad1.b) {
-                robot.deposit.setArmControls(0);
+                robot.deposit.setArmControls(Constants.DEPOSIT_ARM_OVER_SLIDES_MOTOR);
                 robot.deposit.setSlidesControls(0);
+                turretHome = true;
             }
+
+            if (turretHome){
+                robot.deposit.setTurretTheta(PI/2);
+            } else {
+                robot.deposit.setTurretTheta(PI/4);
+            }
+
+            /*
 
             // Move Back Home
             if (gamepad2.a && !cycleToggle) {
@@ -159,6 +171,7 @@ public class Teleop extends LinearOpMode {
             } else {
                 robot.carousel.stop();
             }
+             */
 
             // Slow Mode
             if (gamepad2.right_trigger > 0) {

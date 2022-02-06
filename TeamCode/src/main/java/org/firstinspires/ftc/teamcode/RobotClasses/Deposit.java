@@ -250,7 +250,7 @@ public class Deposit {
     }
 
     public boolean slidesHome() {
-        return Math.abs(getSlidesPosition()) < 0;
+        return Math.abs(getSlidesPosition()) < 10;
     }
 
     public void setSlidesPIDCoefficients(double p) {
