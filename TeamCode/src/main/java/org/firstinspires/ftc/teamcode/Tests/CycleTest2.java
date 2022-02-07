@@ -23,12 +23,14 @@ public class CycleTest2 extends LinearOpMode {
     public static double pArmGoingUp = Deposit.pArmGoingUp;
     public static double pArmGoingDown = Deposit.pArmGoingDown;
 
-    public static double pSlidesExtend = 30;
-    public static double pSlidesRetract = 20;
+    public static double pSlidesExtend = 50;
+    public static double pSlidesRetract = 50;
 
     public static int slidesExtendDist = 16;
 
-    public static boolean home = true;
+    private boolean home = true;
+
+    private boolean slidesAtPos = false;
 
     private boolean depositToggle = false;
     private int depositGatePos = 0;
@@ -80,19 +82,31 @@ public class CycleTest2 extends LinearOpMode {
                     deposit.setArmPIDCoefficients(pArmGoingDown);
                     deposit.setArmControls(Constants.DEPOSIT_ARM_HOME);
                 }
+                slidesAtPos = false;
 
                 deposit.setSlidesPIDCoefficients(pSlidesRetract);
-                deposit.setSlidesControls(0);
-
+                deposit.setSlidesTarget(0);
             } else {
                 deposit.setTurretTheta(turretMovingAngle * PI);
 
                 deposit.setArmPIDCoefficients(pArmGoingUp);
-                deposit.setArmControls(Constants.DEPOSIT_ARM_HIGH);
+
+                if (deposit.slidesAtPos()) {
+                    slidesAtPos = true;
+                }
+
+                if (slidesAtPos) {
+                    deposit.setArmControls(Constants.DEPOSIT_ARM_HIGH);
+                } else {
+                    deposit.setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
+                }
 
                 deposit.setSlidesPIDCoefficients(pSlidesExtend);
-                deposit.setSlidesControls(slidesExtendDist * (int) Constants.DEPOSIT_SLIDES_TICKS_PER_INCH);
+                deposit.setSlidesTarget((int) (slidesExtendDist * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH));
             }
+
+            deposit.setSlidesControls();
+
 
 //            if (enabled) {
 //                targetTheta = (lockTheta * PI - dt.theta + PI/2) % (2 * PI);
