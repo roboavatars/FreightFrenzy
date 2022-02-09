@@ -16,11 +16,6 @@ public class Constants {
     public static double DEPOSIT_CLOSE_POS = 0.3;
     public static double DEPOSIT_HOLD_POS = 0.65;
 
-    // Team Marker
-    public static double TEAM_MARKER_HOME_POS = 0.3;
-    public static double TEAM_MARKER_UP_POS = 0.7;
-    public static double TEAM_MARKER_DOWN_POS = 1;
-
     // Carousel
     public static double CAROUSEL_POWER = 0.55;
 
@@ -28,30 +23,22 @@ public class Constants {
     public static int DEPOSIT_ARM_HOME = 0;
     public static int DEPOSIT_ARM_LOW = 750;
     public static int DEPOSIT_ARM_MID = 600;
-    public static int DEPOSIT_ARM_HIGH = 575;
-    public static int DEPOSIT_ARM_MIDWAY = 300;
+    public static int DEPOSIT_ARM_HIGH = 540;
+    public static int DEPOSIT_ARM_MIDWAY = 400;
     public static int DEPOSIT_ARM_OVER_SLIDES_MOTOR = 30;
-    public static double DEPOSIT_ARM_MAX_POWER = 0.7;
-    public static int DEPOSIT_ARM_ERROR_THRESHOLD = 5;
 
     // Deposit Slides
-    public static double DEPOSIT_SLIDES_TICKS_PER_INCH = 9.142857; //103.6 / (PI * 0.75);
-    public static double DEPOSIT_SLIDES_POWER = 1;
     public static double ARM_DISTANCE_LOW = 36;
     public static double ARM_DISTANCE_MID = 33;
     public static double ARM_DISTANCE_HIGH = 24;
     public static double ARM_DISTANCE_CAP = 27;
-    public static int DEPOSIT_SLIDES_MAX_TICKS = (int) (25 * DEPOSIT_SLIDES_TICKS_PER_INCH);
-    public static double DEPOSIT_SLIDES_SIDE_EXTENSION_LIMIT_IN = 15;
-    public static int DEPOSIT_SLIDES_ERROR_THRESHOLD = 10;
 
     // Intake Stalling
     public static double STALL_THRESHOLD = 7;
 
     // Intake Slides
     public static double INTAKE_EXTEND_POS = 0.2;
-    public static double INTAKE_HOME_POS = 0.65;
-    public static double TRANSFER_TIME = 1000;
+    public static double INTAKE_HOME_POS = 0.63;
 
     // Intake Servo
     public static double INTAKE_UP_POS = 0.15;

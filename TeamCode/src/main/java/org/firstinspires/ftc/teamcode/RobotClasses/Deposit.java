@@ -24,6 +24,12 @@ public class Deposit {
     public double TURRET_TICKS_PER_RADIAN = 103.6 * 20 / (2*PI);
     public static double TURRET_Y_OFFSET = 2.06066;
     public double TURRET_ERROR_THRESHOLD = PI/40;
+    public static double DEPOSIT_SLIDES_TICKS_PER_INCH = 9.142857;
+    public static int DEPOSIT_SLIDES_MAX_TICKS = (int) (25 * DEPOSIT_SLIDES_TICKS_PER_INCH);
+    public int DEPOSIT_SLIDES_ERROR_THRESHOLD = 10;
+    public static double ARM_TICKS_PER_RADIAN = 1120 / (2*PI);
+    public double DEPOSIT_ARM_MAX_POWER = 0.7;
+    public int DEPOSIT_ARM_ERROR_THRESHOLD = 5;
 
     // Turret PD and PDFF
     public static double pTurret = 2.25;
@@ -39,26 +45,35 @@ public class Deposit {
     private double turretLockTheta;
 
     // Slides PD
-    public static double pSlidesExtend = 50;
-    public static double pSlidesRetract = 50;
+    public static double pSlides = 50;
 
     public int targetSlidesTicks;
     private double slidesError = 0;
-
-    // Arm PD
-    public static double pArmGoingUp = 6;
-    public static double pArmGoingDown = 3;
 
     private static final double maxSlidesDistBeforeLoweringArm = 2;
 
     public boolean home = true;
     public int targetArmPos;
 
+    public DepositHeight targetHeight = DepositHeight.HOME;
     public enum DepositHeight {
         HOME, LOW, MID, HIGH
     }
 
-    public DepositHeight targetHeight = DepositHeight.HOME;
+    double initialArmAngle = -0.646;
+
+    // Arm PD
+    double armErrorChange = 0, armError = 0;
+    public static double pArmUp   = 0.004;
+    public static double dArmUp   = 0.002;
+    public static double pArmDown = 0.0015;
+    public static double dArmDown = 0.0006;
+
+    public static double pArm = pArmUp;
+    public static double dArm = dArmUp;
+    public static double fArm = 0;
+
+    public static double fGravity = 0.05;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
         this(op, isAuto, PI/2);
@@ -82,8 +97,7 @@ public class Deposit {
         armMotor = op.hardwareMap.get(DcMotorEx.class, "arm");
         armMotor.setDirection(DcMotorEx.Direction.REVERSE);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armMotor.setTargetPosition(0);
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Slides Motor
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
@@ -91,6 +105,7 @@ public class Deposit {
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slidesMotor.setTargetPosition(0);
         slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slidesMotor.setPositionPIDFCoefficients(pSlides);
 
         // Set Initial Turret Theta
         initialTheta = initialRobotTheta;
@@ -104,17 +119,17 @@ public class Deposit {
     public void setDepositHome() {
         home = true;
         setArmTarget(0);
-        setArmPIDCoefficients(pArmGoingDown);
+//        setArmPIDCoefficients(pArmGoingDown);
         setSlidesTarget(0);
-        setSlidesPIDCoefficients(pSlidesRetract);
+//        setSlidesPIDCoefficients(pSlidesRetract);
     }
 
     public void setDepositControls(int targetArmPos, double slidesDist) {
         home = false;
         setArmTarget(targetArmPos);
-        setArmPIDCoefficients(pArmGoingUp);
-        setSlidesTarget((int) Math.round(slidesDist * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH));
-        setSlidesPIDCoefficients(pSlidesExtend);
+//        setArmPIDCoefficients(pArmGoingUp);
+        setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));
+//        setSlidesPIDCoefficients(pSlidesExtend);
     }
 
     public void setTurretLockTheta(double lockTheta) {
@@ -203,8 +218,15 @@ public class Deposit {
 
     // Arm
     public void setArmControls(int targetArmPos) {
-        armMotor.setTargetPosition(targetArmPos);
-        armMotor.setPower(Constants.DEPOSIT_ARM_MAX_POWER);
+
+        fArm = fGravity * Math.cos(getArmAngle());
+
+        double targetTicks = (int) Math.min(Math.max(targetArmPos, Constants.DEPOSIT_ARM_HOME), Constants.DEPOSIT_ARM_LOW);
+        double currentTicks = getArmPosition();
+        armErrorChange = targetTicks - currentTicks - armError;
+        armError = targetTicks - currentTicks;
+
+        armMotor.setPower(pArm * armError + dArm * armErrorChange + fArm);
     }
 
     public void setArmControls() {
@@ -220,21 +242,26 @@ public class Deposit {
     }
 
     public boolean armAtPos() {
-        return Math.abs(getArmPosition() - targetArmPos) < Constants.DEPOSIT_ARM_ERROR_THRESHOLD;
+        return Math.abs(getArmPosition() - targetArmPos) < DEPOSIT_ARM_ERROR_THRESHOLD;
     }
 
     public boolean armHome() {
-        return Math.abs(getArmPosition() - Constants.DEPOSIT_ARM_OVER_SLIDES_MOTOR) < Constants.DEPOSIT_ARM_ERROR_THRESHOLD;
+        return Math.abs(getArmPosition() - Constants.DEPOSIT_ARM_OVER_SLIDES_MOTOR) < DEPOSIT_ARM_ERROR_THRESHOLD;
     }
 
-    public void setArmPIDCoefficients(double p){
-        armMotor.setPositionPIDFCoefficients(p);
+    public double getArmAngle() {
+        return getArmPosition() / ARM_TICKS_PER_RADIAN + initialArmAngle;
+    }
+
+    public void setArmPIDCoefficients(double p, double d) {
+        pArm = p;
+        dArm = d;
     }
 
     // Slides
     public void setSlidesControls(int targetSlidesPos) {
         slidesMotor.setTargetPosition(targetSlidesPos);
-        slidesMotor.setPower(Constants.DEPOSIT_ARM_MAX_POWER);
+        slidesMotor.setPower(DEPOSIT_ARM_MAX_POWER);
     }
 
     public void setSlidesControls() {
@@ -242,7 +269,7 @@ public class Deposit {
     }
 
     public void setSlidesTarget(int targetPos){
-        targetSlidesTicks = Math.min(Math.max(targetPos, 0), Constants.DEPOSIT_SLIDES_MAX_TICKS);
+        targetSlidesTicks = Math.min(Math.max(targetPos, 0), DEPOSIT_SLIDES_MAX_TICKS);
     }
 
     public double getSlidesPosition() {
@@ -250,15 +277,19 @@ public class Deposit {
     }
 
     public double getSlidesDistInches() {
-        return getSlidesPosition() / Constants.DEPOSIT_SLIDES_TICKS_PER_INCH;
+        return getSlidesPosition() / DEPOSIT_SLIDES_TICKS_PER_INCH;
     }
 
     public boolean slidesAtPos() {
-        return Math.abs(getSlidesPosition() - targetSlidesTicks) < Constants.DEPOSIT_SLIDES_ERROR_THRESHOLD;
+        return Math.abs(getSlidesPosition() - targetSlidesTicks) < DEPOSIT_SLIDES_ERROR_THRESHOLD;
+    }
+
+    public boolean slidesAtPosPercent(double percent) {
+        return getSlidesPosition() > targetSlidesTicks * percent;
     }
 
     public boolean slidesHome() {
-        return Math.abs(getSlidesPosition()) < Constants.DEPOSIT_ARM_ERROR_THRESHOLD;
+        return Math.abs(getSlidesPosition()) < DEPOSIT_ARM_ERROR_THRESHOLD;
     }
 
     public void setSlidesPIDCoefficients(double p) {

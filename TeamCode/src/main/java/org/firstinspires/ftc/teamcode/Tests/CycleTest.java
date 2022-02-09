@@ -2,121 +2,105 @@ package org.firstinspires.ftc.teamcode.Tests;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
-
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
+import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.RobotClasses.Intake;
-import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-@Disabled
-@TeleOp
+@TeleOp(name = "0 0 op teleop (cycle test)")
 @Config
 public class CycleTest extends LinearOpMode {
-    public static int slidesExtendDist = 0;
+
     public static double lockTheta = 0.5;
+    public static double turretMovingAngle = 0.2;
 
-    private boolean armHome = true;
-    private boolean slidesHome = true;
-    private boolean depositToggle = false;
-    private int depositGatePos = 0;
+    public static double pSlidesExtend = 50;
+    public static double pSlidesRetract = 50;
 
+    public static int slidesExtendDist = 16;
+
+    private boolean home = true;
+    private boolean homeToggle = false;
 
     @Override
     public void runOpMode() {
-        Robot robot = new Robot(this, 0, 0, 0, false, false);
-        robot.intake.home();
-        robot.intake.flipUp();
-        robot.intake.off();
-        robot.deposit.open();
-
+        Deposit deposit = new Deposit(this, false, PI/2);
+        Drivetrain dt = new Drivetrain(this, 0, 0, PI/2);
+        Intake intake = new Intake(this, false);
 
         waitForStart();
 
-        double targetTheta = 0;
-
         while (opModeIsActive()) {
-            robot.drivetrain.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);robot.drivetrain.updatePose();
+            dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
+            dt.updatePose();
 
-            if (gamepad1.a) {
-                robot.intake.extend();
-                robot.intake.on();
-                robot.intake.flipDown();
-            } else if (gamepad1.right_trigger > .1){
-                robot.intake.reverse();
+            if (gamepad1.right_bumper) {
+                intake.extend();
+                intake.on();
+                intake.flipDown();
+            } else if (gamepad1.left_bumper) {
+                intake.home();
+                intake.flipUp();
+                intake.off();
+            } else if (gamepad1.a) {
+                deposit.open();
+                intake.reverse();
             } else {
-                robot.intake.home();
-                robot.intake.flipUp();
-                robot.intake.off();
+                intake.off();
             }
 
-
-            if (gamepad1.dpad_up){
-                armHome = false;
-            } else if (gamepad1.dpad_down){
-                armHome = true;
-            }
-
-            if (gamepad1.dpad_right){
-                slidesHome = false;
-            } else if (gamepad1.dpad_left){
-                slidesHome = true;
-            }
-
-            if (armHome){
-                robot.deposit.setArmControls(Constants.DEPOSIT_ARM_HOME);
-            } else {
-                robot.deposit.setArmControls(Constants.DEPOSIT_ARM_HIGH);
-            }
-
-            if (slidesHome){
-                robot.deposit.setSlidesControls(0);
-            } else {
-                robot.deposit.setSlidesControls(slidesExtendDist);
-            }
-
-            targetTheta = (lockTheta * PI -robot.drivetrain.theta + PI/2) % (2 * PI);
-            if (targetTheta < 0) {
-                targetTheta += 2 * PI;
-            }
-            // prevents wrap from 0 to 2pi from screwing things up
-            // now wrap is from -pi/2 to 3pi/2 (which the turret will never reach)
-            if (targetTheta > 3*PI/2) {
-                targetTheta -= 2*PI;
-            }
-//                deposit.setTurretTheta(targetTheta);
-            robot.deposit.setTurretThetaFF(targetTheta,robot.drivetrain.commandedW);
-
-            if (gamepad1.b && depositToggle == false){
-                depositToggle = true;
-                if (depositGatePos == 0){
-                    robot.deposit.close();
-                    depositGatePos ++;
-                } else if (depositGatePos == 1){
-                    robot.deposit.hold();
-                    depositGatePos ++;
-                } else if (depositGatePos == 2){
-                    robot.deposit.open();
-                    depositGatePos = 0;
+            if (gamepad1.x && !homeToggle) {
+                homeToggle = true;
+                if (home) {
+                    deposit.hold();
                 }
-            }
-            if (!gamepad1.b){
-                depositToggle = false;
+                home = !home;
+            } else if (!gamepad1.x && homeToggle) {
+                homeToggle = false;
             }
 
-            addPacket("arm target home", armHome);
-            addPacket("slides target home", slidesHome);
-            addPacket("arm pos", robot.deposit.getArmPosition());
-            addPacket("turret theta", robot.deposit.getTurretTheta());
-            addPacket("slides pos", robot.deposit.getSlidesPosition());
+            if (gamepad1.y) {
+                deposit.open();
+            }
+
+            if (home) {
+                deposit.setTurretTheta(PI/2);
+
+                deposit.setArmPIDCoefficients(Deposit.pArmDown, Deposit.dArmDown);
+                deposit.setArmControls(Constants.DEPOSIT_ARM_HOME);
+
+                deposit.setSlidesPIDCoefficients(pSlidesRetract);
+                deposit.setSlidesTarget(0);
+            } else {
+                deposit.setTurretTheta(turretMovingAngle * PI);
+
+                deposit.setArmPIDCoefficients(Deposit.pArmUp, Deposit.dArmUp);
+                if (!deposit.slidesAtPosPercent(0.75)) {
+                    deposit.setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
+                } else {
+                    deposit.setArmControls(Constants.DEPOSIT_ARM_HIGH);
+                }
+
+                deposit.setSlidesPIDCoefficients(pSlidesExtend);
+                deposit.setSlidesTarget((int) (slidesExtendDist * Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH));
+            }
+
+            deposit.setSlidesControls();
+
+            addPacket("1 arm ticks", deposit.getArmPosition());
+            addPacket("1 arm angle", deposit.getArmAngle());
+            addPacket("1 farm", deposit.fArm);
+            addPacket("2 slide inches", deposit.getSlidesDistInches());
+            addPacket("3 slide ticks", deposit.getSlidesPosition());
+            addPacket("4 slides target ticks", deposit.targetSlidesTicks);
+            addPacket("5 current theta", deposit.getTurretTheta());
             sendPacket();
-
         }
     }
 }

@@ -13,11 +13,10 @@ import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
-import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Config
-@Autonomous(name = "0 Blue Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Blue")
+@Autonomous(name = "Blue Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Blue")
 public class BlueAutoWarehouse extends LinearOpMode {
     public static int barcodeCase = 2; // 0 = left, 1 = mid, 2 = right
 

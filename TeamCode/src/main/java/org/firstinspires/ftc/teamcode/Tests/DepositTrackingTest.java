@@ -1,20 +1,15 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
-import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
-import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
-import org.firstinspires.ftc.teamcode.RobotClasses.Intake;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-@TeleOp(name = "0 0 0 0 deposit tracking test")
+@TeleOp(name = "0 deposit tracking test")
 @Config
 public class DepositTrackingTest extends LinearOpMode {
     private boolean armHome = true;

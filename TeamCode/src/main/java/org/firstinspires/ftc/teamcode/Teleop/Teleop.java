@@ -9,13 +9,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @TeleOp(name = "1 Teleop")
 @SuppressWarnings("FieldCanBeLocal")
@@ -116,7 +114,7 @@ public class Teleop extends LinearOpMode {
             if (gamepad1.x) {
                 robot.deposit.hold();
                 robot.deposit.setArmControls(Constants.DEPOSIT_ARM_HIGH);
-                robot.deposit.setSlidesControls((int) (24.9 * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH));
+                robot.deposit.setSlidesControls((int) (24.9 * Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH));
                 turretHome = false;
             } else if (gamepad1.y) {
                 robot.deposit.open();

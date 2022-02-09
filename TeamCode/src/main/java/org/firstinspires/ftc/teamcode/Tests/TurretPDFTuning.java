@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 
-@TeleOp(name = "0 0 turret tuning")
+@TeleOp(name = "0 turret tuning")
 @Config
 public class TurretPDFTuning extends LinearOpMode {
     public static boolean enabled = true;
