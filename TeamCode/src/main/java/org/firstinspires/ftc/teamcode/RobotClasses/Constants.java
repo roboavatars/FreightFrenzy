@@ -38,7 +38,7 @@ public class Constants {
 
     // Intake Slides
     public static double INTAKE_EXTEND_POS = 0.2;
-    public static double INTAKE_HOME_POS = 0.63;
+    public static double INTAKE_HOME_POS = 0.7;
 
     // Intake Servo
     public static double INTAKE_UP_POS = 0.15;

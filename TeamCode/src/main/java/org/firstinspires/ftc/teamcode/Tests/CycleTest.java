@@ -27,6 +27,10 @@ public class CycleTest extends LinearOpMode {
 
     private boolean home = true;
     private boolean homeToggle = false;
+    private boolean intakeHome;
+
+
+    private double startRetractTime = 0;
 
     @Override
     public void runOpMode() {
@@ -44,15 +48,29 @@ public class CycleTest extends LinearOpMode {
                 intake.extend();
                 intake.on();
                 intake.flipDown();
+                startRetractTime = System.currentTimeMillis();
+                intakeHome = false;
             } else if (gamepad1.left_bumper) {
                 intake.home();
                 intake.flipUp();
-                intake.off();
+                intakeHome = true;
             } else if (gamepad1.a) {
                 deposit.open();
                 intake.reverse();
+                startRetractTime = System.currentTimeMillis();
+                intakeHome = false;
             } else {
                 intake.off();
+                startRetractTime = System.currentTimeMillis();
+                intakeHome = false;
+            }
+
+            if(intakeHome) {
+                if (System.currentTimeMillis() < startRetractTime + 1000) {
+                    intake.on();
+                } else {
+                    intake.off();
+                }
             }
 
             if (gamepad1.x && !homeToggle) {

@@ -26,19 +26,19 @@ public class Intake {
 
         // Slides Motor
         slidesServo = op.hardwareMap.get(Servo.class, "intakeSlides");
-        if (isAuto) {
+//        if (isAuto) {
             home();
-        } else {
-            extend();
-        }
+//        } else {
+//            extend();
+//        }
 
         // Intake Servo
         intakeServo = op.hardwareMap.get(Servo.class, "intakeServo");
-        if (isAuto) {
+//        if (isAuto) {
             flipUp();
-        } else {
-            flipDown();
-        }
+//        } else {
+//            flipDown();
+//        }
 
         // Intake Distance Sensor
         intakeSensor = op.hardwareMap.get(DistanceSensor.class, "intakeSensor");

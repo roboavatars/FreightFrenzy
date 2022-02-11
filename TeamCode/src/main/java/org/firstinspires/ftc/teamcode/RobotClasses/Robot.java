@@ -120,6 +120,8 @@ public class Robot {
 
         profiler = new ElapsedTime();
 
+        depositTargetHeight = Deposit.DepositHeight.HOME;
+
         allHubs = op.hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -133,7 +135,7 @@ public class Robot {
 
         drawField();
         drawRobot(this);
-        sendPacket();
+//        sendPacket();
     }
 
     // Stop logger and t265
@@ -195,7 +197,7 @@ public class Robot {
         after slides home:
         turret home
          */
-
+/*
         if (!intakeTransfer && intake.slidesIsHome() && y > 105) {
             intake.extend();
             intake.on();
@@ -264,6 +266,7 @@ public class Robot {
 
         deposit.update(theta, turretFF);
         turretGlobalTheta = deposit.getTurretTheta() + theta - PI/2;
+*/
 
         // Update Position
         drivetrain.updatePose();
@@ -282,11 +285,15 @@ public class Robot {
         prevTime = curTime / 1000;
         prevVx = vx; prevVy = vy; prevW = w;
 
+        turretGlobalTheta = theta + turretTheta - PI/2;
+
+        /*
         // Update Tape Detector
         if (useTapeDetector) {
             double[] resetOdoCoords = tapeDetector.update(drivetrain.x, drivetrain.y, drivetrain.theta);
             resetOdo(drivetrain.x, resetOdoCoords[0], resetOdoCoords[1]);
         }
+         */
 
         profile(1);
 
