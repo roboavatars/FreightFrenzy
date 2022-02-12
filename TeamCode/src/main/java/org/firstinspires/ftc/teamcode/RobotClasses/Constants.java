@@ -31,13 +31,13 @@ public class Constants {
     public static int DEPOSIT_ARM_HOME = 0;
     public static int DEPOSIT_ARM_LOW = 750;
     public static int DEPOSIT_ARM_MID = 600;
-    public static int DEPOSIT_ARM_HIGH = 540;
+    public static int DEPOSIT_ARM_HIGH = 570;
     public static int DEPOSIT_ARM_MIDWAY = 400;
 
     // Deposit Slides
     public static double ARM_DISTANCE_LOW = 36;
     public static double ARM_DISTANCE_MID = 33;
-    public static double ARM_DISTANCE_HIGH = 24;
+    public static double ARM_DISTANCE_HIGH = 26;
     public static double ARM_DISTANCE_CAP = 27;
 
     // Carousel

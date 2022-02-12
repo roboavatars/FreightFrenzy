@@ -103,10 +103,16 @@ public class Deposit {
 
     public void update() {
         // Move Arm
-        if (home && getSlidesDistInches() > maxSlidesDistBeforeLoweringArm) {
-            setArmControls(Constants.DEPOSIT_ARM_HOME);
+        if (home) {
+            if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm) {
+                setArmControls();
+            }
         } else {
-            setArmControls();
+            if (slidesAtPos()) {
+                setArmControls();
+            } else {
+                setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
+            }
         }
 
         // Move Slides

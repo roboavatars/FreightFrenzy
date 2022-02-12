@@ -18,7 +18,7 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 
 @Config
-@Autonomous(name = "Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
+@Autonomous(name = "0 0 0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoWarehouse extends LinearOpMode {
     public static int barcodeCase = 2; // 0 = left, 1 = mid, 2 = right
 
@@ -32,7 +32,7 @@ public class RedAutoWarehouse extends LinearOpMode {
             park in warehouse
         */
 
-        Robot robot = new Robot(this, 135, 78.5, PI/2, true, true);
+        Robot robot = new Robot(this, 138, 78.5, PI/2, true, true);
         robot.logger.startLogging(true, true);
 
 //        BarcodeDetector detector = new BarcodeDetector(this, true);
@@ -46,8 +46,8 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         // Segment Times
         double preloadScoreTime = 1.75;
-        double goToWarehouseTime = .5;
-        double cycleScoreTime = .5;
+        double goToWarehouseTime = 1;
+        double cycleScoreTime = 1;
         double parkTime = .5;
 
 //        double cycleX = 138;
@@ -147,8 +147,8 @@ public class RedAutoWarehouse extends LinearOpMode {
 
                 if (time.seconds() > goToWarehouseTime + 0.5) {
                     Waypoint[] cycleScoreWaypoints = new Waypoint[] {
-                            new Waypoint(138, 113, PI/2/*robot.x, robot.y, robot.theta*/, -30, -20, 0, 0),
-                            new Waypoint(138, 89, PI/2, -20, -10, 0, cycleScoreTime),
+                            new Waypoint(robot.x, robot.y, robot.theta + PI /*robot.x, robot.y, robot.theta*/, -10, -10, 0, 0),
+                            new Waypoint(138, 89, PI/2, -10, -5, 0, cycleScoreTime),
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 
@@ -158,7 +158,7 @@ public class RedAutoWarehouse extends LinearOpMode {
             } else if (!cycleScore) {
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
                 robot.setTargetPoint(curPose);
-//                robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
+                robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
 
                 addPacket("path", "going to deposit right rn");
 
@@ -166,8 +166,8 @@ public class RedAutoWarehouse extends LinearOpMode {
                     cycleCounter++;
                     if (30 - (System.currentTimeMillis() - robot.startTime) / 1000 > goToWarehouseTime + cycleScoreTime + parkTime + 1) {
                         goToWarehouseWaypoints = new Waypoint[] {
-                                new Waypoint(138, 89, PI/2/*robot.x, robot.y, robot.theta*/, 20, 20,0, 0),
-                                new Waypoint(138,113,PI/2,20,10,0, goToWarehouseTime)
+                                new Waypoint(robot.x, robot.y, PI/2/*robot.x, robot.y, robot.theta*/, 10, 10,0, 0),
+                                new Waypoint(138,113,PI/2,10,50,0, goToWarehouseTime)
                         };
                         goToWarehousePath = new Path(goToWarehouseWaypoints);
                         goToWarehouse = false;

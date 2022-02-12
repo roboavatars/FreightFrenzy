@@ -13,6 +13,7 @@ import static java.lang.Math.sin;
 import android.annotation.SuppressLint;
 import android.util.Log;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -26,6 +27,7 @@ import org.firstinspires.ftc.teamcode.Pathing.Target;
 import java.util.List;
 
 @SuppressWarnings("FieldCanBeLocal")
+@Config
 public class Robot {
 
     // Robot Classes
@@ -102,7 +104,8 @@ public class Robot {
     public int transferThreshold = 1500;
     public int releaseThreshold = 500;
 
-    public static double turretMovingAngle = 0.2;
+    public static double turretMovingAngle = 0.175;
+    public static double slidesDepositDist = 45;
 
     public String automationStep = "n/a";
 
@@ -224,6 +227,7 @@ public class Robot {
                     depositOpenTime = -1;
                     intakeTransfer = false;
                     depositingFreight = false;
+                    intakeApproval = false;
                 }
 
                 log("home: " + deposit.armSlidesHome() + ", atpos: " + deposit.armSlidesAtPose());
@@ -238,7 +242,9 @@ public class Robot {
         double turretFF = 0;
         if (turretHome) {
 //            turret.turretHome();
-            turret.setTurretTheta(PI/2);
+            if (deposit.slidesAtPos()) {
+                turret.setTurretTheta(PI/2);
+            }
         } else {
             turretFF = updateTurret();
             turret.setTurretTheta(turretMovingAngle * PI);
@@ -373,6 +379,7 @@ public class Robot {
     }
 
     public void deposit(Deposit.DepositHeight depositTargetHeight) {
+        slidesDist = slidesDepositDist;
         this.depositTargetHeight = depositTargetHeight;
         if (depositTargetHeight == Deposit.DepositHeight.LOW) {
             deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, slidesDist - Constants.ARM_DISTANCE_LOW);
