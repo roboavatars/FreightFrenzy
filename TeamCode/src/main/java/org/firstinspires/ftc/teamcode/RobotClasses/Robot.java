@@ -7,7 +7,6 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawRobot;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
-import static java.lang.Math.atan2;
 import static java.lang.Math.hypot;
 import static java.lang.Math.sin;
 
@@ -32,6 +31,7 @@ public class Robot {
     // Robot Classes
     public Drivetrain drivetrain;
     public Intake intake;
+    public Turret turret;
     public Deposit deposit;
     public Carousel carousel;
     public TapeDetector tapeDetector;
@@ -44,7 +44,7 @@ public class Robot {
 
     // Class Constants
     private final int loggerUpdatePeriod = 2;
-    private final int sensorUpdatePeriod = 3;
+    private final int sensorUpdatePeriod = 10;
     private final double xyTolerance = 1;
     private final double thetaTolerance = PI/35;
     private final double turretTolerance = PI/50;
@@ -61,7 +61,6 @@ public class Robot {
 
     public boolean intakeTransfer = false;
     public boolean depositingFreight = false;
-    public boolean depositDone = false;
     public boolean intakeFull;
 
     // Cycle Tracker
@@ -70,13 +69,14 @@ public class Robot {
     public double lastCycleTime;
     public double longestCycle = 0;
 
-    public double turretTheta;
     public double depositSlidesDist = 0;
 
-    public boolean turretHome = false;
+    public boolean turretHome = true;
     private Deposit.DepositHeight depositTargetHeight;
     public boolean allianceHub;
+
     public boolean depositApproval = false;
+    public boolean intakeApproval = false;
 
     public double turretGlobalTheta;
     public double lockTheta;
@@ -84,8 +84,8 @@ public class Robot {
 
     // Time and Delay Variables
     public double curTime;
-    private double intakeFlipTime;
-    private double depositOpenTime;
+    private double intakeFlipTime = -1;
+    private double depositOpenTime = -1;
 
     // Motion Variables
     public double x, y, theta, vx, vy, w;
@@ -97,8 +97,12 @@ public class Robot {
 
     //Config
     public boolean useTapeDetector = false;
-    public int transferThreshold = 1000;
-    public int releaseThreshold = 1000;
+    public int flipUpThreshold = 1000;
+    public boolean tRev = false;
+    public int transferThreshold = 1500;
+    public int releaseThreshold = 2000;
+
+    public static double turretMovingAngle = 0.2;
 
     public String automationStep = "n/a";
 
@@ -113,6 +117,7 @@ public class Robot {
 
         drivetrain = new Drivetrain(op, x, y, theta);
         intake = new Intake(op, isAuto);
+        turret = new Turret(op, isAuto, theta);
         deposit = new Deposit(op, isAuto, theta);
         carousel = new Carousel(op);
         logger = new Logger();
@@ -135,7 +140,7 @@ public class Robot {
 
         drawField();
         drawRobot(this);
-//        sendPacket();
+        sendPacket();
     }
 
     // Stop logger and t265
@@ -162,46 +167,14 @@ public class Robot {
 
         if (loopCounter % sensorUpdatePeriod == 0) {
             intakeFull = intake.intakeFull();
-            turretTheta = deposit.getTurretTheta();
             depositSlidesDist = deposit.getSlidesDistInches();
         }
 
-        /* automation planning
-        if passing white line going toward warehouse:
-        extend intake slides
-        intake on
-
-        if intake slides out, distance sensor thresh met:
-        intake off
-        retract slides
-
-        if intake slides home, distance sensor thresh met:
-        flip intake up
-
-        if intake up, slides home, distance sensor thresh met, x ms after flip up:
-        deposit servo down
-        flip intake down
-        auto-align turret
-
-        if turret and robit at pos, arm/slides home:
-        extend deposit slides
-        extend arm
-
-        if at pose, arm and slides at pos + driver approval:
-        deposit servo up
-
-        x ms after deposit:
-        arm home
-        retract slides
-
-        after slides home:
-        turret home
-         */
-/*
-        if (!intakeTransfer && intake.slidesIsHome() && y > 105) {
+        if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && intakeApproval/* y > 105*/) {
             intake.extend();
             intake.on();
             intakeTransfer = true;
+            intakeApproval = false;
             automationStep("Intake Extend/On");
         } else if (intakeTransfer) {
             if (intakeFull && !intake.slidesIsHome() && intakeFlipTime == -1) {
@@ -210,63 +183,71 @@ public class Robot {
                 automationStep("Intake Home/Off");
             } else if (intakeFull && intake.slidesIsHome() && intakeFlipTime == -1) {
                 intake.flipUp();
-                intake.setPower(-0.3);
+                intake.setPower(0.25);
                 intakeFlipTime = curTime;
                 automationStep("Intake Flip Up");
-            } else if (!intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > transferThreshold) {
-                deposit.close();
+            } else if (intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > flipUpThreshold && !tRev) {
+                intake.reverse();
+                tRev = true;
+                automationStep("Transfer Block");
+            } else if (!intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > transferThreshold && tRev) {
+                deposit.hold();
                 intake.off();
                 intake.flipDown();
                 turretHome = false;
                 automationStep("Intake Transfer Done");
 
+                intakeTransfer = false;
                 intakeFlipTime = -1;
+                tRev = false;
                 depositingFreight = true;
             }
+            log("full: " + intakeFull + ", home: " + intake.slidesIsHome() + ", dFlip: " + (curTime-intakeFlipTime) + "");
         }
 
         if (depositingFreight) {
-            if (!depositDone && isAtPose(x, 87) && deposit.turretAtPos()) {
-                if (deposit.armSlidesHome()) {
+            if (y <= 87 /*&& notMoving() && turret.turretAtPos()*/) {
+                if (deposit.armSlidesHome() && depositOpenTime == -1) {
                     depositAllianceHub(Deposit.DepositHeight.HIGH);
                     automationStep("Extend Slides/Arm");
-                } else if (deposit.armSlidesAtPose() && depositOpenTime == -1) {
-                    deposit.open();
+                } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1) {
+                    deposit.open(); /// oops
                     depositOpenTime = curTime;
                     automationStep("Score Freight");
-                } else if (deposit.armSlidesAtPose() && curTime - depositOpenTime > releaseThreshold && depositApproval) {
+                } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && curTime - depositOpenTime > releaseThreshold && depositApproval) {
                     depositHome();
-                    depositDone = true;
-                    automationStep("Home Slides/Arm");
-                }
-            } else if (depositDone && deposit.armSlidesHome()) {
-                turretHome = true;
-                markCycle();
-                automationStep("Deposit Cycle Done");
 
-                depositOpenTime = -1;
-                intakeTransfer = false;
-                depositingFreight = false;
-            } else {
-                if (!depositDone) {
-                    if (!isAtPose(x, 87)) log("Waiting for dt pose");
-                    else if (!deposit.turretAtPos()) log("Waiting for turret align");
+                    markCycle();
+                    automationStep("Home Slides/Arm, Deposit Cycle Done");
+
+                    depositApproval = false;
+                    depositOpenTime = -1;
+                    intakeTransfer = false;
+                    depositingFreight = false;
                 }
+
+                log("home: " + deposit.armSlidesHome() + ", atpos: " + deposit.armSlidesAtPose());
+            } else {
+                if (y > 87) log("Waiting for dt pose");
+                if (!notMoving()) log("Robot is moving");
+                if (!turret.turretAtPos()) log("Waiting for turret align");
             }
         }
 
         // Update turret
         double turretFF = 0;
         if (turretHome) {
-            deposit.turretHome();
+//            turret.turretHome();
+            turret.setTurretTheta(PI/2);
         } else {
             turretFF = updateTurret();
-            addPacket("turret FF", turretFF);
+            turret.setTurretTheta(turretMovingAngle * PI);
+            // addPacket("turret FF", turretFF);
         }
 
-        deposit.update(theta, turretFF);
-        turretGlobalTheta = deposit.getTurretTheta() + theta - PI/2;
-*/
+//        turret.update(theta, turretFF);
+        turretGlobalTheta = turret.getTurretTheta() + theta - PI/2;
+        deposit.update();
 
         // Update Position
         drivetrain.updatePose();
@@ -284,8 +265,6 @@ public class Robot {
         prevTheta = theta;
         prevTime = curTime / 1000;
         prevVx = vx; prevVy = vy; prevW = w;
-
-        turretGlobalTheta = theta + turretTheta - PI/2;
 
         /*
         // Update Tape Detector
@@ -312,16 +291,18 @@ public class Robot {
         addPacket("1 X", round(x));
         addPacket("2 Y", round(y));
         addPacket("3 Theta", round(theta));
-        addPacket("4 Turret Theta", round(turretGlobalTheta));
-        addPacket("5 Deposit Level", depositTargetHeight);
+//        addPacket("4 Turret Theta", round(turretGlobalTheta));
+//        addPacket("5 Deposit Level", depositTargetHeight);
         addPacket("7 Automation Step", automationStep);
         addPacket("8 Run Time", (curTime - startTime) / 1000);
         addPacket("9 Update Frequency (Hz)", round(1 / timeDiff));
-        if (!isAuto) {
-            addPacket("Cycle Time", (curTime - lastCycleTime) / 1000);
-            addPacket("Average Cycle Time", round(cycleTotal / cycles));
-            addPacket("Cycles", cycles);
-        }
+        addPacket("error", turret.getTurretError());
+        addPacket("intake full", intakeFull);
+//        if (!isAuto) {
+//            addPacket("Cycle Time", (curTime - lastCycleTime) / 1000);
+//            addPacket("Average Cycle Time", round(cycleTotal / cycles));
+//            addPacket("Cycles", cycles);
+//        }
 
         // Dashboard Drawings
         drawField();
@@ -339,10 +320,10 @@ public class Robot {
     public double updateTurret() {
         // Calculating the Coords of the Turret Center
         double[] turretCenter = new double[2];
-        turretCenter[0] = x + Math.cos(theta) * Deposit.TURRET_Y_OFFSET;
-        turretCenter[1] = y + Math.sin(theta) * Deposit.TURRET_Y_OFFSET;
+        turretCenter[0] = x + Math.cos(theta) * Turret.TURRET_Y_OFFSET;
+        turretCenter[1] = y + Math.sin(theta) * Turret.TURRET_Y_OFFSET;
 
-        double turretFF;
+        double turretFF = 0;
         double goalX;
         double goalY;
         if (allianceHub && isRed) { // red
@@ -358,18 +339,17 @@ public class Robot {
         goalX -= turretCenter[0];
         goalY -= turretCenter[1];
 
-        lockTheta = PI + atan2(goalY, goalX);
         slidesDist = hypot(goalX, goalY);
-        // calculates ff for turret control (w + atan dot)
-        turretFF = 0; //w + (goalX * vy - vx * goalY) / (goalX * goalX + goalY * goalY);
-
-        lockTheta %= 2*PI;
-        if (lockTheta < 0) {
-            lockTheta += 2*PI;
-        }
-
-        deposit.setTurretLockTheta(lockTheta);
-        addPacket("4 lock theta", lockTheta);
+//        // calculates ff for turret control (w + atan dot)
+//        turretFF = 0; //w + (goalX * vy - vx * goalY) / (goalX * goalX + goalY * goalY);
+//
+//        lockTheta = PI + atan2(goalY, goalX);
+//        lockTheta %= 2*PI;
+//        if (lockTheta < 0) {
+//            lockTheta += 2*PI;
+//        }
+//
+//        turret.setTurretLockTheta(lockTheta);
 
         return turretFF;
     }

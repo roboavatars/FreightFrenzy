@@ -12,8 +12,9 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.RobotClasses.Intake;
+import org.firstinspires.ftc.teamcode.RobotClasses.Turret;
 
-@TeleOp(name = "0 0 op teleop (cycle test)")
+@TeleOp(name = "0 cycle test")
 @Config
 public class CycleTest extends LinearOpMode {
 
@@ -34,6 +35,7 @@ public class CycleTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         Deposit deposit = new Deposit(this, false, PI/2);
+        Turret turret = new Turret(this, false, PI/2);
         Drivetrain dt = new Drivetrain(this, 0, 0, PI/2);
         Intake intake = new Intake(this, false);
 
@@ -64,7 +66,7 @@ public class CycleTest extends LinearOpMode {
                 intakeHome = false;
             }
 
-            if(intakeHome) {
+            if (intakeHome) {
                 if (System.currentTimeMillis() < startRetractTime + 1000) {
                     intake.on();
                 } else {
@@ -87,7 +89,7 @@ public class CycleTest extends LinearOpMode {
             }
 
             if (home) {
-                deposit.setTurretTheta(PI/2);
+                turret.setTurretTheta(PI/2);
 
                 deposit.setArmPIDCoefficients(Deposit.pArmDown, Deposit.dArmDown);
                 deposit.setArmControls(Constants.DEPOSIT_ARM_HOME);
@@ -95,7 +97,7 @@ public class CycleTest extends LinearOpMode {
                 deposit.setSlidesPIDCoefficients(pSlidesRetract);
                 deposit.setSlidesTarget(0);
             } else {
-                deposit.setTurretTheta(turretMovingAngle * PI);
+                turret.setTurretTheta(turretMovingAngle * PI);
 
                 deposit.setArmPIDCoefficients(Deposit.pArmUp, Deposit.dArmUp);
                 if (!deposit.slidesAtPosPercent(0.75)) {
@@ -116,7 +118,7 @@ public class CycleTest extends LinearOpMode {
             addPacket("2 slide inches", deposit.getSlidesDistInches());
             addPacket("3 slide ticks", deposit.getSlidesPosition());
             addPacket("4 slides target ticks", deposit.targetSlidesTicks);
-            addPacket("5 current theta", deposit.getTurretTheta());
+            addPacket("5 current theta", turret.getTurretTheta());
             sendPacket();
         }
     }

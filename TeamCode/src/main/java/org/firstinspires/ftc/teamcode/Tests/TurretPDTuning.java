@@ -2,15 +2,13 @@ package org.firstinspires.ftc.teamcode.Tests;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
-
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
-import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.RobotClasses.Turret;
 
 @TeleOp
 @Config
@@ -20,7 +18,7 @@ public class TurretPDTuning extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Deposit deposit = new Deposit(this, false, PI/2);
+        Turret deposit = new Turret(this, false, PI/2);
 
         waitForStart();
 

@@ -8,8 +8,8 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
+import org.firstinspires.ftc.teamcode.RobotClasses.Turret;
 
 @TeleOp(name = "0 turret tuning")
 @Config
@@ -19,7 +19,7 @@ public class TurretPDFTuning extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Deposit deposit = new Deposit(this, false, PI/2);
+        Turret deposit = new Turret(this, false, PI/2);
         Drivetrain dt = new Drivetrain(this, 0, 0, PI/2);
 
         waitForStart();

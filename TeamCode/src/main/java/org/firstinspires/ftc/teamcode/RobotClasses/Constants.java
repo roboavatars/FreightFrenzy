@@ -9,14 +9,14 @@ public class Constants {
 
     // Intake
     public static double INTAKE_POWER = 1;
-    public static double INTAKE_DISTANCE_THRESHOLD = 100;
+    public static double INTAKE_DISTANCE_THRESHOLD = 65;
 
     // Intake Stalling
     public static double STALL_THRESHOLD = 7;
 
     // Intake Slides
     public static double INTAKE_EXTEND_POS = 0.2;
-    public static double INTAKE_HOME_POS = 0.68;
+    public static double INTAKE_HOME_POS = 0.64;
 
     // Intake Servo
     public static double INTAKE_UP_POS = 0.15;
@@ -33,7 +33,6 @@ public class Constants {
     public static int DEPOSIT_ARM_MID = 600;
     public static int DEPOSIT_ARM_HIGH = 540;
     public static int DEPOSIT_ARM_MIDWAY = 400;
-    public static int DEPOSIT_ARM_OVER_SLIDES_MOTOR = 30;
 
     // Deposit Slides
     public static double ARM_DISTANCE_LOW = 36;

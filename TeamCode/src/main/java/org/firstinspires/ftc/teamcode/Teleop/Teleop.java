@@ -9,13 +9,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
-import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.ArrayList;
 
-@TeleOp(name = "1 Teleop")
+@TeleOp(name = "0 Teleop")
 @SuppressWarnings("FieldCanBeLocal")
 @Config
 public class Teleop extends LinearOpMode {
@@ -79,13 +77,13 @@ public class Teleop extends LinearOpMode {
             robot = new Robot(this, initialData[1], initialData[2], initialData[3], false, initialData[0] == 1);
             robot.logger.startLogging(false, initialData[0] == 1);
         } else {
-//            robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
+            robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
             robot = new Robot(this, 138,60,0, false, true);
             robot.logger.startLogging(false, isRed);
         }
          */
 
-        robot = new Robot(this, 138,60,0, false, true);
+        robot = new Robot(this, 138,81,PI/2, false, true);
 
         waitForStart();
 
@@ -94,41 +92,49 @@ public class Teleop extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            // Intake On / Off / Transfer
-            if (gamepad1.right_bumper) {
-                robot.intake.extend();
-                robot.intake.on();
-                robot.intake.flipDown();
-            } else if (gamepad1.left_bumper) {
-                robot.intake.home();
-                robot.intake.flipUp();
-                robot.intake.off();
-            } else if (gamepad1.a) {
-                robot.deposit.open();
-                robot.intake.reverse();
-            } else {
-                robot.intake.off();
+            if (gamepad1.left_bumper) {
+                robot.intakeApproval = true;
             }
+
+            if (gamepad1.right_bumper) {
+                robot.depositApproval = true;
+            }
+
+            // Intake On / Off / Transfer
+//            if (gamepad1.right_bumper) {
+//                robot.intake.extend();
+//                robot.intake.on();
+//                robot.intake.flipDown();
+//            } else if (gamepad1.left_bumper) {
+//                robot.intake.home();
+//                robot.intake.flipUp();
+//                robot.intake.off();
+//            } else if (gamepad1.a) {
+//                robot.deposit.open();
+//                robot.intake.reverse();
+//            } else {
+//                robot.intake.off();
+//            }
 
             // Deposit Controls
-            if (gamepad1.x) {
-                robot.deposit.hold();
-                robot.deposit.setArmControls(Constants.DEPOSIT_ARM_HIGH);
-                robot.deposit.setSlidesControls((int) (24.9 * Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH));
-                turretHome = false;
-            } else if (gamepad1.y) {
-                robot.deposit.open();
-            } else if (gamepad1.b) {
-                robot.deposit.setArmControls(Constants.DEPOSIT_ARM_OVER_SLIDES_MOTOR);
-                robot.deposit.setSlidesControls(0);
-                turretHome = true;
-            }
+//            if (gamepad1.x) {
+//                robot.deposit.hold();
+//                robot.deposit.setArmControls(Constants.DEPOSIT_ARM_HIGH);
+//                robot.deposit.setSlidesControls((int) (24.9 * Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH));
+//                turretHome = false;
+//            } else if (gamepad1.y) {
+//                robot.deposit.open();
+//            } else if (gamepad1.b) {
+//                robot.deposit.setArmControls(Constants.DEPOSIT_ARM_OVER_SLIDES_MOTOR);
+//                robot.deposit.setSlidesControls(0);
+//                turretHome = true;
+//            }
 
-            if (turretHome){
-                robot.deposit.setTurretTheta(PI/2);
-            } else {
-                robot.deposit.setTurretTheta(PI/4);
-            }
+//            if (turretHome){
+//                robot.turret.setTurretTheta(PI/2);
+//            } else {
+//                robot.turret.setTurretTheta(PI/4);
+//            }
 
             /*
 

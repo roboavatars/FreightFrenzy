@@ -25,7 +25,7 @@ public class DepositTest extends LinearOpMode {
             } else {
                 deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, slidesInches);
             }
-            deposit.update(PI/2,0);
+            deposit.update();
         }
     }
 }

@@ -7,8 +7,8 @@ import static java.lang.Math.sin;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 
-import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
+import org.firstinspires.ftc.teamcode.RobotClasses.Turret;
 
 public class Dashboard {
     public static FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -19,7 +19,7 @@ public class Dashboard {
     }
 
     public static void drawRobot(Robot robot, String drivetrainColor) {
-        drawRobot(robot.x, robot.y, robot.theta, !robot.intake.slidesIsHome(), robot.deposit.getSlidesDistInches(), robot.deposit.getTurretTheta(), drivetrainColor);
+        drawRobot(robot.x, robot.y, robot.theta, !robot.intake.slidesIsHome(), robot.deposit.getSlidesDistInches(), robot.turret.getTurretTheta(), drivetrainColor);
     }
 
     public static void drawRobot(double robotX, double robotY, double robotTheta, boolean intakeSlidesExtend, double depositSlidesDist, double turretTheta, String drivetrainColor) {
@@ -60,8 +60,8 @@ public class Dashboard {
     public static void drawDepositTurretSlides(double x, double y, double robotTheta, double turretTheta, double slidesDist) {
         double extendedPos = 11.5 + slidesDist;
         double theta = robotTheta + turretTheta + PI;
-        double turretCenterX = x + Deposit.TURRET_Y_OFFSET * cos(robotTheta);
-        double turretCenterY = y + Deposit.TURRET_Y_OFFSET * sin(robotTheta);
+        double turretCenterX = x + Turret.TURRET_Y_OFFSET * cos(robotTheta);
+        double turretCenterY = y + Turret.TURRET_Y_OFFSET * sin(robotTheta);
 
         double[] leftSlidesX = {-2 * cos(theta) - -4.5 * sin(theta) + turretCenterX, -2 * cos(theta) - extendedPos * sin(theta) + turretCenterX, -3.5 * cos(theta) - extendedPos * sin(theta) + turretCenterX, -3.5 * cos(theta) - -4.5 * sin(theta) + turretCenterX};
         double[] leftSlidesY = {-2 * sin(theta) + -4.5 * cos(theta) + turretCenterY, -2 * sin(theta) + extendedPos * cos(theta) + turretCenterY, -3.5 * sin(theta) + extendedPos * cos(theta) + turretCenterY, -3.5 * sin(theta) + -4.5 * cos(theta) + turretCenterY};

@@ -18,7 +18,7 @@ public class Intake {
     private TouchSensor slidesSensor;
 
     private double lastIntakePow = 0;
-    private boolean slidesHome;
+    private boolean slidesHome = true;
 
     public Intake(LinearOpMode op, boolean isAuto) {
         // Intake Motor
@@ -34,11 +34,11 @@ public class Intake {
 
         // Intake Servo
         intakeServo = op.hardwareMap.get(Servo.class, "intakeServo");
-//        if (isAuto) {
+        if (isAuto) {
             flipUp();
-//        } else {
-//            flipDown();
-//        }
+        } else {
+            flipDown();
+        }
 
         // Intake Distance Sensor
         intakeSensor = op.hardwareMap.get(DistanceSensor.class, "intakeSensor");

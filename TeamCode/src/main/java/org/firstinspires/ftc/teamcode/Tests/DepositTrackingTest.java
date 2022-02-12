@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-@TeleOp(name = "0 deposit tracking test")
+@TeleOp(name = "deposit tracking test")
 @Config
 public class DepositTrackingTest extends LinearOpMode {
     private boolean armHome = true;
@@ -56,7 +56,7 @@ public class DepositTrackingTest extends LinearOpMode {
             addPacket("4 slides target ticks", robot.deposit.targetSlidesTicks);
             addPacket("5 arm home", armHome);
             addPacket("6 slide home", slidesHome);
-            addPacket("7 current theta", robot.deposit.getTurretTheta());
+            addPacket("7 current theta", robot.turret.getTurretTheta());
         }
     }
 }
