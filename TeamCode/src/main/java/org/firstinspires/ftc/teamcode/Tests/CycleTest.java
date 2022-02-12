@@ -29,7 +29,6 @@ public class CycleTest extends LinearOpMode {
     private boolean homeToggle = false;
     private boolean intakeHome;
 
-
     private double startRetractTime = 0;
 
     @Override

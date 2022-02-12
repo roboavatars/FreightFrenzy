@@ -11,13 +11,21 @@ public class Constants {
     public static double INTAKE_POWER = 1;
     public static double INTAKE_DISTANCE_THRESHOLD = 100;
 
+    // Intake Stalling
+    public static double STALL_THRESHOLD = 7;
+
+    // Intake Slides
+    public static double INTAKE_EXTEND_POS = 0.2;
+    public static double INTAKE_HOME_POS = 0.68;
+
+    // Intake Servo
+    public static double INTAKE_UP_POS = 0.15;
+    public static double INTAKE_DOWN_POS = 0.85;
+
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.9;
     public static double DEPOSIT_CLOSE_POS = 0.3;
     public static double DEPOSIT_HOLD_POS = 0.65;
-
-    // Carousel
-    public static double CAROUSEL_POWER = 0.55;
 
     // Deposit Arm
     public static int DEPOSIT_ARM_HOME = 0;
@@ -33,16 +41,8 @@ public class Constants {
     public static double ARM_DISTANCE_HIGH = 24;
     public static double ARM_DISTANCE_CAP = 27;
 
-    // Intake Stalling
-    public static double STALL_THRESHOLD = 7;
-
-    // Intake Slides
-    public static double INTAKE_EXTEND_POS = 0.2;
-    public static double INTAKE_HOME_POS = 0.7;
-
-    // Intake Servo
-    public static double INTAKE_UP_POS = 0.15;
-    public static double INTAKE_DOWN_POS = 0.85;
+    // Carousel
+    public static double CAROUSEL_POWER = 0.55;
 
     // Anti-Tip
     public static double TIP_THRESHOLD = 0.1;
