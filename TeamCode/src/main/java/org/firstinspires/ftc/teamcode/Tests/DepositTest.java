@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
-import static java.lang.Math.PI;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -17,7 +15,7 @@ public class DepositTest extends LinearOpMode {
 
     @Override
     public void runOpMode(){
-        Deposit deposit = new Deposit(this, false, PI/2);
+        Deposit deposit = new Deposit(this, false);
         waitForStart();
         while (opModeIsActive()) {
             if (home) {

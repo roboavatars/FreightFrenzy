@@ -34,7 +34,7 @@ public class CycleTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Deposit deposit = new Deposit(this, false, PI/2);
+        Deposit deposit = new Deposit(this, false);
         Turret turret = new Turret(this, false, PI/2);
         Drivetrain dt = new Drivetrain(this, 0, 0, PI/2);
         Intake intake = new Intake(this, false);
