@@ -29,7 +29,7 @@ public class Deposit {
 
     public int targetSlidesTicks;
 
-    private static final double maxSlidesDistBeforeLoweringArm = 2;
+    private static final double maxSlidesDistBeforeLoweringArm = 1;
 
     public boolean home = true;
     public int targetArmPos;
@@ -55,10 +55,6 @@ public class Deposit {
     public static double fGravity = 0.05;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
-        this(op, isAuto, PI/2);
-    }
-
-    public Deposit(LinearOpMode op, boolean isAuto, double initialRobotTheta) {
         // Deposit Servo
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         if (isAuto) {
@@ -103,7 +99,9 @@ public class Deposit {
 
     public void update() {
         // Move Arm
-        if (home && getSlidesDistInches() > maxSlidesDistBeforeLoweringArm) {
+        if (!home && !slidesAtPosPercent(0.75)) {
+            setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
+        } if (home && getSlidesDistInches() > maxSlidesDistBeforeLoweringArm) {
             setArmControls(Constants.DEPOSIT_ARM_HOME);
         } else {
             setArmControls();

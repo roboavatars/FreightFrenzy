@@ -118,7 +118,7 @@ public class Robot {
         drivetrain = new Drivetrain(op, x, y, theta);
         intake = new Intake(op, isAuto);
         turret = new Turret(op, isAuto, theta);
-        deposit = new Deposit(op, isAuto, theta);
+        deposit = new Deposit(op, isAuto);
         carousel = new Carousel(op);
         logger = new Logger();
         tapeDetector = new TapeDetector(op);
