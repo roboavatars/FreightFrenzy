@@ -100,7 +100,7 @@ public class Robot {
     public int flipUpThreshold = 1000;
     public boolean tRev = false;
     public int transferThreshold = 1500;
-    public int releaseThreshold = 2000;
+    public int releaseThreshold = 500;
 
     public static double turretMovingAngle = 0.2;
 
@@ -210,11 +210,11 @@ public class Robot {
                 if (deposit.armSlidesHome() && depositOpenTime == -1) {
                     depositAllianceHub(Deposit.DepositHeight.HIGH);
                     automationStep("Extend Slides/Arm");
-                } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1) {
-                    deposit.open(); /// oops
+                } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1 && depositApproval) {
+                    deposit.open();
                     depositOpenTime = curTime;
                     automationStep("Score Freight");
-                } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && curTime - depositOpenTime > releaseThreshold && depositApproval) {
+                } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
                     depositHome();
 
                     markCycle();

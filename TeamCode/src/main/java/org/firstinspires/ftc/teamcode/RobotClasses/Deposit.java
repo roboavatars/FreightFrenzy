@@ -22,7 +22,7 @@ public class Deposit {
     public int DEPOSIT_SLIDES_ERROR_THRESHOLD = 15;
     public static double ARM_TICKS_PER_RADIAN = 1120 / (2*PI);
     public double DEPOSIT_ARM_MAX_POWER = 0.7;
-    public int DEPOSIT_ARM_ERROR_THRESHOLD = 20;
+    public int DEPOSIT_ARM_ERROR_THRESHOLD = 100;
 
     // Slides PD
     public static double pSlides = 50;
