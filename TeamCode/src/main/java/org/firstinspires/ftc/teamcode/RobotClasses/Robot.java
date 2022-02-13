@@ -207,7 +207,7 @@ public class Robot {
                 if (deposit.armSlidesHome() && depositOpenTime == -1) {
                     depositAllianceHub(Deposit.DepositHeight.HIGH);
                     automationStep("Extend Slides/Arm");
-                } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1 && depositApproval) {
+                } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1 && (depositApproval && (!isAuto || deposit.getArmVelocity() < 5))) {
                     deposit.open();
                     depositOpenTime = curTime;
                     automationStep("Score Freight");

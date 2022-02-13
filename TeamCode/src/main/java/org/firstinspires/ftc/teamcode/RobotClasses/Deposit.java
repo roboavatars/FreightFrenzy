@@ -146,6 +146,10 @@ public class Deposit {
         return armMotor.getCurrentPosition();
     }
 
+    public double getArmVelocity() {
+        return armMotor.getVelocity();
+    }
+
     public boolean armAtPos() {
         Robot.log("arm error:" + Math.abs(getArmPosition() - targetArmPos));
         return Math.abs(getArmPosition() - targetArmPos) < DEPOSIT_ARM_ERROR_THRESHOLD;
