@@ -54,6 +54,8 @@ public class Deposit {
 
     public static double fGravity = 0.05;
 
+    public static boolean useMidwayArmPos = true;
+
     public Deposit(LinearOpMode op, boolean isAuto) {
         this(op, isAuto, PI/2);
     }
@@ -110,7 +112,7 @@ public class Deposit {
                 setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
             }
         } else {
-            if (slidesAtPos()) {
+            if (slidesAtPos() || !useMidwayArmPos) {
                 setArmControls();
             } else {
                 setArmControls(Constants.DEPOSIT_ARM_MIDWAY);

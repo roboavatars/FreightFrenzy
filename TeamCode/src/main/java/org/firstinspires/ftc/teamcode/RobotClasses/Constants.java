@@ -9,7 +9,7 @@ public class Constants {
 
     // Intake
     public static double INTAKE_POWER = 1;
-    public static double INTAKE_DISTANCE_THRESHOLD = 65;
+    public static double INTAKE_DISTANCE_THRESHOLD = 80;
 
     // Intake Stalling
     public static double STALL_THRESHOLD = 7;
@@ -29,15 +29,14 @@ public class Constants {
     // Deposit Arm
     public static int DEPOSIT_ARM_HOME = 0;
     public static int DEPOSIT_ARM_LOW = 750;
-    public static int DEPOSIT_ARM_MID = 600;
+    public static int DEPOSIT_ARM_MID = 650;
     public static int DEPOSIT_ARM_HIGH = 570;
     public static int DEPOSIT_ARM_MIDWAY = 400;
 
     // Deposit Slides
-    public static double ARM_DISTANCE_LOW = 36;
-    public static double ARM_DISTANCE_MID = 33;
-    public static double ARM_DISTANCE_HIGH = 26;
-    public static double ARM_DISTANCE_CAP = 27;
+    public static double SLIDES_DISTANCE_LOW = 19;
+    public static double SLIDES_DISTANCE_MID = 19;
+    public static double SLIDES_DISTANCE_HIGH = 19;
 
     // Carousel
     public static double CAROUSEL_POWER = 0.55;

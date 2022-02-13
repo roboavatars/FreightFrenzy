@@ -7,20 +7,19 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodeDetector;
-import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodePipeline;
 import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
+import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
+
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 
 @Config
 @Autonomous(name = "0 0 0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoWarehouse extends LinearOpMode {
-    public static int barcodeCase = 2; // 0 = left, 1 = mid, 2 = right
+    public static int barcodeCase = 1; // 0 = left, 1 = mid, 2 = right
 
     @Override
     public void runOpMode() {
@@ -40,9 +39,9 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         // Segments
         boolean preloadScore = false;
-        boolean goToWarehouse = false;
-        boolean cycleScore = false;
-        boolean park = false;
+        boolean goToWarehouse = true; //<<<<<<<<<<<<<<<
+        boolean cycleScore = true;  //<<<<<<<<<<<<
+        boolean park = true;   //<<<<<<<<<<<<<<
 
         // Segment Times
         double preloadScoreTime = 1.75;
@@ -75,15 +74,15 @@ public class RedAutoWarehouse extends LinearOpMode {
             barcodeCase = 2;
         }
         Robot.log("Barcode Case: " + barcodeCase);
+         */
 
         if (barcodeCase == 0) {
-//            robot.deposit.moveSlides(1, Deposit.DepositHeight.LOW);
+            robot.depositHeight = Deposit.DepositHeight.LOW;
         } else if (barcodeCase == 1) {
-//            robot.deposit.moveSlides(1, Deposit.DepositHeight.MID);
+            robot.depositHeight = Deposit.DepositHeight.MID;
         } else {
-//            robot.deposit.moveSlides(1, Deposit.DepositHeight.TOP);
+            robot.depositHeight = Deposit.DepositHeight.HIGH;
         }
-         */
 
         Waypoint[] goToWarehouseWaypoints = new Waypoint[] {
                 new Waypoint(robot.x, robot.y, PI/2/*robot.theta*/, 10, 2,0, 0),
@@ -104,12 +103,13 @@ public class RedAutoWarehouse extends LinearOpMode {
                 if (!robot.depositingFreight/*time.seconds() > preloadScoreTime + 1.5*/) {
                     time.reset();
                     preloadScore = true;
+                    robot.depositHeight = Deposit.DepositHeight.HIGH;
                 }
             } else if (!goToWarehouse) {
                 if (!robot.intakeFull && robot.y >= 110 && time.seconds() > goToWarehouseTime + 0.1) {
-                    robot.setTargetPoint(138, 111 + 1.5 * (time.seconds() - goToWarehouseTime), PI/2 + 0.4 * Math.sin(2 * (time.seconds() - goToWarehouseTime)));
-                } else if (Math.abs(robot.theta - PI/2) > PI/6) {
-                    robot.setTargetPoint(new Target(goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime, time.seconds()))).thetaKp(4));
+                    robot.setTargetPoint(137, 111 + 2.5 * (time.seconds() - goToWarehouseTime), PI/2 + 0.3 * Math.sin(2 * (time.seconds() - goToWarehouseTime)));
+                } else if (Math.abs(robot.theta - PI/2) > PI/8 || robot.x < 137) {
+                    robot.setTargetPoint(new Target(goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime, time.seconds()))))/*.yKp(0.25).thetaKp(.4))*/;
                 } else {
                     robot.setTargetPoint(goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime, time.seconds())));
                 }
@@ -118,8 +118,8 @@ public class RedAutoWarehouse extends LinearOpMode {
 
                 if (robot.intakeFull/*time.seconds() > goToWarehouseTime + 0.5*/) {
                     Waypoint[] cycleScoreWaypoints = new Waypoint[] {
-                            new Waypoint(robot.x, robot.y, 3*PI/2, 10, 10, 0, 0),
-                            new Waypoint(138, 89, 3*PI/2, 10, -5, 0, cycleScoreTime),
+                            new Waypoint(140, robot.y, 3*PI/2, 10, 10, 0, 0),
+                            new Waypoint(139, 89, 3*PI/2, 10, -5, 0, cycleScoreTime),
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 

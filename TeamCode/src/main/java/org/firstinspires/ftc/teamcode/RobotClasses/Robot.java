@@ -64,6 +64,7 @@ public class Robot {
 
     public boolean intakeFull;
     private Deposit.DepositHeight depositTargetHeight = Deposit.DepositHeight.HOME;
+    public Deposit.DepositHeight depositHeight = Deposit.DepositHeight.HIGH;
     public boolean turretHome = true;
     public double turretGlobalTheta;
     public double lockTheta;
@@ -203,9 +204,9 @@ public class Robot {
         }
 
         if (depositingFreight) {
-            if (y <= 100 /*&& notMoving() && turret.turretAtPos()*/) {
+            if ((!isAuto && y <= 100) || (isAuto && y<=100 && Math.abs(theta-PI/2) < PI/10) /*&& notMoving() && turret.turretAtPos()*/) {
                 if (deposit.armSlidesHome() && depositOpenTime == -1) {
-                    depositAllianceHub(Deposit.DepositHeight.HIGH);
+                    depositAllianceHub(depositHeight);
                     automationStep("Extend Slides/Arm");
                 } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1 && (depositApproval && (!isAuto || deposit.getArmVelocity() < 5))) {
                     deposit.open();
@@ -366,14 +367,16 @@ public class Robot {
     }
 
     public void deposit(Deposit.DepositHeight depositTargetHeight) {
-        slidesDist = slidesDepositDist;
         this.depositTargetHeight = depositTargetHeight;
         if (depositTargetHeight == Deposit.DepositHeight.LOW) {
-            deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, slidesDist - Constants.ARM_DISTANCE_LOW);
+            deposit.useMidwayArmPos = false;
+            deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, Constants.SLIDES_DISTANCE_LOW);
         } else if (depositTargetHeight == Deposit.DepositHeight.MID) {
-            deposit.setDepositControls(Constants.DEPOSIT_ARM_MID, slidesDist - Constants.ARM_DISTANCE_MID);
+            deposit.useMidwayArmPos = false;
+            deposit.setDepositControls(Constants.DEPOSIT_ARM_MID, Constants.SLIDES_DISTANCE_MID);
         } else if (depositTargetHeight == Deposit.DepositHeight.HIGH) {
-            deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, slidesDist - Constants.ARM_DISTANCE_HIGH);
+            deposit.useMidwayArmPos = true;
+            deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, Constants.SLIDES_DISTANCE_HIGH);
         }  else { // Home
             deposit.setDepositHome();
         }
