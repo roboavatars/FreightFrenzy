@@ -9,9 +9,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @TeleOp(name = "0 Teleop")
 @SuppressWarnings("FieldCanBeLocal")
@@ -20,8 +22,8 @@ public class Teleop extends LinearOpMode {
 
     // Backup Starting Position
     public static double startX = 138;
-    public static double startY = 122;
-    public static double startTheta = PI / 2;
+    public static double startY = 81;
+    public static double startTheta = PI/2;
 
     public static boolean useAutoPos = false;
     public static boolean isRed = true;
@@ -35,7 +37,6 @@ public class Teleop extends LinearOpMode {
     // Toggles
     private boolean servoToggle = false;
     private int depositServoStatus = 0;
-    private boolean turretHome = true;
 
     // Cycle counter stuff
     private final ArrayList<Double> cycles = new ArrayList<>();
@@ -69,7 +70,6 @@ public class Teleop extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        /*
         if (useAutoPos) {
             double[] initialData = Logger.readPos();
             telemetry.addData("Starting Position", Arrays.toString(initialData));
@@ -78,12 +78,8 @@ public class Teleop extends LinearOpMode {
             robot.logger.startLogging(false, initialData[0] == 1);
         } else {
             robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
-            robot = new Robot(this, 138,60,0, false, true);
             robot.logger.startLogging(false, isRed);
         }
-         */
-
-        robot = new Robot(this, 138,81,PI/2, false, true);
 
         waitForStart();
 

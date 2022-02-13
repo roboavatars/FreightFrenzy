@@ -8,7 +8,6 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.hypot;
-import static java.lang.Math.sin;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
@@ -49,21 +48,37 @@ public class Robot {
     private final int sensorUpdatePeriod = 10;
     private final double xyTolerance = 1;
     private final double thetaTolerance = PI/35;
-    private final double turretTolerance = PI/50;
     public final static double[] cameraRelativeToRobot = new double[] {1, 3};
     public static double[] redGoalCoords = new double[] {96, 60};
     public static double[] blueGoalCoords = new double[] {48, 60};
     public static double[] neutGoalCoords = new double[] {72, 120};
+    public static double turretMovingAngle = 0.175;
+    public static double slidesDepositDist = 45;
 
     // State Variables
     private final boolean isAuto;
     public final boolean isRed;
     private boolean firstLoop = true;
     private int loopCounter = 0;
+    public String automationStep = "n/a";
 
+    public boolean intakeFull;
+    private Deposit.DepositHeight depositTargetHeight = Deposit.DepositHeight.HOME;
+    public boolean turretHome = true;
+    public double turretGlobalTheta;
+    public double lockTheta;
+    public double slidesDist;
+    public boolean allianceHub;
+    public boolean useTapeDetector = false;
+
+    // Automation Variables
+    public boolean depositApproval = false;
+    public boolean intakeApproval = false;
     public boolean intakeTransfer = false;
     public boolean depositingFreight = false;
-    public boolean intakeFull;
+    public boolean intakeRev = false;
+    private double intakeFlipTime = -1;
+    private double depositOpenTime = -1;
 
     // Cycle Tracker
     public int cycles = 0;
@@ -71,23 +86,11 @@ public class Robot {
     public double lastCycleTime;
     public double longestCycle = 0;
 
-    public double depositSlidesDist = 0;
-
-    public boolean turretHome = true;
-    private Deposit.DepositHeight depositTargetHeight;
-    public boolean allianceHub;
-
-    public boolean depositApproval = false;
-    public boolean intakeApproval = false;
-
-    public double turretGlobalTheta;
-    public double lockTheta;
-    public double slidesDist;
-
     // Time and Delay Variables
     public double curTime;
-    private double intakeFlipTime = -1;
-    private double depositOpenTime = -1;
+    public int flipUpThreshold = 1000;
+    public int transferThreshold = 1500;
+    public int releaseThreshold = 500;
 
     // Motion Variables
     public double x, y, theta, vx, vy, w;
@@ -96,18 +99,6 @@ public class Robot {
 
     // OpMode Stuff
     private LinearOpMode op;
-
-    //Config
-    public boolean useTapeDetector = false;
-    public int flipUpThreshold = 1000;
-    public boolean tRev = false;
-    public int transferThreshold = 1500;
-    public int releaseThreshold = 500;
-
-    public static double turretMovingAngle = 0.175;
-    public static double slidesDepositDist = 45;
-
-    public String automationStep = "n/a";
 
     // Constructor
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed) {
@@ -118,6 +109,7 @@ public class Robot {
         this.isAuto = isAuto;
         this.isRed = isRed;
 
+        // init subsystems
         drivetrain = new Drivetrain(op, x, y, theta);
         intake = new Intake(op, isAuto);
         turret = new Turret(op, isAuto, theta);
@@ -126,27 +118,27 @@ public class Robot {
         logger = new Logger();
         tapeDetector = new TapeDetector(op);
 
-        profiler = new ElapsedTime();
-
-        depositTargetHeight = Deposit.DepositHeight.HOME;
-
+        // set up bulk read
         allHubs = op.hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
 
+        // low voltage warning
         battery = op.hardwareMap.voltageSensor.iterator().next();
         log("Battery Voltage: " + battery.getVoltage() + "v");
         if (battery.getVoltage() < 12.4) {
             startVoltTooLow = true;
         }
+        profiler = new ElapsedTime();
 
+        // initial dashboard drawings
         drawField();
         drawRobot(this);
         sendPacket();
     }
 
-    // Stop logger and t265
+    // Stop logger
     public void stop() {
         logger.stopLogging();
     }
@@ -168,9 +160,9 @@ public class Robot {
             firstLoop = false;
         }
 
+        // Don't check intake sensor every loop
         if (loopCounter % sensorUpdatePeriod == 0) {
             intakeFull = intake.intakeFull();
-            depositSlidesDist = deposit.getSlidesDistInches();
         }
 
         if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && intakeApproval/* y > 105*/) {
@@ -189,11 +181,11 @@ public class Robot {
                 intake.setPower(0.25);
                 intakeFlipTime = curTime;
                 automationStep("Intake Flip Up");
-            } else if (intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > flipUpThreshold && !tRev) {
+            } else if (intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > flipUpThreshold && !intakeRev) {
                 intake.reverse();
-                tRev = true;
+                intakeRev = true;
                 automationStep("Transfer Block");
-            } else if (!intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > transferThreshold && tRev) {
+            } else if (!intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > transferThreshold && intakeRev) {
                 deposit.hold();
                 intake.off();
                 intake.flipDown();
@@ -202,7 +194,7 @@ public class Robot {
 
                 intakeTransfer = false;
                 intakeFlipTime = -1;
-                tRev = false;
+                intakeRev = false;
                 depositingFreight = true;
             }
             log("full: " + intakeFull + ", home: " + intake.slidesIsHome() + ", dFlip: " + (curTime-intakeFlipTime) + "");
@@ -280,15 +272,11 @@ public class Robot {
         }
          */
 
-        profile(1);
-
         // Log Data
         if (loopCounter % loggerUpdatePeriod == 0) {
             logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a,
                     turretGlobalTheta, slidesDist, depositTargetHeight, intake.slidesIsHome(), cycles, cycleTotal / cycles);
         }
-
-        profile(2);
 
         // Dashboard Telemetry
         if (startVoltTooLow) {
@@ -297,18 +285,17 @@ public class Robot {
         addPacket("1 X", round(x));
         addPacket("2 Y", round(y));
         addPacket("3 Theta", round(theta));
-//        addPacket("4 Turret Theta", round(turretGlobalTheta));
-//        addPacket("5 Deposit Level", depositTargetHeight);
+        addPacket("4 Turret Theta", round(turretGlobalTheta));
+        addPacket("5 Deposit Level", depositTargetHeight.name().toLowerCase());
         addPacket("7 Automation Step", automationStep);
         addPacket("8 Run Time", (curTime - startTime) / 1000);
         addPacket("9 Update Frequency (Hz)", round(1 / timeDiff));
-        addPacket("error", turret.getTurretError());
         addPacket("intake full", intakeFull);
-//        if (!isAuto) {
-//            addPacket("Cycle Time", (curTime - lastCycleTime) / 1000);
-//            addPacket("Average Cycle Time", round(cycleTotal / cycles));
-//            addPacket("Cycles", cycles);
-//        }
+        if (!isAuto) {
+            addPacket("Cycle Time", (curTime - lastCycleTime) / 1000);
+            addPacket("Average Cycle Time", round(cycleTotal / cycles));
+            addPacket("Cycles", cycles);
+        }
 
         // Dashboard Drawings
         drawField();
@@ -319,8 +306,6 @@ public class Robot {
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
-
-        profile(3);
     }
 
     public double updateTurret() {
@@ -462,36 +447,12 @@ public class Robot {
         return abs(x - targetX) < xTolerance && abs(y - targetY) < yTolerance && abs(theta - targetTheta) < thetaTolerance;
     }
 
-    public boolean isAtPoseTurret(double turretTheta, double turretTolerance) {
-        return abs(turretGlobalTheta - turretTheta) < turretTolerance;
-    }
-
-    public boolean isAtPoseTurret(double turretTheta) {
-        return abs(turretGlobalTheta - turretTheta) < turretTolerance;
-    }
-
     public boolean notMoving() {
         return notMoving(3.0, 0.2);
     }
 
     public boolean notMoving(double xyThreshold, double thetaThreshold) {
         return (hypot(vx, vy) < xyThreshold && abs(w) < thetaThreshold);
-    }
-
-    private static double sinc(double x) {
-        if (abs(x) < 1e-6) {
-            return 1.0 - 1.0 / 6.0 * x * x;
-        } else {
-            return sin(x) / x;
-        }
-    }
-
-    private static double signOf(double x) {
-        if (abs(x) < 1e-6) {
-            return 1;
-        } else {
-            return abs(x) / x;
-        }
     }
 
     // Logging
