@@ -62,7 +62,7 @@ public class Deposit {
         // Deposit Servo
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         if (isAuto) {
-            close();
+            hold();
         } else {
             open();
         }
@@ -106,6 +106,8 @@ public class Deposit {
         if (home) {
             if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm) {
                 setArmControls();
+            } else {
+                setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
             }
         } else {
             if (slidesAtPos()) {
@@ -211,10 +213,6 @@ public class Deposit {
 
     public void open() {
         setServoPosition(Constants.DEPOSIT_OPEN_POS);
-    }
-
-    public void close() {
-        setServoPosition(Constants.DEPOSIT_CLOSE_POS);
     }
 
     public void hold() {

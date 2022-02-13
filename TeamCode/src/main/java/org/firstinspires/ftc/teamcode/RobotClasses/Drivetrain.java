@@ -48,17 +48,10 @@ public class Drivetrain {
     private final double motorUpdateTolerance = 0.05;
 
     // Odometry constants
-    public static double ticksToInch1 = 0.00051831659076;
-    public static double ticksToInch2 = 0.00051831659076;
-    public static double ticksToInch3 = 0.00053265517048;
-    public static double ODOMETRY_TRACK_WIDTH = 9.78643274429265;
-    //       1 rev                  5 rev
-    // cw:  13.28                  13.247 13.232
-    // ccw: 13.335 13.32 13.31
-
-    //                          13.39 5 rev         13.39 10 rev                13.395 5 rev          1.385 5 rev
-    // cw:  1.56 1.56 1.57 | 1.59 1.59 1.58 1.58 | 1.59 1.58 1.53 1.55 1.56 | 1.58 1.58 1.58 1.58 | 1.55 1.54
-    // ccw: 1.63 1.63 1.62 | 1.60 1.61 1.60 1.60 | 1.66 1.69 1.67 1.68 1.66 | 1.63 1.61 1.62 1.60 | 1.62 1.63
+    public static double ticksToInch1 = 0.00052639659596868;
+    public static double ticksToInch2 = 0.00051562172701052;
+    public static double ticksToInch3 = 0.00053046000828844;
+    public static double ODOMETRY_TRACK_WIDTH = 9.87211596315280939430;
     public static double ODOMETRY_HORIZONTAL_OFFSET = 0.15;
 
     private final double ODOMETRY_HEADING_THRESHOLD = PI/8;

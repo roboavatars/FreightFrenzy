@@ -81,6 +81,11 @@ public class Intake {
         slidesServo.setPosition(Constants.INTAKE_EXTEND_POS);
     }
 
+    public void extend(double pos) {
+        slidesHome = false;
+        slidesServo.setPosition(pos);
+    }
+
     public void home() {
         slidesHome = true;
         slidesServo.setPosition(Constants.INTAKE_HOME_POS);

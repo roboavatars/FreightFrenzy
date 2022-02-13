@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
+import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.ArrayList;
@@ -95,6 +96,15 @@ public class Teleop extends LinearOpMode {
             if (gamepad1.right_bumper) {
                 robot.depositApproval = true;
             }
+
+            if (gamepad2.dpad_up) Constants.DEPOSIT_ARM_HIGH -= 2;
+            else if (gamepad2.dpad_down) Constants.DEPOSIT_ARM_HIGH += 2;
+
+            if (gamepad2.dpad_right) robot.turretMovingAngle -= .005;
+            else if (gamepad2.dpad_left) robot.turretMovingAngle += .005;
+
+            if (gamepad2.y) robot.slidesDepositDist += .2;
+            else if (gamepad2.a) robot.slidesDepositDist -= .2;
 
             // Intake On / Off / Transfer
 //            if (gamepad1.right_bumper) {

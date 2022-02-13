@@ -15,8 +15,8 @@ public class Constants {
     public static double STALL_THRESHOLD = 7;
 
     // Intake Slides
-    public static double INTAKE_EXTEND_POS = 0.2;
-    public static double INTAKE_HOME_POS = 0.64;
+    public static double INTAKE_EXTEND_POS = 0.5;
+    public static double INTAKE_HOME_POS = 0.2;
 
     // Intake Servo
     public static double INTAKE_UP_POS = 0.15;
@@ -24,7 +24,6 @@ public class Constants {
 
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.9;
-    public static double DEPOSIT_CLOSE_POS = 0.3;
     public static double DEPOSIT_HOLD_POS = 0.65;
 
     // Deposit Arm

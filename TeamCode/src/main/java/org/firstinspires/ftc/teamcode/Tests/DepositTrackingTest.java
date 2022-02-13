@@ -15,7 +15,7 @@ public class DepositTrackingTest extends LinearOpMode {
     private boolean armHome = true;
     private boolean slidesHome = true;
     private boolean depositToggle = false;
-    private int depositGatePos = 0;
+    private boolean depositGateHold = true;
 
     private Robot robot;
 
@@ -32,16 +32,12 @@ public class DepositTrackingTest extends LinearOpMode {
             // Deposit Gate
             if (gamepad1.b && depositToggle == false) {
                 depositToggle = true;
-                if (depositGatePos == 0) {
-                    robot.deposit.close();
-                    depositGatePos ++;
-                } else if (depositGatePos == 1) {
+                if (depositGateHold) {
                     robot.deposit.hold();
-                    depositGatePos ++;
-                } else if (depositGatePos == 2) {
+                } else {
                     robot.deposit.open();
-                    depositGatePos = 0;
                 }
+                depositGateHold = !depositGateHold;
             }
             if (!gamepad1.b) {
                 depositToggle = false;
