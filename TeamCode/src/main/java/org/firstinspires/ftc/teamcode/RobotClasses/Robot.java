@@ -50,7 +50,6 @@ public class Robot {
     private final double thetaTolerance = PI / 35;
     public final static double[] cameraRelativeToRobot = new double[]{1, 3};
 
-
     // State Variables
     private final boolean isAuto;
     public final boolean isRed;
@@ -62,7 +61,19 @@ public class Robot {
 
     public boolean intakeFull;
     public double turretGlobalTheta;
-    public double slidesDist;
+    public boolean depositSlidesHome;
+    public double depositSlidesDist;
+
+    //Deposit Tracking
+    public boolean trackGoal = false;
+    private boolean setDepositControlsHome = true;
+    public double distToGoal;
+    public double turretLockTheta;
+    public double turretFF = 0;
+    public double[] turretCenter = new double[2];
+    public double[] redGoalCoords = new double[] {96, 60};
+    public double[] blueGoalCoords = new double[] {48, 60};
+    public double[] neutGoalCoords = new double[] {72, 120};
 
     //Switching Between Preset Turret and Deposit Scoring Positions
     public enum hub {
@@ -155,6 +166,13 @@ public class Robot {
     }
 
     public void update() {
+        // Don't check states every loop
+        if (loopCounter % sensorUpdatePeriod == 0) {
+            intakeFull = intake.intakeFull();
+            depositSlidesHome = deposit.slidesHome();
+            depositSlidesDist = deposit.getSlidesDistInches();
+        }
+
         loopCounter++;
         profiler.reset();
         curTime = System.currentTimeMillis();
@@ -164,11 +182,6 @@ public class Robot {
             startTime = curTime;
             lastCycleTime = curTime;
             firstLoop = false;
-        }
-
-        // Don't check intake sensor every loop
-        if (loopCounter % sensorUpdatePeriod == 0) {
-            intakeFull = intake.intakeFull();
         }
 
         if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && (y > 105 || intakeApproval)) {
@@ -238,9 +251,11 @@ public class Robot {
         }
 
         // Update Turret
-        turret.update(deposit.slidesHome());
+        if (trackGoal) updateTrackingMath();
+        turret.update(depositSlidesHome, theta, depositSlidesDist, turretFF);
 
         //Update Deposit
+        if (trackGoal && !setDepositControlsHome) depositScore();
         deposit.update();
 
         // Update Position
@@ -278,7 +293,7 @@ public class Robot {
         // Log Data
         if (loopCounter % loggerUpdatePeriod == 0) {
             logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a,
-                    turretGlobalTheta, slidesDist, depositTargetHeight, intake.slidesIsHome(), cycles, cycleTotal / cycles);
+                    turretGlobalTheta, distToGoal, depositTargetHeight, intake.slidesIsHome(), cycles, cycleTotal / cycles);
         }
 
         // Dashboard Telemetry
@@ -312,66 +327,108 @@ public class Robot {
     }
 
     public void depositScore() {
+        setDepositControlsHome = false;
         //Set Arm + Slides Controls
-        if (cycleHub == hub.allianceLow) {
+        if (trackGoal) {
+            updateTrackingMath();
             Deposit.useMidwayArmPos = false;
-            deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, Constants.SLIDES_DISTANCE_LOW);
-        } else if (cycleHub == hub.allianceMid) {
-            Deposit.useMidwayArmPos = false;
-            deposit.setDepositControls(Constants.DEPOSIT_ARM_MID, Constants.SLIDES_DISTANCE_MID);
-        } else if (cycleHub == hub.allianceHigh) {
-            Deposit.useMidwayArmPos = true;
-            deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, Constants.SLIDES_DISTANCE_HIGH);
-        } else if (cycleHub == hub.neutral) {
-            Deposit.useMidwayArmPos = false;
-            deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, 0);
-        } else if (cycleHub == hub.duck){
-            Deposit.useMidwayArmPos = true;
-            deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, Constants.SLIDES_DISTANCE_DUCK);
+            if (cycleHub == hub.allianceLow) {
+                deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, distToGoal - Constants.ARM_DISTANCE);
+            } else if (cycleHub == hub.allianceMid) {
+                deposit.setDepositControls(Constants.DEPOSIT_ARM_MID, distToGoal - Constants.ARM_DISTANCE);
+            } else if (cycleHub == hub.allianceHigh) {
+                deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, distToGoal - Constants.ARM_DISTANCE);
+            } else if (cycleHub == hub.neutral) {
+                deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, 0);
+            } else if (cycleHub == hub.duck) {
+                deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, distToGoal - Constants.ARM_DISTANCE);
+            }
+        } else {
+            if (cycleHub == hub.allianceLow) {
+                Deposit.useMidwayArmPos = false;
+                deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, Constants.SLIDES_DISTANCE_LOW);
+            } else if (cycleHub == hub.allianceMid) {
+                Deposit.useMidwayArmPos = false;
+                deposit.setDepositControls(Constants.DEPOSIT_ARM_MID, Constants.SLIDES_DISTANCE_MID);
+            } else if (cycleHub == hub.allianceHigh) {
+                Deposit.useMidwayArmPos = true;
+                deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, Constants.SLIDES_DISTANCE_HIGH);
+            } else if (cycleHub == hub.neutral) {
+                Deposit.useMidwayArmPos = false;
+                deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, 0);
+            } else if (cycleHub == hub.duck) {
+                Deposit.useMidwayArmPos = true;
+                deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, Constants.SLIDES_DISTANCE_DUCK);
+            }
         }
     }
 
     public void depositHome() {
+        setDepositControlsHome = true;
         deposit.setDepositHome();
     }
 
     public void turretScore() {
         //Set Turret Controls
-        if (cycleHub == hub.allianceLow) {
-            if (isRed) {
-                turret.setDepositing(Constants.TURRET_ALLIANCE_RED_CYCLE_THETA * PI);
-            } else {
-                turret.setDepositing((1-Constants.TURRET_ALLIANCE_RED_CYCLE_THETA) * PI);
-            }
-        } else if (cycleHub == hub.allianceMid) {
-            if (isRed) {
-                turret.setDepositing(Constants.TURRET_ALLIANCE_RED_CYCLE_THETA * PI);
-            } else {
-                turret.setDepositing((1-Constants.TURRET_ALLIANCE_RED_CYCLE_THETA) * PI);
-            }
-        } else if (cycleHub == hub.allianceHigh) {
-            if (isRed) {
-                turret.setDepositing(Constants.TURRET_ALLIANCE_RED_CYCLE_THETA * PI);
-            } else {
-                turret.setDepositing((1-Constants.TURRET_ALLIANCE_RED_CYCLE_THETA) * PI);
-            }
-        } else if (cycleHub == hub.neutral) {
-            if (isRed) {
-                turret.setDepositing(Constants.TURRET_NEUTRAL_RED_CYCLE_THETA * PI);
-            } else {
-                turret.setDepositing((1-Constants.TURRET_NEUTRAL_RED_CYCLE_THETA) * PI);
-            }
-        } else if (cycleHub == hub.duck){
-            if (isRed) {
-                turret.setDepositing(Constants.TURRET_DUCK_RED_CYCLE_THETA * PI);
-            } else {
-                turret.setDepositing((1-Constants.TURRET_DUCK_RED_CYCLE_THETA) * PI);
+        if (trackGoal) {
+            updateTrackingMath();
+            turret.setTracking(turretLockTheta);
+        } else {
+            if (cycleHub == hub.allianceLow || cycleHub == hub.allianceMid || cycleHub == hub.allianceHigh) {
+                if (isRed) {
+                    turret.setDepositing(Constants.TURRET_ALLIANCE_RED_CYCLE_THETA * PI);
+                } else {
+                    turret.setDepositing((1 - Constants.TURRET_ALLIANCE_RED_CYCLE_THETA) * PI);
+                }
+            } else if (cycleHub == hub.neutral) {
+                if (isRed) {
+                    turret.setDepositing(Constants.TURRET_NEUTRAL_RED_CYCLE_THETA * PI);
+                } else {
+                    turret.setDepositing((1 - Constants.TURRET_NEUTRAL_RED_CYCLE_THETA) * PI);
+                }
+            } else if (cycleHub == hub.duck) {
+                if (isRed) {
+                    turret.setDepositing(Constants.TURRET_DUCK_RED_CYCLE_THETA * PI);
+                } else {
+                    turret.setDepositing((1 - Constants.TURRET_DUCK_RED_CYCLE_THETA) * PI);
+                }
             }
         }
     }
 
     public void turretHome() {
         turret.setHome();
+    }
+
+    public void updateTrackingMath(){
+        turretCenter[0] = x + Math.cos(theta) * Turret.TURRET_Y_OFFSET;
+        turretCenter[1] = y + Math.sin(theta) * Turret.TURRET_Y_OFFSET;
+
+        double goalX;
+        double goalY;
+        if (cycleHub == hub.neutral) {
+            goalX = neutGoalCoords[0];
+            goalY = neutGoalCoords[1];
+        } else { //Alliance Hub
+            if (isRed) {
+                goalX = redGoalCoords[0];
+                goalY = redGoalCoords[1];
+            } else {
+                goalX = blueGoalCoords[0];
+                goalY = blueGoalCoords[1];
+            }
+        }
+        goalX -= turretCenter[0];
+        goalY -= turretCenter[1];
+
+        distToGoal = hypot(goalX, goalY);
+
+        // calculates ff for turret control (w + atan dot)
+        turretFF = w + (goalX * vy - vx * goalY) / (goalX * goalX + goalY * goalY);
+
+        turretLockTheta = PI + Math.atan2(goalY, goalX);
+        turretLockTheta %= 2*PI;
+        if (turretLockTheta < 0) turretLockTheta += 2*PI;
     }
 
     public void markCycle() {
