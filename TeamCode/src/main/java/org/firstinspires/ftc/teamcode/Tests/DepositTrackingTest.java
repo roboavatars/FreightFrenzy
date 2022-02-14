@@ -3,12 +3,14 @@ package org.firstinspires.ftc.teamcode.Tests;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
+@Disabled
 @TeleOp(name = "deposit tracking test")
 @Config
 public class DepositTrackingTest extends LinearOpMode {
@@ -27,7 +29,7 @@ public class DepositTrackingTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            robot.depositAllianceHub(Deposit.DepositHeight.HIGH);
+            robot.cycleHub = Robot.hub.allianceHigh;
 
             // Deposit Gate
             if (gamepad1.b && depositToggle == false) {

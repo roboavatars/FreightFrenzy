@@ -19,18 +19,20 @@ public class Turret {
     public static double TURRET_Y_OFFSET = 2.06066;
     public double TURRET_ERROR_THRESHOLD = PI/40;
 
-    // Turret PD and PDFF
+    // Turret PD
     public static double pTurret = 2.25;
     public static double dTurret = 5.5;
-    public static double fwTurret = -0.4;
-    public static double fmoiTurret = 0;
     public double initialTheta;
+
+    public static double fwTurret = -0.4;   // TODO: remove usages and delete
+    public static double fmoiTurret = 0;    // TODO: remove usages and delete
 
     private double turretTargetTheta;
     public double turretTheta;
     private double turretError = 0;
     private double turretErrorChange;
-    private double turretLockTheta;
+
+    private boolean home = true;
 
     public Turret(LinearOpMode op, boolean isAuto) {
         this(op, isAuto, PI/2);
@@ -49,44 +51,28 @@ public class Turret {
         op.telemetry.addData("Status", "Turret Initialized");
     }
 
-    public void setTurretLockTheta(double lockTheta) {
-        turretLockTheta = lockTheta;
-    }
+    public void update(boolean slidesHome) {
 
-    public void turretHome() {
-        turretTargetTheta = initialTheta;
-    }
-
-    public void update(double robotTheta, double turretFF) {
-        turretTargetTheta = (turretLockTheta - robotTheta) % (2 * PI);
-        if (turretTargetTheta < 0) {
-            turretTargetTheta += 2 * PI;
+        //Move Turret Home Only If Set To Home And Slides Are Home
+        if (home && slidesHome){
+            turretTargetTheta = Math.min(Math.max(initialTheta, TURRET_MIN_THETA), TURRET_MAX_THETA);;
         }
-        // prevents wrap from 0 to 2pi from screwing things up
-        // now wrap is from -pi/2 to 3pi/2 (which the turret will never reach)
-        if (turretTargetTheta > 3*PI/2) {
-            turretTargetTheta -= 2*PI;
-        }
-        setTurretThetaFF(turretTargetTheta, turretFF);
-    }
 
-    // Turret
-    public void setTurretThetaFF(double theta, double ff) {
-        double clippedTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
         turretTheta = getTurretTheta();
-        turretErrorChange = clippedTargetTheta - turretTheta - turretError;
-        turretError = clippedTargetTheta - turretTheta;
-
-        setTurretPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * ff/* + fmoiTurret * getSlidesDistInches() * getSlidesDistInches()*/);
-    }
-
-    public void setTurretTheta(double theta) { // TODO: make private method
-        double clippedTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
-        turretTheta = getTurretTheta();
-        turretErrorChange = clippedTargetTheta - turretTheta - turretError;
-        turretError = clippedTargetTheta - turretTheta;
+        turretErrorChange = turretTargetTheta - turretTheta - turretError;
+        turretError = turretTargetTheta - turretTheta;
 
         setTurretPower(pTurret * turretError + dTurret * turretErrorChange);
+    }
+
+    // Set Controls
+    public void setDepositing(double theta) { // TODO: make private method
+        home = false;
+        turretTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);;
+    }
+
+    public void setHome() {
+        home = true;
     }
 
     public void setTurretPower(double power) {
@@ -113,5 +99,14 @@ public class Turret {
 
     public boolean turretAtPos() {
         return Math.abs(turretError) < TURRET_ERROR_THRESHOLD;
+    }
+
+    public void setTurretThetaFF(double theta, double ff) {        // TODO: remove usages and delete
+        double clippedTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
+        turretTheta = getTurretTheta();
+        turretErrorChange = clippedTargetTheta - turretTheta - turretError;
+        turretError = clippedTargetTheta - turretTheta;
+
+        setTurretPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * ff/* + fmoiTurret * getSlidesDistInches() * getSlidesDistInches()*/);
     }
 }

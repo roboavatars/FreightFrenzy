@@ -38,22 +38,18 @@ public class Robot {
     public TapeDetector tapeDetector;
     public Logger logger;
 
-    private ElapsedTime profiler;
-    private List<LynxModule> allHubs;
-    private VoltageSensor battery;
+    private final ElapsedTime profiler;
+    private final List<LynxModule> allHubs;
+    private final VoltageSensor battery;
     private boolean startVoltTooLow = false;
 
     // Class Constants
     private final int loggerUpdatePeriod = 2;
     private final int sensorUpdatePeriod = 10;
     private final double xyTolerance = 1;
-    private final double thetaTolerance = PI/35;
-    public final static double[] cameraRelativeToRobot = new double[] {1, 3};
-    public static double[] redGoalCoords = new double[] {96, 60};
-    public static double[] blueGoalCoords = new double[] {48, 60};
-    public static double[] neutGoalCoords = new double[] {72, 120};
-    public static double turretMovingAngle = 0.175;
-    public static double slidesDepositDist = 45;
+    private final double thetaTolerance = PI / 35;
+    public final static double[] cameraRelativeToRobot = new double[]{1, 3};
+
 
     // State Variables
     private final boolean isAuto;
@@ -62,14 +58,22 @@ public class Robot {
     private int loopCounter = 0;
     public String automationStep = "n/a";
 
+    public Deposit.DepositHeight depositTargetHeight = Deposit.DepositHeight.HIGH;
+
     public boolean intakeFull;
-    private Deposit.DepositHeight depositTargetHeight = Deposit.DepositHeight.HOME;
-    public Deposit.DepositHeight depositHeight = Deposit.DepositHeight.HIGH;
-    public boolean turretHome = true;
     public double turretGlobalTheta;
-    public double lockTheta;
     public double slidesDist;
-    public boolean allianceHub;
+
+    //Switching Between Preset Turret and Deposit Scoring Positions
+    public enum hub {
+        allianceLow,
+        allianceMid,
+        allianceHigh,
+        neutral,
+        duck
+    }
+    public hub cycleHub = hub.allianceHigh;
+
     public boolean useTapeDetector = false;
 
     // Automation Variables
@@ -100,7 +104,7 @@ public class Robot {
     public double startTime;
 
     // OpMode Stuff
-    private LinearOpMode op;
+    private final LinearOpMode op;
 
     // Constructor
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed) {
@@ -168,7 +172,7 @@ public class Robot {
         }
 
         if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && (y > 105 || intakeApproval)) {
-            if(!noExtend) intake.extend();
+            if (!noExtend) intake.extend();
             else intake.extend(Constants.INTAKE_HOME_POS);
             intake.on();
             intakeTransfer = true;
@@ -192,7 +196,6 @@ public class Robot {
                 deposit.hold();
                 intake.off();
                 intake.flipDown();
-                turretHome = false;
                 automationStep("Intake Transfer Done");
 
                 intakeTransfer = false;
@@ -200,13 +203,14 @@ public class Robot {
                 intakeRev = false;
                 depositingFreight = true;
             }
-            log("full: " + intakeFull + ", home: " + intake.slidesIsHome() + ", dFlip: " + (curTime-intakeFlipTime) + "");
+            log("full: " + intakeFull + ", home: " + intake.slidesIsHome() + ", dFlip: " + (curTime - intakeFlipTime) + "");
         }
 
         if (depositingFreight) {
-            if ((!isAuto && y <= 100) || (isAuto && y<=100 && Math.abs(theta-PI/2) < PI/10) /*&& notMoving() && turret.turretAtPos()*/) {
+            if ((!isAuto && y <= 100) || (isAuto && y <= 100 && Math.abs(theta - PI / 2) < PI / 10) /*&& notMoving() && turret.turretAtPos()*/) {
                 if (deposit.armSlidesHome() && depositOpenTime == -1) {
-                    depositAllianceHub(depositHeight);
+                    depositScore();
+                    turretScore();
                     automationStep("Extend Slides/Arm");
                 } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1 && (depositApproval && (!isAuto || deposit.getArmVelocity() < 5))) {
                     deposit.open();
@@ -214,6 +218,7 @@ public class Robot {
                     automationStep("Score Freight");
                 } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
                     depositHome();
+                    turretHome();
 
                     markCycle();
                     automationStep("Home Slides/Arm, Deposit Cycle Done");
@@ -232,22 +237,10 @@ public class Robot {
             }
         }
 
-        // Update turret
-        double turretFF = 0;
-        if (turretHome) {
-//            turret.turretHome();
-            if (deposit.slidesHome()) {
-                turret.setTurretTheta(PI/2);
-            }
-        } else {
-            turretFF = updateTurret();
-            turret.setTurretTheta(turretMovingAngle * PI);
-            // addPacket("turret FF", turretFF);
-        }
+        // Update Turret
+        turret.update(deposit.slidesHome());
 
-//        turret.update(theta, turretFF);
-        turretGlobalTheta = turret.getTurretTheta() + theta - PI/2;
-        deposit(depositTargetHeight);
+        //Update Deposit
         deposit.update();
 
         // Update Position
@@ -258,14 +251,21 @@ public class Robot {
         x = drivetrain.x;
         y = drivetrain.y;
         theta = drivetrain.theta;
-        vx = (x - prevX) / timeDiff; vy = (y - prevY) / timeDiff; w = (theta - prevTheta) / timeDiff;
-        ax = (vx - prevVx) / timeDiff; ay = (vy - prevVy) / timeDiff; a = (w - prevW) / timeDiff;
+        vx = (x - prevX) / timeDiff;
+        vy = (y - prevY) / timeDiff;
+        w = (theta - prevTheta) / timeDiff;
+        ax = (vx - prevVx) / timeDiff;
+        ay = (vy - prevVy) / timeDiff;
+        a = (w - prevW) / timeDiff;
 
         // Remember Previous Motion Info
-        prevX = x; prevY = y;
+        prevX = x;
+        prevY = y;
         prevTheta = theta;
         prevTime = curTime / 1000;
-        prevVx = vx; prevVy = vy; prevW = w;
+        prevVx = vx;
+        prevVy = vy;
+        prevW = w;
 
         /*
         // Update Tape Detector
@@ -311,75 +311,67 @@ public class Robot {
         }
     }
 
-    public double updateTurret() {
-        // Calculating the Coords of the Turret Center
-        double[] turretCenter = new double[2];
-        turretCenter[0] = x + Math.cos(theta) * Turret.TURRET_Y_OFFSET;
-        turretCenter[1] = y + Math.sin(theta) * Turret.TURRET_Y_OFFSET;
-
-        double turretFF = 0;
-        double goalX;
-        double goalY;
-        if (allianceHub && isRed) { // red
-            goalX = redGoalCoords[0];
-            goalY = redGoalCoords[1];
-        } else if (allianceHub) { // blue
-            goalX = blueGoalCoords[0];
-            goalY = blueGoalCoords[1];
-        } else { // neutral
-            goalX = neutGoalCoords[0];
-            goalY = neutGoalCoords[1];
-        }
-        goalX -= turretCenter[0];
-        goalY -= turretCenter[1];
-
-        slidesDist = hypot(goalX, goalY);
-//        // calculates ff for turret control (w + atan dot)
-//        turretFF = 0; //w + (goalX * vy - vx * goalY) / (goalX * goalX + goalY * goalY);
-//
-//        lockTheta = PI + atan2(goalY, goalX);
-//        lockTheta %= 2*PI;
-//        if (lockTheta < 0) {
-//            lockTheta += 2*PI;
-//        }
-//
-//        turret.setTurretLockTheta(lockTheta);
-
-        return turretFF;
-    }
-
-    // Set Depositor Controls
-    public void depositHome() {
-        turretHome = true;
-        depositTargetHeight = Deposit.DepositHeight.HOME;
-    }
-
-    public void depositAllianceHub(Deposit.DepositHeight depositTargetHeight) {
-        turretHome = false;
-        allianceHub = true;
-        this.depositTargetHeight = depositTargetHeight;
-    }
-
-    public void depositTrackSharedHub() {
-        turretHome = false;
-        allianceHub = false;
-        depositTargetHeight = Deposit.DepositHeight.LOW;
-    }
-
-    public void deposit(Deposit.DepositHeight depositTargetHeight) {
-        this.depositTargetHeight = depositTargetHeight;
-        if (depositTargetHeight == Deposit.DepositHeight.LOW) {
-            deposit.useMidwayArmPos = false;
+    public void depositScore() {
+        //Set Arm + Slides Controls
+        if (cycleHub == hub.allianceLow) {
+            Deposit.useMidwayArmPos = false;
             deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, Constants.SLIDES_DISTANCE_LOW);
-        } else if (depositTargetHeight == Deposit.DepositHeight.MID) {
-            deposit.useMidwayArmPos = false;
+        } else if (cycleHub == hub.allianceMid) {
+            Deposit.useMidwayArmPos = false;
             deposit.setDepositControls(Constants.DEPOSIT_ARM_MID, Constants.SLIDES_DISTANCE_MID);
-        } else if (depositTargetHeight == Deposit.DepositHeight.HIGH) {
-            deposit.useMidwayArmPos = true;
+        } else if (cycleHub == hub.allianceHigh) {
+            Deposit.useMidwayArmPos = true;
             deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, Constants.SLIDES_DISTANCE_HIGH);
-        }  else { // Home
-            deposit.setDepositHome();
+        } else if (cycleHub == hub.neutral) {
+            Deposit.useMidwayArmPos = false;
+            deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, 0);
+        } else if (cycleHub == hub.duck){
+            Deposit.useMidwayArmPos = true;
+            deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, Constants.SLIDES_DISTANCE_DUCK);
         }
+    }
+
+    public void depositHome() {
+        deposit.setDepositHome();
+    }
+
+    public void turretScore() {
+        //Set Turret Controls
+        if (cycleHub == hub.allianceLow) {
+            if (isRed) {
+                turret.setDepositing(Constants.TURRET_ALLIANCE_RED_CYCLE_THETA * PI);
+            } else {
+                turret.setDepositing((1-Constants.TURRET_ALLIANCE_RED_CYCLE_THETA) * PI);
+            }
+        } else if (cycleHub == hub.allianceMid) {
+            if (isRed) {
+                turret.setDepositing(Constants.TURRET_ALLIANCE_RED_CYCLE_THETA * PI);
+            } else {
+                turret.setDepositing((1-Constants.TURRET_ALLIANCE_RED_CYCLE_THETA) * PI);
+            }
+        } else if (cycleHub == hub.allianceHigh) {
+            if (isRed) {
+                turret.setDepositing(Constants.TURRET_ALLIANCE_RED_CYCLE_THETA * PI);
+            } else {
+                turret.setDepositing((1-Constants.TURRET_ALLIANCE_RED_CYCLE_THETA) * PI);
+            }
+        } else if (cycleHub == hub.neutral) {
+            if (isRed) {
+                turret.setDepositing(Constants.TURRET_NEUTRAL_RED_CYCLE_THETA * PI);
+            } else {
+                turret.setDepositing((1-Constants.TURRET_NEUTRAL_RED_CYCLE_THETA) * PI);
+            }
+        } else if (cycleHub == hub.duck){
+            if (isRed) {
+                turret.setDepositing(Constants.TURRET_DUCK_RED_CYCLE_THETA * PI);
+            } else {
+                turret.setDepositing((1-Constants.TURRET_DUCK_RED_CYCLE_THETA) * PI);
+            }
+        }
+    }
+
+    public void turretHome() {
+        turret.setHome();
     }
 
     public void markCycle() {
@@ -437,7 +429,7 @@ public class Robot {
 
     // Check if robot is at a certain point/angle (default tolerance)
     public boolean isAtPose(double targetX, double targetY) {
-        return isAtPose(targetX, targetY, 0, xyTolerance, xyTolerance, 2*PI);
+        return isAtPose(targetX, targetY, 0, xyTolerance, xyTolerance, 2 * PI);
     }
 
     public boolean isAtPose(double targetX, double targetY, double targetTheta) {
@@ -448,6 +440,7 @@ public class Robot {
     public boolean isAtPose(double targetX, double targetY, double xTolerance, double yTolerance) {
         return abs(x - targetX) < xTolerance && abs(y - targetY) < yTolerance;
     }
+
     public boolean isAtPose(double targetX, double targetY, double targetTheta, double xTolerance, double yTolerance, double thetaTolerance) {
         return abs(x - targetX) < xTolerance && abs(y - targetY) < yTolerance && abs(theta - targetTheta) < thetaTolerance;
     }
@@ -468,6 +461,7 @@ public class Robot {
     private void profile(int num) {
 //        Log.w("profiler", num + ": " + profiler.milliseconds());
     }
+
     public void automationStep(String step) {
         automationStep = step;
         log(automationStep);
@@ -478,3 +472,4 @@ public class Robot {
         return Double.parseDouble(String.format("%.5f", num));
     }
 }
+

@@ -77,11 +77,11 @@ public class RedAutoWarehouse extends LinearOpMode {
          */
 
         if (barcodeCase == 0) {
-            robot.depositHeight = Deposit.DepositHeight.LOW;
+            robot.cycleHub = Robot.hub.allianceLow;
         } else if (barcodeCase == 1) {
-            robot.depositHeight = Deposit.DepositHeight.MID;
+            robot.cycleHub = Robot.hub.allianceMid;
         } else {
-            robot.depositHeight = Deposit.DepositHeight.HIGH;
+            robot.cycleHub = Robot.hub.allianceHigh;
         }
 
         Waypoint[] goToWarehouseWaypoints = new Waypoint[] {
@@ -103,7 +103,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 if (!robot.depositingFreight/*time.seconds() > preloadScoreTime + 1.5*/) {
                     time.reset();
                     preloadScore = true;
-                    robot.depositHeight = Deposit.DepositHeight.HIGH;
+                    robot.cycleHub = Robot.hub.allianceHigh;
                 }
             } else if (!goToWarehouse) {
                 if (!robot.intakeFull && robot.y >= 110 && time.seconds() > goToWarehouseTime + 0.1) {

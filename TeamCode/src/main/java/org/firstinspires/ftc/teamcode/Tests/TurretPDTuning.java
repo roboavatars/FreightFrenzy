@@ -24,7 +24,7 @@ public class TurretPDTuning extends LinearOpMode {
 
         while (opModeIsActive()) {
             if (enabled) {
-                deposit.setTurretTheta(targetTheta * PI);
+                deposit.setDepositing(targetTheta * PI);
             } else {
                 deposit.setTurretPower(0);
             }

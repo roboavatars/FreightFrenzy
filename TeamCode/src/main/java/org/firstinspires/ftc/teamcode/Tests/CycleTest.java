@@ -89,7 +89,7 @@ public class CycleTest extends LinearOpMode {
             }
 
             if (home) {
-                turret.setTurretTheta(PI/2);
+                turret.setDepositing(PI/2);
 
                 deposit.setArmPIDCoefficients(Deposit.pArmDown, Deposit.dArmDown);
                 deposit.setArmControls(Constants.DEPOSIT_ARM_HOME);
@@ -97,7 +97,7 @@ public class CycleTest extends LinearOpMode {
                 deposit.setSlidesPIDCoefficients(pSlidesRetract);
                 deposit.setSlidesTarget(0);
             } else {
-                turret.setTurretTheta(turretMovingAngle * PI);
+                turret.setDepositing(turretMovingAngle * PI);
 
                 deposit.setArmPIDCoefficients(Deposit.pArmUp, Deposit.dArmUp);
                 if (!deposit.slidesAtPosPercent(0.75)) {

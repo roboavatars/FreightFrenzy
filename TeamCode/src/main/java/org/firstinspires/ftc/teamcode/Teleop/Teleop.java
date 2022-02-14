@@ -100,11 +100,40 @@ public class Teleop extends LinearOpMode {
             if (gamepad2.dpad_up) Constants.DEPOSIT_ARM_HIGH -= 2;
             else if (gamepad2.dpad_down) Constants.DEPOSIT_ARM_HIGH += 2;
 
-            if (gamepad2.dpad_right) robot.turretMovingAngle -= .005;
-            else if (gamepad2.dpad_left) robot.turretMovingAngle += .005;
+            if (gamepad2.dpad_right){
+                if (robot.cycleHub == Robot.hub.allianceHigh
+                        || robot.cycleHub == Robot.hub.allianceMid
+                        || robot.cycleHub == Robot.hub.allianceLow){
+                    Constants.TURRET_ALLIANCE_RED_CYCLE_THETA -= 0.005;
+                } else if (robot.cycleHub == Robot.hub.neutral){
+                    Constants.TURRET_NEUTRAL_RED_CYCLE_THETA -= 0.005;
+                } else if (robot.cycleHub == Robot.hub.duck){
+                    Constants.TURRET_DUCK_RED_CYCLE_THETA -= 0.005;
+                }
+            } else if (gamepad2.dpad_left){
+                if (robot.cycleHub == Robot.hub.allianceHigh
+                        || robot.cycleHub == Robot.hub.allianceMid
+                        || robot.cycleHub == Robot.hub.allianceLow){
+                    Constants.TURRET_ALLIANCE_RED_CYCLE_THETA += 0.005;
+                } else if (robot.cycleHub == Robot.hub.neutral){
+                    Constants.TURRET_NEUTRAL_RED_CYCLE_THETA += 0.005;
+                } else if (robot.cycleHub == Robot.hub.duck){
+                    Constants.TURRET_DUCK_RED_CYCLE_THETA += 0.005;
+                }
+            }
 
-            if (gamepad2.y) robot.slidesDepositDist += .2;
-            else if (gamepad2.a) robot.slidesDepositDist -= .2;
+            if (gamepad2.y){
+                if (robot.cycleHub == Robot.hub.allianceHigh) Constants.SLIDES_DISTANCE_HIGH += 0.2;
+                else if (robot.cycleHub == Robot.hub.allianceMid) Constants.SLIDES_DISTANCE_MID += 0.2;
+                else if (robot.cycleHub == Robot.hub.allianceLow) Constants.SLIDES_DISTANCE_LOW += 0.2;
+                else if (robot.cycleHub == Robot.hub.duck) Constants.SLIDES_DISTANCE_DUCK += 0.2;
+            }
+            else if (gamepad2.a){
+                if (robot.cycleHub == Robot.hub.allianceHigh) Constants.SLIDES_DISTANCE_HIGH -= 0.2;
+                else if (robot.cycleHub == Robot.hub.allianceMid) Constants.SLIDES_DISTANCE_MID -= 0.2;
+                else if (robot.cycleHub == Robot.hub.allianceLow) Constants.SLIDES_DISTANCE_LOW -= 0.2;
+                else if (robot.cycleHub == Robot.hub.duck) Constants.SLIDES_DISTANCE_DUCK -= 0.2;
+            }
 
             // Intake On / Off / Transfer
 //            if (gamepad1.right_bumper) {

@@ -37,6 +37,12 @@ public class Constants {
     public static double SLIDES_DISTANCE_LOW = 19;
     public static double SLIDES_DISTANCE_MID = 19;
     public static double SLIDES_DISTANCE_HIGH = 19;
+    public static double SLIDES_DISTANCE_DUCK = 25;
+
+    //Turret
+    public static double TURRET_ALLIANCE_RED_CYCLE_THETA = 0.175;
+    public static double TURRET_NEUTRAL_RED_CYCLE_THETA = 0;
+    public static double TURRET_DUCK_RED_CYCLE_THETA = 0;
 
     // Carousel
     public static double CAROUSEL_POWER = 0.55;
