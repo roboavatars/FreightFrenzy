@@ -61,8 +61,6 @@ public class Robot {
 
     public boolean intakeFull;
     public double turretGlobalTheta;
-    public boolean depositSlidesHome;
-    public double depositSlidesDist;
 
     //Deposit Tracking
     public boolean trackGoal = false;
@@ -75,15 +73,15 @@ public class Robot {
     public double[] blueGoalCoords = new double[] {48, 60};
     public double[] neutGoalCoords = new double[] {72, 120};
 
-    //Switching Between Preset Turret and Deposit Scoring Positions
-    public enum hub {
+    // Switching Between Preset Turret and Deposit Scoring Positions
+    public enum DepositTarget {
         allianceLow,
         allianceMid,
         allianceHigh,
         neutral,
         duck
     }
-    public hub cycleHub = hub.allianceHigh;
+    public DepositTarget cycleHub = DepositTarget.allianceHigh;
 
     public boolean useTapeDetector = false;
 
@@ -169,8 +167,6 @@ public class Robot {
         // Don't check states every loop
         if (loopCounter % sensorUpdatePeriod == 0) {
             intakeFull = intake.intakeFull();
-            depositSlidesHome = deposit.slidesHome();
-            depositSlidesDist = deposit.getSlidesDistInches();
         }
 
         loopCounter++;
@@ -252,9 +248,9 @@ public class Robot {
 
         // Update Turret
         if (trackGoal) updateTrackingMath();
-        turret.update(depositSlidesHome, theta, depositSlidesDist, turretFF);
+        turret.update(deposit.slidesHome(), theta, deposit.getSlidesDistInches(), turretFF);
 
-        //Update Deposit
+        // Update Deposit
         if (trackGoal && !setDepositControlsHome) depositScore();
         deposit.update();
 
@@ -293,7 +289,7 @@ public class Robot {
         // Log Data
         if (loopCounter % loggerUpdatePeriod == 0) {
             logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a,
-                    turretGlobalTheta, distToGoal, depositTargetHeight, intake.slidesIsHome(), cycles, cycleTotal / cycles);
+                    turretGlobalTheta, deposit.getSlidesDistInches(), cycleHub, intake.slidesIsHome(), cycles, cycleTotal / cycles);
         }
 
         // Dashboard Telemetry
@@ -308,7 +304,7 @@ public class Robot {
         addPacket("7 Automation Step", automationStep);
         addPacket("8 Run Time", (curTime - startTime) / 1000);
         addPacket("9 Update Frequency (Hz)", round(1 / timeDiff));
-        addPacket("intake full, intake approval, deposit approval", intakeFull + " " + intakeApproval + " " + depositApproval);
+        addPacket("Intake Full", intakeFull);
         if (!isAuto) {
             addPacket("Cycle Time", (curTime - lastCycleTime) / 1000);
             addPacket("Average Cycle Time", round(cycleTotal / cycles));
@@ -326,37 +322,55 @@ public class Robot {
         }
     }
 
+    public void cancelAutomation() {
+        intake.off();
+        intake.home();
+        intake.flipDown();
+        deposit.open();
+        depositHome();
+        turretHome();
+
+        intakeApproval = false;
+        intakeTransfer = false;
+        intakeFlipTime = -1;
+        intakeRev = false;
+        depositApproval = false;
+        depositOpenTime = -1;
+        depositingFreight = false;
+        automationStep("Automation Cancelled");
+    }
+
     public void depositScore() {
         setDepositControlsHome = false;
-        //Set Arm + Slides Controls
+        // Set Arm + Slides Controls
         if (trackGoal) {
             updateTrackingMath();
             Deposit.useMidwayArmPos = false;
-            if (cycleHub == hub.allianceLow) {
+            if (cycleHub == DepositTarget.allianceLow) {
                 deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, distToGoal - Constants.ARM_DISTANCE);
-            } else if (cycleHub == hub.allianceMid) {
+            } else if (cycleHub == DepositTarget.allianceMid) {
                 deposit.setDepositControls(Constants.DEPOSIT_ARM_MID, distToGoal - Constants.ARM_DISTANCE);
-            } else if (cycleHub == hub.allianceHigh) {
+            } else if (cycleHub == DepositTarget.allianceHigh) {
                 deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, distToGoal - Constants.ARM_DISTANCE);
-            } else if (cycleHub == hub.neutral) {
+            } else if (cycleHub == DepositTarget.neutral) {
                 deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, 0);
-            } else if (cycleHub == hub.duck) {
+            } else if (cycleHub == DepositTarget.duck) {
                 deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, distToGoal - Constants.ARM_DISTANCE);
             }
         } else {
-            if (cycleHub == hub.allianceLow) {
+            if (cycleHub == DepositTarget.allianceLow) {
                 Deposit.useMidwayArmPos = false;
                 deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, Constants.SLIDES_DISTANCE_LOW);
-            } else if (cycleHub == hub.allianceMid) {
+            } else if (cycleHub == DepositTarget.allianceMid) {
                 Deposit.useMidwayArmPos = false;
                 deposit.setDepositControls(Constants.DEPOSIT_ARM_MID, Constants.SLIDES_DISTANCE_MID);
-            } else if (cycleHub == hub.allianceHigh) {
+            } else if (cycleHub == DepositTarget.allianceHigh) {
                 Deposit.useMidwayArmPos = true;
                 deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, Constants.SLIDES_DISTANCE_HIGH);
-            } else if (cycleHub == hub.neutral) {
+            } else if (cycleHub == DepositTarget.neutral) {
                 Deposit.useMidwayArmPos = false;
                 deposit.setDepositControls(Constants.DEPOSIT_ARM_LOW, 0);
-            } else if (cycleHub == hub.duck) {
+            } else if (cycleHub == DepositTarget.duck) {
                 Deposit.useMidwayArmPos = true;
                 deposit.setDepositControls(Constants.DEPOSIT_ARM_HIGH, Constants.SLIDES_DISTANCE_DUCK);
             }
@@ -369,24 +383,24 @@ public class Robot {
     }
 
     public void turretScore() {
-        //Set Turret Controls
+        // Set Turret Controls
         if (trackGoal) {
             updateTrackingMath();
             turret.setTracking(turretLockTheta);
         } else {
-            if (cycleHub == hub.allianceLow || cycleHub == hub.allianceMid || cycleHub == hub.allianceHigh) {
+            if (cycleHub == DepositTarget.allianceLow || cycleHub == DepositTarget.allianceMid || cycleHub == DepositTarget.allianceHigh) {
                 if (isRed) {
                     turret.setDepositing(Constants.TURRET_ALLIANCE_RED_CYCLE_THETA * PI);
                 } else {
                     turret.setDepositing((1 - Constants.TURRET_ALLIANCE_RED_CYCLE_THETA) * PI);
                 }
-            } else if (cycleHub == hub.neutral) {
+            } else if (cycleHub == DepositTarget.neutral) {
                 if (isRed) {
                     turret.setDepositing(Constants.TURRET_NEUTRAL_RED_CYCLE_THETA * PI);
                 } else {
                     turret.setDepositing((1 - Constants.TURRET_NEUTRAL_RED_CYCLE_THETA) * PI);
                 }
-            } else if (cycleHub == hub.duck) {
+            } else if (cycleHub == DepositTarget.duck) {
                 if (isRed) {
                     turret.setDepositing(Constants.TURRET_DUCK_RED_CYCLE_THETA * PI);
                 } else {
@@ -400,13 +414,13 @@ public class Robot {
         turret.setHome();
     }
 
-    public void updateTrackingMath(){
+    public void updateTrackingMath() {
         turretCenter[0] = x + Math.cos(theta) * Turret.TURRET_Y_OFFSET;
         turretCenter[1] = y + Math.sin(theta) * Turret.TURRET_Y_OFFSET;
 
         double goalX;
         double goalY;
-        if (cycleHub == hub.neutral) {
+        if (cycleHub == DepositTarget.neutral) {
             goalX = neutGoalCoords[0];
             goalY = neutGoalCoords[1];
         } else { //Alliance Hub

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.Debug;
 
 import android.annotation.SuppressLint;
 
-import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.io.BufferedReader;
@@ -29,7 +28,7 @@ public class Logger extends Thread {
     private double vx, vy, w;
     private double ax, ay, alpha;
     private double turretTheta, depositSlidesDist;
-    private Deposit.DepositHeight depositTarget;
+    private Robot.DepositTarget depositTarget;
     private boolean intakeSlidesExtend;
     private int numCycles;
     private double avgCycleTime;
@@ -103,7 +102,7 @@ public class Logger extends Thread {
      */
     @SuppressLint("SimpleDateFormat")
     public void logData(double timeSinceSt, double x, double y, double theta, double vx, double vy, double w, double ax, double ay, double alpha,
-                        double turretTheta, double depositSlidesDist, Deposit.DepositHeight depositTarget, boolean intakeSlidesExtend, int numCycles, double avgCycleTime) {
+                        double turretTheta, double depositSlidesDist, Robot.DepositTarget depositTarget, boolean intakeSlidesExtend, int numCycles, double avgCycleTime) {
         df = new SimpleDateFormat("HH:mm:ss.SSS");
         this.timeSinceSt = timeSinceSt;
         this.x = x; this.y = y; this.theta = theta;

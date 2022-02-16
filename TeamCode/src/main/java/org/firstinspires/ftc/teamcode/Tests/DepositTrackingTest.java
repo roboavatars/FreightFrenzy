@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Disabled
@@ -29,7 +28,7 @@ public class DepositTrackingTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            robot.cycleHub = Robot.hub.allianceHigh;
+            robot.cycleHub = Robot.DepositTarget.allianceHigh;
 
             // Deposit Gate
             if (gamepad1.b && depositToggle == false) {

@@ -56,10 +56,13 @@ public class Turret {
 
     public void update(boolean slidesHome, double robotTheta, double slidesDist, double ff) {
 
-        if(tracking){
+        if (tracking) {
             double targetTheta = lockTheta - robotTheta;
             targetTheta %= 2*PI;
             if (targetTheta < 0) targetTheta += 2*PI;
+            // prevents wrap from 0 to 2pi from screwing things up
+            // now wrap is from -pi/2 to 3pi/2 (which the turret will never reach)
+            if (targetTheta > 3*PI/2) targetTheta -= 2*PI;
             double clippedTargetTheta = Math.min(Math.max(targetTheta, TURRET_MIN_THETA), TURRET_MAX_THETA);
             turretTheta = getTurretTheta();
             turretErrorChange = clippedTargetTheta - turretTheta - turretError;
@@ -67,7 +70,7 @@ public class Turret {
 
             setTurretPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * ff + fmoiTurret * slidesDist * slidesDist);
         } else {
-            //Move Turret Home Only If Set To Home And Slides Are Home
+            // Move Turret Home Only If Set To Home And Slides Are Home
             if (home && slidesHome) {
                 turretTargetTheta = Math.min(Math.max(initialTheta, TURRET_MIN_THETA), TURRET_MAX_THETA);
             }
@@ -84,7 +87,7 @@ public class Turret {
     public void setDepositing(double theta) { // TODO: make private method
         tracking = false;
         home = false;
-        turretTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);;
+        turretTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
     }
 
     public void setHome() {
@@ -92,7 +95,7 @@ public class Turret {
         home = true;
     }
 
-    public void setTracking(double lockTheta){
+    public void setTracking(double lockTheta) {
         tracking = true;
         this.lockTheta = lockTheta;
     }

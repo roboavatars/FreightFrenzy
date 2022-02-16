@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Autonomous.Red;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -11,10 +12,7 @@ import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
-import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
-
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 
 @Config
 @Autonomous(name = "0 0 0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
@@ -77,11 +75,11 @@ public class RedAutoWarehouse extends LinearOpMode {
          */
 
         if (barcodeCase == 0) {
-            robot.cycleHub = Robot.hub.allianceLow;
+            robot.cycleHub = Robot.DepositTarget.allianceLow;
         } else if (barcodeCase == 1) {
-            robot.cycleHub = Robot.hub.allianceMid;
+            robot.cycleHub = Robot.DepositTarget.allianceMid;
         } else {
-            robot.cycleHub = Robot.hub.allianceHigh;
+            robot.cycleHub = Robot.DepositTarget.allianceHigh;
         }
 
         Waypoint[] goToWarehouseWaypoints = new Waypoint[] {
@@ -103,7 +101,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 if (!robot.depositingFreight/*time.seconds() > preloadScoreTime + 1.5*/) {
                     time.reset();
                     preloadScore = true;
-                    robot.cycleHub = Robot.hub.allianceHigh;
+                    robot.cycleHub = Robot.DepositTarget.allianceHigh;
                 }
             } else if (!goToWarehouse) {
                 if (!robot.intakeFull && robot.y >= 110 && time.seconds() > goToWarehouseTime + 0.1) {

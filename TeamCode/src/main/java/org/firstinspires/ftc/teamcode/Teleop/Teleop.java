@@ -37,11 +37,9 @@ public class Teleop extends LinearOpMode {
 
     // Toggles
     private boolean servoToggle = false;
-    private int depositServoStatus = 0;
 
     // Cycle counter stuff
     private final ArrayList<Double> cycles = new ArrayList<>();
-    private boolean cycleToggle = false;
 
     // Rumbles
     private boolean teleRumble1 = false;
@@ -52,21 +50,19 @@ public class Teleop extends LinearOpMode {
     Controller Button Mappings:
     Gamepad 1
     Left Stick/Right Stick - Drivetrain Controls
-    Left Trigger - Intake Reverse
-    Right Trigger - Intake On
-
+    Left Bumper - Auto intake
+    Right Bumper - Approve freight deposit
+    A - Cancel automation
 
     Gamepad 2
-    Right Trigger - Slow Mode
-    Left Trigger - Intake Override
-    A - Slides To Home Pos
-    B - Slides to Mid Pos
-    X - Slides To Top Pos
-    Y - Slides To Capping Pos
-    Right Bumper - Open Depositor Servo
     Left Bumper - Carousel Motor Red
-    Dpad Down - Carousel Motor Blue
-    Dpad Up - Team Marker Servo
+    Right Trigger - Slow Mode
+    A - Increase slide extend
+    Y - Decrease slide extend
+    Dpad Up - Increase arm position
+    Dpad Down - Decrease arm position
+    Dpad Left - Decrease turret theta
+    Dpad Right - Increase turret theta
      */
 
     @Override
@@ -97,120 +93,44 @@ public class Teleop extends LinearOpMode {
                 robot.depositApproval = true;
             }
 
+            if (gamepad1.a) {
+                robot.cancelAutomation();
+            }
+
             if (gamepad2.dpad_up) Constants.DEPOSIT_ARM_HIGH -= 2;
             else if (gamepad2.dpad_down) Constants.DEPOSIT_ARM_HIGH += 2;
 
-            if (gamepad2.dpad_right){
-                if (robot.cycleHub == Robot.hub.allianceHigh
-                        || robot.cycleHub == Robot.hub.allianceMid
-                        || robot.cycleHub == Robot.hub.allianceLow){
+            if (gamepad2.dpad_right) {
+                if (robot.cycleHub == Robot.DepositTarget.allianceHigh || robot.cycleHub == Robot.DepositTarget.allianceMid
+                        || robot.cycleHub == Robot.DepositTarget.allianceLow) {
                     Constants.TURRET_ALLIANCE_RED_CYCLE_THETA -= 0.005;
-                } else if (robot.cycleHub == Robot.hub.neutral){
+                } else if (robot.cycleHub == Robot.DepositTarget.neutral) {
                     Constants.TURRET_NEUTRAL_RED_CYCLE_THETA -= 0.005;
-                } else if (robot.cycleHub == Robot.hub.duck){
+                } else if (robot.cycleHub == Robot.DepositTarget.duck) {
                     Constants.TURRET_DUCK_RED_CYCLE_THETA -= 0.005;
                 }
-            } else if (gamepad2.dpad_left){
-                if (robot.cycleHub == Robot.hub.allianceHigh
-                        || robot.cycleHub == Robot.hub.allianceMid
-                        || robot.cycleHub == Robot.hub.allianceLow){
+            } else if (gamepad2.dpad_left) {
+                if (robot.cycleHub == Robot.DepositTarget.allianceHigh || robot.cycleHub == Robot.DepositTarget.allianceMid
+                        || robot.cycleHub == Robot.DepositTarget.allianceLow) {
                     Constants.TURRET_ALLIANCE_RED_CYCLE_THETA += 0.005;
-                } else if (robot.cycleHub == Robot.hub.neutral){
+                } else if (robot.cycleHub == Robot.DepositTarget.neutral) {
                     Constants.TURRET_NEUTRAL_RED_CYCLE_THETA += 0.005;
-                } else if (robot.cycleHub == Robot.hub.duck){
+                } else if (robot.cycleHub == Robot.DepositTarget.duck) {
                     Constants.TURRET_DUCK_RED_CYCLE_THETA += 0.005;
                 }
             }
 
-            if (gamepad2.y){
-                if (robot.cycleHub == Robot.hub.allianceHigh) Constants.SLIDES_DISTANCE_HIGH += 0.2;
-                else if (robot.cycleHub == Robot.hub.allianceMid) Constants.SLIDES_DISTANCE_MID += 0.2;
-                else if (robot.cycleHub == Robot.hub.allianceLow) Constants.SLIDES_DISTANCE_LOW += 0.2;
-                else if (robot.cycleHub == Robot.hub.duck) Constants.SLIDES_DISTANCE_DUCK += 0.2;
-            }
-            else if (gamepad2.a){
-                if (robot.cycleHub == Robot.hub.allianceHigh) Constants.SLIDES_DISTANCE_HIGH -= 0.2;
-                else if (robot.cycleHub == Robot.hub.allianceMid) Constants.SLIDES_DISTANCE_MID -= 0.2;
-                else if (robot.cycleHub == Robot.hub.allianceLow) Constants.SLIDES_DISTANCE_LOW -= 0.2;
-                else if (robot.cycleHub == Robot.hub.duck) Constants.SLIDES_DISTANCE_DUCK -= 0.2;
-            }
-
-            // Intake On / Off / Transfer
-//            if (gamepad1.right_bumper) {
-//                robot.intake.extend();
-//                robot.intake.on();
-//                robot.intake.flipDown();
-//            } else if (gamepad1.left_bumper) {
-//                robot.intake.home();
-//                robot.intake.flipUp();
-//                robot.intake.off();
-//            } else if (gamepad1.a) {
-//                robot.deposit.open();
-//                robot.intake.reverse();
-//            } else {
-//                robot.intake.off();
-//            }
-
-            // Deposit Controls
-//            if (gamepad1.x) {
-//                robot.deposit.hold();
-//                robot.deposit.setArmControls(Constants.DEPOSIT_ARM_HIGH);
-//                robot.deposit.setSlidesControls((int) (24.9 * Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH));
-//                turretHome = false;
-//            } else if (gamepad1.y) {
-//                robot.deposit.open();
-//            } else if (gamepad1.b) {
-//                robot.deposit.setArmControls(Constants.DEPOSIT_ARM_OVER_SLIDES_MOTOR);
-//                robot.deposit.setSlidesControls(0);
-//                turretHome = true;
-//            }
-
-//            if (turretHome){
-//                robot.turret.setTurretTheta(PI/2);
-//            } else {
-//                robot.turret.setTurretTheta(PI/4);
-//            }
-
-            /*
-
-            // Move Back Home
-            if (gamepad2.a && !cycleToggle) {
-                robot.deposit.open();
-                depositServoStatus = 0;
-                robot.depositHome();
-
-                // cycle stuff
-                cycleToggle = true;
-                cycles.add(cycleTimer.seconds());
-                cycleTimer.reset();
-                robot.markCycle();
-            } else if (!gamepad2.a && cycleToggle) {
-                cycleToggle = false;
-            }
-
-            // Set Deposit to Track Alliance Hub
-            if (gamepad2.x) {
-                robot.deposit.close();
-                depositServoStatus = 1;
-                robot.depositAllianceHub(Deposit.DepositHeight.HIGH);
-            }
-
-            // Set Deposit to Track Shared Hub
             if (gamepad2.y) {
-                robot.deposit.close();
-                depositServoStatus = 1;
-                robot.depositTrackSharedHub();
+                if (robot.cycleHub == Robot.DepositTarget.allianceHigh) Constants.SLIDES_DISTANCE_HIGH += 0.2;
+                else if (robot.cycleHub == Robot.DepositTarget.allianceMid) Constants.SLIDES_DISTANCE_MID += 0.2;
+                else if (robot.cycleHub == Robot.DepositTarget.allianceLow) Constants.SLIDES_DISTANCE_LOW += 0.2;
+                else if (robot.cycleHub == Robot.DepositTarget.duck) Constants.SLIDES_DISTANCE_DUCK += 0.2;
+            } else if (gamepad2.a) {
+                if (robot.cycleHub == Robot.DepositTarget.allianceHigh) Constants.SLIDES_DISTANCE_HIGH -= 0.2;
+                else if (robot.cycleHub == Robot.DepositTarget.allianceMid) Constants.SLIDES_DISTANCE_MID -= 0.2;
+                else if (robot.cycleHub == Robot.DepositTarget.allianceLow) Constants.SLIDES_DISTANCE_LOW -= 0.2;
+                else if (robot.cycleHub == Robot.DepositTarget.duck) Constants.SLIDES_DISTANCE_DUCK -= 0.2;
             }
-
-            // Carousel
-            if (gamepad2.left_bumper) {
-                robot.carousel.rotateRed();
-            } else if (gamepad2.dpad_down) {
-                robot.carousel.rotateBlue();
-            } else {
-                robot.carousel.stop();
-            }
-             */
 
             // Slow Mode
             if (gamepad2.right_trigger > 0) {
