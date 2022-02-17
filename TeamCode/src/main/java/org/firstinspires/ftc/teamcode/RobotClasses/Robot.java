@@ -61,7 +61,7 @@ public class Robot {
     public boolean intakeStalling;
     public double turretGlobalTheta;
 
-    //Deposit Tracking
+    // Deposit Tracking
     public boolean trackGoal = false;
     private boolean setDepositControlsHome = true;
     public double distToGoal;
@@ -108,6 +108,7 @@ public class Robot {
 
     public double stallStartTime = -1;
     public static int stallThreshold = 1000;
+    public double automationStepTime;
 
     // Motion Variables
     public double x, y, theta, vx, vy, w;
@@ -183,12 +184,14 @@ public class Robot {
             firstLoop = false;
         }
 
+        // Auto-intaking
         if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && (/*y > 105 || */intakeApproval)) {
             if (!noExtend) intake.extend();
             else intake.extend(Constants.INTAKE_HOME_POS);
             intake.on();
             intakeTransfer = true;
             intakeApproval = false;
+            automationStepTime = curTime;
             automationStep("Intake Extend/On");
         } else if (intakeTransfer) {
             if (intakeFull && !intake.slidesIsHome() && intakeFlipTime == -1) {
@@ -217,6 +220,7 @@ public class Robot {
             }
         }
 
+        // Auto-depositing
         if (depositingFreight) {
             if ((!isAuto && y <= 100) || (isAuto && y <= 100 && Math.abs(theta - PI / 2) < PI / 10) /*&& notMoving() && turret.turretAtPos()*/) {
                 if (deposit.armSlidesHome() && depositOpenTime == -1) {
@@ -248,10 +252,10 @@ public class Robot {
         if (intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
             if (!intakeStalling) stallStartTime = -1;
             if (intakeStalling && stallStartTime == -1) { // 1
-                stallStartTime = System.currentTimeMillis();
-            } else if (!intakeStalling && System.currentTimeMillis() - stallStartTime > stallThreshold + 500) { // 2
+                stallStartTime = curTime;
+            } else if (!intakeStalling && curTime - stallStartTime > stallThreshold + 500) { // 2
                 intake.off();
-            } else if (intakeStalling && System.currentTimeMillis() - stallStartTime > stallThreshold) { // 3
+            } else if (intakeStalling && curTime - stallStartTime > stallThreshold) { // 3
                 intake.reverse();
             }
         }
@@ -333,6 +337,7 @@ public class Robot {
         }
     }
 
+    // Cancel auto-intaking/depositing
     public void cancelAutomation() {
         intake.off();
         intake.home();
@@ -351,10 +356,11 @@ public class Robot {
         automationStep("Automation Cancelled");
     }
 
+    // Set Arm + Slides Control
     public void depositScore() {
         setDepositControlsHome = false;
-        double slidesDist = 0;
 
+        double slidesDist = 0;
         if (trackGoal) {
             updateTrackingMath();
             slidesDist = distToGoal - Constants.ARM_DISTANCE;
@@ -375,43 +381,36 @@ public class Robot {
         deposit.setDepositControls(cycleHub, slidesDist);
     }
 
+    // Arm + Slides Home
     public void depositHome() {
         setDepositControlsHome = true;
         deposit.setDepositHome();
     }
 
+    // Set Turret Controls
     public void turretScore() {
-        // Set Turret Controls
         if (trackGoal) {
             updateTrackingMath();
             turret.setTracking(turretLockTheta);
         } else {
+            double depositTheta = 0;
             if (cycleHub == DepositTarget.allianceLow || cycleHub == DepositTarget.allianceMid || cycleHub == DepositTarget.allianceHigh) {
-                if (isRed) {
-                    turret.setDepositing(Constants.TURRET_ALLIANCE_RED_CYCLE_THETA * PI);
-                } else {
-                    turret.setDepositing((1 - Constants.TURRET_ALLIANCE_RED_CYCLE_THETA) * PI);
-                }
+                depositTheta = Constants.TURRET_ALLIANCE_RED_CYCLE_THETA;
             } else if (cycleHub == DepositTarget.neutral) {
-                if (isRed) {
-                    turret.setDepositing(Constants.TURRET_NEUTRAL_RED_CYCLE_THETA * PI);
-                } else {
-                    turret.setDepositing((1 - Constants.TURRET_NEUTRAL_RED_CYCLE_THETA) * PI);
-                }
+                depositTheta = Constants.TURRET_NEUTRAL_RED_CYCLE_THETA;
             } else if (cycleHub == DepositTarget.duck) {
-                if (isRed) {
-                    turret.setDepositing(Constants.TURRET_DUCK_RED_CYCLE_THETA * PI);
-                } else {
-                    turret.setDepositing((1 - Constants.TURRET_DUCK_RED_CYCLE_THETA) * PI);
-                }
+                depositTheta = Constants.TURRET_DUCK_RED_CYCLE_THETA;
             }
+            turret.setDepositing(isRed ? depositTheta * PI : (1 - depositTheta) * PI);
         }
     }
 
+    // Turret Home
     public void turretHome() {
         turret.setHome();
     }
 
+    // Turret auto lock and slide extend distance
     public void updateTrackingMath() {
         turretCenter[0] = x + Math.cos(theta) * Turret.TURRET_Y_OFFSET;
         turretCenter[1] = y + Math.sin(theta) * Turret.TURRET_Y_OFFSET;
@@ -421,7 +420,7 @@ public class Robot {
         if (cycleHub == DepositTarget.neutral) {
             goalX = neutGoalCoords[0];
             goalY = neutGoalCoords[1];
-        } else { //Alliance Hub
+        } else { // Alliance Hub
             if (isRed) {
                 goalX = redGoalCoords[0];
                 goalY = redGoalCoords[1];
@@ -443,6 +442,7 @@ public class Robot {
         if (turretLockTheta < 0) turretLockTheta += 2*PI;
     }
 
+    // Keep track of cycles
     public void markCycle() {
         double cycleTime = (curTime - lastCycleTime) / 1000;
         cycleTotal += cycleTime;
@@ -533,7 +533,9 @@ public class Robot {
 
     public void automationStep(String step) {
         automationStep = step;
+        log((curTime - automationStepTime) + "ms");
         log(automationStep);
+        automationStepTime = curTime;
     }
 
     @SuppressLint("DefaultLocale")
