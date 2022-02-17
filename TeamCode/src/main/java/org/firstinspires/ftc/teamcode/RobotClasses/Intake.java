@@ -69,10 +69,12 @@ public class Intake {
         }
     }
 
-    public void checkIfStalling() {
-        if (intakeMotor.getCurrent(CurrentUnit.AMPS) > Constants.STALL_THRESHOLD) {
-            off();
-        }
+    public boolean checkIfStalling() {
+        return intakeMotor.getCurrent(CurrentUnit.AMPS) > Constants.STALL_THRESHOLD;
+    }
+
+    public double getCurrent() {
+        return intakeMotor.getCurrent(CurrentUnit.AMPS);
     }
 
     // Intake Slides

@@ -10,16 +10,16 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class HardwareTest extends LinearOpMode {
     public static String motorName1 = "arm";
-    public static String motorName2 = "transfer";
-    public static String servoName1 = "depositServo";
-    public static String servoName2 = "rightClamp";
+//    public static String motorName2 = "depositSlides";
+    public static String servoName1 = "intakeSlides";
+//    public static String servoName2 = "depositServo";
 
     public static double motor1Power = 0;
-    public static double motor2Power = 0;
-    public static double servo1Home = 0.95;
-    public static double servo1Out = 0.4;
-    public static double servo2Home = 0.05;
-    public static double servo2Out = 0.6;
+//    public static double motor2Power = 0;
+    public static double servo1Home = 0.9;
+    public static double servo1Out = 0.65;
+//    public static double servo2Home = 0.05;
+//    public static double servo2Out = 0.6;
 
     public static boolean home = true;
 

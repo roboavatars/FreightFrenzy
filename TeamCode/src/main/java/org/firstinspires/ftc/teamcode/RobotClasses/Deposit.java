@@ -22,22 +22,18 @@ public class Deposit {
     public int DEPOSIT_SLIDES_ERROR_THRESHOLD = 15;
     public static double ARM_TICKS_PER_RADIAN = 1120 / (2*PI);
     public double DEPOSIT_ARM_MAX_POWER = 0.7;
-    public int DEPOSIT_ARM_ERROR_THRESHOLD = 100;
+    public int DEPOSIT_ARM_ERROR_THRESHOLD = 30;
 
     // Slides PD
     public static double pSlides = 50;
 
     public int targetSlidesTicks;
+    public Robot.DepositTarget target;
 
     private static final double maxSlidesDistBeforeLoweringArm = 2;
 
     public boolean home = true;
     public int targetArmPos;
-
-    public DepositHeight targetHeight = DepositHeight.HOME;
-    public enum DepositHeight {
-        HOME, LOW, MID, HIGH
-    }
 
     private double initialArmAngle = -0.646;
 
@@ -53,8 +49,6 @@ public class Deposit {
     public static double fArm = 0;
 
     public static double fGravity = 0.05;
-
-    public static boolean useMidwayArmPos = true;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
         this(op, isAuto, PI/2);
@@ -96,9 +90,20 @@ public class Deposit {
         setSlidesTarget(0);
     }
 
-    public void setDepositControls(int targetArmPos, double slidesDist) {
+    public void setDepositControls(Robot.DepositTarget target, double slidesDist) {
         home = false;
+        this.target = target;
         setArmPIDCoefficients(Deposit.pArmUp, Deposit.dArmUp);
+
+        int targetArmPos = 0;
+        if (target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.neutral) {
+            targetArmPos = Constants.DEPOSIT_ARM_LOW;
+        } else if (target == Robot.DepositTarget.allianceMid) {
+            targetArmPos = Constants.DEPOSIT_ARM_MID;
+        } else if (target == Robot.DepositTarget.allianceHigh || target == Robot.DepositTarget.duck) {
+            targetArmPos = Constants.DEPOSIT_ARM_HIGH;
+        }
+
         setArmTarget(targetArmPos);
         setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));
     }
@@ -111,18 +116,24 @@ public class Deposit {
             } else {
                 setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
             }
+            setSlidesControls();
         } else {
-            if (slidesAtPos() || !useMidwayArmPos) {
-                setArmControls();
-            } else {
+            // arm out first if low or mid
+            if ((target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.allianceMid) && armAtPosPercent(0.75)
+                || target == Robot.DepositTarget.allianceHigh) {
+                setSlidesControls();
+            }
+            // midway arm pos if high or duck
+            if ((target == Robot.DepositTarget.allianceHigh || target == Robot.DepositTarget.duck) && !slidesAtPos()) {
                 setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
+            } else {
+                setArmControls();
             }
         }
 
         // Move Slides
         // Cap Slides Extension Distance When Extending to the Side to Prevent Tipping
         // targetSlidesTicks = (int) Math.min(targetSlidesTicks, Constants.DEPOSIT_SLIDES_SIDE_EXTENSION_LIMIT_IN * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH * Math.abs(1/Math.cos(getTurretTheta())));
-        setSlidesControls();
     }
 
     // Arm
@@ -153,7 +164,6 @@ public class Deposit {
     }
 
     public boolean armAtPos() {
-        Robot.log("arm error:" + Math.abs(getArmPosition() - targetArmPos));
         return Math.abs(getArmPosition() - targetArmPos) < DEPOSIT_ARM_ERROR_THRESHOLD;
     }
 
@@ -163,6 +173,10 @@ public class Deposit {
 
     public double getArmAngle() {
         return getArmPosition() / ARM_TICKS_PER_RADIAN + initialArmAngle;
+    }
+
+    public boolean armAtPosPercent(double percent) {
+        return getArmPosition() > targetArmPos * percent;
     }
 
     public void setArmPIDCoefficients(double p, double d) {
@@ -193,7 +207,6 @@ public class Deposit {
     }
 
     public boolean slidesAtPos() {
-        Robot.log("slides error:" + Math.abs(getSlidesPosition() - targetSlidesTicks));
         return Math.abs(getSlidesPosition() - targetSlidesTicks) < DEPOSIT_SLIDES_ERROR_THRESHOLD;
     }
 

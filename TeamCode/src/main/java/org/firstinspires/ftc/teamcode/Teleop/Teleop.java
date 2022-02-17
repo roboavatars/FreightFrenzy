@@ -87,15 +87,19 @@ public class Teleop extends LinearOpMode {
 
             if (gamepad1.left_bumper) {
                 robot.intakeApproval = true;
-            }
-
-            if (gamepad1.right_bumper) {
+            } else if (gamepad1.right_bumper) {
                 robot.depositApproval = true;
             }
 
             if (gamepad1.a) {
                 robot.cancelAutomation();
             }
+
+            if (gamepad1.dpad_up) robot.cycleHub = Robot.DepositTarget.allianceHigh;
+            else if (gamepad1.dpad_left) robot.cycleHub = Robot.DepositTarget.allianceMid;
+            else if (gamepad1.dpad_down) robot.cycleHub = Robot.DepositTarget.allianceLow;
+            else if (gamepad1.dpad_right) robot.cycleHub = Robot.DepositTarget.neutral;
+            else if (gamepad1.y) robot.cycleHub = Robot.DepositTarget.duck;
 
             if (gamepad2.dpad_up) Constants.DEPOSIT_ARM_HIGH -= 2;
             else if (gamepad2.dpad_down) Constants.DEPOSIT_ARM_HIGH += 2;
@@ -169,7 +173,6 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("X", robot.x);
             telemetry.addData("Y", robot.y);
             telemetry.addData("Theta", robot.theta);
-            telemetry.addData("Slides Height", robot.deposit.targetHeight);
             telemetry.addData("# Cycles", cycles.size());
             telemetry.addData("Average Cycle Time", (robot.cycleTotal / robot.cycles) + "s");
             telemetry.update();

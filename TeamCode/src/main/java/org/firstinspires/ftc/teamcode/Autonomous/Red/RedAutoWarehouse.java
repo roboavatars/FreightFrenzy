@@ -37,9 +37,9 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         // Segments
         boolean preloadScore = false;
-        boolean goToWarehouse = true; //<<<<<<<<<<<<<<<
-        boolean cycleScore = true;  //<<<<<<<<<<<<
-        boolean park = true;   //<<<<<<<<<<<<<<
+        boolean goToWarehouse = false;
+        boolean cycleScore = false;
+        boolean park = false;
 
         // Segment Times
         double preloadScoreTime = 1.75;
@@ -84,7 +84,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         Waypoint[] goToWarehouseWaypoints = new Waypoint[] {
                 new Waypoint(robot.x, robot.y, PI/2/*robot.theta*/, 10, 2,0, 0),
-                new Waypoint(138,111,PI/2,10,-2,0, goToWarehouseTime)
+                new Waypoint(140,111,PI/2,10,-2,0, goToWarehouseTime)
         };
         goToWarehousePath = new Path(goToWarehouseWaypoints);
 
@@ -105,11 +105,15 @@ public class RedAutoWarehouse extends LinearOpMode {
                 }
             } else if (!goToWarehouse) {
                 if (!robot.intakeFull && robot.y >= 110 && time.seconds() > goToWarehouseTime + 0.1) {
-                    robot.setTargetPoint(137, 111 + 2.5 * (time.seconds() - goToWarehouseTime), PI/2 + 0.3 * Math.sin(2 * (time.seconds() - goToWarehouseTime)));
-                } else if (Math.abs(robot.theta - PI/2) > PI/8 || robot.x < 137) {
-                    robot.setTargetPoint(new Target(goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime, time.seconds()))))/*.yKp(0.25).thetaKp(.4))*/;
-                } else {
-                    robot.setTargetPoint(goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime, time.seconds())));
+                    robot.setTargetPoint(137, 111 + 2.5 * (time.seconds() - goToWarehouseTime),
+                            PI/2 + 0.15 * Math.sin(2 * (time.seconds() - goToWarehouseTime)));
+                }
+//                else if (Math.abs(robot.theta - PI/2) > PI/8 || robot.x < 137) {
+//                    robot.setTargetPoint(new Target(goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime, time.seconds()))))/*.yKp(0.25).thetaKp(.4))*/;
+//                }
+                else {
+                    Pose curPose = goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime, time.seconds()));
+                    robot.setTargetPoint(new Target(curPose).theta(PI/2).thetaKp(3.5));
                 }
 
                 addPacket("path", "going to warehouse right rn");
@@ -117,7 +121,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 if (robot.intakeFull/*time.seconds() > goToWarehouseTime + 0.5*/) {
                     Waypoint[] cycleScoreWaypoints = new Waypoint[] {
                             new Waypoint(140, robot.y, 3*PI/2, 10, 10, 0, 0),
-                            new Waypoint(139, 89, 3*PI/2, 10, -5, 0, cycleScoreTime),
+                            new Waypoint(140, 86, 3*PI/2, 10, -5, 0, cycleScoreTime),
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 
@@ -126,7 +130,8 @@ public class RedAutoWarehouse extends LinearOpMode {
                 }
             } else if (!cycleScore) {
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
-                robot.setTargetPoint(138, 89, PI/2);
+                robot.setTargetPoint(new Target(curPose).theta(PI/2).thetaKp(3.5));
+//                robot.setTargetPoint(138, 86, PI/2);
 
                 addPacket("path", "going to deposit right rn");
 
@@ -139,14 +144,14 @@ public class RedAutoWarehouse extends LinearOpMode {
                         if (30 - (System.currentTimeMillis() - robot.startTime) / 1000 > goToWarehouseTime + cycleScoreTime + parkTime + 1) {
                             goToWarehouseWaypoints = new Waypoint[] {
                                     new Waypoint(robot.x, robot.y, PI / 2/*robot.theta*/, 10, 2, 0, 0),
-                                    new Waypoint(138, 111, PI / 2, 10, -2, 0, goToWarehouseTime)
+                                    new Waypoint(140, 111, PI / 2, 10, -2, 0, goToWarehouseTime)
                             };
                             goToWarehousePath = new Path(goToWarehouseWaypoints);
                             goToWarehouse = false;
                         } else {
                             Waypoint[] parkWaypoints = new Waypoint[] {
                                     new Waypoint(robot.x, robot.y, PI / 2/*robot.theta*/, 30, 5, 0, 0),
-                                    new Waypoint(138, 111, PI / 2, 20, -5, 0, parkTime)
+                                    new Waypoint(140, 111, PI / 2, 20, -5, 0, parkTime)
                             };
                             parkPath = new Path(parkWaypoints);
 
