@@ -169,6 +169,7 @@ public class Robot {
         // Don't check states every loop
         if (loopCounter % sensorUpdatePeriod == 0) {
             intakeFull = intake.intakeFull();
+            intakeStalling = intake.checkIfStalling();
         }
 
         loopCounter++;
@@ -182,7 +183,7 @@ public class Robot {
             firstLoop = false;
         }
 
-        if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && (y > 105 || intakeApproval)) {
+        if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && (/*y > 105 || */intakeApproval)) {
             if (!noExtend) intake.extend();
             else intake.extend(Constants.INTAKE_HOME_POS);
             intake.on();
@@ -244,13 +245,15 @@ public class Robot {
             }
         }
 
-        if (!intakeStalling) stallStartTime = -1;
-        if (intakeStalling && stallStartTime == -1) { // 1
-            stallStartTime = System.currentTimeMillis();
-        } else if (!intakeStalling && System.currentTimeMillis() - stallStartTime > stallThreshold + 1000) { // 2
-            intake.off();
-        } else if (intakeStalling && System.currentTimeMillis() - stallStartTime > stallThreshold) { // 3
-            intake.reverse();
+        if (intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
+            if (!intakeStalling) stallStartTime = -1;
+            if (intakeStalling && stallStartTime == -1) { // 1
+                stallStartTime = System.currentTimeMillis();
+            } else if (!intakeStalling && System.currentTimeMillis() - stallStartTime > stallThreshold + 500) { // 2
+                intake.off();
+            } else if (intakeStalling && System.currentTimeMillis() - stallStartTime > stallThreshold) { // 3
+                intake.reverse();
+            }
         }
 
         // Update Turret
