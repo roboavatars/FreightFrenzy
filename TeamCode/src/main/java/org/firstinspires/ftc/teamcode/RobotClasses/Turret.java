@@ -23,6 +23,7 @@ public class Turret {
     public static double pTurret = 2.25;
     public static double dTurret = 5.5;
     public double initialTheta;
+    private boolean isAuto;
 
     //Turret Tracking
     private boolean tracking = false;
@@ -50,6 +51,8 @@ public class Turret {
 
         // Set Initial Turret Theta
         initialTheta = initialRobotTheta;
+
+        this.isAuto = isAuto;
 
         op.telemetry.addData("Status", "Turret Initialized");
     }

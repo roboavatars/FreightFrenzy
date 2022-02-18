@@ -15,9 +15,9 @@ import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Config
-@Autonomous(name = "0 0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
+@Autonomous(name = "0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoWarehouse extends LinearOpMode {
-    public static int barcodeCase = 1; // 0 = left, 1 = mid, 2 = right
+    public static int barcodeCase = 0; // 0 = left, 1 = mid, 2 = right
 
     @Override
     public void runOpMode() {
@@ -38,8 +38,8 @@ public class RedAutoWarehouse extends LinearOpMode {
         // Segments
         boolean preloadScore = false;
         boolean goToWarehouse = false;
-        boolean cycleScore = false;
-        boolean park = false;
+        boolean cycleScore = true;
+        boolean park = true;
 
         // Segment Times
         double preloadScoreTime = 1.75;
@@ -98,24 +98,24 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         while (opModeIsActive()) {
             if (!preloadScore) {
+                robot.drivetrain.setGlobalControls(.5,0,0);
                 if (!robot.depositingFreight/*time.seconds() > preloadScoreTime + 1.5*/) {
                     time.reset();
                     preloadScore = true;
                     robot.cycleHub = Robot.DepositTarget.allianceHigh;
                 }
             } else if (!goToWarehouse) {
-                if (!robot.intakeFull && robot.y >= 110 && time.seconds() > goToWarehouseTime + 0.1) {
-                    robot.setTargetPoint(137, 111 + 2.5 * (time.seconds() - goToWarehouseTime),
-                            PI/2 + 0.15 * Math.sin(2 * (time.seconds() - goToWarehouseTime)));
-                }
-//                else if (Math.abs(robot.theta - PI/2) > PI/8 || robot.x < 137) {
-//                    robot.setTargetPoint(new Target(goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime, time.seconds()))))/*.yKp(0.25).thetaKp(.4))*/;
+//                if (!robot.intakeFull && robot.y >= 110 && time.seconds() > goToWarehouseTime + 0.1) {
+//                    robot.setTargetPoint(137, 111 + 2.5 * (time.seconds() - goToWarehouseTime),
+//                            PI/2 + 0.15 * Math.sin(2 * (time.seconds() - goToWarehouseTime)));
+//                } else {
+//                    Pose curPose = goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime, time.seconds()));
+//                    robot.setTargetPoint(new Target(curPose).theta(PI/2).xKp(1));
 //                }
-                else {
-                    Pose curPose = goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime, time.seconds()));
-                    robot.setTargetPoint(new Target(curPose).theta(PI/2).thetaKp(3.5));
-                }
 
+                if (!robot.intakeFull && robot.y < 110){
+                    robot.drivetrain.setGlobalControls(.5,.25,0);
+                }
                 addPacket("path", "going to warehouse right rn");
 
                 if (robot.intakeFull/*time.seconds() > goToWarehouseTime + 0.5*/) {
