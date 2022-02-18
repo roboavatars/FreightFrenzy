@@ -41,14 +41,15 @@ public class Robot {
     private final ElapsedTime profiler;
     private final List<LynxModule> allHubs;
     private final VoltageSensor battery;
-    private boolean startVoltTooLow = false;
+    private double voltage;
 
     // Class Constants
     private final int loggerUpdatePeriod = 2;
     private final int sensorUpdatePeriod = 15;
+    private final int voltageUpdatePeriod = 1000;
     private final double xyTolerance = 1;
     private final double thetaTolerance = PI / 35;
-    public final static double[] cameraRelativeToRobot = new double[]{1, 3};
+    public final static double[] cameraRelativeToRobot = new double[] {1, 3};
 
     // State Variables
     private final boolean isAuto;
@@ -144,13 +145,11 @@ public class Robot {
 
         // low voltage warning
         battery = op.hardwareMap.voltageSensor.iterator().next();
-        log("Battery Voltage: " + battery.getVoltage() + "v");
-        if (battery.getVoltage() < 12.4) {
-            startVoltTooLow = true;
-        }
+        voltage = battery.getVoltage();
+        log("Battery Voltage: " + voltage + "v");
         profiler = new ElapsedTime();
 
-        // initial dashboard drawings
+        // Initial Dashboard Drawings
         drawField();
         drawRobot(this);
         sendPacket();
@@ -171,6 +170,10 @@ public class Robot {
         if (loopCounter % sensorUpdatePeriod == 0) {
             intakeFull = intake.intakeFull();
             intakeStalling = intake.checkIfStalling();
+        }
+
+        if (loopCounter % voltageUpdatePeriod == 0) {
+            voltage = battery.getVoltage();
         }
 
         loopCounter++;
@@ -307,9 +310,7 @@ public class Robot {
         }
 
         // Dashboard Telemetry
-        if (startVoltTooLow) {
-            addPacket("0", "Starting Battery Voltage < 12.4!!!!");
-        }
+        addPacket("0 Voltage", voltage);
         addPacket("1 X", round(x));
         addPacket("2 Y", round(y));
         addPacket("3 Theta", round(theta));

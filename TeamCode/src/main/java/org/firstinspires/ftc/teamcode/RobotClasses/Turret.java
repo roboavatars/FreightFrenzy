@@ -55,7 +55,6 @@ public class Turret {
     }
 
     public void update(boolean slidesHome, double robotTheta, double slidesDist, double ff) {
-
         if (tracking) {
             double targetTheta = lockTheta - robotTheta;
             targetTheta %= 2*PI;

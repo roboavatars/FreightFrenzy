@@ -59,7 +59,7 @@ public class Dashboard {
 
     public static void drawDepositTurretSlides(double x, double y, double robotTheta, double turretTheta, double slidesDist) {
         double extendedPos = 11.5 + slidesDist;
-        double theta = robotTheta + turretTheta + PI;
+        double theta = robotTheta + turretTheta;
         double turretCenterX = x + Turret.TURRET_Y_OFFSET * cos(robotTheta);
         double turretCenterY = y + Turret.TURRET_Y_OFFSET * sin(robotTheta);
 
@@ -69,9 +69,8 @@ public class Dashboard {
         double[] rightSlidesX = {2 * cos(theta) - -4.5 * sin(theta) + turretCenterX, 2 * cos(theta) - extendedPos * sin(theta) + turretCenterX, 3.5 * cos(theta) - extendedPos * sin(theta) + turretCenterX, 3.5 * cos(theta) - -4.5 * sin(theta) + turretCenterX};
         double[] rightSlidesY = {2 * sin(theta) + -4.5 * cos(theta) + turretCenterY, 2 * sin(theta) + extendedPos * cos(theta) + turretCenterY, 3.5 * sin(theta) + extendedPos * cos(theta) + turretCenterY, 3.5 * sin(theta) + -4.5 * cos(theta) + turretCenterY};
 
-        packet.fieldOverlay().setFill("blue").fillCircle(turretCenterX, turretCenterY, 6);
-        drawPolygon(leftSlidesX, leftSlidesY, "teal");
-        drawPolygon(rightSlidesX, rightSlidesY, "teal");
+        drawPolygon(leftSlidesX, leftSlidesY, "red");
+        drawPolygon(rightSlidesX, rightSlidesY, "red");
     }
 
     public static void drawField() {
