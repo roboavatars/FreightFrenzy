@@ -310,6 +310,7 @@ public class Robot {
         }
 
         // Dashboard Telemetry
+        addPacket("0 0 pod zeroes", drivetrain.zero1 + " " + drivetrain.zero2 + " " + drivetrain.zero3);
         addPacket("0 Voltage", voltage);
         addPacket("1 X", round(x));
         addPacket("2 Y", round(y));

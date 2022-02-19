@@ -28,21 +28,21 @@ public class Constants {
 
     // Deposit Arm
     public static int DEPOSIT_ARM_HOME = 0;
-    public static int DEPOSIT_ARM_LOW = 730;
+    public static int DEPOSIT_ARM_LOW = 710;
     public static int DEPOSIT_ARM_MID = 650;
     public static int DEPOSIT_ARM_HIGH = 570;
     public static int DEPOSIT_ARM_MIDWAY = 400;
 
     // Deposit Slides
-    public static double SLIDES_DISTANCE_LOW = 19;
-    public static double SLIDES_DISTANCE_MID = 19;
+    public static double SLIDES_DISTANCE_LOW = 18;
+    public static double SLIDES_DISTANCE_MID = 14;
     public static double SLIDES_DISTANCE_HIGH = 21;
     public static double SLIDES_DISTANCE_DUCK = 25;
 
     public static double ARM_DISTANCE = 25;
 
     //Turret
-    public static double TURRET_ALLIANCE_RED_CYCLE_THETA = 0.175;
+    public static double TURRET_ALLIANCE_RED_CYCLE_THETA = 0.17;
     public static double TURRET_NEUTRAL_RED_CYCLE_THETA = 0;
     public static double TURRET_DUCK_RED_CYCLE_THETA = 0;
 
