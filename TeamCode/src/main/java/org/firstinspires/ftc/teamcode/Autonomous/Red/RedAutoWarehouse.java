@@ -109,7 +109,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 addPacket("path", "initial deposit imo");
             } else if (!goToWarehouse) {
                 if (robot.y < 112) {
-                    robot.drivetrain.setGlobalControls(barcodeCase == 0 ? 0.08 : 0.06,0.85,0);
+                    robot.drivetrain.setGlobalControls(barcodeCase == 0 && cycleCounter == 0 ? 0.075 : 0.06,0.85,0);
                     passLineTime = time.seconds();
                 } else if (time.seconds() > goToWarehouseTime) {
                     robot.setTargetPoint(136, 111 + 2.5 * (time.seconds() - passLineTime), PI/2 + 0.15 * Math.sin(2 * (time.seconds() - passLineTime)));
