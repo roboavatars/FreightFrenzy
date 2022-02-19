@@ -100,19 +100,27 @@ public class RedAutoWarehouse extends LinearOpMode {
         while (opModeIsActive()) {
             if (!preloadScore) {
                 robot.drivetrain.setGlobalControls(0.4,0,0);
-                if (!robot.depositingFreight || time.seconds() > preloadScoreTime + 1.5) {
-                    time.reset();
-                    preloadScore = true;
+
+                addPacket("path", "initial deposit imo");
+
+                if (!robot.depositingFreight
+                        && (barcodeCase != 0 || robot.deposit.targetSlidesTicks == 0 && robot.deposit.getSlidesDistInches() < 15)
+                        /*|| time.seconds() > preloadScoreTime + 1.5*/) {
+
                     robot.cycleHub = Robot.DepositTarget.allianceHigh;
                     robot.intake.on();
+
+                    time.reset();
+                    preloadScore = true;
                 }
-                addPacket("path", "initial deposit imo");
-            } else if (!goToWarehouse) {
+            }
+
+            else if (!goToWarehouse) {
                 if (robot.y < 112) {
-                    robot.drivetrain.setGlobalControls(barcodeCase == 0 && cycleCounter == 0 ? 0.075 : 0.06,0.85,0);
+                    robot.drivetrain.setGlobalControls(0.06,0.85,0);
                     passLineTime = time.seconds();
                 } else if (time.seconds() > goToWarehouseTime) {
-                    robot.setTargetPoint(136, 111 + 2.5 * (time.seconds() - passLineTime), PI/2 + 0.15 * Math.sin(2 * (time.seconds() - passLineTime)));
+                    robot.setTargetPoint(136, 111 + 2.5 * (time.seconds() - passLineTime), PI/2 + 0.05 * Math.sin(2.5 * (time.seconds() - passLineTime)));
                 } else {
                     Pose curPose = goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime, time.seconds()));
                     robot.setTargetPoint(new Target(curPose).theta(PI/2).xKp(1));
@@ -126,14 +134,16 @@ public class RedAutoWarehouse extends LinearOpMode {
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 
-                    robot.intake.off();
+                    robot.intake.off(); /// rem
 
                     time.reset();
                     goToWarehouse = true;
                     cycleScore = true;
                     park = true;
                 }
-            } else if (!cycleScore) {
+            }
+
+            else if (!cycleScore) {
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
                 robot.setTargetPoint(new Target(curPose).theta(PI/2).thetaKp(3.5));
 //                robot.setTargetPoint(138, 86, PI/2);
@@ -166,7 +176,9 @@ public class RedAutoWarehouse extends LinearOpMode {
                         time.reset();
                     }
                 }
-            } else if (!park) {
+            }
+
+            else if (!park) {
                 robot.setTargetPoint(parkPath.getRobotPose(Math.min(parkTime, time.seconds())));
 
                 addPacket("path", "parking right rn");
@@ -176,7 +188,10 @@ public class RedAutoWarehouse extends LinearOpMode {
 
                     park = true;
                 }
-            } else {
+            }
+
+            else {
+                addPacket("path", "stopped rn");
                 robot.drivetrain.stop();
             }
 

@@ -42,6 +42,7 @@ public class Robot {
     private final List<LynxModule> allHubs;
     private final VoltageSensor battery;
     private double voltage;
+    private boolean startVoltTooLow = false;
 
     // Class Constants
     private final int loggerUpdatePeriod = 2;
@@ -105,7 +106,7 @@ public class Robot {
     public double curTime;
     public static int flipUpThreshold = 1000;
     public static int transferThreshold = 2000;
-    public static int releaseThreshold = 500;
+    public static int releaseThreshold = 750;
 
     public double stallStartTime = -1;
     public static int stallThreshold = 1000;
@@ -147,6 +148,7 @@ public class Robot {
         battery = op.hardwareMap.voltageSensor.iterator().next();
         voltage = battery.getVoltage();
         log("Battery Voltage: " + voltage + "v");
+        if (voltage < 12.4) startVoltTooLow = true;
         profiler = new ElapsedTime();
 
         // Initial Dashboard Drawings
@@ -234,6 +236,7 @@ public class Robot {
                     deposit.open();
                     depositOpenTime = curTime;
                     automationStep("Score Freight");
+                    log("*************arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
                 } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
                     depositHome();
                     turretHome();
@@ -244,6 +247,8 @@ public class Robot {
                     depositApproval = false;
                     depositOpenTime = -1;
                     depositingFreight = false;
+                } else {
+                    log("arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
                 }
             } else {
                 if (y > 87) log("Waiting for dt pose");
@@ -311,6 +316,7 @@ public class Robot {
 
         // Dashboard Telemetry
         addPacket("0 0 pod zeroes", drivetrain.zero1 + " " + drivetrain.zero2 + " " + drivetrain.zero3);
+        if (startVoltTooLow) addPacket("0", "Starting Battery Voltage < 12.4!!!!");
         addPacket("0 Voltage", voltage);
         addPacket("1 X", round(x));
         addPacket("2 Y", round(y));
@@ -396,7 +402,9 @@ public class Robot {
             turret.setTracking(turretLockTheta);
         } else {
             double depositTheta = 0;
-            if (cycleHub == DepositTarget.allianceLow || cycleHub == DepositTarget.allianceMid || cycleHub == DepositTarget.allianceHigh) {
+            if (cycleHub == DepositTarget.allianceLow) {
+                depositTheta = Constants.TURRET_ALLIANCE_RED_CYCLE_LOW_THETA;
+            } else if (cycleHub == DepositTarget.allianceMid || cycleHub == DepositTarget.allianceHigh) {
                 depositTheta = Constants.TURRET_ALLIANCE_RED_CYCLE_THETA;
             } else if (cycleHub == DepositTarget.neutral) {
                 depositTheta = Constants.TURRET_NEUTRAL_RED_CYCLE_THETA;

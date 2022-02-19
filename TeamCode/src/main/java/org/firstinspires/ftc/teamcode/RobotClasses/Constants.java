@@ -8,7 +8,6 @@ import com.acmerobotics.dashboard.config.Config;
 public class Constants {
 
     // Intake
-    public static double INTAKE_POWER = 1;
     public static double INTAKE_DISTANCE_THRESHOLD = 70;
 
     // Intake Stalling
@@ -28,21 +27,22 @@ public class Constants {
 
     // Deposit Arm
     public static int DEPOSIT_ARM_HOME = 0;
-    public static int DEPOSIT_ARM_LOW = 680;
+    public static int DEPOSIT_ARM_LOW = 710;
     public static int DEPOSIT_ARM_MID = 650;
     public static int DEPOSIT_ARM_HIGH = 570;
     public static int DEPOSIT_ARM_MIDWAY = 400;
 
     // Deposit Slides
-    public static double SLIDES_DISTANCE_LOW = 20;
+    public static double SLIDES_DISTANCE_LOW = 17;
     public static double SLIDES_DISTANCE_MID = 14;
-    public static double SLIDES_DISTANCE_HIGH = 21;
+    public static double SLIDES_DISTANCE_HIGH = 18;
     public static double SLIDES_DISTANCE_DUCK = 25;
 
     public static double ARM_DISTANCE = 25;
 
-    //Turret
+    // Turret
     public static double TURRET_ALLIANCE_RED_CYCLE_THETA = 0.17;
+    public static double TURRET_ALLIANCE_RED_CYCLE_LOW_THETA = 0.165;
     public static double TURRET_NEUTRAL_RED_CYCLE_THETA = 0;
     public static double TURRET_DUCK_RED_CYCLE_THETA = 0;
 

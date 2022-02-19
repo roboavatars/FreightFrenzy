@@ -15,14 +15,14 @@ public class Deposit {
     private DcMotorEx armMotor;
     private Servo depositServo;
 
-    private double lastServoPos = 69;
+    private double lastServoPos = 0;
 
     public static double DEPOSIT_SLIDES_TICKS_PER_INCH = 9.142857;
-    public static int DEPOSIT_SLIDES_MAX_TICKS = (int) (25 * DEPOSIT_SLIDES_TICKS_PER_INCH);
+    public int DEPOSIT_SLIDES_MAX_TICKS = (int) (25 * DEPOSIT_SLIDES_TICKS_PER_INCH);
     public int DEPOSIT_SLIDES_ERROR_THRESHOLD = 15;
-    public static double ARM_TICKS_PER_RADIAN = 1120 / (2*PI);
+    public double ARM_TICKS_PER_RADIAN = 1120 / (2*PI);
     public double DEPOSIT_ARM_MAX_POWER = 0.7;
-    public int DEPOSIT_ARM_ERROR_THRESHOLD = 30;
+    public static int DEPOSIT_ARM_ERROR_THRESHOLD = 30;
 
     // Slides PD
     public static double pSlides = 50;
@@ -39,22 +39,18 @@ public class Deposit {
 
     // Arm PD
     double armErrorChange = 0, armError = 0;
-    public static double pArmUp   = 0.004;
-    public static double dArmUp   = 0.002;
+    public static double pArmUp   = 0.003;
+    public static double dArmUp   = 0.0055;
     public static double pArmDown = 0.0015;
-    public static double dArmDown = 0.0006;
+    public static double dArmDown = 0.002;
 
     public static double pArm = pArmUp;
     public static double dArm = dArmUp;
     public static double fArm = 0;
 
-    public static double fGravity = 0.05;
+    public static double fGravity = 0.07;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
-        this(op, isAuto, PI/2);
-    }
-
-    public Deposit(LinearOpMode op, boolean isAuto, double initialRobotTheta) {
         // Deposit Servo
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         if (isAuto) {
@@ -113,8 +109,6 @@ public class Deposit {
         if (home) {
             if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm) {
                 setArmControls();
-            } else {
-                setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
             }
             setSlidesControls();
         } else {
@@ -179,6 +173,10 @@ public class Deposit {
         return getArmPosition() > targetArmPos * percent;
     }
 
+    public double getArmError() {
+        return Math.abs(getArmPosition() - targetArmPos);
+    }
+
     public void setArmPIDCoefficients(double p, double d) {
         pArm = p;
         dArm = d;
@@ -216,6 +214,10 @@ public class Deposit {
 
     public boolean slidesHome() {
         return Math.abs(getSlidesPosition()) < DEPOSIT_ARM_ERROR_THRESHOLD;
+    }
+
+    public double getSlidesError() {
+        return Math.abs(getSlidesPosition() - targetSlidesTicks);
     }
 
     public void setSlidesPIDCoefficients(double p) {

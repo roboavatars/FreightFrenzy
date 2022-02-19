@@ -21,10 +21,8 @@ public class CycleTest extends LinearOpMode {
     public static double lockTheta = 0.5;
     public static double turretMovingAngle = 0.2;
 
-    public static double pSlidesExtend = 50;
-    public static double pSlidesRetract = 50;
-
     public static int slidesExtendDist = 16;
+    public static int armPos = Constants.DEPOSIT_ARM_MID;
 
     private boolean home = true;
     private boolean homeToggle = false;
@@ -45,7 +43,7 @@ public class CycleTest extends LinearOpMode {
             dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
             dt.updatePose();
 
-            if (gamepad1.right_bumper) {
+            /*if (gamepad1.right_bumper) {
                 intake.extend();
                 intake.on();
                 intake.flipDown();
@@ -72,7 +70,7 @@ public class CycleTest extends LinearOpMode {
                 } else {
                     intake.off();
                 }
-            }
+            }*/
 
             if (gamepad1.x && !homeToggle) {
                 homeToggle = true;
@@ -89,32 +87,31 @@ public class CycleTest extends LinearOpMode {
             }
 
             if (home) {
-                turret.setDepositing(PI/2);
+//                turret.setDepositing(PI/2);
 
                 deposit.setArmPIDCoefficients(Deposit.pArmDown, Deposit.dArmDown);
-                deposit.setArmControls(Constants.DEPOSIT_ARM_HOME);
+                deposit.setArmTarget(Constants.DEPOSIT_ARM_HOME);
 
-                deposit.setSlidesPIDCoefficients(pSlidesRetract);
                 deposit.setSlidesTarget(0);
             } else {
-                turret.setDepositing(turretMovingAngle * PI);
+//                turret.setDepositing(turretMovingAngle * PI);
 
                 deposit.setArmPIDCoefficients(Deposit.pArmUp, Deposit.dArmUp);
-                if (!deposit.slidesAtPosPercent(0.75)) {
-                    deposit.setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
-                } else {
-                    deposit.setArmControls(Constants.DEPOSIT_ARM_HIGH);
-                }
+//                if (!deposit.slidesAtPosPercent(0.75)) {
+//                    deposit.setArmTarget(Constants.DEPOSIT_ARM_MIDWAY);
+//                } else {
+                    deposit.setArmTarget(armPos/*Constants.DEPOSIT_ARM_HIGH*/);
+//                }
 
-                deposit.setSlidesPIDCoefficients(pSlidesExtend);
                 deposit.setSlidesTarget((int) (slidesExtendDist * Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH));
             }
-
-            deposit.setSlidesControls();
+            deposit.setSlidesPIDCoefficients(Deposit.pSlides);
+//            deposit.setSlidesControls();
+            deposit.setArmControls();
 
             addPacket("1 arm ticks", deposit.getArmPosition());
             addPacket("1 arm angle", deposit.getArmAngle());
-            addPacket("1 farm", deposit.fArm);
+            addPacket("1 arm error", deposit.getArmError());
             addPacket("2 slide inches", deposit.getSlidesDistInches());
             addPacket("3 slide ticks", deposit.getSlidesPosition());
             addPacket("4 slides target ticks", deposit.targetSlidesTicks);
