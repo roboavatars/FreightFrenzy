@@ -200,7 +200,7 @@ public class Robot {
             automationStep("Intake Extend/On");
         } else if (intakeTransfer) {
             if (intakeFull && !intake.slidesIsHome() && intakeFlipTime == -1) {
-                intake.off();
+//                intake.off();
                 intake.home();
                 automationStep("Intake Home/Off");
             } else if (intakeFull && intake.slidesIsHome() && intakeFlipTime == -1) {
