@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 
 import static java.lang.Math.PI;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -76,6 +78,7 @@ public class Turret {
             if (home && slidesHome) {
                 turretTargetTheta = Math.min(Math.max(initialTheta, TURRET_MIN_THETA), TURRET_MAX_THETA);
             }
+            Log.w("turret-log", turretTargetTheta+"");
 
             turretTheta = getTurretTheta();
             turretErrorChange = turretTargetTheta - turretTheta - turretError;

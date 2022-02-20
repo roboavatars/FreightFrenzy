@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 
 import static java.lang.Math.PI;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -124,6 +126,7 @@ public class Deposit {
                 setArmControls();
             }
         }
+        Log.w("arm-log", targetArmPos+" (" + home + ")");
 
         // Move Slides
         // Cap Slides Extension Distance When Extending to the Side to Prevent Tipping

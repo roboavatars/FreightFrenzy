@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous.Red;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -14,8 +15,11 @@ import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Config
-@Autonomous(name = "0 Red Auto Warehouse 10:51", preselectTeleOp = "1 Teleop", group = "Red")
+@Autonomous(name = "0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoWarehouse extends LinearOpMode {
     public static int barcodeCase = 0; // 0 = left, 1 = mid, 2 = right
 
@@ -40,6 +44,7 @@ public class RedAutoWarehouse extends LinearOpMode {
         boolean goToWarehouse = false;
         boolean cycleScore = false;
         boolean park = false;
+        boolean resetOdo = false;
 
         // Segment Times
         double preloadScoreTime = 1.75;
@@ -87,18 +92,16 @@ public class RedAutoWarehouse extends LinearOpMode {
         robot.intake.flipDown();
         robot.noExtend = false;
 
+        robot.noExtend = true;
         robot.depositingFreight = true;
         robot.depositApproval = true;
 
         while (opModeIsActive()) {
             if (!preloadScore) {
-                robot.drivetrain.setGlobalControls(0.4, 0, 0);
-
                 addPacket("path", "initial deposit imo");
-
+                robot.drivetrain.setGlobalControls(0.4, 0, 0);
                 if (!robot.depositingFreight && (barcodeCase != 0 || robot.deposit.targetSlidesTicks == 0 && robot.deposit.getSlidesDistInches() < 15) /*|| time.seconds() > preloadScoreTime + 1.5*/) {
                     robot.cycleHub = Robot.DepositTarget.allianceHigh;
-                    robot.intake.on();
 
                     time.reset();
                     preloadScore = true;
@@ -107,10 +110,12 @@ public class RedAutoWarehouse extends LinearOpMode {
 
             else if (!goToWarehouse) {
                 if (robot.y < 112) {
-                    robot.drivetrain.setGlobalControls(0.06, 0.85, 0);
+                    robot.drivetrain.setGlobalControls(0.06, 0.85,
+                            PI/2 - robot.theta > PI/6 ? 0.5 : 0);
                     passLineTime = time.seconds();
                 } else {
-                    robot.setTargetPoint(136, 111 + 2.5 * (time.seconds() - passLineTime), PI/2 + 0.05 * Math.sin(2.5 * (time.seconds() - passLineTime)));
+                    robot.setTargetPoint(140 + 5*cycleCounter, 111 + 2.5 * (time.seconds() - passLineTime),
+                            PI/2/* + 0.1 * Math.sin(2.5 * (time.seconds() - passLineTime))*/);
                 }
 
                 addPacket("path", "going to warehouse right rn");
@@ -122,12 +127,8 @@ public class RedAutoWarehouse extends LinearOpMode {
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 
-                    robot.intake.off();
-
                     time.reset();
                     goToWarehouse = true;
-//                    cycleScore = true;
-//                    park = true;
                 }
             }
 
@@ -143,10 +144,15 @@ public class RedAutoWarehouse extends LinearOpMode {
 
                     if (time.seconds() > cycleScoreTime && !robot.intakeRev && !robot.intakeTransfer && !robot.depositingFreight/*time.seconds() > cycleScoreTime + 1.5*/) {
                         cycleCounter++;
+                        if (cycleCounter == 2){
+                            robot.noExtend = false;
+                        }
 
-                        if (30 - (System.currentTimeMillis() - robot.startTime) / 1000 > goToWarehouseTime + cycleScoreTime + parkTime + 1) {
+                        if (30 - (System.currentTimeMillis() - robot.startTime) / 1000 > 5) {
                             goToWarehouse = false;
+                            Robot.log("Doing another cycle");
                         } else {
+                            Robot.log("Parking");
                             Waypoint[] parkWaypoints = new Waypoint[] {
                                     new Waypoint(robot.x, robot.y, PI / 2/*robot.theta*/, 30, 5, 0, 0),
                                     new Waypoint(140, 111, PI / 2, 20, -5, 0, parkTime)
