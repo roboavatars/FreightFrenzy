@@ -38,8 +38,8 @@ public class RedAutoWarehouse extends LinearOpMode {
         // Segments
         boolean preloadScore = false;
         boolean goToWarehouse = false;
-        boolean cycleScore = true;
-        boolean park = true;
+        boolean cycleScore = false;
+        boolean park = false;
 
         // Segment Times
         double preloadScoreTime = 1.75;
@@ -55,7 +55,6 @@ public class RedAutoWarehouse extends LinearOpMode {
 //        double[][] preloadScoreCoord = {{111.5, 63, 5*PI/6}, {115.5, 63, 5*PI/6}, {119, 63, 5*PI/6}};
 
         // Paths
-        Path goToWarehousePath = null;
         Path cycleScorePath = null;
         Path parkPath = null;
 
@@ -83,12 +82,6 @@ public class RedAutoWarehouse extends LinearOpMode {
             robot.cycleHub = Robot.DepositTarget.allianceHigh;
         }
 
-        Waypoint[] goToWarehouseWaypoints = new Waypoint[] {
-                new Waypoint(robot.x, robot.y, PI/2/*robot.theta*/, 10, 2,0, 0),
-                new Waypoint(140,111,PI/2,10,-2,0, goToWarehouseTime)
-        };
-        goToWarehousePath = new Path(goToWarehouseWaypoints);
-
         ElapsedTime time = new ElapsedTime();
 
         robot.intake.flipDown();
@@ -99,14 +92,11 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         while (opModeIsActive()) {
             if (!preloadScore) {
-                robot.drivetrain.setGlobalControls(0.4,0,0);
+                robot.drivetrain.setGlobalControls(0.4, 0, 0);
 
                 addPacket("path", "initial deposit imo");
 
-                if (!robot.depositingFreight
-                        && (barcodeCase != 0 || robot.deposit.targetSlidesTicks == 0 && robot.deposit.getSlidesDistInches() < 15)
-                        /*|| time.seconds() > preloadScoreTime + 1.5*/) {
-
+                if (!robot.depositingFreight && (barcodeCase != 0 || robot.deposit.targetSlidesTicks == 0 && robot.deposit.getSlidesDistInches() < 15) /*|| time.seconds() > preloadScoreTime + 1.5*/) {
                     robot.cycleHub = Robot.DepositTarget.allianceHigh;
                     robot.intake.on();
 
@@ -117,14 +107,12 @@ public class RedAutoWarehouse extends LinearOpMode {
 
             else if (!goToWarehouse) {
                 if (robot.y < 112) {
-                    robot.drivetrain.setGlobalControls(0.06,0.85,0);
+                    robot.drivetrain.setGlobalControls(0.06, 0.85, 0);
                     passLineTime = time.seconds();
-                } else if (time.seconds() > goToWarehouseTime) {
-                    robot.setTargetPoint(136, 111 + 2.5 * (time.seconds() - passLineTime), PI/2 + 0.05 * Math.sin(2.5 * (time.seconds() - passLineTime)));
                 } else {
-                    Pose curPose = goToWarehousePath.getRobotPose(Math.min(goToWarehouseTime, time.seconds()));
-                    robot.setTargetPoint(new Target(curPose).theta(PI/2).xKp(1));
+                    robot.setTargetPoint(136, 111 + 2.5 * (time.seconds() - passLineTime), PI/2 + 0.05 * Math.sin(2.5 * (time.seconds() - passLineTime)));
                 }
+
                 addPacket("path", "going to warehouse right rn");
 
                 if (robot.intakeFull && robot.y > 112/*time.seconds() > goToWarehouseTime + 0.5*/) {
@@ -134,12 +122,12 @@ public class RedAutoWarehouse extends LinearOpMode {
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 
-                    robot.intake.off(); /// rem
+                    robot.intake.off();
 
                     time.reset();
                     goToWarehouse = true;
-                    cycleScore = true;
-                    park = true;
+//                    cycleScore = true;
+//                    park = true;
                 }
             }
 
@@ -153,15 +141,10 @@ public class RedAutoWarehouse extends LinearOpMode {
                 if (robot.y <= 91) {
                     robot.depositApproval = true;
 
-                    if (time.seconds() > cycleScoreTime && !robot.intakeRev && !robot.depositingFreight/*time.seconds() > cycleScoreTime + 1.5*/) {
+                    if (time.seconds() > cycleScoreTime && !robot.intakeRev && !robot.intakeTransfer && !robot.depositingFreight/*time.seconds() > cycleScoreTime + 1.5*/) {
                         cycleCounter++;
 
                         if (30 - (System.currentTimeMillis() - robot.startTime) / 1000 > goToWarehouseTime + cycleScoreTime + parkTime + 1) {
-                            goToWarehouseWaypoints = new Waypoint[] {
-                                    new Waypoint(robot.x, robot.y, PI / 2/*robot.theta*/, 10, 2, 0, 0),
-                                    new Waypoint(140, 111, PI / 2, 10, -2, 0, goToWarehouseTime)
-                            };
-                            goToWarehousePath = new Path(goToWarehouseWaypoints);
                             goToWarehouse = false;
                         } else {
                             Waypoint[] parkWaypoints = new Waypoint[] {

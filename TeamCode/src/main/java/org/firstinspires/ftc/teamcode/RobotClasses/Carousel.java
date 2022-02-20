@@ -4,21 +4,24 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Carousel {
-    private CRServo carouselMotor;
+    private CRServo carousel;
+    private Servo carouselArm;
     private double lastPower = 0;
 
     public Carousel(LinearOpMode op) {
-        carouselMotor = op.hardwareMap.get(CRServo.class, "carousel");
+        carousel = op.hardwareMap.get(CRServo.class, "carousel");
+        carouselArm = op.hardwareMap.get(Servo.class, "carouselArm");
 
         op.telemetry.addData("Status", "Carousel Initialized");
     }
 
     private void setPower(double power) {
         if (power != lastPower) {
-            carouselMotor.setPower(power);
+            carousel.setPower(power);
             lastPower = power;
         }
     }
@@ -34,5 +37,4 @@ public class Carousel {
     public void stop() {
         setPower(0);
     }
-
 }

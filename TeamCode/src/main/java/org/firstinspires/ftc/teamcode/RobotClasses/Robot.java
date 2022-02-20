@@ -227,12 +227,12 @@ public class Robot {
 
         // Auto-depositing
         if (depositingFreight) {
-            if ((!isAuto && y <= 100) || (isAuto && y <= 100 && Math.abs(theta - PI / 2) < PI / 10) /*&& notMoving() && turret.turretAtPos()*/) {
+            if ((!isAuto && y <= 100) || (isAuto && y <= 100 /*&& Math.abs(theta - PI/2) < PI/5*/) /*&& notMoving() && turret.turretAtPos()*/) {
                 if (deposit.armSlidesHome() && depositOpenTime == -1) {
                     depositScore();
                     turretScore();
                     automationStep("Extend Slides/Arm");
-                } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1 && (depositApproval && (!isAuto || deposit.getArmVelocity() < 5))) {
+                } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1 && (depositApproval && (!isAuto || (deposit.getArmVelocity() < 5 && Math.abs(theta - PI/2) < PI/10)))) {
                     deposit.open();
                     depositOpenTime = curTime;
                     automationStep("Score Freight");
@@ -257,16 +257,16 @@ public class Robot {
             }
         }
 
-        if (intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
-            if (!intakeStalling) stallStartTime = -1;
-            if (intakeStalling && stallStartTime == -1) { // 1
-                stallStartTime = curTime;
-            } else if (!intakeStalling && curTime - stallStartTime > stallThreshold + 500) { // 2
-                intake.off();
-            } else if (intakeStalling && curTime - stallStartTime > stallThreshold) { // 3
-                intake.reverse();
-            }
-        }
+//        if (intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
+//            if (!intakeStalling) stallStartTime = -1;
+//            if (intakeStalling && stallStartTime == -1) { // 1
+//                stallStartTime = curTime;
+//            } else if (!intakeStalling && curTime - stallStartTime > stallThreshold + 500) { // 2
+//                intake.off();
+//            } else if (intakeStalling && curTime - stallStartTime > stallThreshold) { // 3
+//                intake.reverse();
+//            }
+//        }
 
         // Update Turret
         if (trackGoal) updateTrackingMath();
