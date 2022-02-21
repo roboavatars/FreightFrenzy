@@ -42,7 +42,7 @@ public class Robot {
     private final List<LynxModule> allHubs;
     private final VoltageSensor battery;
     private double voltage;
-    private boolean startVoltTooLow = false;
+    private double startVoltage;
 
     // Class Constants
     private final int loggerUpdatePeriod = 2;
@@ -149,7 +149,7 @@ public class Robot {
         battery = op.hardwareMap.voltageSensor.iterator().next();
         voltage = battery.getVoltage();
         log("Battery Voltage: " + voltage + "v");
-        if (voltage < 12.4) startVoltTooLow = true;
+        startVoltage = voltage;
         profiler = new ElapsedTime();
 
         // Initial Dashboard Drawings
@@ -191,7 +191,7 @@ public class Robot {
         }
 
         // Auto-intaking
-        if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && (isAuto && y > 105 || intakeApproval)) {
+        if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && ((isAuto && y > 105) || intakeApproval)) {
             if (!noExtend) intake.extend();
             else intake.extend(Constants.INTAKE_HOME_POS);
             intake.on();
@@ -257,19 +257,19 @@ public class Robot {
         }
 
         // Intake Anti-stall
-        if (intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
-            if (!intakeStalling) {
-                stallStartTime = -1;
-                intake.on();
-                antiStallStep = "Intake On"; automationStep(antiStallStep);
-            } else if (stallStartTime == -1) {
-                stallStartTime = curTime;
-                antiStallStep = "Jam Detected"; automationStep(antiStallStep);
-            } else if (curTime - stallStartTime > stallThreshold) {
-                intake.reverse();
-                antiStallStep = "Reverse Intake"; automationStep(antiStallStep);
-            }
-        }
+//        if (intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
+//            if (!intakeStalling) {
+//                stallStartTime = -1;
+//                intake.on();
+//                antiStallStep = "Intake On"; automationStep(antiStallStep);
+//            } else if (stallStartTime == -1) {
+//                stallStartTime = curTime;
+//                antiStallStep = "Jam Detected"; automationStep(antiStallStep);
+//            } else if (curTime - stallStartTime > stallThreshold) {
+//                intake.reverse();
+//                antiStallStep = "Reverse Intake"; automationStep(antiStallStep);
+//            }
+//        }
 
         // Update Turret
         if (trackGoal) updateTrackingMath();
@@ -318,15 +318,14 @@ public class Robot {
         }
 
         // Dashboard Telemetry
-        addPacket("0 0 pod zeroes", drivetrain.zero1 + " " + drivetrain.zero2 + " " + drivetrain.zero3);
-        if (startVoltTooLow) addPacket("0", "Starting Battery Voltage < 12.4!!!!");
-        addPacket("0 Voltage", voltage);
-        addPacket("1 X", round(x));
-        addPacket("2 Y", round(y));
-        addPacket("3 Theta", round(theta));
-        addPacket("4 Turret Theta", round(turretGlobalTheta));
-        addPacket("5 Deposit Level", cycleHub.name().toLowerCase());
-        addPacket("7 Automation Step", automationStep + ", " + antiStallStep);
+        addPacket("0 Voltage", "Starting: " + startVoltage + ", Current: " + voltage);
+        addPacket("1 pod zeroes", drivetrain.zero1 + " " + drivetrain.zero2 + " " + drivetrain.zero3);
+        addPacket("2 X", round(x));
+        addPacket("3 Y", round(y));
+        addPacket("4 Theta", round(theta));
+        addPacket("5 Turret Theta", round(turretGlobalTheta));
+        addPacket("6 Deposit Level", cycleHub.name().toLowerCase());
+        addPacket("7 Automation Step", automationStep + "; " + antiStallStep);
         addPacket("8 Run Time", (curTime - startTime) / 1000);
         addPacket("9 Update Frequency (Hz)", round(1 / timeDiff));
         addPacket("Intake Full", intakeFull);
@@ -545,7 +544,7 @@ public class Robot {
     }
 
     public void automationStep(String step) {
-        automationStep = step;
+        automationStep = step + ", " + automationStep;
 //        log((curTime - automationStepTime) + "ms");
         log(automationStep);
         automationStepTime = curTime;
@@ -556,4 +555,3 @@ public class Robot {
         return Double.parseDouble(String.format("%.5f", num));
     }
 }
-

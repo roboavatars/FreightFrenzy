@@ -90,9 +90,8 @@ public class RedAutoWarehouse extends LinearOpMode {
         ElapsedTime time = new ElapsedTime();
 
         robot.intake.flipDown();
-        robot.noExtend = false;
-
         robot.noExtend = true;
+
         robot.depositingFreight = true;
         robot.depositApproval = true;
 
@@ -144,7 +143,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
                     if (time.seconds() > cycleScoreTime && !robot.intakeRev && !robot.intakeTransfer && !robot.depositingFreight/*time.seconds() > cycleScoreTime + 1.5*/) {
                         cycleCounter++;
-                        if (cycleCounter == 2){
+                        if (cycleCounter == 2) {
                             robot.noExtend = false;
                         }
 

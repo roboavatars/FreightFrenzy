@@ -126,7 +126,7 @@ public class Deposit {
                 setArmControls();
             }
         }
-        Log.w("arm-log", targetArmPos+" (" + home + ")");
+        Log.w("arm-log", targetArmPos + " (" + home + ")");
 
         // Move Slides
         // Cap Slides Extension Distance When Extending to the Side to Prevent Tipping
@@ -135,7 +135,7 @@ public class Deposit {
 
     // Arm
     public void setArmControls(int targetArmPos) {
-        double targetTicks = (int) Math.min(Math.max(targetArmPos, Constants.DEPOSIT_ARM_HOME), Constants.DEPOSIT_ARM_LOW);
+        double targetTicks = Math.min(Math.max(targetArmPos, Constants.DEPOSIT_ARM_HOME), Constants.DEPOSIT_ARM_LOW);
         double currentTicks = getArmPosition();
         armErrorChange = targetTicks - currentTicks - armError;
         armError = targetTicks - currentTicks;
@@ -189,13 +189,14 @@ public class Deposit {
     public void setSlidesControls(int targetSlidesPos) {
         slidesMotor.setTargetPosition(targetSlidesPos);
         slidesMotor.setPower(DEPOSIT_ARM_MAX_POWER);
+        Log.w("arm-log", "slides set to: " + targetSlidesPos + ", current position: " + getSlidesPosition());
     }
 
     public void setSlidesControls() {
         setSlidesControls(targetSlidesTicks);
     }
 
-    public void setSlidesTarget(int targetPos){
+    public void setSlidesTarget(int targetPos) {
         targetSlidesTicks = Math.min(Math.max(targetPos, 0), DEPOSIT_SLIDES_MAX_TICKS);
     }
 

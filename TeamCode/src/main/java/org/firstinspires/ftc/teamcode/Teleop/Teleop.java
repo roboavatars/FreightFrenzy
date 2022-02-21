@@ -74,23 +74,28 @@ public class Teleop extends LinearOpMode {
             robot = new Robot(this, initialData[1], initialData[2], initialData[3], false, initialData[0] == 1);
             robot.logger.startLogging(false, initialData[0] == 1);
         } else {
-            robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
+            robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, true, isRed);
             robot.logger.startLogging(false, isRed);
         }
 
         waitForStart();
 
+        robot.intake.flipDown();
+        robot.deposit.open();
+        robot.noExtend = true;
+        robot.depositApproval = true;
+
         ElapsedTime cycleTimer = new ElapsedTime();
         cycleTimer.reset();
 
         while (opModeIsActive()) {
-
             if (gamepad1.left_bumper) {
                 robot.intakeApproval = true;
             } else if (gamepad1.right_bumper) {
                 robot.depositApproval = true;
             }
-            if (gamepad1.left_trigger>0){
+
+            if (gamepad1.left_trigger > 0) {
                 robot.intakeFull = true;
             }
 
