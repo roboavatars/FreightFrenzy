@@ -110,7 +110,7 @@ public class Robot {
     public static int releaseThreshold = 750;
 
     public double stallStartTime = -1;
-    public static int stallThreshold = 1000;
+    public static int stallThreshold = 1500;
     public double automationStepTime;
 
     // Motion Variables
@@ -257,19 +257,19 @@ public class Robot {
         }
 
         // Intake Anti-stall
-//        if (intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
-//            if (!intakeStalling) {
-//                stallStartTime = -1;
-//                intake.on();
-//                antiStallStep = "Intake On"; automationStep(antiStallStep);
-//            } else if (stallStartTime == -1) {
-//                stallStartTime = curTime;
-//                antiStallStep = "Jam Detected"; automationStep(antiStallStep);
-//            } else if (curTime - stallStartTime > stallThreshold) {
-//                intake.reverse();
-//                antiStallStep = "Reverse Intake"; automationStep(antiStallStep);
-//            }
-//        }
+        if (intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
+            if (!intakeStalling) {
+                stallStartTime = -1;
+                intake.on();
+                antiStallStep = "Intake On"; automationStep(antiStallStep);
+            } else if (stallStartTime == -1) {
+                stallStartTime = curTime;
+                antiStallStep = "Jam Detected"; automationStep(antiStallStep);
+            } else if (curTime - stallStartTime > stallThreshold) {
+                intake.reverse();
+                antiStallStep = "Reverse Intake"; automationStep(antiStallStep);
+            }
+        }
 
         // Update Turret
         if (trackGoal) updateTrackingMath();
@@ -544,7 +544,7 @@ public class Robot {
     }
 
     public void automationStep(String step) {
-        automationStep = step + ", " + automationStep;
+        automationStep = step;
 //        log((curTime - automationStepTime) + "ms");
         log(automationStep);
         automationStepTime = curTime;

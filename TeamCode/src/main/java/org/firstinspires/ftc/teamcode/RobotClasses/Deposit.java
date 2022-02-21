@@ -23,7 +23,7 @@ public class Deposit {
     public int DEPOSIT_SLIDES_MAX_TICKS = (int) (25 * DEPOSIT_SLIDES_TICKS_PER_INCH);
     public int DEPOSIT_SLIDES_ERROR_THRESHOLD = 15;
     public double ARM_TICKS_PER_RADIAN = 1120 / (2*PI);
-    public double DEPOSIT_ARM_MAX_POWER = 0.7;
+    public double DEPOSIT_ARM_MAX_POWER = 1;
     public static int DEPOSIT_ARM_ERROR_THRESHOLD = 30;
 
     // Slides PD
@@ -85,7 +85,7 @@ public class Deposit {
         home = true;
         setArmPIDCoefficients(Deposit.pArmDown, Deposit.dArmDown);
         setArmTarget(Constants.DEPOSIT_ARM_HOME);
-        setSlidesTarget(0);
+        setSlidesTarget(1);
     }
 
     public void setDepositControls(Robot.DepositTarget target, double slidesDist) {
