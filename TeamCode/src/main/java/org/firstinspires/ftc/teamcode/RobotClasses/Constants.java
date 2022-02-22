@@ -26,13 +26,14 @@ public class Constants {
     public static double DEPOSIT_HOLD_POS = 0.65;
 
     // Deposit Arm
-    public static int DEPOSIT_ARM_HOME = 10;
+    public static int DEPOSIT_ARM_HOME = 5;
     public static int DEPOSIT_ARM_LOW = 710;
     public static int DEPOSIT_ARM_MID = 650;
     public static int DEPOSIT_ARM_HIGH = 570;
     public static int DEPOSIT_ARM_MIDWAY = 400;
 
     // Deposit Slides
+    public static int SLIDES_DISTANCE_HOME = 0;
     public static double SLIDES_DISTANCE_LOW = 17;
     public static double SLIDES_DISTANCE_MID = 14;
     public static double SLIDES_DISTANCE_HIGH = 18;

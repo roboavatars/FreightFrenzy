@@ -39,6 +39,7 @@ public class Turret {
     private double turretErrorChange;
 
     private boolean home = true;
+    public double turretOffset = 0;
 
     public Turret(LinearOpMode op, boolean isAuto) {
         this(op, isAuto, PI/2);
@@ -59,7 +60,21 @@ public class Turret {
         op.telemetry.addData("Status", "Turret Initialized");
     }
 
-    public void update(boolean slidesHome, double robotTheta, double slidesDist, double ff) {
+    public void update(boolean slidesHome) {
+        // Move Turret Home Only If Set To Home And Slides Are Home
+        if (home && slidesHome) {
+            turretTargetTheta = Math.min(Math.max(initialTheta + turretOffset, TURRET_MIN_THETA), TURRET_MAX_THETA);
+        }
+        Log.w("turret-log", turretTargetTheta+"");
+
+        turretTheta = getTurretTheta() + turretOffset;
+        turretErrorChange = turretTargetTheta - turretTheta - turretError;
+        turretError = turretTargetTheta - turretTheta;
+
+        setTurretPower(pTurret * turretError + dTurret * turretErrorChange);
+    }
+
+    public void updateTracking(double robotTheta, double slidesDist, double ff) {
         if (tracking) {
             double targetTheta = lockTheta - robotTheta;
             targetTheta %= 2*PI;
@@ -73,18 +88,6 @@ public class Turret {
             turretError = clippedTargetTheta - turretTheta;
 
             setTurretPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * ff + fmoiTurret * slidesDist * slidesDist);
-        } else {
-            // Move Turret Home Only If Set To Home And Slides Are Home
-            if (home && slidesHome) {
-                turretTargetTheta = Math.min(Math.max(initialTheta, TURRET_MIN_THETA), TURRET_MAX_THETA);
-            }
-            Log.w("turret-log", turretTargetTheta+"");
-
-            turretTheta = getTurretTheta();
-            turretErrorChange = turretTargetTheta - turretTheta - turretError;
-            turretError = turretTargetTheta - turretTheta;
-
-            setTurretPower(pTurret * turretError + dTurret * turretErrorChange);
         }
     }
 

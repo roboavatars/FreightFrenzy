@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
-import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.ArrayList;
@@ -80,9 +79,6 @@ public class Teleop extends LinearOpMode {
 
         waitForStart();
 
-        robot.intake.flipDown();
-        robot.deposit.open();
-
         ElapsedTime cycleTimer = new ElapsedTime();
         cycleTimer.reset();
 
@@ -107,40 +103,17 @@ public class Teleop extends LinearOpMode {
             else if (gamepad1.dpad_right) robot.cycleHub = Robot.DepositTarget.neutral;
             else if (gamepad1.y) robot.cycleHub = Robot.DepositTarget.duck;
 
-            if (gamepad2.dpad_up) Constants.DEPOSIT_ARM_HIGH -= 2;
-            else if (gamepad2.dpad_down) Constants.DEPOSIT_ARM_HIGH += 2;
+            if (gamepad1.dpad_up) robot.intake.intakeOffset += 0.025;
+            else if (gamepad1.dpad_down) robot.intake.intakeOffset -= 0.025;
 
-            if (gamepad2.dpad_right) {
-                if (robot.cycleHub == Robot.DepositTarget.allianceHigh || robot.cycleHub == Robot.DepositTarget.allianceMid
-                        || robot.cycleHub == Robot.DepositTarget.allianceLow) {
-                    Constants.TURRET_ALLIANCE_RED_CYCLE_THETA -= 0.005;
-                } else if (robot.cycleHub == Robot.DepositTarget.neutral) {
-                    Constants.TURRET_NEUTRAL_RED_CYCLE_THETA -= 0.005;
-                } else if (robot.cycleHub == Robot.DepositTarget.duck) {
-                    Constants.TURRET_DUCK_RED_CYCLE_THETA -= 0.005;
-                }
-            } else if (gamepad2.dpad_left) {
-                if (robot.cycleHub == Robot.DepositTarget.allianceHigh || robot.cycleHub == Robot.DepositTarget.allianceMid
-                        || robot.cycleHub == Robot.DepositTarget.allianceLow) {
-                    Constants.TURRET_ALLIANCE_RED_CYCLE_THETA += 0.005;
-                } else if (robot.cycleHub == Robot.DepositTarget.neutral) {
-                    Constants.TURRET_NEUTRAL_RED_CYCLE_THETA += 0.005;
-                } else if (robot.cycleHub == Robot.DepositTarget.duck) {
-                    Constants.TURRET_DUCK_RED_CYCLE_THETA += 0.005;
-                }
-            }
+            if (gamepad2.dpad_up) robot.deposit.armOffset -= 2;
+            else if (gamepad2.dpad_down) robot.deposit.armOffset += 2;
 
-            if (gamepad2.y) {
-                if (robot.cycleHub == Robot.DepositTarget.allianceHigh) Constants.SLIDES_DISTANCE_HIGH += 0.2;
-                else if (robot.cycleHub == Robot.DepositTarget.allianceMid) Constants.SLIDES_DISTANCE_MID += 0.2;
-                else if (robot.cycleHub == Robot.DepositTarget.allianceLow) Constants.SLIDES_DISTANCE_LOW += 0.2;
-                else if (robot.cycleHub == Robot.DepositTarget.duck) Constants.SLIDES_DISTANCE_DUCK += 0.2;
-            } else if (gamepad2.a) {
-                if (robot.cycleHub == Robot.DepositTarget.allianceHigh) Constants.SLIDES_DISTANCE_HIGH -= 0.2;
-                else if (robot.cycleHub == Robot.DepositTarget.allianceMid) Constants.SLIDES_DISTANCE_MID -= 0.2;
-                else if (robot.cycleHub == Robot.DepositTarget.allianceLow) Constants.SLIDES_DISTANCE_LOW -= 0.2;
-                else if (robot.cycleHub == Robot.DepositTarget.duck) Constants.SLIDES_DISTANCE_DUCK -= 0.2;
-            }
+            if (gamepad2.dpad_right) robot.turret.turretOffset += 0.0025;
+            else if (gamepad2.dpad_left) robot.turret.turretOffset -= 0.0025;
+
+            if (gamepad2.y) robot.deposit.slidesOffset += 2;
+            else if (gamepad2.a) robot.deposit.slidesOffset -= 2;
 
             // Slow Mode
             if (gamepad2.right_trigger > 0) {

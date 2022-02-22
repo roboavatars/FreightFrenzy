@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -15,10 +14,13 @@ public class Intake {
     private Servo slidesServo;
     private Servo intakeServo;
     private DistanceSensor intakeSensor;
-    private TouchSensor slidesSensor;
 
     private double lastIntakePow = 0;
+
     private boolean slidesHome = true;
+    public double intakeOffset = 0;
+    private double lastSlidesPos = 0;
+    private double slidesTargetPos = 0;
 
     public Intake(LinearOpMode op, boolean isAuto) {
         // Intake Motor
@@ -42,9 +44,6 @@ public class Intake {
 
         // Intake Distance Sensor
         intakeSensor = op.hardwareMap.get(DistanceSensor.class, "intakeSensor");
-
-        // Intake Slides Limit Switch
-        slidesSensor = op.hardwareMap.get(TouchSensor.class, "intakeSlidesLimit");
 
         op.telemetry.addData("Status", "Intake Initialized");
     }
@@ -80,21 +79,31 @@ public class Intake {
     // Intake Slides
     public void extend() {
         slidesHome = false;
-        slidesServo.setPosition(Constants.INTAKE_EXTEND_POS);
+        slidesTargetPos = Constants.INTAKE_EXTEND_POS;
     }
 
-    public void extend(double pos) {
+    public void extend(double extendPos) {
         slidesHome = false;
-        slidesServo.setPosition(pos);
+        slidesTargetPos = extendPos;
     }
 
     public void home() {
         slidesHome = true;
-        slidesServo.setPosition(Constants.INTAKE_HOME_POS);
+        slidesTargetPos = Constants.INTAKE_HOME_POS;
+    }
+
+    public void setSlidesPosition(double position) {
+        if (position != lastSlidesPos) {
+            slidesServo.setPosition(position);
+            lastSlidesPos = position;
+        }
+    }
+
+    public void update() {
+        setSlidesPosition(slidesTargetPos + intakeOffset);
     }
 
     public boolean slidesIsHome() {
-//        return slidesSensor.isPressed();
         return slidesHome;
     }
 
@@ -108,7 +117,7 @@ public class Intake {
     }
 
     // Distance Sensor
-    private double getDistance() {
+    public double getDistance() {
         return intakeSensor.getDistance(DistanceUnit.MM);
     }
 

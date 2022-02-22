@@ -38,6 +38,8 @@ public class Deposit {
     public int targetArmPos;
 
     private double initialArmAngle = -0.646;
+    public int armOffset = 0;
+    public int slidesOffset = 0;
 
     // Arm PD
     double armErrorChange = 0, armError = 0;
@@ -84,8 +86,8 @@ public class Deposit {
     public void setDepositHome() {
         home = true;
         setArmPIDCoefficients(Deposit.pArmDown, Deposit.dArmDown);
-        setArmTarget(Constants.DEPOSIT_ARM_HOME);
-        setSlidesTarget(1);
+        setArmTarget(Constants.DEPOSIT_ARM_HOME - armOffset);
+        setSlidesTarget(Constants.SLIDES_DISTANCE_HOME - slidesOffset);
     }
 
     public void setDepositControls(Robot.DepositTarget target, double slidesDist) {
@@ -126,22 +128,19 @@ public class Deposit {
                 setArmControls();
             }
         }
-        Log.w("arm-log", targetArmPos + " (" + home + ")");
-
-        // Move Slides
-        // Cap Slides Extension Distance When Extending to the Side to Prevent Tipping
-        // targetSlidesTicks = (int) Math.min(targetSlidesTicks, Constants.DEPOSIT_SLIDES_SIDE_EXTENSION_LIMIT_IN * Constants.DEPOSIT_SLIDES_TICKS_PER_INCH * Math.abs(1/Math.cos(getTurretTheta())));
     }
 
     // Arm
     public void setArmControls(int targetArmPos) {
-        double targetTicks = Math.min(Math.max(targetArmPos, Constants.DEPOSIT_ARM_HOME), Constants.DEPOSIT_ARM_LOW);
+        double targetTicks = Math.min(Math.max(targetArmPos, Constants.DEPOSIT_ARM_HOME), Constants.DEPOSIT_ARM_LOW) + armOffset;
         double currentTicks = getArmPosition();
         armErrorChange = targetTicks - currentTicks - armError;
         armError = targetTicks - currentTicks;
 
         fArm = fGravity * Math.cos(getArmAngle());
         armMotor.setPower(pArm * armError + dArm * armErrorChange + fArm);
+
+        Log.w("arm-log", "arm set to: " + targetArmPos + ", current position: " + getArmPosition());
     }
 
     public void setArmControls() {
@@ -187,7 +186,7 @@ public class Deposit {
 
     // Slides
     public void setSlidesControls(int targetSlidesPos) {
-        slidesMotor.setTargetPosition(targetSlidesPos);
+        slidesMotor.setTargetPosition(targetSlidesPos + slidesOffset);
         slidesMotor.setPower(DEPOSIT_ARM_MAX_POWER);
         Log.w("arm-log", "slides set to: " + targetSlidesPos + ", current position: " + getSlidesPosition());
     }

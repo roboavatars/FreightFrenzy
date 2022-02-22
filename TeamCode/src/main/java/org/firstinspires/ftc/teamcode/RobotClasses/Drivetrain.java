@@ -71,6 +71,9 @@ public class Drivetrain {
 
     public double lastHeading;
 
+    public boolean constantStrafe = false;
+    public double constantStrafeConstant = 0;
+
     // Constructor
     public Drivetrain(LinearOpMode op, double initialX, double initialY, double initialTheta) {
         this.op = op;
@@ -183,6 +186,7 @@ public class Drivetrain {
     public void setGlobalControls(double xvelocity, double yvelocity, double w) {
         double xdot = xvelocity * Math.cos(-theta) - yvelocity * Math.sin(-theta);
         double ydot = yvelocity * Math.cos(-theta) + xvelocity * Math.sin(-theta);
+        ydot += constantStrafeConstant;
         setControls(xdot, ydot, w);
     }
 

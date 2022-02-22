@@ -110,7 +110,7 @@ public class Robot {
     public static int releaseThreshold = 750;
 
     public double stallStartTime = -1;
-    public static int stallThreshold = 1500;
+    public static int stallThreshold = 1000;
     public double automationStepTime;
 
     // Motion Variables
@@ -147,12 +147,17 @@ public class Robot {
 
         // low voltage warning
         battery = op.hardwareMap.voltageSensor.iterator().next();
-        voltage = battery.getVoltage();
+        voltage = round(battery.getVoltage());
         log("Battery Voltage: " + voltage + "v");
         startVoltage = voltage;
         profiler = new ElapsedTime();
 
         // Initial Dashboard Drawings
+        if (intake.getDistance() > 1000) {
+            addPacket("0 DISTANCE SENSOR", "> 1000!!!");
+            op.telemetry.addData("0 DISTANCE SENSOR", "> 1000!!!");
+            op.telemetry.update();
+        }
         drawField();
         drawRobot(this);
         sendPacket();
@@ -174,7 +179,6 @@ public class Robot {
             intakeFull = intake.intakeFull();
             intakeStalling = intake.checkIfStalling();
         }
-
         if (loopCounter % voltageUpdatePeriod == 0) {
             voltage = battery.getVoltage();
         }
@@ -190,31 +194,33 @@ public class Robot {
             firstLoop = false;
         }
 
-        // Auto-intaking
+        // Auto-Intaking
         if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && ((isAuto && y > 105) || intakeApproval)) {
             if (!noExtend) intake.extend();
             else intake.extend(Constants.INTAKE_HOME_POS);
             intake.on();
             intakeTransfer = true;
             intakeApproval = false;
-            automationStepTime = curTime;
-            automationStep("Intake Extend/On");
+            automationStep("Intake Extend/On"); automationStepTime = curTime;
         } else if (intakeTransfer) {
             if (intakeFull && !intake.slidesIsHome() && intakeFlipTime == -1) {
                 intake.setPower(0.5);
                 intake.home();
                 intake.flipUp();
                 intakeFlipTime = curTime;
-                automationStep("Intake Home and Flip");
+                automationStep("Intake Home/Flip");
             } else if (intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > flipUpThreshold && !intakeRev) {
                 intake.reverse();
                 intakeRev = true;
-                automationStep("Transfer Block");
+                automationStep("Transfer Freight");
             } else if (!intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > transferThreshold && intakeRev) {
                 deposit.hold();
                 intake.off();
                 intake.flipDown();
-                automationStep("Intake Transfer Done");
+
+                automationStep("Intake/Transfer Done");
+                log("Intake done after: " + (curTime - automationStepTime) + "ms");
+                automationStepTime = curTime;
 
                 intakeTransfer = false;
                 intakeFlipTime = -1;
@@ -223,40 +229,41 @@ public class Robot {
             }
         }
 
-        // Auto-depositing
+        // Auto-Depositing
         if (depositingFreight) {
-            if ((!isAuto && y <= 100) || (isAuto && y <= 100 /*&& Math.abs(theta - PI/2) < PI/5*/) /*&& notMoving() && turret.turretAtPos()*/) {
+            if (y <= 100 /*&& notMoving() && turret.turretAtPos()*/ /*&& (!isAuto || Math.abs(theta - PI/2) < PI/5)*/) {
                 if (deposit.armSlidesHome() && depositOpenTime == -1) {
                     depositScore();
                     turretScore();
                     automationStep("Extend Slides/Arm");
                 } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1
-                        && (depositApproval && (!isAuto || (deposit.getArmVelocity() < 5/* && Math.abs(theta - PI/2) < PI/6*/)))) {
+                        && (depositApproval && (!isAuto || (deposit.getArmVelocity() < 5 /*&& Math.abs(theta - PI/2) < PI/6*/)))) {
                     deposit.open();
                     depositOpenTime = curTime;
                     automationStep("Score Freight");
-                    log("*************arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
+                    log("@deposit: arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
                 } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
                     depositHome();
                     turretHome();
 
                     markCycle();
-                    automationStep("Home Slides/Arm, Deposit Cycle Done");
+                    automationStep("Home Slides/Arm + Cycle Done");
+                    log("Depositing done after: " + (curTime - automationStepTime) + "ms");
 
                     depositApproval = false;
                     depositOpenTime = -1;
                     depositingFreight = false;
                 } else {
-                    log("arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
+                    log("going to pos arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
                 }
             } else {
-                if (y > 87) log("Waiting for dt pose");
-                if (!notMoving()) log("Robot is moving");
-                if (!turret.turretAtPos()) log("Waiting for turret align");
+                if (y > 100) log("Waiting for dt pose");
+                /*if (!notMoving()) log("Robot is moving");
+                if (!turret.turretAtPos()) log("Waiting for turret align");*/
             }
         }
 
-        // Intake Anti-stall
+        // Intake Anti-Stall
         if (intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
             if (!intakeStalling) {
                 stallStartTime = -1;
@@ -271,11 +278,17 @@ public class Robot {
             }
         }
 
-        // Update Turret
-        if (trackGoal) updateTrackingMath();
-        turret.update(deposit.slidesHome(), theta, deposit.getSlidesDistInches(), turretFF);
+        // Update Intake Slides
+        intake.update();
 
-        // Update Deposit
+        // Update Turret
+        if (trackGoal) {
+            updateTrackingMath();
+            turret.updateTracking(theta, deposit.getSlidesDistInches(), turretFF);
+        }
+        turret.update(deposit.slidesHome());
+
+        // Update Arm/Slides
         if (trackGoal && !setDepositControlsHome) depositScore();
         deposit.update();
 
@@ -303,13 +316,11 @@ public class Robot {
         prevVy = vy;
         prevW = w;
 
-        /*
-        // Update Tape Detector
+        /*// Update Tape Detector
         if (useTapeDetector) {
             double[] resetOdoCoords = tapeDetector.update(drivetrain.x, drivetrain.y, drivetrain.theta);
             resetOdo(drivetrain.x, resetOdoCoords[0], resetOdoCoords[1]);
-        }
-         */
+        }*/
 
         // Log Data
         if (loopCounter % loggerUpdatePeriod == 0) {
@@ -319,17 +330,21 @@ public class Robot {
 
         // Dashboard Telemetry
         addPacket("0 Voltage", "Starting: " + startVoltage + ", Current: " + voltage);
-        addPacket("1 pod zeroes", drivetrain.zero1 + " " + drivetrain.zero2 + " " + drivetrain.zero3);
         addPacket("2 X", round(x));
         addPacket("3 Y", round(y));
         addPacket("4 Theta", round(theta));
         addPacket("5 Turret Theta", round(turretGlobalTheta));
         addPacket("6 Deposit Level", cycleHub.name().toLowerCase());
-        addPacket("7 Automation Step", automationStep + "; " + antiStallStep);
-        addPacket("8 Run Time", (curTime - startTime) / 1000);
-        addPacket("9 Update Frequency (Hz)", round(1 / timeDiff));
-        addPacket("Intake Full", intakeFull);
-        addPacket("Intake Stalling", intakeStalling);
+        addPacket("7 Intake Full", intakeFull);
+        addPacket("8 Intake Stalling", intakeStalling);
+        addPacket("9 Automation Step", automationStep + "; " + antiStallStep);
+        addPacket("10 Run Time", (curTime - startTime) / 1000);
+        addPacket("11 Update Frequency (Hz)", round(1 / timeDiff));
+        addPacket("pod zeroes", drivetrain.zero1 + " " + drivetrain.zero2 + " " + drivetrain.zero3);
+        if (intake.getDistance() > 1000) {
+            addPacket("0 DISTANCE SENSOR", "> 1000!!!");
+            op.telemetry.addData("0 DISTANCE SENSOR", "> 1000!!!");
+        }
         if (!isAuto) {
             addPacket("Cycle Time", (curTime - lastCycleTime) / 1000);
             addPacket("Average Cycle Time", round(cycleTotal / cycles));
@@ -540,14 +555,12 @@ public class Robot {
     }
 
     private void profile(int num) {
-//        Log.w("profiler", num + ": " + profiler.milliseconds());
+        // Log.w("profiler", num + ": " + profiler.milliseconds());
     }
 
     public void automationStep(String step) {
         automationStep = step;
-//        log((curTime - automationStepTime) + "ms");
         log(automationStep);
-        automationStepTime = curTime;
     }
 
     @SuppressLint("DefaultLocale")
