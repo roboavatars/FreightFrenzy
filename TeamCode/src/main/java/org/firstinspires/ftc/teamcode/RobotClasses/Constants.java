@@ -26,7 +26,7 @@ public class Constants {
     public static double DEPOSIT_HOLD_POS = 0.65;
 
     // Deposit Arm
-    public static int DEPOSIT_ARM_HOME = 5;
+    public static int DEPOSIT_ARM_HOME = 0;
     public static int DEPOSIT_ARM_LOW = 710;
     public static int DEPOSIT_ARM_MID = 650;
     public static int DEPOSIT_ARM_HIGH = 570;

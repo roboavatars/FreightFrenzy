@@ -88,7 +88,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            robot.drivetrain.constantStrafeConstant = -0.5;
+            robot.drivetrain.constantStrafeConstant = -0.3;
 
             if (!preloadScore) {
                 robot.drivetrain.setGlobalControls(0, 0, 0);
@@ -122,7 +122,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 if (robot.intakeFull && robot.y >= 105 /*time.seconds() > goToWarehouseTime + 0.5*/) {
                     Waypoint[] cycleScoreWaypoints = new Waypoint[] {
                             new Waypoint(140, robot.y, 3*PI/2, 10, 10, 0, 0),
-                            new Waypoint(140, 85, 3*PI/2, 10, -5, 0, cycleScoreTime),
+                            new Waypoint(140, 84, 3*PI/2, 5, -5, 0, cycleScoreTime),
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 
@@ -153,7 +153,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                             Robot.log("Parking");
                             Waypoint[] parkWaypoints = new Waypoint[] {
                                     new Waypoint(robot.x, robot.y, PI/2/*robot.theta*/, 30, 5, 0, 0),
-                                    new Waypoint(140, 111, PI/2, 20, -5, 0, parkTime)
+                                    new Waypoint(140, 112, PI/2, 20, -5, 0, parkTime)
                             };
                             parkPath = new Path(parkWaypoints);
 
@@ -170,7 +170,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
                 addPacket("path", "parking right rn");
 
-                if (time.seconds() > parkTime || robot.y > 100) {
+                if (robot.y > 112) {
                     Robot.log("Auto finished in " + ((System.currentTimeMillis() - robot.startTime) / 1000) + " seconds");
 
                     park = true;

@@ -176,7 +176,7 @@ public class Robot {
     public void update() {
         // Don't check states every loop
         if (loopCounter % sensorUpdatePeriod == 0) {
-            intakeFull = intake.intakeFull();
+//            intakeFull = intake.intakeFull();
             intakeStalling = intake.checkIfStalling();
         }
         if (loopCounter % voltageUpdatePeriod == 0) {
@@ -212,6 +212,7 @@ public class Robot {
             } else if (intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > flipUpThreshold && !intakeRev) {
                 intake.reverse();
                 intakeRev = true;
+                intakeFull = false;
                 automationStep("Transfer Freight");
             } else if (!intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > transferThreshold && intakeRev) {
                 deposit.hold();
