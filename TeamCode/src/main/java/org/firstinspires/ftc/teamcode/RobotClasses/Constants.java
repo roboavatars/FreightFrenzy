@@ -15,6 +15,7 @@ public class Constants {
 
     // Intake Slides
     public static double INTAKE_EXTEND_POS = 0.35;
+    public static double INTAKE_MIDWAY_POS = 0.5;
     public static double INTAKE_HOME_POS = 0.675;
 
     // Intake Servo
@@ -28,9 +29,10 @@ public class Constants {
     // Deposit Arm
     public static int DEPOSIT_ARM_HOME = 0;
     public static int DEPOSIT_ARM_LOW = 710;
-    public static int DEPOSIT_ARM_MID = 650;
+    public static int DEPOSIT_ARM_MID = 630;
     public static int DEPOSIT_ARM_HIGH = 570;
     public static int DEPOSIT_ARM_MIDWAY = 400;
+    public static int ARM_ON_HUB_THRESHOLD = 550;
 
     // Deposit Slides
     public static int SLIDES_DISTANCE_HOME = 0;
@@ -42,8 +44,9 @@ public class Constants {
     public static double ARM_DISTANCE = 25;
 
     // Turret
-    public static double TURRET_ALLIANCE_RED_CYCLE_THETA = 0.18;
     public static double TURRET_ALLIANCE_RED_CYCLE_LOW_THETA = 0.165;
+    public static double TURRET_ALLIANCE_RED_CYCLE_MID_THETA = 0.15;
+    public static double TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA = 0.18;
     public static double TURRET_NEUTRAL_RED_CYCLE_THETA = 0;
     public static double TURRET_DUCK_RED_CYCLE_THETA = 0;
 

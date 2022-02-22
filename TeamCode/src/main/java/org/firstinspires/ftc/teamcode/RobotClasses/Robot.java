@@ -95,6 +95,7 @@ public class Robot {
     public boolean intakeRev = false;
     private double intakeFlipTime = -1;
     private double depositOpenTime = -1;
+    private double slidesAtPosTime = -1;
     public boolean noExtend = false;
 
     // Cycle Tracker
@@ -108,9 +109,10 @@ public class Robot {
     public static int flipUpThreshold = 1000;
     public static int transferThreshold = 2000;
     public static int releaseThreshold = 750;
+    public static int hubTipThreshold = 300;
 
     public double stallStartTime = -1;
-    public static int stallThreshold = 1000;
+    public static int stallThreshold = 250;
     public double automationStepTime;
 
     // Motion Variables
@@ -176,7 +178,7 @@ public class Robot {
     public void update() {
         // Don't check states every loop
         if (loopCounter % sensorUpdatePeriod == 0) {
-//            intakeFull = intake.intakeFull();
+            intakeFull = intake.intakeFull();
             intakeStalling = intake.checkIfStalling();
         }
         if (loopCounter % voltageUpdatePeriod == 0) {
@@ -196,8 +198,12 @@ public class Robot {
 
         // Auto-Intaking
         if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && ((isAuto && y > 105) || intakeApproval)) {
-            if (!noExtend) intake.extend();
-            else intake.extend(Constants.INTAKE_HOME_POS);
+            if (!noExtend) {
+                if (isAuto) intake.extend(Constants.INTAKE_MIDWAY_POS);
+                else intake.extend();
+            } else {
+                intake.extend(Constants.INTAKE_HOME_POS);
+            }
             intake.on();
             intakeTransfer = true;
             intakeApproval = false;
@@ -232,13 +238,16 @@ public class Robot {
 
         // Auto-Depositing
         if (depositingFreight) {
+            if (!deposit.slidesAtPos()) slidesAtPosTime = curTime;
+
             if (y <= 100 /*&& notMoving() && turret.turretAtPos()*/ /*&& (!isAuto || Math.abs(theta - PI/2) < PI/5)*/) {
                 if (deposit.armSlidesHome() && depositOpenTime == -1) {
                     depositScore();
                     turretScore();
                     automationStep("Extend Slides/Arm");
                 } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1
-                        && (depositApproval && (!isAuto || (deposit.getArmVelocity() < 5 /*&& Math.abs(theta - PI/2) < PI/6*/)))) {
+                        && (depositApproval && (!isAuto || (deposit.getArmVelocity() < 5))
+                        && (!isAuto || cycleHub != DepositTarget.allianceMid || curTime - slidesAtPosTime > hubTipThreshold))) {
                     deposit.open();
                     depositOpenTime = curTime;
                     automationStep("Score Freight");
@@ -254,6 +263,7 @@ public class Robot {
                     depositApproval = false;
                     depositOpenTime = -1;
                     depositingFreight = false;
+                    slidesAtPosTime = -1;
                 } else {
                     log("going to pos arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
                 }
@@ -420,15 +430,11 @@ public class Robot {
             turret.setTracking(turretLockTheta);
         } else {
             double depositTheta = 0;
-            if (cycleHub == DepositTarget.allianceLow) {
-                depositTheta = Constants.TURRET_ALLIANCE_RED_CYCLE_LOW_THETA;
-            } else if (cycleHub == DepositTarget.allianceMid || cycleHub == DepositTarget.allianceHigh) {
-                depositTheta = Constants.TURRET_ALLIANCE_RED_CYCLE_THETA;
-            } else if (cycleHub == DepositTarget.neutral) {
-                depositTheta = Constants.TURRET_NEUTRAL_RED_CYCLE_THETA;
-            } else if (cycleHub == DepositTarget.duck) {
-                depositTheta = Constants.TURRET_DUCK_RED_CYCLE_THETA;
-            }
+            if (cycleHub == DepositTarget.allianceLow) depositTheta = Constants.TURRET_ALLIANCE_RED_CYCLE_LOW_THETA;
+            else if (cycleHub == DepositTarget.allianceMid) depositTheta = Constants.TURRET_ALLIANCE_RED_CYCLE_MID_THETA;
+            else if (cycleHub == DepositTarget.allianceHigh) depositTheta = Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA;
+            else if (cycleHub == DepositTarget.neutral) depositTheta = Constants.TURRET_NEUTRAL_RED_CYCLE_THETA;
+            else if (cycleHub == DepositTarget.duck) depositTheta = Constants.TURRET_DUCK_RED_CYCLE_THETA;
             turret.setDepositing(isRed ? depositTheta * PI : (1 - depositTheta) * PI);
         }
     }

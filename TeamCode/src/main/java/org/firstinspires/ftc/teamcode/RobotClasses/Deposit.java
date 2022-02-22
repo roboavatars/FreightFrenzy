@@ -111,10 +111,16 @@ public class Deposit {
     public void update() {
         // Move Arm
         if (home) {
-            if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm) {
+            if (target == Robot.DepositTarget.allianceHigh && getSlidesDistInches() >= maxSlidesDistBeforeLoweringArm) {
+                targetArmPos = Constants.DEPOSIT_ARM_MIDWAY;
+                setArmControls();
+            } else if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm) {
+                targetArmPos = Constants.DEPOSIT_ARM_HOME;
                 setArmControls();
             }
-            setSlidesControls();
+            if (target != Robot.DepositTarget.allianceHigh || getArmPosition() < Constants.ARM_ON_HUB_THRESHOLD) {
+                setSlidesControls();
+            }
         } else {
             // arm out first if low or mid
             if ((target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.allianceMid) && armAtPosPercent(0.75)

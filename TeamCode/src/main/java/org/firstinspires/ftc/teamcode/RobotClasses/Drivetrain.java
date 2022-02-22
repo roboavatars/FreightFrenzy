@@ -183,11 +183,15 @@ public class Drivetrain {
     }
 
     // field centric movement
-    public void setGlobalControls(double xvelocity, double yvelocity, double w) {
+    public void setGlobalControls(double xvelocity, double yvelocity, double w, boolean useStrafeConstant) {
         double xdot = xvelocity * Math.cos(-theta) - yvelocity * Math.sin(-theta);
         double ydot = yvelocity * Math.cos(-theta) + xvelocity * Math.sin(-theta);
-        ydot += constantStrafeConstant;
+        if (useStrafeConstant) ydot += constantStrafeConstant;
         setControls(xdot, ydot, w);
+    }
+
+    public void setGlobalControls(double xvelocity, double yvelocity, double w) {
+        setGlobalControls(xvelocity, yvelocity, w, true);
     }
 
     // stop drivetrain
