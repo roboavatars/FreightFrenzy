@@ -106,13 +106,13 @@ public class Robot {
 
     // Time and Delay Variables
     public double curTime;
-    public static int flipUpThreshold = 1000;
-    public static int transferThreshold = 2000;
+    public static int flipUpThreshold = 1500;
+    public static int transferThreshold = 2500;
     public static int releaseThreshold = 750;
     public static int hubTipThreshold = 300;
 
     public double stallStartTime = -1;
-    public static int stallThreshold = 250;
+    public static int stallThreshold = 350;
     public double automationStepTime;
 
     // Motion Variables
@@ -218,7 +218,6 @@ public class Robot {
             } else if (intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > flipUpThreshold && !intakeRev) {
                 intake.reverse();
                 intakeRev = true;
-                intakeFull = false;
                 automationStep("Transfer Freight");
             } else if (!intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > transferThreshold && intakeRev) {
                 deposit.hold();
@@ -275,7 +274,7 @@ public class Robot {
         }
 
         // Intake Anti-Stall
-        if (intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
+        if (isAuto && intakeTransfer && !intakeFull && !intake.slidesIsHome()) {  //Prevent Intake Stalling
             if (!intakeStalling) {
                 stallStartTime = -1;
                 intake.on();
@@ -288,6 +287,19 @@ public class Robot {
                 antiStallStep = "Reverse Intake"; automationStep(antiStallStep);
             }
         }
+//        else if (intakeTransfer && intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > flipUpThreshold && !(!intakeFull && curTime - intakeFlipTime > transferThreshold)) { //Prevent Transfer Stalling
+//            if (!intakeStalling) {
+//                stallStartTime = -1;
+//                intake.reverse();
+//                antiStallStep = "Intake On"; automationStep(antiStallStep);
+//            } else if (stallStartTime == -1) {
+//                stallStartTime = curTime;
+//                antiStallStep = "Jam Detected"; automationStep(antiStallStep);
+//            } else if (curTime - stallStartTime > stallThreshold) {
+//                intake.on();
+//                antiStallStep = "Reverse Intake"; automationStep(antiStallStep);
+//            }
+//        }
 
         // Update Intake Slides
         intake.update();
