@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
+import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.ArrayList;
@@ -159,20 +160,23 @@ public class Teleop extends LinearOpMode {
                 if (gamepad2.dpad_up) depositCoords[1] += 0.1;
                 else if (gamepad2.dpad_down) depositCoords[1] -= 0.1;
 
-                if (robot.cycleHub == Robot.DepositTarget.allianceLow)
+                if (robot.cycleHub == Robot.DepositTarget.allianceLow) {
                     robot.turret.turretOffset = Math.atan2(depositCoords[1], depositCoords[0])
                             - PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_LOW_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_LOW_THETA);
-                if (robot.cycleHub == Robot.DepositTarget.allianceMid)
+                    robot.deposit.slidesOffset = (int) (Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH * (Math.hypot(depositCoords[0], depositCoords[1]) - Constants.SLIDES_DISTANCE_LOW));
+                } else if (robot.cycleHub == Robot.DepositTarget.allianceMid) {
                     robot.turret.turretOffset = Math.atan2(depositCoords[1], depositCoords[0])
                             - PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_MID_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_MID_THETA);
-                if (robot.cycleHub == Robot.DepositTarget.allianceHigh)
+                    robot.deposit.slidesOffset = (int) (Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH * (Math.hypot(depositCoords[0], depositCoords[1]) - Constants.SLIDES_DISTANCE_MID));
+                } else if (robot.cycleHub == Robot.DepositTarget.allianceHigh) {
                     robot.turret.turretOffset = Math.atan2(depositCoords[1], depositCoords[0])
                             - PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA);
-                if (robot.cycleHub == Robot.DepositTarget.duck)
+                    robot.deposit.slidesOffset = (int) (Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH * (Math.hypot(depositCoords[0], depositCoords[1]) - Constants.SLIDES_DISTANCE_HIGH));
+                } else if (robot.cycleHub == Robot.DepositTarget.duck) {
                     robot.turret.turretOffset = Math.atan2(depositCoords[1], depositCoords[0])
                             - PI * (isRed ? Constants.TURRET_DUCK_RED_CYCLE_THETA + 0.5 : 0.5 - Constants.TURRET_DUCK_RED_CYCLE_THETA);
-
-                robot.deposit.slidesOffset = (int) Math.hypot(depositCoords[0], depositCoords[1]);
+                    robot.deposit.slidesOffset = (int) (Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH * (Math.hypot(depositCoords[0], depositCoords[1]) - Constants.SLIDES_DISTANCE_DUCK));
+                }
             }
 
             // Slow Mode
