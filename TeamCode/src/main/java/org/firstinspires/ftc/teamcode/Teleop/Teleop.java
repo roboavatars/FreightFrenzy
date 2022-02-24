@@ -113,34 +113,40 @@ public class Teleop extends LinearOpMode {
             //Switching the Goal Cycled
             if (gamepad1.dpad_up) {
                 robot.cycleHub = Robot.DepositTarget.allianceHigh;
-                depositCoords[0] = Constants.SLIDES_DISTANCE_HIGH *
-                        Math.cos(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
-                depositCoords[1] = Constants.SLIDES_DISTANCE_HIGH *
-                        Math.sin(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
+//                depositCoords[0] = Constants.SLIDES_DISTANCE_HIGH *
+//                        Math.cos(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
+//                depositCoords[1] = Constants.SLIDES_DISTANCE_HIGH *
+//                        Math.sin(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
             }
             else if (gamepad1.dpad_left) {
                 robot.cycleHub = Robot.DepositTarget.allianceMid;
-                depositCoords[0] = Constants.SLIDES_DISTANCE_MID *
-                        Math.cos(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
-                depositCoords[1] = Constants.SLIDES_DISTANCE_MID *
-                        Math.sin(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
+//                depositCoords[0] = Constants.SLIDES_DISTANCE_MID *
+//                        Math.cos(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
+//                depositCoords[1] = Constants.SLIDES_DISTANCE_MID *
+//                        Math.sin(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
             }
             else if (gamepad1.dpad_down) {
                 robot.cycleHub = Robot.DepositTarget.allianceLow;
-                depositCoords[0] = Constants.SLIDES_DISTANCE_LOW *
-                        Math.cos(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
-                depositCoords[1] = Constants.SLIDES_DISTANCE_LOW *
-                        Math.sin(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
+//                depositCoords[0] = Constants.SLIDES_DISTANCE_LOW *
+//                        Math.cos(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
+//                depositCoords[1] = Constants.SLIDES_DISTANCE_LOW *
+//                        Math.sin(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
             }
             else if (gamepad1.dpad_right) {
                 robot.cycleHub = Robot.DepositTarget.neutral;
             }
             else if (gamepad1.x) {
                 robot.cycleHub = Robot.DepositTarget.duck;
-                depositCoords[0] = Constants.SLIDES_DISTANCE_DUCK *
-                        Math.cos(PI * (isRed ? Constants.TURRET_DUCK_RED_CYCLE_THETA + 0.5 : 0.5 - Constants.TURRET_DUCK_RED_CYCLE_THETA));
-                depositCoords[1] = Constants.SLIDES_DISTANCE_DUCK *
-                        Math.sin(PI * (isRed ? Constants.TURRET_DUCK_RED_CYCLE_THETA + 0.5 : 0.5 - Constants.TURRET_DUCK_RED_CYCLE_THETA));
+//                depositCoords[0] = Constants.SLIDES_DISTANCE_DUCK *
+//                        Math.cos(PI * (isRed ? Constants.TURRET_DUCK_RED_CYCLE_THETA + 0.5 : 0.5 - Constants.TURRET_DUCK_RED_CYCLE_THETA));
+//                depositCoords[1] = Constants.SLIDES_DISTANCE_DUCK *
+//                        Math.sin(PI * (isRed ? Constants.TURRET_DUCK_RED_CYCLE_THETA + 0.5 : 0.5 - Constants.TURRET_DUCK_RED_CYCLE_THETA));
+            }
+
+            if (gamepad1.dpad_up || gamepad1.dpad_left || gamepad1.dpad_down || gamepad1.dpad_right || gamepad1.x){
+                robot.deposit.armOffset = 0;
+                robot.turret.turretOffset = 0;
+                robot.deposit.slidesOffset = 0;
             }
 
             //Offsets
@@ -167,8 +173,8 @@ public class Teleop extends LinearOpMode {
 //            if (gamepad2.y) robot.deposit.slidesOffset += 2;
 //            else if (gamepad2.a) robot.deposit.slidesOffset -= 2;
 
-            robot.turret.turretOffset -= 0.004 * gamepad2.left_stick_x;
-            robot.deposit.slidesOffset += 2 * gamepad2.left_stick_y;
+            robot.turret.turretOffset += 0.008 * gamepad2.left_stick_x;
+            robot.deposit.slidesOffset -= 1.5 * gamepad2.left_stick_y;
 
 //            //Field Centric Deposit Offsets
 //            if (robot.cycleHub == Robot.DepositTarget.neutral){
