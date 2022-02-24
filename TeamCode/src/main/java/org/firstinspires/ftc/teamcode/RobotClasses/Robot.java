@@ -63,6 +63,7 @@ public class Robot {
     public boolean intakeFull;
     public boolean intakeStalling;
     public double turretGlobalTheta;
+    public boolean intakeReverse = false;
 
     // Deposit Tracking
     public boolean trackGoal = false;
@@ -270,6 +271,19 @@ public class Robot {
                 if (y > 100) log("Waiting for dt pose");
                 /*if (!notMoving()) log("Robot is moving");
                 if (!turret.turretAtPos()) log("Waiting for turret align");*/
+            }
+        }
+
+        //Intake Overrides for Jamming
+        if (!isAuto && intakeTransfer) {
+            if (intakeReverse && !intakeFull && !intake.slidesIsHome()) {
+                intake.reverse();
+            } else if (!intakeReverse && !intakeFull && !intake.slidesIsHome()) {
+                intake.on();
+            } else if (intakeReverse && intake.slidesIsHome() && curTime - intakeFlipTime > flipUpThreshold && !(!intakeFull && curTime - intakeFlipTime > transferThreshold)) {
+                intake.on();
+            } else if (!intakeReverse && intake.slidesIsHome() && curTime - intakeFlipTime > flipUpThreshold && !(!intakeFull && curTime - intakeFlipTime > transferThreshold)) {
+                intake.reverse();
             }
         }
 

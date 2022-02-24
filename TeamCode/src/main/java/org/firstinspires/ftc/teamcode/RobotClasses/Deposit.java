@@ -31,11 +31,13 @@ public class Deposit {
 
     public int targetSlidesTicks;
     public Robot.DepositTarget target;
+    private double slidesDist;
 
     private static final double maxSlidesDistBeforeLoweringArm = 2;
 
     public boolean home = true;
     public int targetArmPos;
+    private int targetArmPosNoOffset = 0;;
 
     private double initialArmAngle = -0.646;
     public int armOffset = 0;
@@ -94,17 +96,17 @@ public class Deposit {
         home = false;
         this.target = target;
         setArmPIDCoefficients(Deposit.pArmUp, Deposit.dArmUp);
+        this.slidesDist = slidesDist;
 
-        int targetArmPos = 0;
         if (target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.neutral) {
-            targetArmPos = Constants.DEPOSIT_ARM_LOW;
+            targetArmPosNoOffset = Constants.DEPOSIT_ARM_LOW;
         } else if (target == Robot.DepositTarget.allianceMid) {
-            targetArmPos = Constants.DEPOSIT_ARM_MID;
+            targetArmPosNoOffset = Constants.DEPOSIT_ARM_MID;
         } else if (target == Robot.DepositTarget.allianceHigh || target == Robot.DepositTarget.duck) {
-            targetArmPos = Constants.DEPOSIT_ARM_HIGH;
+            targetArmPosNoOffset = Constants.DEPOSIT_ARM_HIGH;
         }
 
-        setArmTarget(targetArmPos);
+        setArmTarget(targetArmPosNoOffset);
         setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));
     }
 
@@ -122,6 +124,8 @@ public class Deposit {
                 setSlidesControls();
             }
         } else {
+            setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));  //Reset target every update to change with offset
+            setArmTarget(targetArmPosNoOffset);
             // arm out first if low or mid
             if ((target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.allianceMid) && armAtPosPercent(0.75)
                 || target == Robot.DepositTarget.allianceHigh) {
@@ -138,7 +142,7 @@ public class Deposit {
 
     // Arm
     public void setArmControls(int targetArmPos) {
-        double targetTicks = Math.min(Math.max(targetArmPos, Constants.DEPOSIT_ARM_HOME), Constants.DEPOSIT_ARM_LOW) + armOffset;
+        double targetTicks = Math.min(Math.max(targetArmPos, Constants.DEPOSIT_ARM_HOME), Constants.DEPOSIT_ARM_LOW);
         double currentTicks = getArmPosition();
         armErrorChange = targetTicks - currentTicks - armError;
         armError = targetTicks - currentTicks;
@@ -154,7 +158,7 @@ public class Deposit {
     }
 
     public void setArmTarget(int targetPos){
-        targetArmPos = Math.min(Math.max(targetPos, 0), Constants.DEPOSIT_ARM_LOW);
+        targetArmPos = Math.min(Math.max(targetPos + armOffset, 0), Constants.DEPOSIT_ARM_LOW);
     }
 
     public double getArmPosition() {
@@ -192,7 +196,7 @@ public class Deposit {
 
     // Slides
     public void setSlidesControls(int targetSlidesPos) {
-        slidesMotor.setTargetPosition(targetSlidesPos + slidesOffset);
+        slidesMotor.setTargetPosition(targetSlidesPos);
         slidesMotor.setPower(DEPOSIT_ARM_MAX_POWER);
         Log.w("arm-log", "slides set to: " + targetSlidesPos + ", current position: " + getSlidesPosition());
     }
@@ -202,7 +206,7 @@ public class Deposit {
     }
 
     public void setSlidesTarget(int targetPos) {
-        targetSlidesTicks = Math.min(Math.max(targetPos, 0), DEPOSIT_SLIDES_MAX_TICKS);
+        targetSlidesTicks = Math.min(Math.max(targetPos + slidesOffset, 0), DEPOSIT_SLIDES_MAX_TICKS);
     }
 
     public double getSlidesPosition() {
