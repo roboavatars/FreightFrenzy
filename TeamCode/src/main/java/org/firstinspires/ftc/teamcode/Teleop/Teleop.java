@@ -51,20 +51,27 @@ public class Teleop extends LinearOpMode {
     /*
     Controller Button Mappings:
     Gamepad 1
-    Left Stick/Right Stick - Drivetrain Controls
-    Left Bumper - Auto intake
-    Right Bumper - Approve freight deposit
-    A - Cancel automation
+    Left/Right Sticks - Drivetrain Controls
+    Left Bumper - Start Auto Intake
+    Right Bumper - Approve Freight Deposit
+    Left Trigger - Override Intake Sensor
+    Right Trigger - Reverse Intake
+    A - Cancel Automation
+    Dpad/X - Switch Goal
+    Y/B - Intake Slides Offset
 
     Gamepad 2
-    Left Bumper - Carousel Motor Red
+    Left/Right Sticks - Turret, Deposit Slides, Arm Offset
     Right Trigger - Slow Mode
-    A - Increase slide extend
-    Y - Decrease slide extend
-    Dpad Up - Increase arm position
-    Dpad Down - Decrease arm position
-    Dpad Left - Decrease turret theta
-    Dpad Right - Increase turret theta
+    X - Odo Reset
+    Right Bumper - Retract Odo
+//    Left Bumper - Carousel Motor Red
+//    A - Increase Slide Extend
+//    Y - Decrease Slide Extend
+//    Dpad Up - Increase Arm Position
+//    Dpad Down - Decrease Arm Position
+//    Dpad Left - Decrease Turret Theta
+//    Dpad Right - Increase Turret Theta
      */
 
     @Override
@@ -110,7 +117,7 @@ public class Teleop extends LinearOpMode {
                 robot.cancelAutomation();
             }
 
-            //Switching the Goal Cycled
+            // Switching the Goal Cycled
             if (gamepad1.dpad_up) {
                 robot.cycleHub = Robot.DepositTarget.allianceHigh;
 //                depositCoords[0] = Constants.SLIDES_DISTANCE_HIGH *
@@ -143,21 +150,26 @@ public class Teleop extends LinearOpMode {
 //                        Math.sin(PI * (isRed ? Constants.TURRET_DUCK_RED_CYCLE_THETA + 0.5 : 0.5 - Constants.TURRET_DUCK_RED_CYCLE_THETA));
             }
 
-            if (gamepad1.dpad_up || gamepad1.dpad_left || gamepad1.dpad_down || gamepad1.dpad_right || gamepad1.x){
+            if (gamepad1.dpad_up || gamepad1.dpad_left || gamepad1.dpad_down || gamepad1.dpad_right || gamepad1.x) {
                 robot.deposit.armOffset = 0;
                 robot.turret.turretOffset = 0;
                 robot.deposit.slidesOffset = 0;
             }
 
-            //Offsets
+            // Offsets
             if (gamepad1.y) robot.intake.intakeOffset += 0.025;
             else if (gamepad1.b) robot.intake.intakeOffset -= 0.025;
 
             robot.deposit.armOffset += 2 * gamepad2.right_stick_y;
 
-            //Odo Reset
-            if (gamepad2.x) {
+            // Odo Reset
+            if (gamepad2.right_bumper) {
                 robot.resetOdo(138,81,PI/2);
+            }
+
+            // Retract Odo
+            if (gamepad2.b) {
+                robot.drivetrain.retractOdo();
             }
 
             addPacket("0 0 depositCoordsX", depositCoords[0]);

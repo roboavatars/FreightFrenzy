@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode.Debug;
 
-import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 
+import org.firstinspires.ftc.teamcode.OpenCV.Freight;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 import org.firstinspires.ftc.teamcode.RobotClasses.Turret;
 
@@ -72,6 +72,8 @@ public class Dashboard {
         drawPolygon(leftSlidesX, leftSlidesY, "red");
         drawPolygon(rightSlidesX, rightSlidesY, "red");
     }
+
+    public static void drawFreight(Freight freight, String color) {}
 
     public static void drawField() {
         outlineRect(0, 0, 144, 144, "black");

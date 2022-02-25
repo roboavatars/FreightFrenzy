@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @SuppressWarnings("FieldCanBeLocal") @Config
 public class Drivetrain {
@@ -19,6 +20,7 @@ public class Drivetrain {
     private DcMotorEx motorFrontLeft;
     private DcMotorEx motorBackRight;
     private DcMotorEx motorBackLeft;
+    private Servo odoRetractServo;
 
     // OpMode
     private LinearOpMode op;
@@ -97,11 +99,19 @@ public class Drivetrain {
         motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        odoRetractServo = hardwareMap.get(Servo.class, "odoRetractServo");
+        odoRetractServo.setPosition(Constants.ODO_NORMAL_POS);
+
         x = initialX;
         y = initialY;
         startTheta = initialTheta;
         theta = initialTheta;
         lastHeading = theta;
+    }
+
+    // retract horizontal odometry pod
+    public void retractOdo() {
+        odoRetractServo.setPosition(Constants.ODO_RETRACT_POS);
     }
 
     // reset odometry

@@ -276,14 +276,18 @@ public class Robot {
 
         //Intake Overrides for Jamming
         if (!isAuto && intakeTransfer) {
-            if (intakeReverse && !intakeFull && !intake.slidesIsHome()) {
-                intake.reverse();
-            } else if (!intakeReverse && !intakeFull && !intake.slidesIsHome()) {
-                intake.on();
-            } else if (intakeReverse && intake.slidesIsHome() && curTime - intakeFlipTime > flipUpThreshold && !(!intakeFull && curTime - intakeFlipTime > transferThreshold)) {
-                intake.on();
-            } else if (!intakeReverse && intake.slidesIsHome() && curTime - intakeFlipTime > flipUpThreshold && !(!intakeFull && curTime - intakeFlipTime > transferThreshold)) {
-                intake.reverse();
+            if (!intakeFull && !intake.slidesIsHome()) {
+                if (intakeReverse) {
+                    intake.reverse();
+                } else {
+                    intake.on();
+                }
+            } else if (intake.slidesIsHome() && curTime - intakeFlipTime > flipUpThreshold && !(!intakeFull && curTime - intakeFlipTime > transferThreshold)) {
+                if (intakeReverse) {
+                    intake.on();
+                } else {
+                    intake.reverse();
+                }
             }
         }
 
