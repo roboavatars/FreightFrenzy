@@ -47,7 +47,7 @@ public class Robot {
     // Class Constants
     private final int loggerUpdatePeriod = 2;
     private final int sensorUpdatePeriod = 15;
-    private final int voltageUpdatePeriod = 1000;
+    private final int voltageUpdatePeriod = 10;
     private final double xyTolerance = 1;
     private final double thetaTolerance = PI / 35;
     public final static double[] cameraRelativeToRobot = new double[] {1, 3};
@@ -107,8 +107,8 @@ public class Robot {
 
     // Time and Delay Variables
     public double curTime;
-    public static int flipUpThreshold = 1500;
-    public static int transferThreshold = 2500;
+    public static int flipUpThreshold = 700;
+    public static int transferThreshold = 1200;
     public static int releaseThreshold = 750;
     public static int hubTipThreshold = 300;
 
@@ -140,7 +140,7 @@ public class Robot {
         deposit = new Deposit(op, isAuto);
         carousel = new Carousel(op);
         logger = new Logger();
-        tapeDetector = new TapeDetector(op);
+//        tapeDetector = new TapeDetector(op);
 
         // set up bulk read
         allHubs = op.hardwareMap.getAll(LynxModule.class);
@@ -183,7 +183,7 @@ public class Robot {
             intakeStalling = intake.checkIfStalling();
         }
         if (loopCounter % voltageUpdatePeriod == 0) {
-            voltage = battery.getVoltage();
+            voltage = round(battery.getVoltage());
         }
 
         loopCounter++;
@@ -370,7 +370,10 @@ public class Robot {
         }
 
         // Dashboard Telemetry
-        addPacket("0 Voltage", "Starting: " + startVoltage + ", Current: " + voltage);
+        addPacket("0 0 arm positions", deposit.getArmPosition());
+
+        addPacket("0 Voltage Starting:", startVoltage);
+        addPacket("1 Current Voltage", voltage);
         addPacket("2 X", round(x));
         addPacket("3 Y", round(y));
         addPacket("4 Theta", round(theta));

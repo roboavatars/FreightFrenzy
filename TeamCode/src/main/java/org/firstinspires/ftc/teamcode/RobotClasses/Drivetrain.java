@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+
 @SuppressWarnings("FieldCanBeLocal") @Config
 public class Drivetrain {
 
@@ -252,12 +254,19 @@ public class Drivetrain {
             }
 
             theta += deltaHeading;
+
             theta = theta % (Math.PI * 2);
             if (theta < 0) theta += Math.PI * 2;
 
             lastPod1 = pod1;
             lastPod2 = pod2;
             lastPod3 = pod3;
+
+            addPacket("0 0 delta heading", deltaHeading);
+            addPacket("0 1 delta pod1", deltaPod1);
+            addPacket("0 2 delta pod2", deltaPod2);
+            addPacket("0 3 delta pod3", deltaPod3);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

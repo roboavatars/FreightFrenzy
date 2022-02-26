@@ -107,6 +107,8 @@ public class RedAutoWarehouse extends LinearOpMode {
             }
 
             else if (!goToWarehouse) {
+                robot.drivetrain.constantStrafeConstant = -0.3;
+
                 if (robot.y < 105) {
                     robot.drivetrain.setGlobalControls(0, 0.7,
                             PI/2 - robot.theta > PI/6 ? 0.5 : 0);
@@ -139,6 +141,8 @@ public class RedAutoWarehouse extends LinearOpMode {
             }
 
             else if (!cycleScore) {
+                robot.drivetrain.constantStrafeConstant = -0.7;
+
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
                 robot.setTargetPoint(new Target(curPose).theta(PI/2).thetaKp(3.5));
 
@@ -173,6 +177,8 @@ public class RedAutoWarehouse extends LinearOpMode {
             }
 
             else if (!park) {
+                robot.drivetrain.constantStrafeConstant = -0.3;
+
                 robot.setTargetPoint(parkPath.getRobotPose(Math.min(parkTime, time.seconds())));
 
                 addPacket("path", "parking right rn");

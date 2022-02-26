@@ -54,7 +54,7 @@ public class Deposit {
     public static double dArm = dArmUp;
     public static double fArm = 0;
 
-    public static double fGravity = 0.07;
+    public static double fGravity = 0.074;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
         // Deposit Servo

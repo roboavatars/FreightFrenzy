@@ -16,13 +16,13 @@ public class Constants {
     public static double STALL_THRESHOLD = 6;
 
     // Intake Slides
-    public static double INTAKE_EXTEND_POS = 0.35;
+    public static double INTAKE_EXTEND_POS = 0.36;
     public static double INTAKE_MIDWAY_POS = 0.5;
-    public static double INTAKE_HOME_POS = 0.675;
+    public static double INTAKE_HOME_POS = 0.72;
 
     // Intake Servo
-    public static double INTAKE_UP_POS = 0.15;
-    public static double INTAKE_DOWN_POS = 0.85;
+    public static double INTAKE_UP_POS = 0.55;
+    public static double INTAKE_DOWN_POS = 1;
 
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.9;
@@ -30,11 +30,11 @@ public class Constants {
 
     // Deposit Arm
     public static int DEPOSIT_ARM_HOME = 0;
-    public static int DEPOSIT_ARM_LOW = 680;
-    public static int DEPOSIT_ARM_MID = 600;
-    public static int DEPOSIT_ARM_HIGH = 540;
-    public static int DEPOSIT_ARM_MIDWAY = 370;
-    public static int ARM_ON_HUB_THRESHOLD = 530;
+    public static int DEPOSIT_ARM_LOW = 685;
+    public static int DEPOSIT_ARM_MID = 605;
+    public static int DEPOSIT_ARM_HIGH = 545;
+    public static int DEPOSIT_ARM_MIDWAY = 375;
+    public static int ARM_ON_HUB_THRESHOLD = 535;
 
     // Deposit Slides
     public static double SLIDES_DISTANCE_HOME = 0;
