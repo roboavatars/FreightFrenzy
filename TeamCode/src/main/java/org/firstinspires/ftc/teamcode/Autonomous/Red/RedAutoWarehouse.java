@@ -83,11 +83,11 @@ public class RedAutoWarehouse extends LinearOpMode {
         robot.intake.flipDown();
         robot.noExtend = true;
 
+        robot.deposit.clearCarousel();
         robot.depositingFreight = true;
         robot.depositApproval = true;
 
-
-        robot.drivetrain.constantStrafeConstant = -0.3;
+//        robot.drivetrain.constantStrafeConstant = -0.3;
 
         while (opModeIsActive()) {
 
@@ -110,20 +110,19 @@ public class RedAutoWarehouse extends LinearOpMode {
                 robot.drivetrain.constantStrafeConstant = -0.3;
 
                 if (robot.y < 105) {
-                    robot.drivetrain.setGlobalControls(0, 0.7,
-                            PI/2 - robot.theta > PI/6 ? 0.5 : 0);
+                    robot.drivetrain.setGlobalControls(0, 0.7, PI/2 - robot.theta > PI/6 ? 0.5 : 0);
                     passLineTime = time.seconds();
                 } else {
-                    if (!robot.intakeFull || robot.x > 130) {
+                    if (!robot.intakeFull || robot.x > 132) {
                         robot.drivetrain.setGlobalControls(0, robot.y < 115 ? 0.15 : 0, 0.25 * Math.sin(1.5 * (time.seconds() - passLineTime)), false);
                     } else {
-                        robot.drivetrain.setGlobalControls(2, 0, 0);
+                        robot.drivetrain.setGlobalControls(5, 0, 0);
                     }
                 }
 
                 addPacket("path", "going to warehouse right rn");
 
-                if (robot.intakeFull && robot.y >= 105 && robot.x > 130) {
+                if (robot.intakeFull && robot.y >= 105 - 4 * cycleCounter && robot.x > 132) {
                     Waypoint[] cycleScoreWaypoints = new Waypoint[] {
                             new Waypoint(140, robot.y, 3*PI/2, 10, 10, 0, 0),
                             new Waypoint(140, 86, 3*PI/2, 5, -5, 0, cycleScoreTime),
@@ -148,10 +147,12 @@ public class RedAutoWarehouse extends LinearOpMode {
 
                 addPacket("path", "going to deposit right rn");
 
-                if (robot.y <= 91) {
-                    robot.depositApproval = true;
+                if (robot.y <= 91 - 4 * cycleCounter) {
+                    if (robot.depositingFreight && time.seconds() > 6) {
+                        robot.cancelAutomation();
+                    }
 
-                    if (time.seconds() > cycleScoreTime && !robot.intakeRev && !robot.intakeTransfer && !robot.depositingFreight/*time.seconds() > cycleScoreTime + 1.5*/) {
+                    if (time.seconds() > cycleScoreTime && !robot.intakeTransfer && !robot.depositingFreight) {
                         cycleCounter++;
                         if (cycleCounter == 2) {
                             robot.noExtend = false;
@@ -173,6 +174,8 @@ public class RedAutoWarehouse extends LinearOpMode {
 
                         time.reset();
                     }
+
+                    robot.depositApproval = true;
                 }
             }
 

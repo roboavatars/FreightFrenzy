@@ -35,7 +35,8 @@ public class Deposit {
 
     private static final double maxSlidesDistBeforeLoweringArm = 2;
 
-    public boolean home = true;
+    private enum state {Homing, Depositing, Clearing};
+    public state curState = state.Homing;
     public int targetArmPos;
     private int targetArmPosNoOffset = 0;;
 
@@ -86,14 +87,14 @@ public class Deposit {
 
     // Slides + Arm
     public void setDepositHome() {
-        home = true;
+        curState = state.Homing;
         setArmPIDCoefficients(Deposit.pArmDown, Deposit.dArmDown);
         setArmTarget(Constants.DEPOSIT_ARM_HOME - armOffset);
         setSlidesTarget((int) Math.round(DEPOSIT_SLIDES_TICKS_PER_INCH * Constants.SLIDES_DISTANCE_HOME) - slidesOffset);
     }
 
     public void setDepositControls(Robot.DepositTarget target, double slidesDist) {
-        home = false;
+        curState = state.Depositing;
         this.target = target;
         setArmPIDCoefficients(Deposit.pArmUp, Deposit.dArmUp);
         this.slidesDist = slidesDist;
@@ -110,9 +111,14 @@ public class Deposit {
         setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));
     }
 
+    public void clearCarousel() {
+        curState = state.Clearing;
+        setSlidesTarget((int) Math.round(DEPOSIT_SLIDES_TICKS_PER_INCH * Constants.SLIDES_DISTANCE_CLEAR) - slidesOffset);
+    }
+
     public void update() {
         // Move Arm
-        if (home) {
+        if (curState == state.Homing) {
             if (target == Robot.DepositTarget.allianceHigh && getSlidesDistInches() >= maxSlidesDistBeforeLoweringArm) {
                 targetArmPos = Constants.DEPOSIT_ARM_MIDWAY;
                 setArmControls();
@@ -123,8 +129,8 @@ public class Deposit {
             if (target != Robot.DepositTarget.allianceHigh || getArmPosition() < Constants.ARM_ON_HUB_THRESHOLD) {
                 setSlidesControls();
             }
-        } else {
-            setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));  //Reset target every update to change with offset
+        } else if (curState == state.Depositing) {
+            setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));  // Reset target every update to change with offset
             setArmTarget(targetArmPosNoOffset);
             // arm out first if low or mid
             if ((target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.allianceMid) && armAtPosPercent(0.75)
@@ -137,6 +143,8 @@ public class Deposit {
             } else {
                 setArmControls();
             }
+        } else  if (curState == state.Clearing) {
+            setSlidesControls();
         }
     }
 
@@ -251,6 +259,10 @@ public class Deposit {
 
     public void hold() {
         setServoPosition(Constants.DEPOSIT_HOLD_POS);
+    }
+
+    public boolean depositCleared() {
+        return armHome() && Math.abs(getSlidesPosition() - Math.round(DEPOSIT_SLIDES_TICKS_PER_INCH * Constants.SLIDES_DISTANCE_CLEAR)) < DEPOSIT_SLIDES_ERROR_THRESHOLD;
     }
 
     public boolean armSlidesAtPose() {

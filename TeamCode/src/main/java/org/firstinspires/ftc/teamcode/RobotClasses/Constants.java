@@ -25,21 +25,22 @@ public class Constants {
     public static double INTAKE_DOWN_POS = 1;
 
     // Deposit Servo
-    public static double DEPOSIT_OPEN_POS = 0.9;
-    public static double DEPOSIT_HOLD_POS = 0.65;
+    public static double DEPOSIT_OPEN_POS = 0.2;
+    public static double DEPOSIT_HOLD_POS = 0.45;
 
     // Deposit Arm
     public static int DEPOSIT_ARM_HOME = 0;
     public static int DEPOSIT_ARM_LOW = 685;
-    public static int DEPOSIT_ARM_MID = 605;
+    public static int DEPOSIT_ARM_MID = 615;
     public static int DEPOSIT_ARM_HIGH = 545;
     public static int DEPOSIT_ARM_MIDWAY = 375;
     public static int ARM_ON_HUB_THRESHOLD = 535;
 
     // Deposit Slides
     public static double SLIDES_DISTANCE_HOME = 0;
+    public static double SLIDES_DISTANCE_CLEAR = 3;
     public static double SLIDES_DISTANCE_LOW = 17;
-    public static double SLIDES_DISTANCE_MID = 14;
+    public static double SLIDES_DISTANCE_MID = 13;
     public static double SLIDES_DISTANCE_HIGH = 18;
     public static double SLIDES_DISTANCE_DUCK = 25;
 
@@ -54,6 +55,8 @@ public class Constants {
 
     // Carousel
     public static double CAROUSEL_POWER = 0.55;
+    public static double CAROUSEL_HOME = 0.75;
+    public static double CAROUSEL_OUT = 0.05;
 
     // Anti-Tip
     public static double TIP_THRESHOLD = 0.1;

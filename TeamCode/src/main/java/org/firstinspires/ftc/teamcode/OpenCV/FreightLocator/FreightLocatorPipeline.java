@@ -137,13 +137,13 @@ public class FreightLocatorPipeline extends OpenCvPipeline {
     }
 
     // Return freights
-    public ArrayList<Freight> getFreights() {
+    public ArrayList<Freight> getRawFreights() {
         return new ArrayList<>(prevFreights);
     }
 
-    // Return a sorted list with up to three coordinate-filtered freights
+    // Return a list of coordinate-filtered freight
     public ArrayList<Freight> getFreights(double robotX, double robotY, double robotTheta) {
-        ArrayList<Freight> freights = getFreights();
+        ArrayList<Freight> freights = getRawFreights();
         int i = 0;
         while (i < freights.size()) {
             try {
@@ -154,9 +154,7 @@ public class FreightLocatorPipeline extends OpenCvPipeline {
             }
         }
 
-        freights = Freight.getFreightCoords(freights, robotX, robotY);
-
-        return new ArrayList<>(freights);
+        return Freight.getFreightCoords(freights, robotX, robotY);
     }
 
     public void log(String message) {

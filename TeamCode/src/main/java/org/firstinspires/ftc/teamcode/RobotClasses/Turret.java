@@ -65,7 +65,7 @@ public class Turret {
         if (home && slidesHome) {
             turretTargetTheta = Math.min(Math.max(initialTheta + turretOffset, TURRET_MIN_THETA), TURRET_MAX_THETA);
         }
-        Log.w("turret-log", turretTargetTheta+"");
+        Log.w("turret-log", turretTargetTheta + "");
 
         turretTheta = getTurretTheta() + turretOffset;
         turretErrorChange = turretTargetTheta - turretTheta - turretError;

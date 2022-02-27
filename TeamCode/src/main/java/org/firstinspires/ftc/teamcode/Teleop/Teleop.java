@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static java.lang.Math.PI;
 
 import android.util.Log;
@@ -12,7 +11,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
-import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.ArrayList;
@@ -87,9 +85,11 @@ public class Teleop extends LinearOpMode {
             robot.logger.startLogging(false, isRed);
         }
 
-        //Deposit Position Offsets
-        double[] depositCoords = new double[]{Constants.SLIDES_DISTANCE_HIGH * Math.cos(PI * (Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + (isRed ? 0.5 : -0.5))),
-                Constants.SLIDES_DISTANCE_HIGH * Math.sin(PI * (Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + (isRed ? 0.5 : -0.5)))};
+        // Deposit Position Offsets
+        double[] depositCoords = new double[] {
+                Constants.SLIDES_DISTANCE_HIGH * Math.cos(PI * (Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + (isRed ? 0.5 : -0.5))),
+                Constants.SLIDES_DISTANCE_HIGH * Math.sin(PI * (Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + (isRed ? 0.5 : -0.5)))
+        };
 
         waitForStart();
 
@@ -107,11 +107,7 @@ public class Teleop extends LinearOpMode {
                 robot.intakeFull = true;
             }
 
-            if (gamepad1.right_trigger > 0.1) {
-                robot.intakeReverse = true;
-            } else {
-                robot.intakeReverse = false;
-            }
+            robot.intakeReverse = gamepad1.right_trigger > 0.1;
 
             if (gamepad1.a) {
                 robot.cancelAutomation();
@@ -172,12 +168,11 @@ public class Teleop extends LinearOpMode {
                 robot.drivetrain.retractOdo();
             }
 
-            addPacket("0 0 depositCoordsX", depositCoords[0]);
-            addPacket("0 1 depositCoordsY", depositCoords[1]);
-            addPacket("0 2 slides offset", robot.deposit.slidesOffset);
-            addPacket("0 3 slides target ticks", robot.deposit.targetSlidesTicks);
-            addPacket("0 4 turret offset", robot.turret.turretOffset);
-            addPacket("0 5 cycle hub", robot.cycleHub);
+//            addPacket("0 0 depositCoordsX", depositCoords[0]);
+//            addPacket("0 1 depositCoordsY", depositCoords[1]);
+//            addPacket("0 offsets", robot.deposit.slidesOffset);
+//            addPacket("0 3 slides target ticks", robot.deposit.targetSlidesTicks);
+//            addPacket("0 4 turret offset", robot.turret.turretOffset);
 
 //            if (gamepad2.dpad_right) robot.turret.turretOffset += 0.0025;
 //            else if (gamepad2.dpad_left) robot.turret.turretOffset -= 0.0025;

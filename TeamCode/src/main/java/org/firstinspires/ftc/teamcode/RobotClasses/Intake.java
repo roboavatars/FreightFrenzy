@@ -28,11 +28,7 @@ public class Intake {
 
         // Slides Motor
         slidesServo = op.hardwareMap.get(Servo.class, "intakeSlides");
-//        if (isAuto) {
-            home();
-//        } else {
-//            extend();
-//        }
+        home();
 
         // Intake Servo
         intakeServo = op.hardwareMap.get(Servo.class, "intakeServo");

@@ -1,18 +1,18 @@
 package org.firstinspires.ftc.teamcode.OpenCV;
 
+import static org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.FreightLocator.maxX;
+import static org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.FreightLocator.maxY;
+import static org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.FreightLocator.minX;
+import static org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.FreightLocator.minY;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 import android.annotation.SuppressLint;
 
 import org.firstinspires.ftc.teamcode.RobotClasses.Turret;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
-import static org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.FreightLocator.maxX;
-import static org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.FreightLocator.maxY;
-import static org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.FreightLocator.minX;
-import static org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.FreightLocator.minY;
 
 public class Freight {
     private double relX;
@@ -39,7 +39,7 @@ public class Freight {
         this.absY = startY + Turret.TURRET_Y_OFFSET * sin(theta);
     }
 
-    // Return a sorted list with up to three coordinate-filtered freights
+    // Return a list of coordinate-filtered freight
     public static ArrayList<Freight> getFreightCoords(ArrayList<Freight> freights, double minX, double minY, double maxX, double maxY, double robotX, double robotY) {
         // Remove freights out of bounds
         int i = 0;
@@ -52,51 +52,18 @@ public class Freight {
             }
         }
 
-        // Remove freights that are too close to each other
-        i = 0;
-        while (i < freights.size()) {
-            double xi = freights.get(i).getX();
-            double yi = freights.get(i).getY();
-            int j = i + 1;
-
-            while (j < freights.size()) {
-                Freight freight = freights.get(j);
-                if (Math.abs(xi - freight.getX()) < DIST_THRESH && Math.abs(yi - freight.getY()) < DIST_THRESH) {
-                    freights.remove(j);
-                } else {
-                    j++;
-                }
-            }
-            i++;
-        }
-
         // Sort freights based on y coordinate
-        freights.sort(Comparator.comparingDouble(r -> r.getY()));
+        freights.sort(Comparator.comparingDouble(Freight::getY));
 
-        // Return up to three freights
-        if (freights.size() > 3) {
-            freights = new ArrayList<>(freights.subList(0, 3));
+        // Return freight
+        if (freights.size() > 1) {
+            return new ArrayList<>(freights.subList(0, 1));
+        } else {
+            return freights;
         }
-
-        // Determine left or right sweep
-        if (freights.size() > 0) {
-            if (freights.get(freights.size() - 1).getY() - freights.get(0).getY() > 8) {
-                Freight closest = freights.remove(0);
-                if (closest.getX() <= robotX + 9) {
-                    freights.sort(Comparator.comparingDouble(r -> r.getX()));
-                } else {
-                    freights.sort(Comparator.comparingDouble(r -> -r.getX()));
-                }
-                freights.add(0, closest);
-            } else {
-                freights.sort(Comparator.comparingDouble(r -> r.getX()));
-            }
-        }
-
-        return freights;
     }
 
-    // Return a sorted list with up to three coordinate-filtered freights
+    // Return a list of coordinate-filtered freight
     public static ArrayList<Freight> getFreightCoords(ArrayList<Freight> freights, double robotX, double robotY) {
         return getFreightCoords(freights, minX, minY, maxX, maxY, robotX, robotY);
     }

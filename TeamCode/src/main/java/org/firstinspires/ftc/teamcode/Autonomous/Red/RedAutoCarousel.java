@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
-import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Disabled
@@ -127,11 +126,11 @@ public class RedAutoCarousel extends LinearOpMode {
                 if (time.seconds() > spinCarouselTime) {
 
                     // spin
-                    robot.carousel.rotateRed();
+//                    robot.carousel.on();
                     time.reset();
 
                     if (time.seconds() > 1) {
-                        robot.carousel.stop();
+//                        robot.carousel.stop();
                     }
 //                    robot.intake.on();
 

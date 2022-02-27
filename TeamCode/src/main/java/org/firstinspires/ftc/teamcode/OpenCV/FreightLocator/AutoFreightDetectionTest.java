@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.OpenCV.FreightLocator;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawFreight;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawPoint;
+import static java.lang.Math.PI;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -12,11 +17,6 @@ import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.ArrayList;
-
-import static java.lang.Math.PI;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawPoint;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawFreight;
 
 @TeleOp(name = "Auto Freight Detection Test")
 @Disabled
@@ -56,11 +56,7 @@ public class AutoFreightDetectionTest extends LinearOpMode {
             freights = locator.getFreights(x, y, theta);
             for (int i = 0; i < freights.size(); i++) {
                 if (i == 0) {
-                    drawFreight(freights.get(i), "green");
-                } else if (i == 1) {
                     drawFreight(freights.get(i), "yellow");
-                } else if (i == 2) {
-                    drawFreight(freights.get(i), "red");
                 }
             }
 
@@ -71,10 +67,6 @@ public class AutoFreightDetectionTest extends LinearOpMode {
                     robot.setTargetPoint(freightPath.getRobotPose(curTime));
                 } else if (freights.size() >= 1 && curTime < 1.5) {
                     robot.setTargetPoint(new Target(freightPath.getRobotPose(curTime)).thetaW0(freightIntakeTheta[0]));
-                } else if (freights.size() >= 2 && curTime < 3.0) {
-                    robot.setTargetPoint(new Target(freightPath.getRobotPose(curTime)).thetaW0(freightIntakeTheta[1]));
-                } else if (freights.size() == 3 && curTime < 4.5) {
-                    robot.setTargetPoint(new Target(freightPath.getRobotPose(curTime)).thetaW0(freightIntakeTheta[2]));
                 } else {
                     robot.setTargetPoint(new Target(freightPath.getRobotPose(curTime)).thetaW0(PI/2));
                 }
@@ -102,7 +94,7 @@ public class AutoFreightDetectionTest extends LinearOpMode {
 
                 // Reset Odo
                 if (gamepad1.x) {
-                    robot.resetOdo(111, 63, PI/2);
+                    robot.resetOdo(138, 81, PI/2);
                 }
 
                 // Start Path Following
@@ -129,32 +121,8 @@ public class AutoFreightDetectionTest extends LinearOpMode {
                     freightWaypoints.add(new Waypoint(freightPos[0], Math.min(130, freightPos[1]), freightIntakeTheta[0], 30, 10, 0, freightTime));
                 }
 
-                if (freights.size() >= 2) {
-                    freightPos = freights.get(1).driveToFreight(freightPos[0], Math.min(130, freightPos[1]));
-                    freightTime += 1.5;
-                    if (freightPos[1] > 130) {
-                        freightPos[2] = 0;
-                        freightIntakeTheta[1] = freightPos[0] - freights.get(0).getX() < 0 ? 3*PI/4 : PI/4;
-                    } else {
-                        freightIntakeTheta[1] = freightPos[2];
-                    }
-                    freightWaypoints.add(new Waypoint(freightPos[0], Math.min(130, freightPos[1]), freightIntakeTheta[1], 30, 10, 0, freightTime));
-                }
-
-                if (freights.size() >= 3) {
-                    freightPos = freights.get(2).driveToFreight(freightPos[0], Math.min(130, freightPos[1]));
-                    freightTime += 1.5;
-                    if (freightPos[1] > 130 && freights.get(2).getY() > 130) {
-                        freightPos[2] = 0;
-                        freightIntakeTheta[2] = freightPos[0] - freights.get(1).getX() < 0 ? 3*PI/4 : PI/4;
-                    } else {
-                        freightIntakeTheta[2] = freightPos[2];
-                    }
-                    freightWaypoints.add(new Waypoint(freightPos[0], Math.min(130, freightPos[1]), freightIntakeTheta[2], 30, 10, 0, freightTime));
-                }
-
                 freightTime += 1.5;
-                freightWaypoints.add(new Waypoint(111, 63, PI/2, -30, -60, 0, freightTime));
+                freightWaypoints.add(new Waypoint(138, 81, PI/2, -30, -60, 0, freightTime));
                 freightPath = new Path(freightWaypoints);
             }
 
