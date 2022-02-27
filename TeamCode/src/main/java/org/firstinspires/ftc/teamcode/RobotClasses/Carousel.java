@@ -15,7 +15,7 @@ public class Carousel {
     public Carousel(LinearOpMode op, boolean isRed) {
         this.isRed = isRed;
 
-        carousel = op.hardwareMap.get(CRServo.class, "carousel");
+//        carousel = op.hardwareMap.get(CRServo.class, "carousel");
         carouselArm = op.hardwareMap.get(Servo.class, "carouselArm");
 
         home();
@@ -25,7 +25,7 @@ public class Carousel {
 
     private void setPower(double power) {
         if (power != lastPower) {
-            carousel.setPower(power);
+//            carousel.setPower(power);
             lastPower = power;
         }
     }

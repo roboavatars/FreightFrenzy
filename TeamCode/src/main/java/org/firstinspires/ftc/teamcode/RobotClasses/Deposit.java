@@ -24,7 +24,7 @@ public class Deposit {
     public int DEPOSIT_SLIDES_ERROR_THRESHOLD = 15;
     public double ARM_TICKS_PER_RADIAN = 1120 / (2*PI);
     public double DEPOSIT_ARM_MAX_POWER = 1;
-    public static int DEPOSIT_ARM_ERROR_THRESHOLD = 30;
+    public static int DEPOSIT_ARM_ERROR_THRESHOLD = 40;
 
     // Slides PD
     public static double pSlides = 50;
@@ -35,10 +35,8 @@ public class Deposit {
 
     private static final double maxSlidesDistBeforeLoweringArm = 2;
 
-    private enum state {Homing, Depositing, Clearing};
-    public state curState = state.Homing;
     public int targetArmPos;
-    private int targetArmPosNoOffset = 0;;
+    private int targetArmPosNoOffset = 0;
 
     private double initialArmAngle = -0.646;
     public int armOffset = 0;
@@ -46,8 +44,8 @@ public class Deposit {
 
     // Arm PD
     double armErrorChange = 0, armError = 0;
-    public static double pArmUp   = 0.003;
-    public static double dArmUp   = 0.0055;
+    public static double pArmUp = 0.003;
+    public static double dArmUp = 0.0055;
     public static double pArmDown = 0.0015;
     public static double dArmDown = 0.002;
 
@@ -55,9 +53,16 @@ public class Deposit {
     public static double dArm = dArmUp;
     public static double fArm = 0;
 
-    public static double fGravity = 0.074;
+    public static double fGravity = 0.095;
+    public boolean isDeposit = false;
+
+    public double lastArmPos = 0;
+    public double lastSlidesPos = 0;
+    public double armErrorOffset = 0;
+    public double slidesErrorOffset = 0;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
+
         // Deposit Servo
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         if (isAuto) {
@@ -87,14 +92,14 @@ public class Deposit {
 
     // Slides + Arm
     public void setDepositHome() {
-        curState = state.Homing;
+        isDeposit = false;
         setArmPIDCoefficients(Deposit.pArmDown, Deposit.dArmDown);
         setArmTarget(Constants.DEPOSIT_ARM_HOME - armOffset);
         setSlidesTarget((int) Math.round(DEPOSIT_SLIDES_TICKS_PER_INCH * Constants.SLIDES_DISTANCE_HOME) - slidesOffset);
     }
 
     public void setDepositControls(Robot.DepositTarget target, double slidesDist) {
-        curState = state.Depositing;
+        isDeposit = true;
         this.target = target;
         setArmPIDCoefficients(Deposit.pArmUp, Deposit.dArmUp);
         this.slidesDist = slidesDist;
@@ -111,25 +116,27 @@ public class Deposit {
         setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));
     }
 
-    public void clearCarousel() {
-        curState = state.Clearing;
-        setSlidesTarget((int) Math.round(DEPOSIT_SLIDES_TICKS_PER_INCH * Constants.SLIDES_DISTANCE_CLEAR) - slidesOffset);
-    }
-
     public void update() {
-        // Move Arm
-        if (curState == state.Homing) {
+
+        if (lastArmPos > 100 && getArmPosition() < 10) {
+            Robot.log("Critical arm error saved: " + lastArmPos + " -> " + getArmPosition());
+            armErrorOffset += lastArmPos - getArmPosition();
+        }
+        if (lastSlidesPos > 100 && getSlidesError() < 10) {
+            Robot.log("Critical slides error saved: " + lastSlidesPos + " -> " + getSlidesPosition());
+            slidesErrorOffset += lastSlidesPos - getSlidesPosition();
+        }
+
+        if (!isDeposit) {
             if (target == Robot.DepositTarget.allianceHigh && getSlidesDistInches() >= maxSlidesDistBeforeLoweringArm) {
-                targetArmPos = Constants.DEPOSIT_ARM_MIDWAY;
-                setArmControls();
+                setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
             } else if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm) {
-                targetArmPos = Constants.DEPOSIT_ARM_HOME;
-                setArmControls();
+                setArmControls(Constants.DEPOSIT_ARM_HOME);
             }
             if (target != Robot.DepositTarget.allianceHigh || getArmPosition() < Constants.ARM_ON_HUB_THRESHOLD) {
                 setSlidesControls();
             }
-        } else if (curState == state.Depositing) {
+        } else {
             setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));  // Reset target every update to change with offset
             setArmTarget(targetArmPosNoOffset);
             // arm out first if low or mid
@@ -143,9 +150,18 @@ public class Deposit {
             } else {
                 setArmControls();
             }
-        } else  if (curState == state.Clearing) {
-            setSlidesControls();
         }
+
+        /*if (isDeposit) {
+            setSlidesTarget((int) Math.round((Constants.SLIDES_DISTANCE_HIGH) * DEPOSIT_SLIDES_TICKS_PER_INCH));
+            setArmTarget((Constants.DEPOSIT_ARM_HIGH));
+        } else {
+            setSlidesTarget((int) Constants.SLIDES_DISTANCE_HOME);
+            setArmTarget(Constants.DEPOSIT_ARM_HOME);
+        }*/
+
+        lastArmPos = getArmPosition();
+        lastSlidesPos = getSlidesPosition();
     }
 
     // Arm
@@ -165,12 +181,12 @@ public class Deposit {
         setArmControls(targetArmPos);
     }
 
-    public void setArmTarget(int targetPos){
+    public void setArmTarget(int targetPos) {
         targetArmPos = Math.min(Math.max(targetPos + armOffset, 0), Constants.DEPOSIT_ARM_LOW);
     }
 
     public double getArmPosition() {
-        return armMotor.getCurrentPosition();
+        return armMotor.getCurrentPosition() + armErrorOffset;
     }
 
     public double getArmVelocity() {
@@ -205,7 +221,7 @@ public class Deposit {
     // Slides
     public void setSlidesControls(int targetSlidesPos) {
         slidesMotor.setTargetPosition(targetSlidesPos);
-        slidesMotor.setPower(DEPOSIT_ARM_MAX_POWER);
+        slidesMotor.setPower(!slidesAtPos() ? DEPOSIT_ARM_MAX_POWER : 0);
         Log.w("arm-log", "slides set to: " + targetSlidesPos + ", current position: " + getSlidesPosition());
     }
 
@@ -218,7 +234,7 @@ public class Deposit {
     }
 
     public double getSlidesPosition() {
-        return slidesMotor.getCurrentPosition();
+        return slidesMotor.getCurrentPosition() + slidesErrorOffset;
     }
 
     public double getSlidesDistInches() {
@@ -262,7 +278,7 @@ public class Deposit {
     }
 
     public boolean depositCleared() {
-        return armHome() && Math.abs(getSlidesPosition() - Math.round(DEPOSIT_SLIDES_TICKS_PER_INCH * Constants.SLIDES_DISTANCE_CLEAR)) < DEPOSIT_SLIDES_ERROR_THRESHOLD;
+        return getSlidesPosition() > Math.round(DEPOSIT_SLIDES_TICKS_PER_INCH * Constants.SLIDES_DISTANCE_CLEAR);
     }
 
     public boolean armSlidesAtPose() {

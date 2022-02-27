@@ -34,7 +34,7 @@ public class Robot {
     public Intake intake;
     public Turret turret;
     public Deposit deposit;
-    // public Carousel carousel;
+    public Carousel carousel;
     public TapeDetector tapeDetector;
     public Logger logger;
 
@@ -108,8 +108,8 @@ public class Robot {
 
     // Time and Delay Variables
     public double curTime;
-    public static int flipUpThreshold = 700;
-    public static int transferThreshold = 1200;
+    public static int flipUpThreshold = 900;
+    public static int transferThreshold = 1500;
     public static int releaseThreshold = 750;
     public static int hubTipThreshold = 300;
 
@@ -139,7 +139,7 @@ public class Robot {
         intake = new Intake(op, isAuto);
         turret = new Turret(op, isAuto, theta);
         deposit = new Deposit(op, isAuto);
-        // carousel = new Carousel(op, isRed);
+        carousel = new Carousel(op, isRed);
         logger = new Logger();
 //        tapeDetector = new TapeDetector(op);
 
@@ -224,7 +224,6 @@ public class Robot {
                 automationStep("Transfer Freight");
             } else if (!intakeFull && intake.slidesIsHome() && curTime - intakeFlipTime > transferThreshold && intakeRev) {
                 deposit.hold();
-                deposit.clearCarousel();
                 intake.off();
                 intake.flipDown();
 
@@ -247,37 +246,33 @@ public class Robot {
         if (depositingFreight) {
             if (!deposit.slidesAtPos()) slidesAtPosTime = curTime;
 
-            if (y <= 100 /*&& notMoving() && turret.turretAtPos()*/ /*&& (!isAuto || Math.abs(theta - PI/2) < PI/5)*/) {
-                if (deposit.depositCleared() && depositOpenTime == -1) {
-                    depositScore();
-                    turretScore();
-                    automationStep("Extend Slides/Arm");
-                } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1
-                        && (depositApproval && (!isAuto || (deposit.getArmVelocity() < 5))
-                        && (!isAuto || cycleHub != DepositTarget.allianceMid || curTime - slidesAtPosTime > hubTipThreshold))) {
-                    deposit.open();
-                    depositOpenTime = curTime;
-                    automationStep("Score Freight");
-                    log("@deposit: arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
-                } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
-                    depositHome();
-                    turretHome();
+            if (deposit.armSlidesHome() && depositOpenTime == -1) {
+                depositScore();
+                automationStep("Extend Slides/Arm");
+            } else if (deposit.depositCleared() && !deposit.armSlidesAtPose() && depositOpenTime == -1) {
+                turretScore();
+                automationStep("Align Turret");
+            } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1
+                    && (depositApproval && (!isAuto || (deposit.getArmVelocity() < 5))
+                    && (!isAuto || cycleHub != DepositTarget.allianceMid || curTime - slidesAtPosTime > hubTipThreshold))) {
+                deposit.open();
+                depositOpenTime = curTime;
+                automationStep("Score Freight");
+                log("@deposit: arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
+            } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
+                depositHome();
+                turretHome();
 
-                    markCycle();
-                    automationStep("Home Slides/Arm + Cycle Done");
-                    log("Depositing done after: " + (curTime - automationStepTime) + "ms");
+                markCycle();
+                automationStep("Home Slides/Arm + Cycle Done");
+                log("Depositing done after: " + (curTime - automationStepTime) + "ms");
 
-                    depositApproval = false;
-                    depositOpenTime = -1;
-                    depositingFreight = false;
-                    slidesAtPosTime = -1;
-                } else {
-                    log("going to pos arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
-                }
+                depositApproval = false;
+                depositOpenTime = -1;
+                depositingFreight = false;
+                slidesAtPosTime = -1;
             } else {
-                if (y > 100) log("Waiting for dt pose");
-                /*if (!notMoving()) log("Robot is moving");
-                if (!turret.turretAtPos()) log("Waiting for turret align");*/
+                log("going to pos arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
             }
         }
 
@@ -299,7 +294,7 @@ public class Robot {
         }
 
         // Intake Anti-Stall
-        if (isAuto && intakeTransfer && !intakeFull && !intake.slidesIsHome()) {  //Prevent Intake Stalling
+        if (isAuto && intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
             if (!intakeStalling) {
                 stallStartTime = -1;
                 intake.on();
@@ -337,7 +332,7 @@ public class Robot {
             updateTrackingMath();
             turret.updateTracking(theta, deposit.getSlidesDistInches(), turretFF);
         }
-        turret.update(deposit.slidesHome());
+        turret.update();
 
         // Update Arm/Slides
         if (trackGoal && !setDepositControlsHome) depositScore();
@@ -395,7 +390,6 @@ public class Robot {
         addPacket("10 Run Time", (curTime - startTime) / 1000);
         addPacket("11 Update Frequency (Hz)", round(1 / timeDiff));
         addPacket("pod zeroes", drivetrain.zero1 + " " + drivetrain.zero2 + " " + drivetrain.zero3);
-        addPacket("arm state", deposit.curState);
         if (intake.getDistance() > 1000) {
             addPacket("0 DISTANCE SENSOR", "> 1000!!!");
             op.telemetry.addData("0 DISTANCE SENSOR", "> 1000!!!");
@@ -435,7 +429,6 @@ public class Robot {
         depositingFreight = false;
         automationStep("Automation Cancelled");
     }
-
     // Set Arm + Slides Control
     public void depositScore() {
         setDepositControlsHome = false;

@@ -83,7 +83,6 @@ public class RedAutoWarehouse extends LinearOpMode {
         robot.intake.flipDown();
         robot.noExtend = true;
 
-        robot.deposit.clearCarousel();
         robot.depositingFreight = true;
         robot.depositApproval = true;
 
