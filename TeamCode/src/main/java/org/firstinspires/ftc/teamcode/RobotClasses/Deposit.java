@@ -23,7 +23,7 @@ public class Deposit {
     public int DEPOSIT_SLIDES_MAX_TICKS = (int) Math.round(25 * DEPOSIT_SLIDES_TICKS_PER_INCH);
     public int DEPOSIT_SLIDES_ERROR_THRESHOLD = 15;
     public double ARM_TICKS_PER_RADIAN = 1120 / (2*PI);
-    public double DEPOSIT_ARM_MAX_POWER = 1;
+    public static double DEPOSIT_SLIDES_MAX_POWER = 0.7;
     public static int DEPOSIT_ARM_ERROR_THRESHOLD = 40;
 
     // Slides PD
@@ -53,8 +53,8 @@ public class Deposit {
     public static double dArm = dArmUp;
     public static double fArm = 0;
 
-    public static double fGravity = 0.095;
-    public boolean isDeposit = false;
+    public static double fGravity = 0.09;
+    public boolean depositing = false;
 
     public double lastArmPos = 0;
     public double lastSlidesPos = 0;
@@ -92,14 +92,14 @@ public class Deposit {
 
     // Slides + Arm
     public void setDepositHome() {
-        isDeposit = false;
+        depositing = false;
         setArmPIDCoefficients(Deposit.pArmDown, Deposit.dArmDown);
         setArmTarget(Constants.DEPOSIT_ARM_HOME - armOffset);
         setSlidesTarget((int) Math.round(DEPOSIT_SLIDES_TICKS_PER_INCH * Constants.SLIDES_DISTANCE_HOME) - slidesOffset);
     }
 
     public void setDepositControls(Robot.DepositTarget target, double slidesDist) {
-        isDeposit = true;
+        depositing = true;
         this.target = target;
         setArmPIDCoefficients(Deposit.pArmUp, Deposit.dArmUp);
         this.slidesDist = slidesDist;
@@ -122,16 +122,20 @@ public class Deposit {
             Robot.log("Critical arm error saved: " + lastArmPos + " -> " + getArmPosition());
             armErrorOffset += lastArmPos - getArmPosition();
         }
-        if (lastSlidesPos > 100 && getSlidesError() < 10) {
+        if (lastSlidesPos > 100 && getSlidesPosition() < 10) {
             Robot.log("Critical slides error saved: " + lastSlidesPos + " -> " + getSlidesPosition());
             slidesErrorOffset += lastSlidesPos - getSlidesPosition();
         }
 
-        if (!isDeposit) {
+        if (!depositing) {
             if (target == Robot.DepositTarget.allianceHigh && getSlidesDistInches() >= maxSlidesDistBeforeLoweringArm) {
                 setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
-            } else if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm) {
+            } else if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm && !armHome()) {
                 setArmControls(Constants.DEPOSIT_ARM_HOME);
+            } else if (getArmVelocity() > 3 && armHome()) { // constant power to make sure arm does all the way home
+                armMotor.setPower(-0.05);
+            } else {
+                armMotor.setPower(0);
             }
             if (target != Robot.DepositTarget.allianceHigh || getArmPosition() < Constants.ARM_ON_HUB_THRESHOLD) {
                 setSlidesControls();
@@ -139,26 +143,17 @@ public class Deposit {
         } else {
             setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));  // Reset target every update to change with offset
             setArmTarget(targetArmPosNoOffset);
-            // arm out first if low or mid
-            if ((target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.allianceMid) && armAtPosPercent(0.75)
-                || target == Robot.DepositTarget.allianceHigh) {
+            // arm out first if low or mid goal
+            if (!(target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.allianceMid) || armAtPosPercent(0.75)) {
                 setSlidesControls();
             }
             // midway arm pos if high or duck
-            if ((target == Robot.DepositTarget.allianceHigh || target == Robot.DepositTarget.duck) && !slidesAtPos()) {
+            if ((target == Robot.DepositTarget.allianceHigh || target == Robot.DepositTarget.duck) && !slidesAtPosPercent(0.9)) {
                 setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
             } else {
                 setArmControls();
             }
         }
-
-        /*if (isDeposit) {
-            setSlidesTarget((int) Math.round((Constants.SLIDES_DISTANCE_HIGH) * DEPOSIT_SLIDES_TICKS_PER_INCH));
-            setArmTarget((Constants.DEPOSIT_ARM_HIGH));
-        } else {
-            setSlidesTarget((int) Constants.SLIDES_DISTANCE_HOME);
-            setArmTarget(Constants.DEPOSIT_ARM_HOME);
-        }*/
 
         lastArmPos = getArmPosition();
         lastSlidesPos = getSlidesPosition();
@@ -221,7 +216,7 @@ public class Deposit {
     // Slides
     public void setSlidesControls(int targetSlidesPos) {
         slidesMotor.setTargetPosition(targetSlidesPos);
-        slidesMotor.setPower(!slidesAtPos() ? DEPOSIT_ARM_MAX_POWER : 0);
+        slidesMotor.setPower(!slidesAtPos() ? DEPOSIT_SLIDES_MAX_POWER : 0);
         Log.w("arm-log", "slides set to: " + targetSlidesPos + ", current position: " + getSlidesPosition());
     }
 

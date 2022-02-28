@@ -21,8 +21,8 @@ public class Constants {
     public static double INTAKE_HOME_POS = 0.72;
 
     // Intake Servo
-    public static double INTAKE_UP_POS = 0.55;
-    public static double INTAKE_DOWN_POS = 1;
+    public static double INTAKE_UP_POS = 0.23;
+    public static double INTAKE_DOWN_POS = 0.9;
 
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.2;
@@ -50,12 +50,12 @@ public class Constants {
     public static double TURRET_ALLIANCE_RED_CYCLE_LOW_THETA = 0.165;
     public static double TURRET_ALLIANCE_RED_CYCLE_MID_THETA = 0.15;
     public static double TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA = 0.18;
-    public static double TURRET_NEUTRAL_RED_CYCLE_THETA = .8;
-    public static double TURRET_DUCK_RED_CYCLE_THETA = 0;
+    public static double TURRET_NEUTRAL_RED_CYCLE_THETA = 0.8;
+    public static double TURRET_DUCK_RED_CYCLE_THETA = 0.48;
 
     // Carousel
     public static double CAROUSEL_POWER = 0.55;
-    public static double CAROUSEL_HOME = 0.75;
+    public static double CAROUSEL_HOME = 0.78;
     public static double CAROUSEL_OUT = 0.05;
 
     // Anti-Tip

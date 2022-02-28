@@ -57,6 +57,7 @@ public class Turret {
 
         // Set Initial Turret Theta
         initialTheta = initialRobotTheta;
+        turretTargetTheta = initialTheta;
         lastTurretTheta = initialTheta;
 
         this.isAuto = isAuto;
