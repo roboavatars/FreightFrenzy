@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Disabled
-@TeleOp(name = "deposit tracking test")
+@TeleOp
 @Config
 public class DepositTrackingTest extends LinearOpMode {
     private boolean armHome = true;

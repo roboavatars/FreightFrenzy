@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Tests;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -11,6 +12,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 
 //Config in Constants.java
 @TeleOp(name = "AntiTip Test")
+@Disabled
 public class AntiTipTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
