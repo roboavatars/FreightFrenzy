@@ -144,7 +144,7 @@ public class Deposit {
             setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));  // Reset target every update to change with offset
             setArmTarget(targetArmPosNoOffset);
             // arm out first if low or mid goal
-            if (!(target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.allianceMid) || armAtPosPercent(0.75)) {
+            if (!(target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.allianceMid) || armAtPosPercent(0.5)) {
                 setSlidesControls();
             }
             // midway arm pos if high or duck

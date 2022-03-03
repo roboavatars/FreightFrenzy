@@ -4,6 +4,8 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
@@ -25,7 +27,7 @@ public class HardwareTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        CRServo motor1 = hardwareMap.get(CRServo.class, motorName1);
+        DcMotorEx motor1 = hardwareMap.get(DcMotorEx.class, motorName1);
 //        DcMotor motor2 = hardwareMap.get(DcMotor.class, motorName2);
         Servo servo1 = hardwareMap.get(Servo.class, servoName1);
 //        Servo servo2 = hardwareMap.get(Servo.class, servoName2);

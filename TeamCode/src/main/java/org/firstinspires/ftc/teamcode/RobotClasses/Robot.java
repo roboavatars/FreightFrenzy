@@ -183,6 +183,7 @@ public class Robot {
         if (loopCounter % sensorUpdatePeriod == 0) {
             intakeFull = intake.intakeFull();
             intakeStalling = intake.checkIfStalling();
+            if(intakeStalling) log("intake stalling");
         }
         if (loopCounter % voltageUpdatePeriod == 0) {
             voltage = round(battery.getVoltage());
@@ -225,7 +226,8 @@ public class Robot {
                 intake.reverse();
                 intakeRev = true;
                 automationStep("Transfer Freight");
-            } else if (transferVerify && intake.slidesIsHome() /*&& curTime - intakeFlipTime > transferThreshold*/ && intakeRev) {
+            } else if ((transferVerify || (isAuto && curTime - intakeFlipTime > transferThreshold))
+                    && intake.slidesIsHome() && intakeRev) {
                 deposit.hold();
                 intake.off();
                 intake.flipDown();
@@ -240,6 +242,7 @@ public class Robot {
                 intakeRev = false;
                 depositingFreight = true;
             }
+            Robot.log(transferVerify + " " + (curTime - intakeFlipTime > transferThreshold));
         }
 
         // Auto-Depositing

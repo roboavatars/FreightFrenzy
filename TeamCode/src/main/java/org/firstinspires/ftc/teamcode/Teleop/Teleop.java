@@ -88,7 +88,7 @@ public class Teleop extends LinearOpMode {
                 robot.intakeApproval = true;
             } else if (gamepad1.right_bumper) {
                 robot.depositApproval = true;
-            } else if (gamepad1.left_trigger > 0) {
+            } else if (gamepad1.left_trigger > 0.1) {
                 robot.transferVerify = true;
             }
 
