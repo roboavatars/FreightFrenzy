@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
-import static java.lang.Math.PI;
-
 import com.acmerobotics.dashboard.config.Config;
 
 @Config
@@ -30,17 +28,17 @@ public class Constants {
 
     // Deposit Arm
     public static int DEPOSIT_ARM_HOME = 0;
-    public static int DEPOSIT_ARM_LOW = 685;
-    public static int DEPOSIT_ARM_MID = 615;
+    public static int DEPOSIT_ARM_LOW = 715;
+    public static int DEPOSIT_ARM_MID = 655;
     public static int DEPOSIT_ARM_HIGH = 545;
     public static int DEPOSIT_ARM_MIDWAY = 375;
-    public static int ARM_ON_HUB_THRESHOLD = 535;
+    public static int ARM_ON_HUB_THRESHOLD = 520;
 
     // Deposit Slides
     public static double SLIDES_DISTANCE_HOME = 0;
     public static double SLIDES_DISTANCE_CLEAR = 3;
-    public static double SLIDES_DISTANCE_LOW = 17;
-    public static double SLIDES_DISTANCE_MID = 13;
+    public static double SLIDES_DISTANCE_LOW = 16;
+    public static double SLIDES_DISTANCE_MID = 17;
     public static double SLIDES_DISTANCE_HIGH = 18;
     public static double SLIDES_DISTANCE_DUCK = 25;
 
@@ -64,7 +62,4 @@ public class Constants {
 
     // Tape Detector
     public static double COLOR_SENSOR_THRESHOLD = 400;
-    public static double TAPE_THETA_THRESHOLD = PI/20;
-    public static double TAPE_SENSORS_DIST = 10;
-    public static double TAPE_SENSOR_CENTER_TO_ROBOT_CENTER = 8;
 }

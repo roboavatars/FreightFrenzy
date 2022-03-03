@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode.Localization.TapeDetector;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
 import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 
-@Config
 public class TapeColorSensor {
     public ColorSensor colorSensor;
     private boolean hitTape;

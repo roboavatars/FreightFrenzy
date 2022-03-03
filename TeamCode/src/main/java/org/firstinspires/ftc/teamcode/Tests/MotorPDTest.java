@@ -8,16 +8,17 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
 @Config
 public class MotorPDTest extends LinearOpMode {
     public static boolean move = false;
     public static int targetTicks = 0;
-    public static String motorName = "motor";
+    public static String motorName = "arm";
 
     public static double Kp = 2.25;
-    public static double Kd = 5.5;
+    public static double Kd = 2.5;
 
     private double error;
     private double errorChange;
@@ -26,9 +27,12 @@ public class MotorPDTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         DcMotorEx motor = hardwareMap.get(DcMotorEx.class, motorName);
+        motor.setDirection(DcMotorSimple.Direction.REVERSE);
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         waitForStart();
+
         while (opModeIsActive()) {
             if (move) {
                 double currentTicks = motor.getCurrentPosition();

@@ -118,13 +118,13 @@ public class Deposit {
 
     public void update() {
 
-        if (lastArmPos > 100 && getArmPosition() < 10) {
-            Robot.log("Critical arm error saved: " + lastArmPos + " -> " + getArmPosition());
-            armErrorOffset += lastArmPos - getArmPosition();
+        if (lastArmPos > 100 && armMotor.getCurrentPosition() < 10) {
+            Robot.log("Critical arm error saved: " + lastArmPos + " -> " + armMotor.getCurrentPosition());
+            armErrorOffset += lastArmPos - armMotor.getCurrentPosition();
         }
-        if (lastSlidesPos > 100 && getSlidesPosition() < 10) {
-            Robot.log("Critical slides error saved: " + lastSlidesPos + " -> " + getSlidesPosition());
-            slidesErrorOffset += lastSlidesPos - getSlidesPosition();
+        if (lastSlidesPos > 100 && slidesMotor.getCurrentPosition() < 10) {
+            Robot.log("Critical slides error saved: " + lastSlidesPos + " -> " + slidesMotor.getCurrentPosition());
+            slidesErrorOffset += lastSlidesPos - slidesMotor.getCurrentPosition();
         }
 
         if (!depositing) {
@@ -169,7 +169,7 @@ public class Deposit {
         fArm = fGravity * Math.cos(getArmAngle());
         armMotor.setPower(pArm * armError + dArm * armErrorChange + fArm);
 
-        Log.w("arm-log", "arm set to: " + targetArmPos + ", current position: " + getArmPosition());
+        Log.w("deposit-log", "arm set to: " + targetArmPos + ", current position: " + getArmPosition());
     }
 
     public void setArmControls() {
@@ -216,8 +216,9 @@ public class Deposit {
     // Slides
     public void setSlidesControls(int targetSlidesPos) {
         slidesMotor.setTargetPosition(targetSlidesPos);
-        slidesMotor.setPower(!slidesAtPos() ? DEPOSIT_SLIDES_MAX_POWER : 0);
-        Log.w("arm-log", "slides set to: " + targetSlidesPos + ", current position: " + getSlidesPosition());
+        double power = depositing ? DEPOSIT_SLIDES_MAX_POWER : 1;
+        slidesMotor.setPower(power);
+        Log.w("deposit-log", "slides set to: " + targetSlidesPos + ", current position: " + getSlidesPosition());
     }
 
     public void setSlidesControls() {

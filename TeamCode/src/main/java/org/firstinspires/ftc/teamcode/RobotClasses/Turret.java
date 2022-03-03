@@ -27,7 +27,7 @@ public class Turret {
     public double initialTheta;
     private boolean isAuto;
 
-    //Turret Tracking
+    // Turret Tracking
     private boolean tracking = false;
     public double lockTheta;
     public static double fwTurret = -0.4;

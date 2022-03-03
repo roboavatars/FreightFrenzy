@@ -94,6 +94,7 @@ public class Robot {
     public boolean transferVerify = false;
     public boolean intakeApproval = false;
     public boolean intakeTransfer = false;
+    public boolean slidesInCommand = false;
     public boolean depositingFreight = false;
     public boolean intakeRev = false;
     private double intakeFlipTime = -1;
@@ -110,8 +111,8 @@ public class Robot {
     // Time and Delay Variables
     public double curTime;
     public static int flipUpThreshold = 1000;
-    public static int transferThreshold = 1500;
-    public static int releaseThreshold = 750;
+    public static int transferThreshold = 1750;
+    public static int releaseThreshold = 150;
     public static int hubTipThreshold = 300;
 
     public double stallStartTime = -1;
@@ -183,7 +184,6 @@ public class Robot {
         if (loopCounter % sensorUpdatePeriod == 0) {
             intakeFull = intake.intakeFull();
             intakeStalling = intake.checkIfStalling();
-            if(intakeStalling) log("intake stalling");
         }
         if (loopCounter % voltageUpdatePeriod == 0) {
             voltage = round(battery.getVoltage());
@@ -212,6 +212,7 @@ public class Robot {
             if (cycleHub == DepositTarget.duck) carousel.on();
             intakeTransfer = true;
             intakeApproval = false;
+            slidesInCommand = false;
             automationStep("Intake Extend/On");
             automationStepTime = curTime;
         } else if (intakeTransfer) {
@@ -242,7 +243,7 @@ public class Robot {
                 intakeRev = false;
                 depositingFreight = true;
             }
-            Robot.log(transferVerify + " " + (curTime - intakeFlipTime > transferThreshold));
+            //Robot.log(transferVerify + " " + (curTime - intakeFlipTime > transferThreshold));
         }
 
         // Auto-Depositing
@@ -264,8 +265,9 @@ public class Robot {
                 log("@deposit: arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
             } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
                 depositHome();
+                slidesInCommand = true;
                 automationStep("Home Slides/Arm");
-            } else if (!deposit.armSlidesHome() && deposit.getSlidesDistInches() < 13 && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
+            } else if (!deposit.armSlidesHome() && deposit.getSlidesDistInches() < 5 && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
                 turretHome();
 
                 automationStep("Home Turret + Cycle Done");
@@ -303,8 +305,8 @@ public class Robot {
             if (!intakeStalling) {
                 stallStartTime = -1;
                 intake.on();
-                antiStallStep = "Intake On";
-                automationStep(antiStallStep);
+                //antiStallStep = "Intake On";
+                //automationStep(antiStallStep);
             } else if (stallStartTime == -1) {
                 stallStartTime = curTime;
                 antiStallStep = "Jam Detected";
@@ -328,6 +330,9 @@ public class Robot {
                 antiStallStep = "Reverse Intake"; automationStep(antiStallStep);
             }
         }*/
+
+
+        addPacket("delta a", (deposit.getArmPosition()-deposit.lastArmPos));
 
         // Update Intake Slides
         intake.update();
@@ -380,8 +385,6 @@ public class Robot {
         }
 
         // Dashboard Telemetry
-        addPacket("0 0 arm positions", deposit.getArmPosition());
-
         addPacket("0 Voltage Starting", startVoltage);
         addPacket("1 Current Voltage", voltage);
         addPacket("2 X", round(x));
@@ -392,8 +395,8 @@ public class Robot {
         addPacket("7 Intake Full", intakeFull);
         addPacket("8 Intake Stalling", intakeStalling);
         addPacket("9 Automation Step", automationStep + "; " + antiStallStep);
-        addPacket("10 Run Time", (curTime - startTime) / 1000);
-        addPacket("11 Update Frequency (Hz)", round(1 / timeDiff));
+        addPacket("91 Run Time", (curTime - startTime) / 1000);
+        addPacket("92 Update Frequency (Hz)", round(1 / timeDiff));
         addPacket("pod zeroes", drivetrain.zero1 + " " + drivetrain.zero2 + " " + drivetrain.zero3);
         addPacket("arm", deposit.getArmPosition());
         addPacket("slides", deposit.getSlidesPosition());
@@ -434,9 +437,11 @@ public class Robot {
         intakeRev = false;
         depositApproval = false;
         depositOpenTime = -1;
+        slidesInCommand = true;
         depositingFreight = false;
         automationStep("Automation Cancelled");
     }
+
     // Set Arm + Slides Control
     public void depositScore() {
         setDepositControlsHome = false;
