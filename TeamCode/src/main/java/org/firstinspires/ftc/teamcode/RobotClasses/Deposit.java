@@ -24,7 +24,7 @@ public class Deposit {
     public int DEPOSIT_SLIDES_ERROR_THRESHOLD = 15;
     public double ARM_TICKS_PER_RADIAN = 1120 / (2*PI);
     public static double DEPOSIT_SLIDES_MAX_POWER = 0.7;
-    public static int DEPOSIT_ARM_ERROR_THRESHOLD = 40;
+    public static int DEPOSIT_ARM_ERROR_THRESHOLD = 35;
 
     // Slides PD
     public static double pSlides = 50;
@@ -33,7 +33,7 @@ public class Deposit {
     public Robot.DepositTarget target;
     private double slidesDist;
 
-    private static final double maxSlidesDistBeforeLoweringArm = 2;
+    private static final double maxSlidesDistBeforeLoweringArm = 5;
 
     public int targetArmPos;
     private int targetArmPosNoOffset = 0;
@@ -116,7 +116,11 @@ public class Deposit {
         setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));
     }
 
-    public void update() {
+    public void update(){
+        update(false, true);
+    }
+
+    public void update(boolean intakeTransfer, boolean turretHome) {
 
         if (lastArmPos > 100 && armMotor.getCurrentPosition() < 10) {
             Robot.log("Critical arm error saved: " + lastArmPos + " -> " + armMotor.getCurrentPosition());
@@ -130,15 +134,16 @@ public class Deposit {
         if (!depositing) {
             if (target == Robot.DepositTarget.allianceHigh && getSlidesDistInches() >= maxSlidesDistBeforeLoweringArm) {
                 setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
-            } else if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm && !armHome()) {
+            } else if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm && !armHome() && turretHome) {
                 setArmControls(Constants.DEPOSIT_ARM_HOME);
             } else if (getArmVelocity() > 3 && armHome()) { // constant power to make sure arm does all the way home
                 armMotor.setPower(-0.05);
-            } else {
+            } else if (armSlidesHome()){
                 armMotor.setPower(0);
             }
             if (target != Robot.DepositTarget.allianceHigh || getArmPosition() < Constants.ARM_ON_HUB_THRESHOLD) {
-                setSlidesControls();
+                if (intakeTransfer && slidesHome()) slidesMotor.setPower(-0.25);
+                else setSlidesControls();
             }
         } else {
             setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));  // Reset target every update to change with offset

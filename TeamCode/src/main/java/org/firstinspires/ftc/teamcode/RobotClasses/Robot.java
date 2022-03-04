@@ -101,6 +101,7 @@ public class Robot {
     private double depositOpenTime = -1;
     private double slidesAtPosTime = -1;
     public boolean noExtend = false;
+    public boolean noDeposit = false;
 
     // Cycle Tracker
     public ArrayList<Double> cycles = new ArrayList<>();
@@ -171,6 +172,7 @@ public class Robot {
 
     // Stop logger
     public void stop() {
+        drivetrain.stop();
         logger.stopLogging();
     }
 
@@ -250,13 +252,13 @@ public class Robot {
         if (depositingFreight) {
             if (!deposit.slidesAtPos()) slidesAtPosTime = curTime;
 
-            if (deposit.armSlidesHome() && depositOpenTime == -1) {
+            if (!noDeposit && deposit.armSlidesHome() && depositOpenTime == -1) {
                 depositScore();
                 automationStep("Extend Slides/Arm");
-            } else if (deposit.depositCleared() && !deposit.armSlidesAtPose() && depositOpenTime == -1) {
+            } else if (!noDeposit &&  deposit.depositCleared() && !deposit.armSlidesAtPose() && depositOpenTime == -1) {
                 turretScore();
                 automationStep("Align Turret");
-            } else if (!deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1
+            } else if (!noDeposit &&  !deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1
                     && (depositApproval && (!isAuto || (deposit.getArmVelocity() < 5))
                     && (!isAuto || cycleHub != DepositTarget.allianceMid || curTime - slidesAtPosTime > hubTipThreshold))) {
                 deposit.open();
@@ -267,7 +269,7 @@ public class Robot {
                 depositHome();
                 slidesInCommand = true;
                 automationStep("Home Slides/Arm");
-            } else if (!deposit.armSlidesHome() && deposit.getSlidesDistInches() < 5 && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
+            } else if (!deposit.armSlidesHome() && deposit.getSlidesDistInches() < 7 && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
                 turretHome();
 
                 automationStep("Home Turret + Cycle Done");
@@ -346,7 +348,7 @@ public class Robot {
 
         // Update Arm/Slides
         if (trackGoal && !setDepositControlsHome) depositScore();
-        deposit.update();
+        deposit.update(intakeTransfer, turret.isHome());
 
         // Update Position
         drivetrain.updatePose();

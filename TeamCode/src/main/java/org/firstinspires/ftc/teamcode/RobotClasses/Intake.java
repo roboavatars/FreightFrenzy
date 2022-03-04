@@ -29,6 +29,7 @@ public class Intake {
         // Slides Motor
         slidesServo = op.hardwareMap.get(Servo.class, "intakeSlides");
         home();
+        setSlidesPosition(slidesTargetPos);
 
         // Intake Servo
         intakeServo = op.hardwareMap.get(Servo.class, "intakeServo");

@@ -144,6 +144,10 @@ public class Turret {
         return Math.abs(turretError) < TURRET_ERROR_THRESHOLD;
     }
 
+    public boolean isHome(){
+        return Math.abs(getTurretTheta() - PI/2) < TURRET_ERROR_THRESHOLD;
+    }
+
     public void setTurretThetaFF(double theta, double ff) { // TODO: remove usages and delete
         double clippedTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
         turretTheta = getTurretTheta();
