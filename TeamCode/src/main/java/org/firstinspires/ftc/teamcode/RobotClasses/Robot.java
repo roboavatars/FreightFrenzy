@@ -255,7 +255,7 @@ public class Robot {
             if (!noDeposit && deposit.armSlidesHome() && depositOpenTime == -1) {
                 depositScore();
                 automationStep("Extend Slides/Arm");
-            } else if (!noDeposit &&  deposit.depositCleared() && !deposit.armSlidesAtPose() && depositOpenTime == -1) {
+            } else if (!noDeposit && deposit.depositCleared() && !deposit.armSlidesAtPose() && depositOpenTime == -1) {
                 turretScore();
                 automationStep("Align Turret");
             } else if (!noDeposit &&  !deposit.armSlidesHome() && deposit.armSlidesAtPose() && depositOpenTime == -1
@@ -334,7 +334,7 @@ public class Robot {
         }*/
 
 
-        addPacket("delta a", (deposit.getArmPosition()-deposit.lastArmPos));
+        addPacket("ay", round(ay));
 
         // Update Intake Slides
         intake.update();
@@ -345,6 +345,7 @@ public class Robot {
             turret.updateTracking(theta, deposit.getSlidesDistInches(), turretFF);
         }
         turret.update();
+        turretGlobalTheta = turret.getTheta() + theta;
 
         // Update Arm/Slides
         if (trackGoal && !setDepositControlsHome) depositScore();
@@ -383,7 +384,8 @@ public class Robot {
         // Log Data
         if (loopCounter % loggerUpdatePeriod == 0) {
             logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a,
-                    turretGlobalTheta, deposit.getSlidesDistInches(), cycleHub, intake.slidesIsHome(), cycles.size(), cycleAvg);
+                    turretGlobalTheta, deposit.getSlidesDistInches(), cycleHub, intake.slidesIsHome(), intakeTransfer, depositingFreight,
+                    cycles.size(), cycleAvg);
         }
 
         // Dashboard Telemetry
@@ -392,11 +394,12 @@ public class Robot {
         addPacket("2 X", round(x));
         addPacket("3 Y", round(y));
         addPacket("4 Theta", round(theta));
-        addPacket("5 Turret Theta", round(turretGlobalTheta));
+        addPacket("5 Turret Theta", round(turretGlobalTheta) + " " + round(turret.getTheta()));
         addPacket("6 Cycle Hub", cycleHub.toString());
-        addPacket("7 Intake Full", intakeFull);
-        addPacket("8 Intake Stalling", intakeStalling);
-        addPacket("9 Automation Step", automationStep + "; " + antiStallStep);
+        addPacket("7 Automation Step", automationStep + "; " + antiStallStep);
+        addPacket("7 Automation", intakeTransfer + "; " + depositingFreight);
+        addPacket("8 Intake Full", intakeFull);
+        addPacket("9 Intake Stalling", intakeStalling);
         addPacket("91 Run Time", (curTime - startTime) / 1000);
         addPacket("92 Update Frequency (Hz)", round(1 / timeDiff));
         addPacket("pod zeroes", drivetrain.zero1 + " " + drivetrain.zero2 + " " + drivetrain.zero3);

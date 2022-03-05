@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodePipeline;
 import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
@@ -18,7 +19,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Autonomous(name = "0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoWarehouse extends LinearOpMode {
 
-    public static int barcodeCase = 2; // 0 = left, 1 = mid, 2 = right
+    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Middle;
 
     @Override
     public void runOpMode() {
@@ -55,27 +56,20 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         int cycleCounter = 0;
         double passLineTime = 0;
+        int odoDriftAdjustment = 3;
 
         waitForStart();
 
-        /*
-        if(detector.getResult() == BarcodePipeline.Case.Left) {
-            barcodeCase = 0;
-        } else if(detector.getResult() == BarcodePipeline.Case.Middle) {
-            barcodeCase = 1;
-        } else {
-            barcodeCase = 2;
-        }
-        Robot.log("Barcode Case: " + barcodeCase);
-         */
+//        barcodeCase = detector.getResult();
 
-        if (barcodeCase == 0) {
+        if (barcodeCase == BarcodePipeline.Case.Left) {
             robot.cycleHub = Robot.DepositTarget.allianceLow;
-        } else if (barcodeCase == 1) {
+        } else if (barcodeCase == BarcodePipeline.Case.Middle) {
             robot.cycleHub = Robot.DepositTarget.allianceMid;
         } else {
             robot.cycleHub = Robot.DepositTarget.allianceHigh;
         }
+//        Robot.log("Barcode Case: " + barcodeCase);
 
         ElapsedTime time = new ElapsedTime();
 
@@ -89,7 +83,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
             double timeLeft = 30 - (System.currentTimeMillis() - robot.startTime) / 1000;
             addPacket("time left", timeLeft);
-            addPacket("auto stuff", robot.depositApproval + " " + robot.deposit.armSlidesHome());
+            addPacket("auto stuff", robot.depositApproval + " " +  robot.deposit.armSlidesAtPose() + " " + robot.deposit.armSlidesAtPose());
 
             if (!preloadScore) {
                 robot.drivetrain.setGlobalControls(0, 0, 0);
@@ -110,21 +104,25 @@ public class RedAutoWarehouse extends LinearOpMode {
                     robot.drivetrain.constantStrafeConstant = -0.3;
                     robot.drivetrain.setGlobalControls(0, 0.7, PI/2 - robot.theta > PI/6 ? 0.5 : 0);
                     passLineTime = time.seconds();
+
+                    addPacket("path", "going to warehouse right rn");
                 } else if (timeLeft > parkThreshold) {
                     robot.drivetrain.constantStrafeConstant = 0;
                     robot.setTargetPoint(new Target(robot.x, 110 + 3 * (time.seconds() - passLineTime),
                             PI/2 + (0.15 * Math.sin(1.5 * (time.seconds() - passLineTime)))));
+
+                    addPacket("path", "creeping right rn");
                 } else {
                     robot.noDeposit = true;
                     robot.setTargetPoint(new Target(140, 112, PI/2));
+                    addPacket("path", "going to park right rn");
                 }
 
-                addPacket("path", "going to warehouse right rn");
 
-                if (robot.intakeFull && robot.y >= 110 - 4 * cycleCounter && robot.x > 132) {
+                if (robot.intakeFull && robot.y >= 110 - odoDriftAdjustment * cycleCounter && robot.x > 132) {
                     Waypoint[] cycleScoreWaypoints = new Waypoint[] {
                             new Waypoint(140, robot.y, 3*PI/2, 10, 10, 0, 0),
-                            new Waypoint(140, 86, 3*PI/2, 5, -5, 0, cycleScoreTime),
+                            new Waypoint(140, 86 - odoDriftAdjustment * cycleCounter, 3*PI/2, 5, -5, 0, cycleScoreTime),
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 
@@ -139,47 +137,30 @@ public class RedAutoWarehouse extends LinearOpMode {
             }
 
             else if (!cycleScore) {
-                robot.drivetrain.constantStrafeConstant = robot.y > 90 ? -0.5 : 0;
+                robot.drivetrain.constantStrafeConstant = robot.y > 90 ? -0.5 : -0.25;
 
-                if (Math.abs(PI/2 - robot.theta) > PI/10) {
-                    boolean greater = PI/2 - robot.theta > 0;
-                    robot.drivetrain.setGlobalControls(0, 0, greater ? -0.5 : 0.5);
+                if (Math.abs(PI/2 - robot.theta) > PI/10 && robot.y > 105) {
+                    boolean greater = PI/2 - robot.theta < 0;
+                    robot.drivetrain.setGlobalControls(0, 0, greater ? -0.6 : 0.6);
                 } else {
                     Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
-                    robot.setTargetPoint(new Target(curPose).theta(PI/2).thetaKp(5));
+                    robot.setTargetPoint(new Target(curPose).theta(PI/2).thetaKp(5).yKp(0.3));
                 }
 
                 addPacket("path", "going to deposit right rn");
 
-                if (robot.y <= 90 - 4 * cycleCounter) {
-                    if (robot.depositingFreight && time.seconds() > 6) {
+                if (robot.y <= 90 - odoDriftAdjustment * cycleCounter) {
+                    if ((robot.depositingFreight || robot.intakeTransfer) && time.seconds() > 6) {
                         robot.cancelAutomation();
                     }
 
                     if (time.seconds() > cycleScoreTime && !robot.intakeTransfer && robot.slidesInCommand) {
                         cycleCounter++;
-                        if (cycleCounter == 2) {
-                            //robot.noExtend = false;
-                        }
+                        // if (cycleCounter == 2) robot.noExtend = false;
 
-//                        if (30 - (System.currentTimeMillis() - robot.startTime) / 1000 > 15) {
-                            goToWarehouse = false;
-//                            Robot.log("Doing another cycle");
-//                        } else {
-//
-//                            Robot.log("Parking");
-//                            Waypoint[] parkWaypoints = new Waypoint[] {
-//                                    new Waypoint(robot.x, robot.y, PI/2, 30, 5, 0, 0),
-//                                    new Waypoint(140, 112, PI/2, 20, -5, 0, parkTime)
-//                            };
-//                            parkPath = new Path(parkWaypoints);
-//
-//                            cycleScore = true;
-//                        }
-
+                        goToWarehouse = false;
                         time.reset();
                     }
-
                     robot.depositApproval = true;
                 }
             }

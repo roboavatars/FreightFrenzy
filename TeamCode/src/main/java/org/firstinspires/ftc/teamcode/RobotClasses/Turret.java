@@ -67,20 +67,20 @@ public class Turret {
 
     public void update() {
 
-        if (Math.abs(lastTurretTheta - getTurretTheta()) > 0.5) {
-            Robot.log("Critical turret theta error saved: " + lastTurretTheta + " -> " + getTurretTheta());
-            thetaErrorOffset += lastTurretTheta - getTurretTheta();
+        if (Math.abs(lastTurretTheta - getTheta()) > 0.5) {
+            Robot.log("Critical turret theta error saved: " + lastTurretTheta + " -> " + getTheta());
+            thetaErrorOffset += lastTurretTheta - getTheta();
         }
 
-        turretTheta = getTurretTheta() + turretOffset;
+        turretTheta = getTheta() + turretOffset;
         turretErrorChange = turretTargetTheta - turretTheta - turretError;
         turretError = turretTargetTheta - turretTheta;
 
-        setTurretPower(pTurret * turretError + dTurret * turretErrorChange);
+        setPower(pTurret * turretError + dTurret * turretErrorChange);
 
-        Log.w("turret-log", getTurretTheta() + "");
+        Log.w("turret-log", getTheta() + "");
 
-        lastTurretTheta = getTurretTheta();
+        lastTurretTheta = getTheta();
     }
 
     public void updateTracking(double robotTheta, double slidesDist, double ff) {
@@ -92,11 +92,11 @@ public class Turret {
             // now wrap is from -pi/2 to 3pi/2 (which the turret will never reach)
             if (targetTheta > 3*PI/2) targetTheta -= 2*PI;
             double clippedTargetTheta = Math.min(Math.max(targetTheta, TURRET_MIN_THETA), TURRET_MAX_THETA);
-            turretTheta = getTurretTheta();
+            turretTheta = getTheta();
             turretErrorChange = clippedTargetTheta - turretTheta - turretError;
             turretError = clippedTargetTheta - turretTheta;
 
-            setTurretPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * ff + fmoiTurret * slidesDist * slidesDist);
+            setPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * ff + fmoiTurret * slidesDist * slidesDist);
         }
     }
 
@@ -118,11 +118,11 @@ public class Turret {
         this.lockTheta = lockTheta;
     }
 
-    public void setTurretPower(double power) {
+    public void setPower(double power) {
         turretMotor.setPower(Math.max(Math.min(power, MAX_TURRET_POWER), -MAX_TURRET_POWER));
     }
 
-    public void resetTurret(double resetTheta) {
+    public void reset(double resetTheta) {
         initialTheta = resetTheta;
         turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -132,28 +132,28 @@ public class Turret {
         return turretTargetTheta;
     }
 
-    public double getTurretTheta() {
+    public double getTheta() {
         return turretMotor.getCurrentPosition() / TURRET_TICKS_PER_RADIAN + initialTheta + thetaErrorOffset;
     }
 
-    public double getTurretError() {
+    public double getError() {
         return turretError;
     }
 
-    public boolean turretAtPos() {
+    public boolean atPos() {
         return Math.abs(turretError) < TURRET_ERROR_THRESHOLD;
     }
 
     public boolean isHome(){
-        return Math.abs(getTurretTheta() - PI/2) < TURRET_ERROR_THRESHOLD;
+        return Math.abs(getTheta() - PI/2) < TURRET_ERROR_THRESHOLD;
     }
 
     public void setTurretThetaFF(double theta, double ff) { // TODO: remove usages and delete
         double clippedTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
-        turretTheta = getTurretTheta();
+        turretTheta = getTheta();
         turretErrorChange = clippedTargetTheta - turretTheta - turretError;
         turretError = clippedTargetTheta - turretTheta;
 
-        setTurretPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * ff/* + fmoiTurret * getSlidesDistInches() * getSlidesDistInches()*/);
+        setPower(pTurret * turretError + dTurret * turretErrorChange + fwTurret * ff/* + fmoiTurret * getSlidesDistInches() * getSlidesDistInches()*/);
     }
 }

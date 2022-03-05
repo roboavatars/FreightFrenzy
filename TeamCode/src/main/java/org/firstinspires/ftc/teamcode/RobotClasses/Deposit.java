@@ -24,7 +24,7 @@ public class Deposit {
     public int DEPOSIT_SLIDES_ERROR_THRESHOLD = 15;
     public double ARM_TICKS_PER_RADIAN = 1120 / (2*PI);
     public static double DEPOSIT_SLIDES_MAX_POWER = 0.7;
-    public static int DEPOSIT_ARM_ERROR_THRESHOLD = 35;
+    public static int DEPOSIT_ARM_ERROR_THRESHOLD = 20;
 
     // Slides PD
     public static double pSlides = 50;
@@ -53,7 +53,7 @@ public class Deposit {
     public static double dArm = dArmUp;
     public static double fArm = 0;
 
-    public static double fGravity = 0.09;
+    public static double fGravity = 0.095;
     public boolean depositing = false;
 
     public double lastArmPos = 0;
@@ -142,14 +142,14 @@ public class Deposit {
                 armMotor.setPower(0);
             }
             if (target != Robot.DepositTarget.allianceHigh || getArmPosition() < Constants.ARM_ON_HUB_THRESHOLD) {
-                if (intakeTransfer && slidesHome()) slidesMotor.setPower(-0.25);
+                if (intakeTransfer && slidesHome()) slidesMotor.setPower(-0.25); // constant power so slides dont come out when robot slowing down
                 else setSlidesControls();
             }
         } else {
             setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));  // Reset target every update to change with offset
             setArmTarget(targetArmPosNoOffset);
             // arm out first if low or mid goal
-            if (!(target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.allianceMid) || armAtPosPercent(0.5)) {
+            if (!(target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.allianceMid) || armAtPosPercent(0.75)) {
                 setSlidesControls();
             }
             // midway arm pos if high or duck
@@ -230,6 +230,10 @@ public class Deposit {
         setSlidesControls(targetSlidesTicks);
     }
 
+    public void setSlidesInches(int inches) {
+        setSlidesTarget((int) Math.round(inches * DEPOSIT_SLIDES_TICKS_PER_INCH));
+    }
+
     public void setSlidesTarget(int targetPos) {
         targetSlidesTicks = Math.min(Math.max(targetPos + slidesOffset, 0), DEPOSIT_SLIDES_MAX_TICKS);
     }
@@ -287,6 +291,6 @@ public class Deposit {
     }
 
     public boolean armSlidesHome() {
-        return armHome() && slidesHome();
+        return getArmPosition() < 50 && slidesHome();
     }
 }

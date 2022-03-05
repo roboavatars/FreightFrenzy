@@ -47,13 +47,18 @@ public class Teleop extends LinearOpMode {
     Right Bumper - Approve Freight Deposit
     Left Trigger - Verify Transfer
     Right Trigger - Override Intake Sensor
+    Dpad Up - High Goal
+    Dpad Left - Mid Goal
+    Dpad Down - Low Goal
+    Dpad Right - Neutral Goal
+    X - Duck Cycling
     A - Cancel Automation
-    Dpad/X - Switch Goal
     Y/B - Intake Slides Offset
 
     Gamepad 2
     Left Stick - Turret, Deposit Slides Offset
     Right Stick - Arm Offset
+    Left Trigger - Defense Mode
     Right Trigger - Slow Mode
     X - Odo Reset
     B - Retract Odo
@@ -161,6 +166,10 @@ public class Teleop extends LinearOpMode {
                 robot.drivetrain.retractOdo();
             }
 
+            if (gamepad2.left_trigger > 0.1) {
+                robot.defenseMode = !robot.defenseMode;
+            }
+
             // Field Centric Deposit Offsets
             /*if (robot.cycleHub == Robot.DepositTarget.neutral){
                 robot.turret.turretOffset -= (isRed ? 0.03 : -0.03) * gamepad2.left_stick_y;
@@ -190,7 +199,7 @@ public class Teleop extends LinearOpMode {
             robot.turret.turretOffset = -1 * robot.turret.turretOffset;*/
 
             // Slow Mode
-            if (gamepad2.right_trigger > 0) {
+            if (gamepad2.right_trigger > 0.1) {
                 xyGain = 0.22;
                 wGain = 0.17;
             } else {

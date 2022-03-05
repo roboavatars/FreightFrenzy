@@ -26,10 +26,10 @@ public class TurretPDTuning extends LinearOpMode {
             if (enabled) {
                 deposit.setDepositing(targetTheta * PI);
             } else {
-                deposit.setTurretPower(0);
+                deposit.setPower(0);
             }
 
-            addPacket("current theta", deposit.getTurretTheta());
+            addPacket("current theta", deposit.getTheta());
             addPacket("target theta", targetTheta * PI);
             sendPacket();
         }

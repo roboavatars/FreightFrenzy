@@ -115,7 +115,7 @@ public class CycleTest extends LinearOpMode {
             addPacket("2 slide inches", deposit.getSlidesDistInches());
             addPacket("3 slide ticks", deposit.getSlidesPosition());
             addPacket("4 slides target ticks", deposit.targetSlidesTicks);
-            addPacket("5 current theta", turret.getTurretTheta());
+            addPacket("5 current theta", turret.getTheta());
             sendPacket();
         }
     }

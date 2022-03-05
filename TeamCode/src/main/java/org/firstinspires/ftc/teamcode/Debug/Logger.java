@@ -30,6 +30,7 @@ public class Logger extends Thread {
     private double turretTheta, depositSlidesDist;
     private Robot.DepositTarget depositTarget;
     private boolean intakeSlidesExtend;
+    private boolean intakeTransfer, depositingFreight;
     private int numCycles;
     private double avgCycleTime;
 
@@ -42,7 +43,7 @@ public class Logger extends Thread {
             fileWriter = new FileWriter(robotDataLog);
             fileWriter.write("# " + (isAuto ? "Auto" : "Teleop") + "\n# " + (isRed ? "Red" : "Blue") + "\n");
             fileWriter.write("Timestamp,SinceStart,X,Y,Theta,VelocityX,VelocityY,VelocityTheta,AccelX,AccelY,AccelTheta," +
-                    "TurretTheta,DepositSlidesDist,DepositTarget,IntakeSlidesExtend,Cycles,AvgCycle\n");
+                    "TurretTheta,DepositSlidesDist,DepositTarget,IntakeSlidesExtend,IntakeTransfer,Depositing,Cycles,AvgCycle\n");
             logCounter = 0;
             writeCounter = 0;
             start();
@@ -88,7 +89,8 @@ public class Logger extends Thread {
             if (writeCounter < logCounter) {
                 try {
                     fileWriter.write(df.format(new Date()) + "," + timeSinceSt + "," + x + "," + y + "," + theta + "," + vx + "," + vy + "," + w + "," + ax + "," + ay + "," + alpha + ","
-                            + turretTheta + ", " + depositSlidesDist + ", " + depositTarget + ", " + intakeSlidesExtend + ", " + numCycles + "," + avgCycleTime + "\n");
+                            + turretTheta + ", " + depositSlidesDist + ", " + depositTarget + ", " + intakeSlidesExtend + ", " + intakeTransfer + ", " + depositingFreight + ", " +
+                            numCycles + "," + avgCycleTime + "\n");
                     writeCounter++;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -102,7 +104,8 @@ public class Logger extends Thread {
      */
     @SuppressLint("SimpleDateFormat")
     public void logData(double timeSinceSt, double x, double y, double theta, double vx, double vy, double w, double ax, double ay, double alpha,
-                        double turretTheta, double depositSlidesDist, Robot.DepositTarget depositTarget, boolean intakeSlidesExtend, int numCycles, double avgCycleTime) {
+                        double turretTheta, double depositSlidesDist, Robot.DepositTarget depositTarget, boolean intakeSlidesExtend, boolean intakeTransfer, boolean depositingFreight,
+                        int numCycles, double avgCycleTime) {
         df = new SimpleDateFormat("HH:mm:ss.SSS");
         this.timeSinceSt = timeSinceSt;
         this.x = x; this.y = y; this.theta = theta;
@@ -112,6 +115,7 @@ public class Logger extends Thread {
         this.depositSlidesDist = depositSlidesDist;
         this.depositTarget = depositTarget;
         this.intakeSlidesExtend = intakeSlidesExtend;
+        this.intakeTransfer = intakeTransfer; this.depositingFreight = depositingFreight;
         this.numCycles = numCycles;
         this.avgCycleTime = avgCycleTime;
 

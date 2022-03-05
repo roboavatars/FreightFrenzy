@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.Tests;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -12,11 +11,11 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @TeleOp
 @Config
 public class PDTest extends LinearOpMode {
-    public static double xKp = 0.5;
-    public static double yKp = 0.4;
+    public static double xKp = 0.45;
+    public static double yKp = 0.34;
     public static double thetaKp = 2.5;
-    public static double xKd = 0.05;
-    public static double yKd = 0.04;
+    public static double xKd = 0.035;
+    public static double yKd = 0.0315;
     public static double thetaKd = 0.12;
 
     public static double targetX = 0;

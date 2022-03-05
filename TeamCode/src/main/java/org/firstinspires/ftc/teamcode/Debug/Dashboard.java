@@ -19,7 +19,7 @@ public class Dashboard {
     }
 
     public static void drawRobot(Robot robot, String drivetrainColor) {
-        drawRobot(robot.x, robot.y, robot.theta, !robot.intake.slidesIsHome(), robot.deposit.getSlidesDistInches(), robot.turret.getTurretTheta(), drivetrainColor);
+        drawRobot(robot.x, robot.y, robot.theta, !robot.intake.slidesIsHome(), robot.deposit.getSlidesDistInches(), robot.turret.getTheta(), drivetrainColor);
     }
 
     public static void drawRobot(double robotX, double robotY, double robotTheta, boolean intakeSlidesExtend, double depositSlidesDist, double turretTheta, String drivetrainColor) {
@@ -53,8 +53,8 @@ public class Dashboard {
         double[] rightX = {2.5 * cos(theta) - 9 * sin(theta) + x, 2.5 * cos(theta) - (9 + extendedPos) * sin(theta) + x, 3 * cos(theta) - (9 + extendedPos) * sin(theta) + x, 3 * cos(theta) - 9 * sin(theta) + x};
         double[] rightY = {2.5 * sin(theta) + 9 * cos(theta) + y, 2.5 * sin(theta) + (9 + extendedPos) * cos(theta) + y, 3 * sin(theta) + (9 + extendedPos) * cos(theta) + y, 3 * sin(theta) + 9 * cos(theta) + y};
 
-        drawPolygon(leftX, leftY, "orange");
-        drawPolygon(rightX, rightY, "orange");
+//        drawPolygon(leftX, leftY, "orange");
+//        drawPolygon(rightX, rightY, "orange");
     }
 
     public static void drawDepositTurretSlides(double x, double y, double robotTheta, double turretTheta, double slidesDist) {
