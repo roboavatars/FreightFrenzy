@@ -31,7 +31,7 @@ public class RedAutoWarehouse extends LinearOpMode {
             park in warehouse
         */
 
-        Robot robot = new Robot(this, 138, 86, PI/2, true, true);
+        Robot robot = new Robot(this, 138, 84, PI/2, true, true);
         robot.logger.startLogging(true, true);
 
 //        BarcodeDetector detector = new BarcodeDetector(this, true);
@@ -101,7 +101,7 @@ public class RedAutoWarehouse extends LinearOpMode {
             else if (!goToWarehouse) {
 
                 if (robot.y < 105) {
-                    robot.drivetrain.constantStrafeConstant = -0.3;
+                    robot.drivetrain.constantStrafeConstant = -0.4;
                     robot.drivetrain.setGlobalControls(0, 0.7, PI/2 - robot.theta > PI/6 ? 0.5 : 0);
                     passLineTime = time.seconds();
 
@@ -118,11 +118,13 @@ public class RedAutoWarehouse extends LinearOpMode {
                     addPacket("path", "going to park right rn");
                 }
 
-
                 if (robot.intakeFull && robot.y >= 110 - odoDriftAdjustment * cycleCounter && robot.x > 132) {
+
+                    robot.depositApproval = true;
+
                     Waypoint[] cycleScoreWaypoints = new Waypoint[] {
                             new Waypoint(140, robot.y, 3*PI/2, 10, 10, 0, 0),
-                            new Waypoint(140, 86 - odoDriftAdjustment * cycleCounter, 3*PI/2, 5, -5, 0, cycleScoreTime),
+                            new Waypoint(140 + cycleCounter, 86 - odoDriftAdjustment * cycleCounter, 3*PI/2, 5, -5, 0, cycleScoreTime),
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 
@@ -137,7 +139,8 @@ public class RedAutoWarehouse extends LinearOpMode {
             }
 
             else if (!cycleScore) {
-                robot.drivetrain.constantStrafeConstant = robot.y > 90 ? -0.5 : -0.25;
+
+                robot.drivetrain.constantStrafeConstant = robot.depositingFreight ? -0.1 : -0.5;
 
                 if (Math.abs(PI/2 - robot.theta) > PI/10 && robot.y > 105) {
                     boolean greater = PI/2 - robot.theta < 0;
@@ -149,19 +152,18 @@ public class RedAutoWarehouse extends LinearOpMode {
 
                 addPacket("path", "going to deposit right rn");
 
-                if (robot.y <= 90 - odoDriftAdjustment * cycleCounter) {
-                    if ((robot.depositingFreight || robot.intakeTransfer) && time.seconds() > 6) {
-                        robot.cancelAutomation();
-                    }
+                if ((robot.depositingFreight || robot.intakeTransfer) && time.seconds() > 6) {
+                    robot.cancelAutomation();
+                }
 
-                    if (time.seconds() > cycleScoreTime && !robot.intakeTransfer && robot.slidesInCommand) {
-                        cycleCounter++;
-                        // if (cycleCounter == 2) robot.noExtend = false;
+                if (time.seconds() > cycleScoreTime && robot.y <= 90 - odoDriftAdjustment * cycleCounter
+                        && !robot.intakeTransfer && robot.slidesInCommand) {
+                    Robot.log("ctime: " + time.seconds());
+                    cycleCounter++;
+                    // if (cycleCounter == 2) robot.noExtend = false;
 
-                        goToWarehouse = false;
-                        time.reset();
-                    }
-                    robot.depositApproval = true;
+                    goToWarehouse = false;
+                    time.reset();
                 }
             }
 
