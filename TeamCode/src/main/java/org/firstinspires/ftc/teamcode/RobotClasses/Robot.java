@@ -463,7 +463,7 @@ public class Robot {
                 slidesDist = Constants.SLIDES_DISTANCE_DUCK;
             }
         }
-        if (cycleHub == DepositTarget.neutral) {
+        if (cycleHub == DepositTarget.neutral || defenseMode) {
             slidesDist = 0;
         }
         deposit.setDepositControls(cycleHub, slidesDist);
