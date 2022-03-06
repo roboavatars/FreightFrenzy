@@ -243,7 +243,7 @@ public class Robot {
                 intakeRev = true;
                 automationStep("Transfer Freight");
             } else if (intake.slidesIsHome() && intakeRev &&
-                    (transferVerify || (isAuto && curTime - intakeFlipTime > (transferThreshold - (noExtend ? intakeExtendOffset : 0))))) {
+                    ((curTime - intakeFlipTime > (transferThreshold - (noExtend ? intakeExtendOffset : 0))))) {
                 deposit.hold();
                 intake.off();
                 intake.flipDown();
@@ -252,7 +252,7 @@ public class Robot {
                 log("Intake done after: " + (curTime - automationStepTime) + "ms");
                 automationStepTime = curTime;
 
-                transferVerify = false;
+
                 intakeTransfer = false;
                 intakeFlipTime = -1;
                 intakeRev = false;
@@ -443,7 +443,7 @@ public class Robot {
 
         intakeApproval = false;
         intakeTransfer = false;
-        transferVerify = false;
+
         intakeFlipTime = -1;
         intakeRev = false;
         depositApproval = false;
