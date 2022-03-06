@@ -10,8 +10,8 @@ import java.util.ArrayList;
 
 @Config
 public class FreightLocator extends BaseDetector {
-
     private FreightLocatorPipeline pipeline;
+
     public static double minX = 0;
     public static double minY = 72;
     public static double maxX = 144;
@@ -31,6 +31,6 @@ public class FreightLocator extends BaseDetector {
 
     // Return a list of coordinate-filtered freight
     public ArrayList<Freight> getFreights(double robotX, double robotY, double robotTheta) {
-        return pipeline.getFreights(robotX, robotY, robotTheta);
+        return pipeline.getFilteredFreight(robotX, robotY, robotTheta);
     }
 }

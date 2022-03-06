@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.OpenCV.FreightLocator;
 
+import static org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.FreightLocator.maxX;
+import static org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.FreightLocator.maxY;
+import static org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.FreightLocator.minX;
+import static org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.FreightLocator.minY;
+
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -16,6 +21,7 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Config
@@ -142,7 +148,7 @@ public class FreightLocatorPipeline extends OpenCvPipeline {
     }
 
     // Return a list of coordinate-filtered freight
-    public ArrayList<Freight> getFreights(double robotX, double robotY, double robotTheta) {
+    public ArrayList<Freight> getFilteredFreight(double robotX, double robotY, double robotTheta, double minX, double minY, double maxX, double maxY) {
         ArrayList<Freight> freights = getRawFreights();
         int i = 0;
         while (i < freights.size()) {
@@ -154,7 +160,30 @@ public class FreightLocatorPipeline extends OpenCvPipeline {
             }
         }
 
-        return Freight.getFreightCoords(freights, robotX, robotY);
+        // Remove freights out of bounds
+        i = 0;
+        while (i < freights.size()) {
+            Freight freight = freights.get(i);
+            if (freight.getX() < minX || freight.getX() > maxX || freight.getY() < minY || freight.getY() > maxY) {
+                freights.remove(i);
+            } else {
+                i++;
+            }
+        }
+
+        // Sort freights based on y coordinate
+        freights.sort(Comparator.comparingDouble(Freight::getY));
+
+        // Return freight
+        if (freights.size() > 1) {
+            return new ArrayList<>(freights.subList(0, 1));
+        } else {
+            return freights;
+        }
+    }
+
+    public ArrayList<Freight> getFilteredFreight(double robotX, double robotY, double robotTheta) {
+        return getFilteredFreight(robotX, robotY, robotTheta, minX, minY, maxX, maxY);
     }
 
     public void log(String message) {

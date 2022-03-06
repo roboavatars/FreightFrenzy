@@ -22,6 +22,8 @@ public class FreightProcessor {
     public static double maxSWhite = 66;
     public static double maxVWhite = 255;
 
+    public static int i = 0;
+
     public static double minHYellow = 16;
     public static double minSYellow = 85;
     public static double minVYellow = 139;
@@ -60,18 +62,20 @@ public class FreightProcessor {
         Core.bitwise_and(input, input, mask, filtered);
 
         // Save Images for Debug
-        saveMatToDisk("input.jpg", input);
-        saveMatToDisk("filteredWhite.jpg", filteredWhite);
-        saveMatToDisk("filteredYellow.jpg", filteredYellow);
-        saveMatToDisk("filtered.jpg", filtered);
-        saveMatToDisk("mask.jpg", mask);
+        saveMatToDisk("input", input);
+        saveMatToDisk("filteredWhite", filteredWhite);
+        saveMatToDisk("filteredYellow", filteredYellow);
+        saveMatToDisk("filtered", filtered);
+        saveMatToDisk("mask", mask);
+
+        i++;
 
         return new Mat[] {filteredWhite, filteredYellow, filtered, mask};
     }
 
     public void saveMatToDisk(String name, Mat mat) {
-        save = mat.clone();
+        save = mat.clone(); // TODO: test if this is even necessary
         Imgproc.cvtColor(mat, save, Imgproc.COLOR_BGR2RGB);
-        Imgcodecs.imwrite(path + name, save);
+        Imgcodecs.imwrite(path + name + i + ".jpg", save);
     }
 }
