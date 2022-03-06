@@ -21,10 +21,11 @@ public class Deposit {
 
     public static double DEPOSIT_SLIDES_TICKS_PER_INCH = 9.142857;
     public int DEPOSIT_SLIDES_MAX_TICKS = (int) Math.round(25 * DEPOSIT_SLIDES_TICKS_PER_INCH);
-    public int DEPOSIT_SLIDES_ERROR_THRESHOLD = 15;
+    public static int DEPOSIT_SLIDES_ERROR_THRESHOLD = 15;
     public double ARM_TICKS_PER_RADIAN = 1120 / (2*PI);
     public static double DEPOSIT_SLIDES_MAX_POWER = 0.7;
     public static int DEPOSIT_ARM_ERROR_THRESHOLD = 20;
+    public static double maxSlidesDistBeforeLoweringArm = 8;
 
     // Slides PD
     public static double pSlides = 50;
@@ -32,8 +33,6 @@ public class Deposit {
     public int targetSlidesTicks;
     public Robot.DepositTarget target;
     private double slidesDist;
-
-    private static final double maxSlidesDistBeforeLoweringArm = 5;
 
     public int targetArmPos;
     private int targetArmPosNoOffset = 0;
@@ -53,13 +52,11 @@ public class Deposit {
     public static double dArm = dArmUp;
     public static double fArm = 0;
 
-    public static double fGravity = 0.095;
+    public static double fGravity = 0.1;
     public boolean depositing = false;
 
     public double lastArmPos = 0;
     public double lastSlidesPos = 0;
-    public double armErrorOffset = 0;
-    public double slidesErrorOffset = 0;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
 
@@ -122,15 +119,6 @@ public class Deposit {
 
     public void update(boolean intakeTransfer, boolean turretHome) {
 
-        if (lastArmPos > 100 && armMotor.getCurrentPosition() < 10) {
-            Robot.log("Critical arm error saved: " + lastArmPos + " -> " + armMotor.getCurrentPosition());
-            armErrorOffset += lastArmPos - armMotor.getCurrentPosition();
-        }
-        if (lastSlidesPos > 100 && slidesMotor.getCurrentPosition() < 10) {
-            Robot.log("Critical slides error saved: " + lastSlidesPos + " -> " + slidesMotor.getCurrentPosition());
-            slidesErrorOffset += lastSlidesPos - slidesMotor.getCurrentPosition();
-        }
-
         if (!depositing) {
             if (target == Robot.DepositTarget.allianceHigh && getSlidesDistInches() >= maxSlidesDistBeforeLoweringArm) {
                 setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
@@ -186,7 +174,7 @@ public class Deposit {
     }
 
     public double getArmPosition() {
-        return armMotor.getCurrentPosition() + armErrorOffset;
+        return armMotor.getCurrentPosition();
     }
 
     public double getArmVelocity() {
@@ -239,7 +227,7 @@ public class Deposit {
     }
 
     public double getSlidesPosition() {
-        return slidesMotor.getCurrentPosition() + slidesErrorOffset;
+        return slidesMotor.getCurrentPosition();
     }
 
     public double getSlidesDistInches() {

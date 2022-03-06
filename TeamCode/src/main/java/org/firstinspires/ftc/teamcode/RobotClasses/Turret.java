@@ -38,11 +38,7 @@ public class Turret {
     private double turretError = 0;
     private double turretErrorChange;
 
-    private boolean home = true;
     public double turretOffset = 0;
-
-    public double lastTurretTheta = 0;
-    public double thetaErrorOffset = 0;
 
     public Turret(LinearOpMode op, boolean isAuto) {
         this(op, isAuto, PI/2);
@@ -57,8 +53,7 @@ public class Turret {
 
         // Set Initial Turret Theta
         initialTheta = initialRobotTheta;
-        turretTargetTheta = initialTheta;
-        lastTurretTheta = initialTheta;
+        setHome();
 
         this.isAuto = isAuto;
 
@@ -67,11 +62,6 @@ public class Turret {
 
     public void update() {
 
-        if (Math.abs(lastTurretTheta - getTheta()) > 0.5) {
-            Robot.log("Critical turret theta error saved: " + lastTurretTheta + " -> " + getTheta());
-            thetaErrorOffset += lastTurretTheta - getTheta();
-        }
-
         turretTheta = getTheta() + turretOffset;
         turretErrorChange = turretTargetTheta - turretTheta - turretError;
         turretError = turretTargetTheta - turretTheta;
@@ -79,8 +69,6 @@ public class Turret {
         setPower(pTurret * turretError + dTurret * turretErrorChange);
 
         Log.w("turret-log", getTheta() + "");
-
-        lastTurretTheta = getTheta();
     }
 
     public void updateTracking(double robotTheta, double slidesDist, double ff) {
@@ -103,14 +91,12 @@ public class Turret {
     // Set Controls
     public void setDepositing(double theta) {
         tracking = false;
-        home = false;
         turretTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
     }
 
     public void setHome() {
         tracking = false;
-        home = true;
-        turretTargetTheta = Math.min(Math.max(initialTheta + turretOffset, TURRET_MIN_THETA), TURRET_MAX_THETA);
+        turretTargetTheta = (Constants.TURRET_HOME_THETA*PI) + turretOffset;
     }
 
     public void setTracking(double lockTheta) {
@@ -133,7 +119,7 @@ public class Turret {
     }
 
     public double getTheta() {
-        return turretMotor.getCurrentPosition() / TURRET_TICKS_PER_RADIAN + initialTheta + thetaErrorOffset;
+        return turretMotor.getCurrentPosition() / TURRET_TICKS_PER_RADIAN + initialTheta;
     }
 
     public double getError() {
@@ -144,8 +130,8 @@ public class Turret {
         return Math.abs(turretError) < TURRET_ERROR_THRESHOLD;
     }
 
-    public boolean isHome(){
-        return Math.abs(getTheta() - PI/2) < TURRET_ERROR_THRESHOLD;
+    public boolean isHome() {
+        return Math.abs(getTheta() - (Constants.TURRET_HOME_THETA*PI)) < TURRET_ERROR_THRESHOLD;
     }
 
     public void setTurretThetaFF(double theta, double ff) { // TODO: remove usages and delete

@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.Teleop;
 
 import static java.lang.Math.PI;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -228,7 +226,7 @@ public class Teleop extends LinearOpMode {
             robot.update();
 
             // Telemetry
-//            for (int i = 0; i < cycles.size(); i++) {
+//            for (int i = 0; i < robot.cycles.size(); i++) {
 //                telemetry.addData("cycle " + i, cycles.get(i));
 //            }
 
@@ -239,9 +237,6 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("Average Cycle Time", robot.cycleAvg + "s");
             telemetry.update();
         }
-
-        Log.w("cycle-log", "# Cycles: " + robot.cycles.size());
-        Log.w("cycle-log", "Avg cycle Time: " + robot.cycleAvg + "s");
 //        if (robot.cycleList.size() > 0) {
 //            Log.w("cycle-log", "Avg dropping longest: " + ((robot.cycleTotal - robot.longestCycle) / (robot.cycles - 1)) + "s");
 //        }
