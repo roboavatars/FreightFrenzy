@@ -243,7 +243,7 @@ public class Robot {
                 intakeRev = true;
                 automationStep("Transfer Freight");
             } else if (intake.slidesIsHome() && intakeRev &&
-                    (!isAuto || (curTime - intakeFlipTime > (transferThreshold - (noExtend ? intakeExtendOffset : 0))))) {
+                    ((curTime - intakeFlipTime  > (transferThreshold - (noExtend ? intakeExtendOffset : 0))))) {
                 deposit.hold();
                 intake.off();
                 intake.flipDown();
