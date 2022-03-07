@@ -239,7 +239,7 @@ public class Deposit {
     }
 
     public boolean slidesAtPosPercent(double percent) {
-        return getSlidesPosition() > targetSlidesTicks * percent;
+        return getSlidesPosition() >= targetSlidesTicks * percent;
     }
 
     public boolean slidesHome() {
