@@ -101,15 +101,15 @@ public class WallDepositAuto extends LinearOpMode {
             else if (!goToWarehouse) {
 
                 if (robot.y < 105) {
-                    robot.drivetrain.constantStrafeConstant = -0.4;
-                    robot.drivetrain.setGlobalControls(0, 0.7, PI/2 - robot.theta > PI/6 ? 0.5 : 0);
+                    robot.drivetrain.constantStrafeConstant = -0.3;
+                    robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI/2 > PI/10 ? -0.5 : 0);
                     passLineTime = time.seconds();
 
                     addPacket("path", "going to warehouse right rn");
                 } else if (timeLeft > parkThreshold) {
                     robot.drivetrain.constantStrafeConstant = 0;
-                    robot.setTargetPoint(new Target(robot.x, 110 + 3 * (time.seconds() - passLineTime),
-                            PI/2 + (0.15 * Math.sin(1.5 * (time.seconds() - passLineTime)))));
+                    double y = Math.min(107 + 3 * (time.seconds() - passLineTime), 116);
+                    robot.setTargetPoint(new Target(138, y, PI/2));
 
                     addPacket("path", "creeping right rn");
                 } else {
@@ -118,7 +118,13 @@ public class WallDepositAuto extends LinearOpMode {
                     addPacket("path", "going to park right rn");
                 }
 
-                if (robot.intakeFull && robot.y >= 110 - odoDriftAdjustment * cycleCounter && robot.x > 132) {
+                if (Math.abs(robot.y - 105) < 0.5 && !resetOdo) {
+                    robot.resetOdo(138, robot.y, PI/2);
+                    resetOdo = true;
+                }
+
+                if (robot.intakeFull && robot.y >= 107) {
+                    resetOdo = false;
 
                     robot.depositApproval = true;
 
@@ -140,46 +146,31 @@ public class WallDepositAuto extends LinearOpMode {
 
             else if (!cycleScore) {
 
-                robot.drivetrain.constantStrafeConstant = robot.depositingFreight ? -0.1 : -0.5;
+                robot.drivetrain.constantStrafeConstant = robot.y > 105 ? -0.4 : 0;
 
-                if (Math.abs(PI/2 - robot.theta) > PI/10 && robot.y > 105) {
-                    boolean greater = PI/2 - robot.theta < 0;
-                    robot.drivetrain.setGlobalControls(0, 0, greater ? -0.6 : 0.6);
-                } else {
-                    Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
-                    robot.setTargetPoint(new Target(curPose).theta(PI/2).thetaKp(5).yKp(0.3));
-                }
+                Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
+                robot.setTargetPoint(new Target(curPose).theta(robot.y >= 83 ? PI/2 : curPose.theta + PI));
 
                 addPacket("path", "going to deposit right rn");
 
-                if ((robot.depositingFreight || robot.intakeTransfer) && time.seconds() > 6) {
+                if (Math.abs(robot.y - 105) < 0.5 && !resetOdo) {
+                    robot.resetOdo(138, robot.y, PI/2);
+                    resetOdo = true;
+                }
+
+                if ((robot.depositingFreight || robot.intakeTransfer) && time.seconds() > 5) {
                     robot.cancelAutomation();
                 }
 
-                if (time.seconds() > cycleScoreTime && robot.y <= 90 - odoDriftAdjustment * cycleCounter
-                        && !robot.intakeTransfer && robot.slidesInCommand) {
-                    Robot.log("ctime: " + time.seconds());
+                if (time.seconds() > cycleScoreTime && robot.y <= 90 && !robot.intakeTransfer && robot.slidesInCommand) {
                     cycleCounter++;
-                    // if (cycleCounter == 2) robot.noExtend = false;
+                    if (cycleCounter == 2) robot.noExtend = false;
 
+                    resetOdo = false;
                     goToWarehouse = false;
                     time.reset();
                 }
             }
-
-//            else if (!park) {
-//                robot.drivetrain.constantStrafeConstant = -0.3;
-//
-//                robot.setTargetPoint(parkPath.getRobotPose(Math.min(parkTime, time.seconds())));
-//
-//                addPacket("path", "parking right rn");
-//
-//                if (robot.y > 112) {
-//                    Robot.log("Auto finished in " + ((System.currentTimeMillis() - robot.startTime) / 1000) + " seconds");
-//
-//                    park = true;
-//                }
-//            }
 
             else {
                 robot.noDeposit = true;

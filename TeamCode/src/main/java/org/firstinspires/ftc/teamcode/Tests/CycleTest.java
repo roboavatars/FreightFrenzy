@@ -103,7 +103,7 @@ public class CycleTest extends LinearOpMode {
                     deposit.setArmTarget(armPos/*Constants.DEPOSIT_ARM_HIGH*/);
 //                }
 
-                deposit.setSlidesTarget((int) (slidesExtendDist * Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH));
+                deposit.setSlidesInches(slidesExtendDist);
             }
             deposit.setSlidesPIDCoefficients(Deposit.pSlides);
 //            deposit.setSlidesControls();

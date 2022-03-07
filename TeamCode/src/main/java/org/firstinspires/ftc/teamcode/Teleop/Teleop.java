@@ -28,6 +28,10 @@ public class Teleop extends LinearOpMode {
 
     private Robot robot;
 
+    // Toggles
+    private boolean duckActive = false;
+    private boolean duckToggle = false;
+
     // Control Gains
     private double xyGain;
     private double wGain;
@@ -56,10 +60,11 @@ public class Teleop extends LinearOpMode {
     Gamepad 2
     Left Stick - Turret, Deposit Slides Offset
     Right Stick - Arm Offset
-    Left Trigger - Defense Mode
     Right Trigger - Slow Mode
     X - Odo Reset
-    B - Retract Odo
+    Y - Retract Odo
+    B - Defense Mode
+    A - Carousel On/Off
     */
 
     @Override
@@ -106,36 +111,29 @@ public class Teleop extends LinearOpMode {
             // Switching the Goal Cycled
             if (gamepad1.dpad_up) {
                 robot.cycleHub = Robot.DepositTarget.allianceHigh;
-//                depositCoords[0] = Constants.SLIDES_DISTANCE_HIGH *
-//                        Math.cos(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
-//                depositCoords[1] = Constants.SLIDES_DISTANCE_HIGH *
-//                        Math.sin(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
-            }
-            else if (gamepad1.dpad_left) {
+            } else if (gamepad1.dpad_left) {
                 robot.cycleHub = Robot.DepositTarget.allianceMid;
-//                depositCoords[0] = Constants.SLIDES_DISTANCE_MID *
-//                        Math.cos(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
-//                depositCoords[1] = Constants.SLIDES_DISTANCE_MID *
-//                        Math.sin(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
-            }
-            else if (gamepad1.dpad_down) {
+            } else if (gamepad1.dpad_down) {
                 robot.cycleHub = Robot.DepositTarget.allianceLow;
-//                depositCoords[0] = Constants.SLIDES_DISTANCE_LOW *
-//                        Math.cos(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
-//                depositCoords[1] = Constants.SLIDES_DISTANCE_LOW *
-//                        Math.sin(PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA));
-            }
-            else if (gamepad1.dpad_right) {
+            } else if (gamepad1.dpad_right) {
                 robot.cycleHub = Robot.DepositTarget.neutral;
             }
-            else if (gamepad1.x) {
+
+            if (gamepad1.x && !duckToggle) {
                 robot.cycleHub = Robot.DepositTarget.duck;
-                if (!robot.carousel.isOut) robot.carousel.out();
-                else robot.carousel.home();
-//                depositCoords[0] = Constants.SLIDES_DISTANCE_DUCK *
-//                        Math.cos(PI * (isRed ? Constants.TURRET_DUCK_RED_CYCLE_THETA + 0.5 : 0.5 - Constants.TURRET_DUCK_RED_CYCLE_THETA));
-//                depositCoords[1] = Constants.SLIDES_DISTANCE_DUCK *
-//                        Math.sin(PI * (isRed ? Constants.TURRET_DUCK_RED_CYCLE_THETA + 0.5 : 0.5 - Constants.TURRET_DUCK_RED_CYCLE_THETA));
+                duckToggle = true;
+                if (!duckActive) {
+                    robot.carousel.out();
+                    xyGain = 0.25;
+                    wGain = 0.3;
+                } else {
+                    robot.carousel.home();
+                    xyGain = 1;
+                    wGain = 0.6;
+                }
+                duckActive = !duckActive;
+            } else if (!gamepad1.x && duckToggle) {
+                duckToggle = false;
             }
 
             if (gamepad1.dpad_up || gamepad1.dpad_left || gamepad1.dpad_down || gamepad1.dpad_right || gamepad1.x) {
@@ -158,12 +156,18 @@ public class Teleop extends LinearOpMode {
             }
 
             // Retract Odo
-            if (gamepad2.b) {
+            if (gamepad2.y) {
                 robot.drivetrain.retractOdo();
             }
 
-            if (gamepad2.left_trigger > 0.1) {
+            if (gamepad2.b) {
                 robot.defenseMode = !robot.defenseMode;
+            }
+
+            if (gamepad2.a) {
+                robot.carousel.on();
+            } else {
+                robot.carousel.stop();
             }
 
             // Field Centric Deposit Offsets
@@ -198,7 +202,7 @@ public class Teleop extends LinearOpMode {
             if (gamepad2.right_trigger > 0.1) {
                 xyGain = 0.22;
                 wGain = 0.17;
-            } else {
+            } else if (!duckActive) {
                 xyGain = 1;
                 wGain = 0.6;
             }
@@ -231,8 +235,12 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("X", robot.x);
             telemetry.addData("Y", robot.y);
             telemetry.addData("Theta", robot.theta);
+            telemetry.addData("Cycle Hub", robot.cycleHub);
+            telemetry.addData("Defense Mode", robot.defenseMode);
+            telemetry.addData("Automation", robot.automationStep);
+            telemetry.addData("Intake Full/Stall", robot.intakeFull + "/" + robot.intakeStalling);
             telemetry.addData("# Cycles", robot.cycles.size());
-            telemetry.addData("Average Cycle Time", robot.cycleAvg + "s");
+            telemetry.addData("Average Cycle Time", Robot.round(robot.cycleAvg) + "s");
             telemetry.update();
         }
 //        if (robot.cycleList.size() > 0) {

@@ -98,7 +98,7 @@ public class RedAutoWarehouse extends LinearOpMode {
             else if (!goToWarehouse) {
 
                 if (robot.y < 105 && robot.x < 137 && PI/2 - robot.theta > PI/10) {
-                    robot.drivetrain.constantStrafeConstant = 0;
+                    robot.drivetrain.constantStrafeConstant = -0.4;
                     robot.setTargetPoint(new Target(140, 78, PI/2).xKp(0.55).thetaKp(4));
 
                     addPacket("path", "going to the wall right rn");
@@ -151,18 +151,13 @@ public class RedAutoWarehouse extends LinearOpMode {
             }
 
             else if (!cycleScore) {
-                if (robot.y > 105) {
-                    robot.drivetrain.constantStrafeConstant = -0.4;
-                    robot.drivetrain.setGlobalControls(0, 0, 0);
 
-                    addPacket("path", "course correcting right rn");
-                } else {
-                    robot.drivetrain.constantStrafeConstant = 0;
-                    Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
-                    robot.setTargetPoint(new Target(curPose).theta(robot.y >= 83 ? PI/2 : curPose.theta + PI));
+                robot.drivetrain.constantStrafeConstant = robot.y > 105 ? -0.4 : 0;
 
-                    addPacket("path", "going to deposit right rn");
-                }
+                Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
+                robot.setTargetPoint(new Target(curPose).theta(robot.y >= 83 ? PI/2 : curPose.theta + PI));
+
+                addPacket("path", "going to deposit right rn");
 
                 if (Math.abs(robot.y - 105) < 0.5 && !resetOdo) {
                     robot.resetOdo(138, robot.y, PI/2);

@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
+import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 import org.firstinspires.ftc.teamcode.RobotClasses.Turret;
 
 @TeleOp
@@ -27,14 +28,14 @@ public class DepositTest extends LinearOpMode {
       waitForStart();
       while (opModeIsActive()) {
          if (home) {
-//            deposit.setDepositHome();
+            deposit.setDepositHome();
             turret.setHome();
          } else {
-//            deposit.setDepositControls(Robot.DepositTarget.allianceHigh, Constants.SLIDES_DISTANCE_HIGH);
+            deposit.setDepositControls(Robot.DepositTarget.allianceHigh, Constants.SLIDES_DISTANCE_HIGH);
             turret.setDepositing(theta*PI);
          }
-         deposit.update();
-         turret.update();
+         deposit.update(false, turret.isHome());
+         turret.update(deposit.armHome());
 
          addPacket("arm", deposit.getArmPosition());
          addPacket("slides", deposit.getSlidesPosition());

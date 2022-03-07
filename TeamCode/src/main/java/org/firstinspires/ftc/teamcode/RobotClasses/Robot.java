@@ -113,9 +113,9 @@ public class Robot {
 
     // Time and Delay Variables
     public double curTime;
-    public static int intakeExtendOffset = 200;
     public static int flipUpThreshold = 1200;
     public static int transferThreshold = 1800;
+    public static int transferThresholdDuck = 1600;
     public static int releaseThreshold = 150;
     public static int hubTipThreshold = 300;
 
@@ -179,7 +179,7 @@ public class Robot {
     public void stop() {
         Log.w("cycle-log", "All cycles:");
         for (int i = 0; i < cycles.size(); i++) Log.w("cycle-log", "Cycle " + (i+1) + ": " + cycles.get(i) + "s");
-        Log.w("cycle-log", "Avg cycle Time: " + cycleAvg + "s");
+        Log.w("cycle-log", "Avg cycle Time: " + round(cycleAvg) + "s");
         drivetrain.stop();
         logger.stopLogging();
     }
@@ -216,13 +216,12 @@ public class Robot {
         // Auto-Intaking
         if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && ((isAuto && y > 105) || intakeApproval)) {
             if (!noExtend) {
-                if (isAuto || cycleHub == DepositTarget.duck) intake.extend(Constants.INTAKE_MIDWAY_POS);
+                if (isAuto) intake.extend(Constants.INTAKE_MIDWAY_POS);
                 else intake.extend();
             } else {
                 intake.extend(Constants.INTAKE_HOME_POS);
             }
             intake.on();
-            if (cycleHub == DepositTarget.duck) carousel.on();
 
             intakeTransfer = true;
             intakeApproval = false;
@@ -235,15 +234,13 @@ public class Robot {
                 intake.home();
                 intake.flipUp();
                 intakeFlipTime = curTime;
-                if (cycleHub == DepositTarget.duck) carousel.stop();
                 automationStep("Intake Home/Flip");
-            } else if (intakeFull && intake.slidesIsHome() && !intakeRev
-                    && curTime - intakeFlipTime > (flipUpThreshold - (noExtend ? intakeExtendOffset : 0))) {
-                intake.reverse();
+            } else if (intakeFull && intake.slidesIsHome() && !intakeRev && curTime - intakeFlipTime > flipUpThreshold) {
+                intake.setPower(cycleHub != DepositTarget.duck ? -1 : -0.5);
                 intakeRev = true;
                 automationStep("Transfer Freight");
             } else if (intake.slidesIsHome() && intakeRev &&
-                    ((curTime - intakeFlipTime  > (transferThreshold - (noExtend ? intakeExtendOffset : 0))))) {
+                    (curTime - intakeFlipTime > (cycleHub != DepositTarget.duck ? transferThreshold : transferThresholdDuck))) {
                 deposit.hold();
                 intake.off();
                 intake.flipDown();
@@ -347,7 +344,7 @@ public class Robot {
             updateTrackingMath();
             turret.updateTracking(theta, deposit.getSlidesDistInches(), turretFF);
         }
-        turret.update();
+        turret.update(deposit.armHome());
         turretGlobalTheta = turret.getTheta() + theta;
 
         // Update Arm/Slides
@@ -392,12 +389,12 @@ public class Robot {
         }
 
         // Dashboard Telemetry
-        addPacket("0 Voltage Starting", startVoltage);
-        addPacket("1 Current Voltage", voltage);
+        addPacket("1 Voltage", startVoltage + " -> " + voltage);
         addPacket("2 X", round(x));
         addPacket("3 Y", round(y));
         addPacket("4 Theta", round(theta));
-        addPacket("5 Turret Theta", round(turretGlobalTheta) + " " + round(turret.getTheta()));
+        addPacket("5 Turret Theta", round(turretGlobalTheta));
+        addPacket("5 Slides Dist", round(deposit.getSlidesDistInches()));
         addPacket("6 Cycle Hub", cycleHub.toString());
         addPacket("7 Automation Step", automationStep + "; " + antiStallStep);
         addPacket("7 Automation", intakeTransfer + "; " + depositingFreight);
@@ -409,7 +406,6 @@ public class Robot {
         addPacket("arm", deposit.getArmPosition());
         addPacket("slides", deposit.getSlidesPosition());
         addPacket("errors", deposit.getArmError() + " " + deposit.getSlidesError());
-        addPacket("turret home error", (turret.getTheta() - (Constants.TURRET_HOME_THETA*PI)));
         if (intake.getDistance() > 1000) {
             addPacket("0 DISTANCE SENSOR", "> 1000!!!");
             op.telemetry.addData("0 DISTANCE SENSOR", "> 1000!!!");

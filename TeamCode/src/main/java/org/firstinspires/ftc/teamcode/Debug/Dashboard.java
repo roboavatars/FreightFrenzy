@@ -41,17 +41,12 @@ public class Dashboard {
     }
 
     public static void drawIntakeSlides(double x, double y, double theta, boolean extended) {
-        double extendedPos;
-        if (extended){
-            extendedPos = 13.5;
-        } else {
-            extendedPos = 0;
-        }
-        double[] leftX = {-2.5 * cos(theta) - 9 * sin(theta) + x, -2.5 * cos(theta) - (9 + extendedPos) * sin(theta) + x, -3 * cos(theta) - (9 + extendedPos) * sin(theta) + x, -3 * cos(theta) - 9 * sin(theta) + x};
-        double[] leftY = {-2.5 * sin(theta) + 9 * cos(theta) + y, -2.5 * sin(theta) + (9 + extendedPos) * cos(theta) + y, -3 * sin(theta) + (9 + extendedPos) * cos(theta) + y, -3 * sin(theta) + 9 * cos(theta) + y};
+        double extendedPos = extended ? 13.5 : 0;
+        double[] leftX = {-2.5 * sin(theta) - 9 * cos(theta) + x, -2.5 * sin(theta) - (9 + extendedPos) * cos(theta) + x, -3 * sin(theta) - (9 + extendedPos) * sin(theta) + x, -3 * sin(theta) - 9 * cos(theta) + x};
+        double[] leftY = {-2.5 * cos(theta) + 9 * sin(theta) + y, -2.5 * cos(theta) + (9 + extendedPos) * sin(theta) + y, -3 * cos(theta) + (9 + extendedPos) * cos(theta) + y, -3 * cos(theta) + 9 * sin(theta) + y};
 
-        double[] rightX = {2.5 * cos(theta) - 9 * sin(theta) + x, 2.5 * cos(theta) - (9 + extendedPos) * sin(theta) + x, 3 * cos(theta) - (9 + extendedPos) * sin(theta) + x, 3 * cos(theta) - 9 * sin(theta) + x};
-        double[] rightY = {2.5 * sin(theta) + 9 * cos(theta) + y, 2.5 * sin(theta) + (9 + extendedPos) * cos(theta) + y, 3 * sin(theta) + (9 + extendedPos) * cos(theta) + y, 3 * sin(theta) + 9 * cos(theta) + y};
+        double[] rightX = {2.5 * sin(theta) - 9 * cos(theta) + x, 2.5 * sin(theta) - (9 + extendedPos) * cos(theta) + x, 3 * sin(theta) - (9 + extendedPos) * sin(theta) + x, 3 * sin(theta) - 9 * cos(theta) + x};
+        double[] rightY = {2.5 * cos(theta) + 9 * sin(theta) + y, 2.5 * cos(theta) + (9 + extendedPos) * sin(theta) + y, 3 * cos(theta) + (9 + extendedPos) * cos(theta) + y, 3 * cos(theta) + 9 * sin(theta) + y};
 
 //        drawPolygon(leftX, leftY, "orange");
 //        drawPolygon(rightX, rightY, "orange");

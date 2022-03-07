@@ -89,7 +89,7 @@ public class Logger extends Thread {
             if (writeCounter < logCounter) {
                 try {
                     fileWriter.write(df.format(new Date()) + "," + timeSinceSt + "," + x + "," + y + "," + theta + "," + vx + "," + vy + "," + w + "," + ax + "," + ay + "," + alpha + ","
-                            + turretTheta + ", " + depositSlidesDist + ", " + depositTarget + ", " + intakeSlidesExtend + ", " + intakeTransfer + ", " + depositingFreight + ", " +
+                            + turretTheta + "," + depositSlidesDist + "," + depositTarget + "," + intakeSlidesExtend + "," + intakeTransfer + "," + depositingFreight + "," +
                             numCycles + "," + avgCycleTime + "\n");
                     writeCounter++;
                 } catch (Exception e) {

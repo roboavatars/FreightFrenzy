@@ -19,7 +19,7 @@ public class Deposit {
 
     private double lastServoPos = 0;
 
-    public static double DEPOSIT_SLIDES_TICKS_PER_INCH = 9.142857;
+    public double DEPOSIT_SLIDES_TICKS_PER_INCH = 9.142857;
     public int DEPOSIT_SLIDES_MAX_TICKS = (int) Math.round(25 * DEPOSIT_SLIDES_TICKS_PER_INCH);
     public static int DEPOSIT_SLIDES_ERROR_THRESHOLD = 15;
     public double ARM_TICKS_PER_RADIAN = 1120 / (2*PI);
@@ -92,7 +92,7 @@ public class Deposit {
         depositing = false;
         setArmPIDCoefficients(Deposit.pArmDown, Deposit.dArmDown);
         setArmTarget(Constants.DEPOSIT_ARM_HOME - armOffset);
-        setSlidesTarget((int) Math.round(DEPOSIT_SLIDES_TICKS_PER_INCH * Constants.SLIDES_DISTANCE_HOME) - slidesOffset);
+        setSlidesInches(Constants.SLIDES_DISTANCE_HOME - slidesOffset);
     }
 
     public void setDepositControls(Robot.DepositTarget target, double slidesDist) {
@@ -110,7 +110,7 @@ public class Deposit {
         }
 
         setArmTarget(targetArmPosNoOffset);
-        setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));
+        setSlidesInches(slidesDist);
     }
 
     public void update(){
@@ -125,7 +125,7 @@ public class Deposit {
             } else if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm && !armHome() && turretHome) {
                 setArmControls(Constants.DEPOSIT_ARM_HOME);
             } else if (getArmVelocity() > 3 && armHome()) { // constant power to make sure arm does all the way home
-                armMotor.setPower(-0.05);
+                armMotor.setPower(-0.1);
             } else if (armSlidesHome()){
                 armMotor.setPower(0);
             }
@@ -134,7 +134,7 @@ public class Deposit {
                 else setSlidesControls();
             }
         } else {
-            setSlidesTarget((int) Math.round(slidesDist * DEPOSIT_SLIDES_TICKS_PER_INCH));  // Reset target every update to change with offset
+            setSlidesInches(slidesDist); // Reset target every update to change with offset
             setArmTarget(targetArmPosNoOffset);
             // arm out first if low or mid goal
             if (!(target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.allianceMid) || armAtPosPercent(0.75)) {
@@ -218,12 +218,12 @@ public class Deposit {
         setSlidesControls(targetSlidesTicks);
     }
 
-    public void setSlidesInches(int inches) {
-        setSlidesTarget((int) Math.round(inches * DEPOSIT_SLIDES_TICKS_PER_INCH));
+    public void setSlidesInches(double inches) {
+        setSlidesTarget((int) Math.round(inches * DEPOSIT_SLIDES_TICKS_PER_INCH + slidesOffset));
     }
 
     public void setSlidesTarget(int targetPos) {
-        targetSlidesTicks = Math.min(Math.max(targetPos + slidesOffset, 0), DEPOSIT_SLIDES_MAX_TICKS);
+        targetSlidesTicks = Math.min(Math.max(targetPos, 0), DEPOSIT_SLIDES_MAX_TICKS);
     }
 
     public double getSlidesPosition() {

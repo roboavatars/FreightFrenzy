@@ -3,13 +3,13 @@ package org.firstinspires.ftc.teamcode.Tests;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
 @Config
 public class HardwareTest extends LinearOpMode {
-    public static String motorName1 = "arm";
+    public static String motorName1 = "carousel";
 //    public static String motorName2 = "depositSlides";
     public static String servoName1 = "carouselArm";
 //    public static String servoName2 = "depositServo";
@@ -25,7 +25,7 @@ public class HardwareTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        DcMotorEx motor1 = hardwareMap.get(DcMotorEx.class, motorName1);
+        CRServo motor1 = hardwareMap.get(CRServo.class, motorName1);
 //        DcMotor motor2 = hardwareMap.get(DcMotor.class, motorName2);
         Servo servo1 = hardwareMap.get(Servo.class, servoName1);
 //        Servo servo2 = hardwareMap.get(Servo.class, servoName2);

@@ -22,6 +22,8 @@ public class Drivetrain {
     private DcMotorEx motorBackLeft;
     private Servo odoRetractServo;
 
+    // private IMU imu;
+
     // OpMode
     private LinearOpMode op;
 
@@ -81,6 +83,8 @@ public class Drivetrain {
         this.op = op;
         HardwareMap hardwareMap = op.hardwareMap;
 
+        // imu = new IMU(initialTheta, op);
+
         motorFrontRight = hardwareMap.get(DcMotorEx.class, "motorFrontRight");
         motorFrontLeft = hardwareMap.get(DcMotorEx.class, "motorFrontLeft");
         motorBackRight = hardwareMap.get(DcMotorEx.class, "motorBackRight");
@@ -107,6 +111,8 @@ public class Drivetrain {
         startTheta = initialTheta;
         theta = initialTheta;
         lastHeading = theta;
+
+        op.telemetry.addData("Status", "Drivetrain Initialized");
     }
 
     // retract horizontal odometry pod
@@ -119,6 +125,7 @@ public class Drivetrain {
         x = newX;
         y = newY;
         theta = newTheta;
+        // imu.resetHeading(newTheta);
     }
 
     // robot centric movement
@@ -214,13 +221,17 @@ public class Drivetrain {
         try {
             pod1 = motorBackRight.getCurrentPosition() * ticksToInch1;
             pod2 = motorFrontLeft.getCurrentPosition() * -ticksToInch2;
-            pod3 = motorFrontRight.getCurrentPosition() * -ticksToInch3;
+            pod3 = motorFrontRight.getCurrentPosition() * ticksToInch3;
 
             deltaPod1 = pod1 - lastPod1;
             deltaPod2 = pod2 - lastPod2;
             deltaPod3 = pod3 - lastPod3;
 
-            Log.w("auto", deltaPod1 + " " + deltaPod2 + " " + deltaPod3);
+//            imu.updateHeading();
+//            deltaHeading = imu.getDeltaHeading();
+            deltaHeading = (deltaPod1 - deltaPod2) / ODOMETRY_TRACK_WIDTH;
+
+            // Log.w("auto", deltaPod1 + " " + deltaPod2 + " " + deltaPod3);
             if (!(deltaPod1 == 0 && deltaPod2 == 0 && deltaPod3 == 0)) {
                 if (deltaPod1 == 0) {
                     Log.w("pod-delta-log", "pod1 delta 0");
@@ -236,8 +247,6 @@ public class Drivetrain {
                 }
             }
 
-            deltaHeading = (deltaPod1 - deltaPod2) / ODOMETRY_TRACK_WIDTH;
-
             double localX = (deltaPod1 + deltaPod2) / 2;
             double localY = deltaPod3 - deltaHeading * ODOMETRY_HORIZONTAL_OFFSET;
 
@@ -251,6 +260,7 @@ public class Drivetrain {
                         - localY * Math.sin(theta) + localX * Math.cos(theta)) / deltaHeading;
             }
 
+            // theta = imu.getTheta();
             theta += deltaHeading;
 
             theta = theta % (Math.PI * 2);

@@ -38,6 +38,7 @@ public class Turret {
     private double turretError = 0;
     private double turretErrorChange;
 
+    private boolean home = true;
     public double turretOffset = 0;
 
     public Turret(LinearOpMode op, boolean isAuto) {
@@ -61,6 +62,16 @@ public class Turret {
     }
 
     public void update() {
+        update(true);
+    }
+
+    public void update(boolean armHome) {
+
+        if (home && !armHome) {
+            turretTargetTheta = (0.5*PI) + turretOffset;
+        } else if (home) {
+            turretTargetTheta = (Constants.TURRET_HOME_THETA*PI) + turretOffset;
+        }
 
         turretTheta = getTheta() + turretOffset;
         turretErrorChange = turretTargetTheta - turretTheta - turretError;
@@ -91,11 +102,13 @@ public class Turret {
     // Set Controls
     public void setDepositing(double theta) {
         tracking = false;
+        home = false;
         turretTargetTheta = Math.min(Math.max(theta, TURRET_MIN_THETA), TURRET_MAX_THETA);
     }
 
     public void setHome() {
         tracking = false;
+        home = true;
         turretTargetTheta = (Constants.TURRET_HOME_THETA*PI) + turretOffset;
     }
 
@@ -131,6 +144,10 @@ public class Turret {
     }
 
     public boolean isHome() {
+        return Math.abs(getTheta() - initialTheta) < TURRET_ERROR_THRESHOLD;
+    }
+
+    public boolean isTransferAligned() {
         return Math.abs(getTheta() - (Constants.TURRET_HOME_THETA*PI)) < TURRET_ERROR_THRESHOLD;
     }
 
