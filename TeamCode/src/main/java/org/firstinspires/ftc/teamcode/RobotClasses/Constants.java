@@ -33,7 +33,7 @@ public class Constants {
     public static int DEPOSIT_ARM_MID = 645;
     public static int DEPOSIT_ARM_HIGH = 540;
     public static int DEPOSIT_ARM_MIDWAY = 375;
-    public static int ARM_ON_HUB_THRESHOLD = 520;
+    public static int ARM_ON_HUB_THRESHOLD = DEPOSIT_ARM_HIGH;
 
     // Deposit Slides
     public static double SLIDES_DISTANCE_HOME = 0;

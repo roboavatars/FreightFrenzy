@@ -24,7 +24,7 @@ public class Dashboard {
 
     public static void drawRobot(double robotX, double robotY, double robotTheta, boolean intakeSlidesExtend, double depositSlidesDist, double turretTheta, String drivetrainColor) {
         drawDrivetrain(robotX, robotY, robotTheta, drivetrainColor);
-        drawIntakeSlides(robotX, robotY, robotTheta, intakeSlidesExtend);
+        // drawIntakeSlides(robotX, robotY, robotTheta, intakeSlidesExtend);
         drawDepositTurretSlides(robotX, robotY, robotTheta, turretTheta, depositSlidesDist);
     }
 
@@ -48,8 +48,8 @@ public class Dashboard {
         double[] rightX = {2.5 * sin(theta) - 9 * cos(theta) + x, 2.5 * sin(theta) - (9 + extendedPos) * cos(theta) + x, 3 * sin(theta) - (9 + extendedPos) * sin(theta) + x, 3 * sin(theta) - 9 * cos(theta) + x};
         double[] rightY = {2.5 * cos(theta) + 9 * sin(theta) + y, 2.5 * cos(theta) + (9 + extendedPos) * sin(theta) + y, 3 * cos(theta) + (9 + extendedPos) * cos(theta) + y, 3 * cos(theta) + 9 * sin(theta) + y};
 
-//        drawPolygon(leftX, leftY, "orange");
-//        drawPolygon(rightX, rightY, "orange");
+        drawPolygon(leftX, leftY, "orange");
+        drawPolygon(rightX, rightY, "orange");
     }
 
     public static void drawDepositTurretSlides(double x, double y, double robotTheta, double turretTheta, double slidesDist) {

@@ -221,9 +221,9 @@ public class Teleop extends LinearOpMode {
 //                telemetry.addData("cycle " + i, cycles.get(i));
 //            }
 
-            telemetry.addData("X", robot.x);
-            telemetry.addData("Y", robot.y);
-            telemetry.addData("Theta", robot.theta);
+            telemetry.addData("X", Robot.round(robot.x));
+            telemetry.addData("Y", Robot.round(robot.y));
+            telemetry.addData("Theta", Robot.round(robot.theta));
             telemetry.addData("Cycle Hub", robot.cycleHub);
             telemetry.addData("Defense Mode", robot.defenseMode);
             telemetry.addData("Automation", robot.automationStep);

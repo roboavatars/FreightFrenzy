@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -22,6 +24,8 @@ public class Intake {
     private double lastSlidesPos = 0;
     private double slidesTargetPos = 0;
 
+    private LinearOpMode op;
+
     public Intake(LinearOpMode op, boolean isAuto) {
         // Intake Motor
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
@@ -42,6 +46,7 @@ public class Intake {
         // Intake Distance Sensor
         intakeSensor = op.hardwareMap.get(DistanceSensor.class, "intakeSensor");
 
+        this.op = op;
         op.telemetry.addData("Status", "Intake Initialized");
     }
 
@@ -115,6 +120,8 @@ public class Intake {
 
     // Distance Sensor
     public double getDistance() {
+        addPacket("0 DISTANCE SENSOR", "> 1000!!!");
+        op.telemetry.addData("0 DISTANCE SENSOR", "> 1000!!!");
         return intakeSensor.getDistance(DistanceUnit.MM);
     }
 
