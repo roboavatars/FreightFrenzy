@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
+import org.firstinspires.ftc.teamcode.Localization.IMU;
 import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
@@ -27,14 +28,17 @@ public class Teleop extends LinearOpMode {
     public static boolean isRed = true;
 
     private Robot robot;
+    private IMU imu;
 
     // Toggles
     private boolean duckActive = false;
     private boolean duckToggle = false;
+    private boolean intakeToggle = false;
+    private boolean defenseModeToggle = false;
 
     // Control Gains
-    private double xyGain;
-    private double wGain;
+    private double xyGain = 1;
+    private double wGain = 0.6;
 
     // Rumbles
     private boolean teleRumble1 = false;
@@ -79,6 +83,7 @@ public class Teleop extends LinearOpMode {
             robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
             robot.logger.startLogging(false, isRed);
         }
+        imu = new IMU(robot.theta, this);
 
         // Deposit Position Offsets
         double[] depositCoords = new double[] {
@@ -92,14 +97,15 @@ public class Teleop extends LinearOpMode {
         cycleTimer.reset();
 
         while (opModeIsActive()) {
-            if (gamepad1.left_bumper) {
-                robot.intakeApproval = true;
-            } else if (gamepad1.right_bumper) {
+            if (gamepad2.left_trigger > 0.1) {
                 robot.depositApproval = true;
             }
 
-            if (gamepad1.right_trigger > 0) {
-                robot.intakeFull = true;
+            if (!intakeToggle && gamepad2.right_trigger > 0.1) {
+                robot.intakeApproval = !robot.intakeApproval;
+                intakeToggle = true;
+            } else if (intakeToggle && gamepad2.right_trigger <= 0.1) {
+                intakeToggle = false;
             }
 
             // robot.intakeReverse = gamepad1.right_trigger > 0.1;
@@ -119,7 +125,9 @@ public class Teleop extends LinearOpMode {
                 robot.cycleHub = Robot.DepositTarget.neutral;
             }
 
-            if (gamepad1.x && !duckToggle) {
+            if ( robot.cycleHub == Robot.DepositTarget.neutral) {
+                robot.carousel.out();
+            } else if (gamepad1.x && !duckToggle) {
                 robot.cycleHub = Robot.DepositTarget.duck;
                 duckToggle = true;
                 if (!duckActive) {
@@ -153,6 +161,7 @@ public class Teleop extends LinearOpMode {
             // Odo Reset
             if (gamepad2.x) {
                 robot.resetOdo(138,81,PI/2);
+                imu.resetHeading(PI/2);
             }
 
             // Retract Odo
@@ -160,8 +169,11 @@ public class Teleop extends LinearOpMode {
                 robot.drivetrain.retractOdo();
             }
 
-            if (gamepad2.b) {
+            if (!defenseModeToggle && gamepad2.b) {
                 robot.defenseMode = !robot.defenseMode;
+                defenseModeToggle = true;
+            } else if (defenseModeToggle && !gamepad2.b){
+                defenseModeToggle = false;
             }
 
             if (gamepad2.a) {
@@ -169,43 +181,15 @@ public class Teleop extends LinearOpMode {
             } else {
                 robot.carousel.stop();
             }
-
-            // Field Centric Deposit Offsets
-            /*if (robot.cycleHub == Robot.DepositTarget.neutral){
-                robot.turret.turretOffset -= (isRed ? 0.03 : -0.03) * gamepad2.left_stick_y;
-                robot.deposit.slidesOffset = 0;
-            } else {
-                depositCoords[0] += 0.15 * gamepad2.left_stick_x;
-                depositCoords[1] += 0.15 * gamepad2.left_stick_y;
-
-                if (robot.cycleHub == Robot.DepositTarget.allianceLow) {
-                    robot.turret.turretOffset = Math.atan2(depositCoords[1], depositCoords[0])
-                            - PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_LOW_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_LOW_THETA);
-                    robot.deposit.slidesOffset = (int) (Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH * (Math.hypot(depositCoords[0], depositCoords[1]) - Constants.SLIDES_DISTANCE_LOW));
-                } else if (robot.cycleHub == Robot.DepositTarget.allianceMid) {
-                    robot.turret.turretOffset = Math.atan2(depositCoords[1], depositCoords[0])
-                            - PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_MID_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_MID_THETA);
-                    robot.deposit.slidesOffset = (int) (Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH * (Math.hypot(depositCoords[0], depositCoords[1]) - Constants.SLIDES_DISTANCE_MID));
-                } else if (robot.cycleHub == Robot.DepositTarget.allianceHigh) {
-                    robot.turret.turretOffset = Math.atan2(depositCoords[1], depositCoords[0])
-                            - PI * (isRed ? Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA + 0.5 : 0.5 - Constants.TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA);
-                    robot.deposit.slidesOffset = (int) (Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH * (Math.hypot(depositCoords[0], depositCoords[1]) - Constants.SLIDES_DISTANCE_HIGH));
-                } else if (robot.cycleHub == Robot.DepositTarget.duck) {
-                    robot.turret.turretOffset = Math.atan2(depositCoords[1], depositCoords[0])
-                            - PI * (isRed ? Constants.TURRET_DUCK_RED_CYCLE_THETA + 0.5 : 0.5 - Constants.TURRET_DUCK_RED_CYCLE_THETA);
-                    robot.deposit.slidesOffset = (int) (Deposit.DEPOSIT_SLIDES_TICKS_PER_INCH * (Math.hypot(depositCoords[0], depositCoords[1]) - Constants.SLIDES_DISTANCE_DUCK));
-                }
-            }
-            robot.turret.turretOffset = -1 * robot.turret.turretOffset;*/
-
-            // Slow Mode
-            if (gamepad2.right_trigger > 0.1) {
-                xyGain = 0.22;
-                wGain = 0.17;
-            } else if (!duckActive) {
-                xyGain = 1;
-                wGain = 0.6;
-            }
+//
+//            // Slow Mode
+//            if (gamepad2.right_trigger > 0.1) {
+//                xyGain = 0.22;
+//                wGain = 0.17;
+//            } else if (!duckActive) {
+//                xyGain = 1;
+//                wGain = 0.6;
+//            }
 
             // Rumble
             if (!teleRumble1 && 120 - (System.currentTimeMillis() - robot.startTime) / 1000 < 90) {
@@ -222,7 +206,12 @@ public class Teleop extends LinearOpMode {
             }
 
             // Drivetrain Controls
-            robot.drivetrain.setControls(-gamepad1.left_stick_y * xyGain, -gamepad1.left_stick_x * xyGain, -gamepad1.right_stick_x * wGain);
+            //Field Centric Driving
+            imu.updateHeading();
+            double theta = imu.getTheta() + (isRed? 0 : PI);
+            double xControls = gamepad1.left_stick_x * xyGain;
+            double yControls = gamepad1.left_stick_y * xyGain;
+            robot.drivetrain.setControls(xControls * Math.sin(theta) + yControls * Math.cos(theta), xControls * Math.cos(theta) - yControls * Math.sin(theta), -gamepad1.right_stick_x * wGain);
 
             // Update Robot
             robot.update();

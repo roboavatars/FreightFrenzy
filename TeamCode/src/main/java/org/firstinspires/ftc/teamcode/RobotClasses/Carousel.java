@@ -10,6 +10,7 @@ public class Carousel {
     private Servo carouselArm;
     private double lastPower = 0;
     private double lastPosition = 0;
+    public boolean home;
 
     private boolean isRed;
 
@@ -48,9 +49,11 @@ public class Carousel {
 
     public void home() {
         setPosition(Constants.CAROUSEL_HOME);
+        home = true;
     }
 
     public void out() {
         setPosition(Constants.CAROUSEL_OUT);
+        home = false;
     }
 }

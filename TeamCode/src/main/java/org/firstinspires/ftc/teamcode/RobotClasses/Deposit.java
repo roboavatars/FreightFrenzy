@@ -58,7 +58,10 @@ public class Deposit {
     public double lastArmPos = 0;
     public double lastSlidesPos = 0;
 
+    private boolean isAuto;
+
     public Deposit(LinearOpMode op, boolean isAuto) {
+        this.isAuto = isAuto;
 
         // Deposit Servo
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
@@ -129,7 +132,7 @@ public class Deposit {
             } else if (armSlidesHome()){
                 armMotor.setPower(0);
             }
-            if (target != Robot.DepositTarget.allianceHigh || getArmPosition() < Constants.ARM_ON_HUB_THRESHOLD) {
+            if (target != Robot.DepositTarget.allianceHigh || !isAuto || getArmPosition() < Constants.ARM_ON_HUB_THRESHOLD) {
                 if (intakeTransfer && slidesHome()) slidesMotor.setPower(-0.25); // constant power so slides dont come out when robot slowing down
                 else setSlidesControls();
             }
@@ -209,8 +212,7 @@ public class Deposit {
     // Slides
     public void setSlidesControls(int targetSlidesPos) {
         slidesMotor.setTargetPosition(targetSlidesPos);
-        double power = depositing ? DEPOSIT_SLIDES_MAX_POWER : 1;
-        slidesMotor.setPower(power);
+        slidesMotor.setPower(DEPOSIT_SLIDES_MAX_POWER);
         Log.w("deposit-log", "slides set to: " + targetSlidesPos + ", current position: " + getSlidesPosition());
     }
 
@@ -267,7 +269,7 @@ public class Deposit {
     }
 
     public void hold() {
-        setServoPosition(Constants.DEPOSIT_HOLD_POS);
+        setServoPosition(target != Robot.DepositTarget.duck ? Constants.DEPOSIT_HOLD_POS : Constants.DEPOSIT_DUCK_HOLD_POS);
     }
 
     public boolean depositCleared() {

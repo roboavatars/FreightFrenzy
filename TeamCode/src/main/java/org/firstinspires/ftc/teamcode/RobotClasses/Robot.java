@@ -96,6 +96,7 @@ public class Robot {
     public boolean intakeTransfer = false;
     public boolean slidesInCommand = false;
     public boolean depositingFreight = false;
+    public boolean depositExtendCommands = false;
     public boolean intakeRev = false;
     private double intakeFlipTime = -1;
     private double depositOpenTime = -1;
@@ -113,9 +114,9 @@ public class Robot {
 
     // Time and Delay Variables
     public double curTime;
-    public static int flipUpThreshold = 1200;
-    public static int transferThreshold = 1800;
-    public static int transferThresholdDuck = 1600;
+    public static int flipUpThreshold = 900;
+    public static int transferThreshold = flipUpThreshold + 600;
+    public static int transferThresholdDuck = flipUpThreshold + 400;
     public static int releaseThreshold = 150;
     public static int hubTipThreshold = 300;
 
@@ -213,78 +214,158 @@ public class Robot {
             firstLoop = false;
         }
 
-        // Auto-Intaking
-        if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && ((isAuto && y > 105) || intakeApproval)) {
-            if (!noExtend) {
-                if (isAuto) intake.extend(Constants.INTAKE_MIDWAY_POS);
-                else intake.extend();
-            } else {
-                intake.extend(Constants.INTAKE_HOME_POS);
-            }
-            intake.on();
+        if (isAuto) {
+            // Auto-Intaking
+            if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && (y > 105 || intakeApproval)) {
+                if (!noExtend) {
+                    intake.extend(Constants.INTAKE_MIDWAY_POS);
+                } else {
+                    intake.extend(Constants.INTAKE_HOME_POS);
+                }
+                intake.on();
 
-            intakeTransfer = true;
-            intakeApproval = false;
-            slidesInCommand = false;
-            automationStep("Intake Extend/On");
-            automationStepTime = curTime;
-        } else if (intakeTransfer) {
-            if (intakeFull && !intake.slidesIsHome() && intakeFlipTime == -1) {
-                intake.setPower(0.2);
-                intake.home();
-                intake.flipUp();
-                intakeFlipTime = curTime;
-                automationStep("Intake Home/Flip");
-            } else if (intakeFull && intake.slidesIsHome() && !intakeRev && curTime - intakeFlipTime > flipUpThreshold) {
-                intake.setPower(cycleHub != DepositTarget.duck ? -1 : -0.5);
-                intakeRev = true;
-                automationStep("Transfer Freight");
-            } else if (intake.slidesIsHome() && intakeRev &&
-                    (curTime - intakeFlipTime > (cycleHub != DepositTarget.duck ? transferThreshold : transferThresholdDuck))) {
-                deposit.hold();
-                intake.off();
-                intake.flipDown();
-
-                automationStep("Intake/Transfer Done");
-                log("Intake done after: " + (curTime - automationStepTime) + "ms");
+                intakeTransfer = true;
+                intakeApproval = false;
+                slidesInCommand = false;
+                automationStep("Intake Extend/On");
                 automationStepTime = curTime;
+            } else if (intakeTransfer) {
+                if (intakeFull && !intake.slidesIsHome() && intakeFlipTime == -1) {
+                    intake.setPower(0.2);
+                    intake.home();
+                    intake.flipUp();
+                    intakeFlipTime = curTime;
+                    automationStep("Intake Home/Flip");
+                } else if (intakeFull && intake.slidesIsHome() && !intakeRev && curTime - intakeFlipTime > flipUpThreshold) {
+                    intake.setPower(cycleHub != DepositTarget.duck ? -1 : -0.5);
+                    intakeRev = true;
+                    automationStep("Transfer Freight");
+                } else if (intake.slidesIsHome() && intakeRev &&
+                        (curTime - intakeFlipTime > (cycleHub != DepositTarget.duck ? transferThreshold : transferThresholdDuck))) {
+                    deposit.hold();
+                    intake.off();
+                    intake.flipDown();
 
-                intakeTransfer = false;
+                    automationStep("Intake/Transfer Done");
+                    log("Intake done after: " + (curTime - automationStepTime) + "ms");
+                    automationStepTime = curTime;
+
+                    intakeTransfer = false;
+                    intakeFlipTime = -1;
+                    intakeRev = false;
+                    depositingFreight = true;
+                }
+                // Robot.log(transferVerify + " " + (curTime - intakeFlipTime > transferThreshold));
+            }
+
+            // Auto-Depositing
+            if (depositingFreight) {
+                if (!deposit.slidesAtPos()) slidesAtPosTime = curTime;
+
+                boolean timeOverride = !deposit.armSlidesAtPose() && deposit.getArmError() < 75 && deposit.getArmVelocity() < 5
+                        && curTime - extendTime > convergeThreshold && extendTime != -1;
+                addPacket("time override", timeOverride);
+
+                if (!noDeposit && deposit.armSlidesHome() && depositOpenTime == -1) {
+                    depositScore();
+                    automationStep("Extend Slides/Arm");
+                    extendTime = curTime;
+                } else if (!noDeposit && (deposit.depositCleared() || !carousel.home) && (!deposit.armSlidesAtPose() && !timeOverride) && depositOpenTime == -1) {
+                    turretScore();
+                    automationStep("Align Turret");
+                } else if (!noDeposit && !deposit.armSlidesHome() && depositOpenTime == -1 && depositApproval &&
+                        (deposit.armSlidesAtPose() || timeOverride)) {
+                    //&& (!isAuto || (deposit.getArmVelocity() < 5 && (cycleHub != DepositTarget.allianceMid || curTime - slidesAtPosTime > hubTipThreshold)))) {
+                    if (!deposit.armSlidesAtPose()) Robot.log("**********TIME OVERRIDE");
+                    deposit.open();
+                    depositOpenTime = curTime;
+                    automationStep("Score Freight");
+                    log("@deposit: arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
+                } else if (!deposit.armSlidesHome() && (deposit.armSlidesAtPose() || timeOverride) && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
+                    depositHome();
+                    slidesInCommand = true;
+                    automationStep("Home Slides/Arm");
+                } else if (!deposit.armSlidesHome() && deposit.getSlidesDistInches() < 7 && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
+                    turretHome();
+
+                    automationStep("Home Turret + Cycle Done");
+                    log("Depositing done after: " + (curTime - automationStepTime) + "ms");
+                    markCycle();
+
+                    depositApproval = false;
+                    depositOpenTime = -1;
+                    depositingFreight = false;
+                    slidesAtPosTime = -1;
+                    extendTime = -1;
+                } else {
+                    log("going to pos arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
+                }
+            }
+        } else {
+            // Auto-Intaking
+            if (!intakeTransfer && intake.slidesIsHome() && intakeApproval) {
+                intake.extend();
+                intake.on();
+
+                intakeTransfer = true;
+                slidesInCommand = false;
+                automationStep("Intake Extend/On");
+                automationStepTime = curTime;
                 intakeFlipTime = -1;
                 intakeRev = false;
-                depositingFreight = true;
+            } else if (intakeTransfer) {
+                if (!intakeApproval && !intake.slidesIsHome() && intakeFlipTime == -1) {
+                    intake.setPower(0.2);
+                    intake.home();
+                    intake.flipUp();
+                    intakeFlipTime = curTime;
+                    automationStep("Intake Home/Flip");
+                } else if (!intakeApproval && intake.slidesIsHome() && deposit.armSlidesHome() && turret.isHome() && !intakeRev && curTime - intakeFlipTime > flipUpThreshold) {
+                    intake.setPower(cycleHub != DepositTarget.duck ? -1 : -0.5);
+                    intakeRev = true;
+                    automationStep("Transfer Freight");
+                } else if (intake.slidesIsHome() && intakeRev &&
+                        (curTime - intakeFlipTime > (cycleHub != DepositTarget.duck ? transferThreshold : transferThresholdDuck))) {
+                    deposit.hold();
+                    intake.off();
+                    intake.flipDown();
+
+                    automationStep("Intake/Transfer Done");
+                    log("Intake done after: " + (curTime - automationStepTime) + "ms");
+                    automationStepTime = curTime;
+
+                    intakeTransfer = false;
+                    intakeFlipTime = -1;
+                    intakeRev = false;
+                    depositingFreight = true;
+                }
+                // Robot.log(transferVerify + " " + (curTime - intakeFlipTime > transferThreshold));
             }
-            // Robot.log(transferVerify + " " + (curTime - intakeFlipTime > transferThreshold));
         }
 
         // Auto-Depositing
         if (depositingFreight) {
+            addPacket("deposit Approval", depositApproval);
             if (!deposit.slidesAtPos()) slidesAtPosTime = curTime;
 
-            boolean timeOverride = !deposit.armSlidesAtPose() && deposit.getArmError() < 75 && deposit.getArmVelocity() < 5
-                    && curTime - extendTime > convergeThreshold && extendTime != -1;
-            addPacket("time override", timeOverride);
-
-            if (!noDeposit && deposit.armSlidesHome() && depositOpenTime == -1) {
+            if (deposit.armSlidesHome() && depositOpenTime == -1) {
                 depositScore();
                 automationStep("Extend Slides/Arm");
                 extendTime = curTime;
-            } else if (!noDeposit && deposit.depositCleared() && (!deposit.armSlidesAtPose() && !timeOverride) && depositOpenTime == -1) {
+            } else if ((deposit.depositCleared() || !carousel.home) && !depositExtendCommands && depositOpenTime == -1) {
                 turretScore();
                 automationStep("Align Turret");
-            } else if (!noDeposit && !deposit.armSlidesHome() && depositOpenTime == -1 && depositApproval &&
-                    (deposit.armSlidesAtPose() || timeOverride)) {
-                    //&& (!isAuto || (deposit.getArmVelocity() < 5 && (cycleHub != DepositTarget.allianceMid || curTime - slidesAtPosTime > hubTipThreshold)))) {
-                if (!deposit.armSlidesAtPose()) Robot.log("**********TIME OVERRIDE");
+                depositExtendCommands = true;
+            } else if (!deposit.armSlidesHome() && depositOpenTime == -1 && depositApproval) {
                 deposit.open();
                 depositOpenTime = curTime;
                 automationStep("Score Freight");
                 log("@deposit: arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
-            } else if (!deposit.armSlidesHome() && (deposit.armSlidesAtPose() || timeOverride) && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
+            } else if ((deposit.getSlidesDistInches() > 4 || ((defenseMode || cycleHub == DepositTarget.neutral) && !slidesInCommand)) && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
                 depositHome();
                 slidesInCommand = true;
                 automationStep("Home Slides/Arm");
-            } else if (!deposit.armSlidesHome() && deposit.getSlidesDistInches() < 7 && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
+            } else if ((deposit.getSlidesDistInches() <= 4 || ((defenseMode || cycleHub == DepositTarget.neutral) && slidesInCommand)) && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
                 turretHome();
 
                 automationStep("Home Turret + Cycle Done");
@@ -296,6 +377,7 @@ public class Robot {
                 depositingFreight = false;
                 slidesAtPosTime = -1;
                 extendTime = -1;
+                depositExtendCommands = false;
             } else {
                 log("going to pos arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
             }
@@ -449,6 +531,10 @@ public class Robot {
 
     // Set Arm + Slides Control
     public void depositScore() {
+        if (cycleHub == DepositTarget.neutral) {
+            defenseMode = false;
+        }
+
         setDepositControlsHome = false;
 
         double slidesDist = 0;

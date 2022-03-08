@@ -16,15 +16,16 @@ public class Constants {
     // Intake Slides
     public static double INTAKE_EXTEND_POS = 0.3;
     public static double INTAKE_MIDWAY_POS = 0.6;
-    public static double INTAKE_HOME_POS = 0.67;
+    public static double INTAKE_HOME_POS = 0.63;
 
     // Intake Servo
-    public static double INTAKE_UP_POS = 0.48;
+    public static double INTAKE_UP_POS = 0.42;
     public static double INTAKE_DOWN_POS = 0.83;
 
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.2;
-    public static double DEPOSIT_HOLD_POS = 0.45;
+    public static double DEPOSIT_HOLD_POS = 0.52;
+    public static double DEPOSIT_DUCK_HOLD_POS = 0.5;
 
     // Deposit Arm
     public static int DEPOSIT_ARM_HOME = 0;
@@ -46,7 +47,7 @@ public class Constants {
     public static double ARM_DISTANCE = 25;
 
     // Turret
-    public static double TURRET_HOME_THETA = 0.53; // changed from 0.54 for quack
+    public static double TURRET_HOME_THETA = 0.49; // changed from 0.54 for quack
     public static double TURRET_ALLIANCE_RED_CYCLE_LOW_THETA = 0.18;
     public static double TURRET_ALLIANCE_RED_CYCLE_MID_THETA = 0.18;
     public static double TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA = 0.18;
