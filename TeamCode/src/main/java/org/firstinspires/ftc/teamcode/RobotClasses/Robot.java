@@ -280,7 +280,7 @@ public class Robot {
                     depositScore();
                     automationStep("Extend Slides/Arm");
                     extendTime = curTime;
-                } else if (!noDeposit && (deposit.depositCleared() || !carousel.home) && (!deposit.armSlidesAtPose() && !timeOverride) && depositOpenTime == -1) {
+                } else if (!noDeposit && clearCarousel() && (!deposit.armSlidesAtPose() && !timeOverride) && depositOpenTime == -1) {
                     turretScore();
                     automationStep("Align Turret");
                 } else if (!noDeposit && !deposit.armSlidesHome() && depositOpenTime == -1 && depositApproval && (deposit.armSlidesAtPose() || timeOverride)) {
@@ -360,7 +360,7 @@ public class Robot {
                     depositScore();
                     automationStep("Extend Slides/Arm");
                     extendTime = curTime;
-                } else if ((deposit.depositCleared() || !carousel.home) && !depositExtendCommands && depositOpenTime == -1) {
+                } else if ((clearCarousel() || !carousel.home || !isRed) && !depositExtendCommands && depositOpenTime == -1) {
                     turretScore();
                     automationStep("Align Turret");
                     depositExtendCommands = true;
@@ -567,6 +567,10 @@ public class Robot {
     public void depositHome() {
         setDepositControlsHome = true;
         deposit.setDepositHome();
+    }
+
+    public boolean clearCarousel(){
+        return deposit.depositCleared() || !carousel.home || defenseMode || autoNoTurret;
     }
 
     // Set Turret Controls

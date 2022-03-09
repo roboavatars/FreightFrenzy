@@ -16,9 +16,9 @@ import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Config
-@Autonomous(name = "0 red old auto", preselectTeleOp = "1 Teleop", group = "Red")
+@Autonomous(name = "0 0 red old auto", preselectTeleOp = "1 Teleop", group = "Red")
 public class WallDepositAuto extends LinearOpMode {
-    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Middle;
+    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Right;
 
     @Override
     public void runOpMode() {
@@ -166,6 +166,7 @@ public class WallDepositAuto extends LinearOpMode {
             }
 
             else {
+                robot.cancelAutomation();
                 robot.noDeposit = true;
                 robot.drivetrain.stop();
                 addPacket("path", "stopped rn");

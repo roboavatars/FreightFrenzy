@@ -49,10 +49,10 @@ public class Constants {
     // Turret
     public static double TURRET_HOME_THETA = 0.49; // changed from 0.54 for quack
     public static double TURRET_ALLIANCE_RED_CYCLE_LOW_THETA = 0.18;
-    public static double TURRET_ALLIANCE_RED_CYCLE_MID_THETA = 0.18;
+    public static double TURRET_ALLIANCE_RED_CYCLE_MID_THETA = 0.19;
     public static double TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA = 0.18;
     public static double TURRET_NEUTRAL_RED_CYCLE_THETA = 0.8;
-    public static double TURRET_DUCK_RED_CYCLE_THETA = 0.19;
+    public static double TURRET_DUCK_RED_CYCLE_THETA = 0.5;
 
     // Carousel
     public static double CAROUSEL_POWER = 0.55;
