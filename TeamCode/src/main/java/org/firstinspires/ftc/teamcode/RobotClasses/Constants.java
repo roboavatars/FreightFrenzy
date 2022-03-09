@@ -6,8 +6,8 @@ import com.acmerobotics.dashboard.config.Config;
 public class Constants {
 
     // Drivetrain
-    public static double ODO_NORMAL_POS = 0.33;
-    public static double ODO_RETRACT_POS = 0.6;
+    public static double ODO_NORMAL_POS = 0.4;
+    public static double ODO_RETRACT_POS = 0.7;
 
     // Intake
     public static double INTAKE_DISTANCE_THRESHOLD = 70;

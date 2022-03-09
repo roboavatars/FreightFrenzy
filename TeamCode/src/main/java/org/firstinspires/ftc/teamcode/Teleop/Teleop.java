@@ -172,7 +172,7 @@ public class Teleop extends LinearOpMode {
             if (!defenseModeToggle && gamepad2.b) {
                 robot.defenseMode = !robot.defenseMode;
                 defenseModeToggle = true;
-            } else if (defenseModeToggle && !gamepad2.b){
+            } else if (defenseModeToggle && !gamepad2.b) {
                 defenseModeToggle = false;
             }
 
@@ -181,7 +181,7 @@ public class Teleop extends LinearOpMode {
             } else {
                 robot.carousel.stop();
             }
-//
+
 //            // Slow Mode
 //            if (gamepad2.right_trigger > 0.1) {
 //                xyGain = 0.22;
@@ -206,7 +206,7 @@ public class Teleop extends LinearOpMode {
             }
 
             // Drivetrain Controls
-            //Field Centric Driving
+            // Field Centric Driving
             imu.updateHeading();
             double theta = imu.getTheta() + (isRed? 0 : PI);
             double xControls = gamepad1.left_stick_x * xyGain;

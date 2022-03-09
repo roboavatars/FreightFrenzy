@@ -18,7 +18,6 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Config
 @Autonomous(name = "0 red old auto", preselectTeleOp = "1 Teleop", group = "Red")
 public class WallDepositAuto extends LinearOpMode {
-
     public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Middle;
 
     @Override
@@ -34,7 +33,7 @@ public class WallDepositAuto extends LinearOpMode {
         Robot robot = new Robot(this, 138, 84, PI/2, true, true);
         robot.logger.startLogging(true, true);
 
-//        BarcodeDetector detector = new BarcodeDetector(this, true);
+//        Vision detector = new Vision(this, true, Vision.Pipeline.Barcode);
 //        detector.start();
 
         // Segments
@@ -45,8 +44,6 @@ public class WallDepositAuto extends LinearOpMode {
         boolean resetOdo = false;
 
         // Segment Times
-        double preloadScoreTime = 1.75;
-        double goToWarehouseTime = 0.5;
         double cycleScoreTime = 0.7;
         double parkThreshold = 5;
 
@@ -60,7 +57,7 @@ public class WallDepositAuto extends LinearOpMode {
 
         waitForStart();
 
-//        barcodeCase = detector.getResult();
+//        barcodeCase = detector.getBarcodePipeline().getResult();
 
         if (barcodeCase == BarcodePipeline.Case.Left) {
             robot.cycleHub = Robot.DepositTarget.allianceLow;
@@ -80,7 +77,6 @@ public class WallDepositAuto extends LinearOpMode {
         robot.depositApproval = true;
 
         while (opModeIsActive()) {
-
             double timeLeft = 30 - (System.currentTimeMillis() - robot.startTime) / 1000;
             addPacket("time left", timeLeft);
             addPacket("auto stuff", robot.depositApproval + " " +  robot.deposit.armSlidesAtPose() + " " + robot.deposit.armSlidesAtPose());
@@ -90,7 +86,7 @@ public class WallDepositAuto extends LinearOpMode {
 
                 addPacket("path", "initial deposit imo");
 
-                if (robot.slidesInCommand /*|| time.seconds() > preloadScoreTime + 1.5*/) {
+                if (robot.slidesInCommand) {
                     robot.cycleHub = Robot.DepositTarget.allianceHigh;
 
                     time.reset();
@@ -99,7 +95,6 @@ public class WallDepositAuto extends LinearOpMode {
             }
 
             else if (!goToWarehouse) {
-
                 if (robot.y < 105) {
                     robot.drivetrain.constantStrafeConstant = -0.3;
                     robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI/2 > PI/10 ? -0.5 : 0);
@@ -137,7 +132,6 @@ public class WallDepositAuto extends LinearOpMode {
                     time.reset();
                     goToWarehouse = true;
                 } else if (timeLeft < parkThreshold && robot.y > 112) {
-
                     time.reset();
                     goToWarehouse = true;
                     cycleScore = true;
@@ -145,7 +139,6 @@ public class WallDepositAuto extends LinearOpMode {
             }
 
             else if (!cycleScore) {
-
                 robot.drivetrain.constantStrafeConstant = robot.y > 105 ? -0.4 : 0;
 
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));

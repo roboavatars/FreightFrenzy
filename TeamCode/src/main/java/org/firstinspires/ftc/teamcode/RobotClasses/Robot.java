@@ -269,10 +269,11 @@ public class Robot {
 
             // Auto-Depositing
             if (depositingFreight) {
-                if (!deposit.slidesAtPos()) slidesAtPosTime = curTime;
+                if (!deposit.slidesAtPos()) {
+                    slidesAtPosTime = curTime;
+                }
 
-                boolean timeOverride = !deposit.armSlidesAtPose() && deposit.getArmError() < 75 && deposit.getArmVelocity() < 5
-                        && curTime - extendTime > convergeThreshold && extendTime != -1;
+                boolean timeOverride = !deposit.armSlidesAtPose() && deposit.getArmError() < 75 && deposit.getArmVelocity() < 5 && curTime - extendTime > convergeThreshold && extendTime != -1;
                 addPacket("time override", timeOverride);
 
                 if (!noDeposit && deposit.armSlidesHome() && depositOpenTime == -1) {
@@ -282,8 +283,7 @@ public class Robot {
                 } else if (!noDeposit && (deposit.depositCleared() || !carousel.home) && (!deposit.armSlidesAtPose() && !timeOverride) && depositOpenTime == -1) {
                     turretScore();
                     automationStep("Align Turret");
-                } else if (!noDeposit && !deposit.armSlidesHome() && depositOpenTime == -1 && depositApproval &&
-                        (deposit.armSlidesAtPose() || timeOverride)) {
+                } else if (!noDeposit && !deposit.armSlidesHome() && depositOpenTime == -1 && depositApproval && (deposit.armSlidesAtPose() || timeOverride)) {
                     //&& (!isAuto || (deposit.getArmVelocity() < 5 && (cycleHub != DepositTarget.allianceMid || curTime - slidesAtPosTime > hubTipThreshold)))) {
                     if (!deposit.armSlidesAtPose()) Robot.log("**********TIME OVERRIDE");
                     deposit.open();
