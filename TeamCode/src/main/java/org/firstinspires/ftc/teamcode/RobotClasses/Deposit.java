@@ -22,7 +22,7 @@ public class Deposit {
     public double DEPOSIT_SLIDES_TICKS_PER_INCH = 9.142857;
     public int DEPOSIT_SLIDES_MAX_TICKS = (int) Math.round(25 * DEPOSIT_SLIDES_TICKS_PER_INCH);
     public static int DEPOSIT_SLIDES_ERROR_THRESHOLD = 15;
-    public double ARM_TICKS_PER_RADIAN = 1120 / (2*PI);
+    public double ARM_TICKS_PER_RADIAN = 540 / PI;
     public static double DEPOSIT_SLIDES_MAX_POWER = 0.7;
     public static int DEPOSIT_ARM_ERROR_THRESHOLD = 20;
     public static double maxSlidesDistBeforeLoweringArm = 8;
@@ -37,7 +37,7 @@ public class Deposit {
     public int targetArmPos;
     private int targetArmPosNoOffset = 0;
 
-    private double initialArmAngle = -0.646;
+    private double initialArmAngle = -PI/6;
     public int armOffset = 0;
     public int slidesOffset = 0;
 
@@ -45,20 +45,26 @@ public class Deposit {
     double armErrorChange = 0, armError = 0;
     public static double pArmUp = 0.003;
     public static double dArmUp = 0.0055;
+    public static double fGravityUp = 0.1;
+
     public static double pArmDown = 0.0015;
     public static double dArmDown = 0.002;
+    public static double fGravityDown = 0.2;
+
+    public static double pArmUpPreload = 0.003;
+    public static double dArmUpPreload = 0.035;
 
     public static double pArm = pArmUp;
     public static double dArm = dArmUp;
-    public static double fArm = 0;
+    public static double fGravity = fGravityUp;
 
-    public static double fGravity = 0.1;
     public boolean depositing = false;
 
     public double lastArmPos = 0;
     public double lastSlidesPos = 0;
 
     private boolean isAuto;
+    public boolean preload = false;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
         this.isAuto = isAuto;
@@ -93,7 +99,7 @@ public class Deposit {
     // Slides + Arm
     public void setDepositHome() {
         depositing = false;
-        setArmPIDCoefficients(Deposit.pArmDown, Deposit.dArmDown);
+        setArmPIDCoefficients(pArmDown, dArmDown, fGravityDown);
         setArmTarget(Constants.DEPOSIT_ARM_HOME - armOffset);
         setSlidesInches(Constants.SLIDES_DISTANCE_HOME - slidesOffset);
     }
@@ -101,8 +107,10 @@ public class Deposit {
     public void setDepositControls(Robot.DepositTarget target, double slidesDist) {
         depositing = true;
         this.target = target;
-        setArmPIDCoefficients(Deposit.pArmUp, Deposit.dArmUp);
         this.slidesDist = slidesDist;
+
+        if (preload) setArmPIDCoefficients(pArmUpPreload, dArmUpPreload, fGravityUp);
+        else setArmPIDCoefficients(pArmUp, dArmUp, fGravityUp);
 
         if (target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.neutral) {
             targetArmPosNoOffset = Constants.DEPOSIT_ARM_LOW;
@@ -132,7 +140,7 @@ public class Deposit {
             } else if (armSlidesHome()){
                 armMotor.setPower(0);
             }
-            if (target != Robot.DepositTarget.allianceHigh || !isAuto || getArmPosition() < Constants.ARM_ON_HUB_THRESHOLD) {
+            if (target != Robot.DepositTarget.allianceHigh || !isAuto || getArmPosition() <= Constants.ARM_ON_HUB_THRESHOLD) {
                 if (intakeTransfer && slidesHome()) slidesMotor.setPower(-0.25); // constant power so slides dont come out when robot slowing down
                 else setSlidesControls();
             }
@@ -162,7 +170,7 @@ public class Deposit {
         armErrorChange = targetTicks - currentTicks - armError;
         armError = targetTicks - currentTicks;
 
-        fArm = fGravity * Math.cos(getArmAngle());
+        double fArm = fGravity * Math.cos(getArmAngle());
         armMotor.setPower(pArm * armError + dArm * armErrorChange + fArm);
 
         Log.w("deposit-log", "arm set to: " + targetArmPos + ", current position: " + getArmPosition());
@@ -204,9 +212,10 @@ public class Deposit {
         return Math.abs(getArmPosition() - targetArmPos);
     }
 
-    public void setArmPIDCoefficients(double p, double d) {
+    public void setArmPIDCoefficients(double p, double d, double f) {
         pArm = p;
         dArm = d;
+        fGravity = f;
     }
 
     // Slides

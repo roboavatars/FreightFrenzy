@@ -5,6 +5,7 @@ import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -15,10 +16,11 @@ import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
+@Disabled
 @Config
-@Autonomous(name = "0 0 red old auto", preselectTeleOp = "1 Teleop", group = "Red")
-public class WallDepositAuto extends LinearOpMode {
-    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Right;
+@Autonomous(name = "Red Auto Warehouse (no turret)", preselectTeleOp = "1 Teleop", group = "Red")
+public class RedAutoWarehouseNoTurret extends LinearOpMode {
+    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Middle;
 
     @Override
     public void runOpMode() {
@@ -44,7 +46,7 @@ public class WallDepositAuto extends LinearOpMode {
         boolean resetOdo = false;
 
         // Segment Times
-        double cycleScoreTime = 0.7;
+        double cycleScoreTime = 1.5;
         double parkThreshold = 5;
 
         // Paths
@@ -53,7 +55,6 @@ public class WallDepositAuto extends LinearOpMode {
 
         int cycleCounter = 0;
         double passLineTime = 0;
-        int odoDriftAdjustment = 3;
 
         waitForStart();
 
@@ -82,12 +83,11 @@ public class WallDepositAuto extends LinearOpMode {
             addPacket("auto stuff", robot.depositApproval + " " +  robot.deposit.armSlidesAtPose() + " " + robot.deposit.armSlidesAtPose());
 
             if (!preloadScore) {
-                robot.drivetrain.setGlobalControls(0, 0, 0);
-
                 addPacket("path", "initial deposit imo");
 
                 if (robot.slidesInCommand) {
                     robot.cycleHub = Robot.DepositTarget.allianceHigh;
+                    robot.autoNoTurret = true;
 
                     time.reset();
                     preloadScore = true;
@@ -95,7 +95,12 @@ public class WallDepositAuto extends LinearOpMode {
             }
 
             else if (!goToWarehouse) {
-                if (robot.y < 105) {
+                if (robot.y < 105 && robot.x < 137 && PI/2 - robot.theta > PI/10) {
+                    robot.drivetrain.constantStrafeConstant = -0.4;
+                    robot.setTargetPoint(new Target(143, 78, PI/2).xKp(0.55).thetaKp(4));
+
+                    addPacket("path", "going to the wall right rn");
+                } else if (robot.y < 105) {
                     robot.drivetrain.constantStrafeConstant = -0.3;
                     robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI/2 > PI/10 ? -0.5 : 0);
                     passLineTime = time.seconds();
@@ -125,7 +130,8 @@ public class WallDepositAuto extends LinearOpMode {
 
                     Waypoint[] cycleScoreWaypoints = new Waypoint[] {
                             new Waypoint(140, robot.y, 3*PI/2, 10, 10, 0, 0),
-                            new Waypoint(140 + cycleCounter, 86 - odoDriftAdjustment * cycleCounter, 3*PI/2, 5, -5, 0, cycleScoreTime),
+                            new Waypoint(140, 83, 3*PI/2, 5, 1, 0, 0.75),
+                            new Waypoint(130, 78.5, 0.70 + PI, 5, 5, 0, cycleScoreTime),
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 
@@ -139,7 +145,7 @@ public class WallDepositAuto extends LinearOpMode {
             }
 
             else if (!cycleScore) {
-                robot.drivetrain.constantStrafeConstant = robot.y > 105 ? -0.4 : 0;
+                robot.drivetrain.constantStrafeConstant = robot.y > 105 ? -0.7 : 0;
 
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
                 robot.setTargetPoint(new Target(curPose).theta(robot.y >= 83 ? PI/2 : curPose.theta + PI));
@@ -166,7 +172,6 @@ public class WallDepositAuto extends LinearOpMode {
             }
 
             else {
-                robot.cancelAutomation();
                 robot.noDeposit = true;
                 robot.drivetrain.stop();
                 addPacket("path", "stopped rn");

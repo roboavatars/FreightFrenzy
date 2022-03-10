@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawRect;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
-import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
@@ -19,7 +18,7 @@ import org.firstinspires.ftc.teamcode.OpenCV.Vision;
 public class AprilTagLocalizationTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        Vision detector = new Vision(this, Vision.Pipeline.AprilTag);
+        Vision detector = new Vision(this, Vision.Pipeline.AprilTag, true);
         detector.start();
 
         waitForStart();

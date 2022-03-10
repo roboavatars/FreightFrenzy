@@ -6,7 +6,7 @@ import static java.lang.Math.sin;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 
-import org.firstinspires.ftc.teamcode.OpenCV.Freight;
+import org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.Freight;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 import org.firstinspires.ftc.teamcode.RobotClasses.Turret;
 

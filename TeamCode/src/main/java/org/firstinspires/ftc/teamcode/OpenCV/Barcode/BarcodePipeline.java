@@ -27,11 +27,11 @@ public class BarcodePipeline extends OpenCvPipeline {
     public static int RECT_X = 0;
     public static int RECT_Y = 0;
     public static int RECT_WIDTH = 320;
-    public static int RECT_HEIGHT = 160;
+    public static int RECT_HEIGHT = 240;
     public static int BLUE_LEFT_DIVIDER = 100;
     public static int BLUE_RIGHT_DIVIDER = 200;
-    public static int RED_LEFT_DIVIDER = 250;
-    public static int RED_RIGHT_DIVIDER = 320;
+    public static int RED_LEFT_DIVIDER = 140;
+    public static int RED_RIGHT_DIVIDER = 230;
     public static int RETURN_IMAGE = 1;
     public static int leftDivider;
     public static int rightDivider;
@@ -78,7 +78,7 @@ public class BarcodePipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
 
         // Crop Input Image
-        input = new Mat(input, new Rect(RECT_X, RECT_Y, RECT_WIDTH, RECT_HEIGHT));
+        //input = new Mat(input, new Rect(RECT_X, RECT_Y, RECT_WIDTH, RECT_HEIGHT));
         saveMatToDisk("input.jpg", input);
 
         // Draw Three Red Rectangles
@@ -135,11 +135,11 @@ public class BarcodePipeline extends OpenCvPipeline {
         // Draw Green Rectangle Depending on Region
         if (debug) {
             if (outputCase == Case.Left) {
-                Imgproc.rectangle(input, new Point(0, 0), new Point(RECT_WIDTH/3, RECT_HEIGHT), new Scalar(0, 255, 0), 4);
+                Imgproc.rectangle(input, new Point(0, 0), new Point(leftDivider, RECT_HEIGHT), new Scalar(0, 255, 0), 4);
             } else if (outputCase == Case.Middle) {
-                Imgproc.rectangle(input, new Point(RECT_WIDTH/3, 0), new Point(2*RECT_WIDTH/3, RECT_HEIGHT), new Scalar(0, 255, 0), 4);
+                Imgproc.rectangle(input, new Point(leftDivider, 0), new Point(rightDivider, RECT_HEIGHT), new Scalar(0, 255, 0), 4);
             } else if (outputCase == Case.Right) {
-                Imgproc.rectangle(input, new Point(2*RECT_WIDTH/3, 0), new Point(RECT_WIDTH, RECT_HEIGHT), new Scalar(0, 255, 0), 4);
+                Imgproc.rectangle(input, new Point(rightDivider, 0), new Point(RECT_WIDTH, RECT_HEIGHT), new Scalar(0, 255, 0), 4);
             }
         }
         saveMatToDisk("greenRect.jpg", input);

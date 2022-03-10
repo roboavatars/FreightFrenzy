@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpenCV;
+package org.firstinspires.ftc.teamcode.OpenCV.FreightLocator;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;

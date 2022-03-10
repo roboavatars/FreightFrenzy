@@ -15,7 +15,7 @@ public class AprilTagTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Vision detector = new Vision(this, Vision.Pipeline.AprilTag);
+        Vision detector = new Vision(this, Vision.Pipeline.AprilTag, true);
         detector.start();
 
         waitForStart();

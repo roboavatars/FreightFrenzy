@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpenCV;
+package org.firstinspires.ftc.teamcode.OpenCV.FreightLocator;
 
 import android.annotation.SuppressLint;
 

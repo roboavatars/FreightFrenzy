@@ -9,8 +9,6 @@ import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
 
-import org.firstinspires.ftc.teamcode.OpenCV.Freight;
-import org.firstinspires.ftc.teamcode.OpenCV.FreightProcessor;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;

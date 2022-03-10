@@ -89,14 +89,14 @@ public class CycleTest extends LinearOpMode {
             if (home) {
 //                turret.setDepositing(PI/2);
 
-                deposit.setArmPIDCoefficients(Deposit.pArmDown, Deposit.dArmDown);
+                deposit.setArmPIDCoefficients(Deposit.pArmDown, Deposit.dArmDown,Deposit.fGravityDown);
                 deposit.setArmTarget(Constants.DEPOSIT_ARM_HOME);
 
                 deposit.setSlidesTarget(0);
             } else {
 //                turret.setDepositing(turretMovingAngle * PI);
 
-                deposit.setArmPIDCoefficients(Deposit.pArmUp, Deposit.dArmUp);
+                deposit.setArmPIDCoefficients(Deposit.pArmUp, Deposit.dArmUp, Deposit.fGravityUp);
 //                if (!deposit.slidesAtPosPercent(0.75)) {
 //                    deposit.setArmTarget(Constants.DEPOSIT_ARM_MIDWAY);
 //                } else {

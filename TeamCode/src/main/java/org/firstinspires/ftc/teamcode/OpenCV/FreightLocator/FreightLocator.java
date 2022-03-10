@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.OpenCV.BaseDetector;
-import org.firstinspires.ftc.teamcode.OpenCV.Freight;
+import org.firstinspires.ftc.teamcode.OpenCV.Vision;
 
 import java.util.ArrayList;
 
@@ -18,7 +18,7 @@ public class FreightLocator extends BaseDetector {
     public static double maxY = 144;
 
     public FreightLocator(LinearOpMode op) {
-        super(op);
+        super(op, Vision.Pipeline.Freight);
 
         pipeline = new FreightLocatorPipeline();
         setPipeline(pipeline);
