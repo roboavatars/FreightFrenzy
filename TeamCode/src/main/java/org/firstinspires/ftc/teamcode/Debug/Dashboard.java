@@ -24,7 +24,7 @@ public class Dashboard {
 
     public static void drawRobot(double robotX, double robotY, double robotTheta, boolean intakeSlidesExtend, double depositSlidesDist, double turretTheta, String drivetrainColor) {
         drawDrivetrain(robotX, robotY, robotTheta, drivetrainColor);
-        // drawIntakeSlides(robotX, robotY, robotTheta, intakeSlidesExtend);
+//        drawIntakeSlides(robotX, robotY, robotTheta, intakeSlidesExtend);
         drawDepositTurretSlides(robotX, robotY, robotTheta, turretTheta, depositSlidesDist);
     }
 

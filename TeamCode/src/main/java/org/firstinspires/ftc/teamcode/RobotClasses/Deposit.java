@@ -129,7 +129,6 @@ public class Deposit {
     }
 
     public void update(boolean intakeTransfer, boolean turretHome) {
-
         if (!depositing) {
             if (target == Robot.DepositTarget.allianceHigh && getSlidesDistInches() >= maxSlidesDistBeforeLoweringArm) {
                 setArmControls(Constants.DEPOSIT_ARM_MIDWAY);

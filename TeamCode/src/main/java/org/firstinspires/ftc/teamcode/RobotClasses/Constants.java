@@ -25,7 +25,7 @@ public class Constants {
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.2;
     public static double DEPOSIT_HOLD_POS = 0.52;
-    public static double DEPOSIT_DUCK_HOLD_POS = 0.5;
+    public static double DEPOSIT_DUCK_HOLD_POS = 0.48;
 
     // Deposit Arm
     public static int DEPOSIT_ARM_HOME = 0;
@@ -57,7 +57,7 @@ public class Constants {
     // Carousel
     public static double CAROUSEL_POWER = 0.55;
     public static double CAROUSEL_HOME = 0.9;
-    public static double CAROUSEL_OUT = 0.15;
+    public static double CAROUSEL_OUT = 0.2;
 
     // Anti-Tip
     public static double TIP_THRESHOLD = 0.1;

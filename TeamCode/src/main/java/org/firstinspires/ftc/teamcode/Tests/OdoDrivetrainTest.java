@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawField;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
+import static java.lang.Math.PI;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -16,7 +17,7 @@ public class OdoDrivetrainTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Drivetrain dt = new Drivetrain(this, 90, 9, 0);
+        Drivetrain dt = new Drivetrain(this, 90, 9, PI/2);
 
         waitForStart();
 
@@ -24,7 +25,7 @@ public class OdoDrivetrainTest extends LinearOpMode {
             dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
 
             if (gamepad1.x) {
-                dt.resetOdo(90, 9, 0);
+                dt.resetOdo(90, 9, PI/2);
             }
 
             if (gamepad1.dpad_right || gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left) {
@@ -41,7 +42,7 @@ public class OdoDrivetrainTest extends LinearOpMode {
             prevTime = curTime;
 
             drawField();
-            drawDrivetrain(x, y, theta, "green");
+            drawDrivetrain(x, y, theta, "blue");
             addPacket("X", x);
             addPacket("Y", y);
             addPacket("Theta", theta);

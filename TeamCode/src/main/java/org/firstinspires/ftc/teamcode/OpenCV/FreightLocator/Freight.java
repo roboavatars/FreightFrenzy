@@ -22,6 +22,11 @@ public class Freight {
         this.absY = absY;
     }
 
+    public Freight(double[] relPos) {
+        this.relX = relPos[0];
+        this.relY = relPos[1];
+    }
+
     public Freight(double relX, double relY) {
         this.relX = relX;
         this.relY = relY;

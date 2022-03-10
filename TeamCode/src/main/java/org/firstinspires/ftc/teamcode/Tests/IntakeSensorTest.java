@@ -8,18 +8,21 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 
-@TeleOp
+@TeleOp(name = "Intake Sensor Test")
 public class IntakeSensorTest extends LinearOpMode {
+    public static double INTAKE_DISTANCE_THRESHOLD = 70;
+
     @Override
     public void runOpMode() throws InterruptedException {
         DistanceSensor intakeSensor = hardwareMap.get(DistanceSensor.class, "intakeSensor");
 
         waitForStart();
+
         while (opModeIsActive()) {
-            addPacket("distance", intakeSensor.getDistance(DistanceUnit.MM));
-            addPacket("intaked", intakeSensor.getDistance(DistanceUnit.MM) < Constants.INTAKE_DISTANCE_THRESHOLD);
+            addPacket("Measured Distance", intakeSensor.getDistance(DistanceUnit.MM));
+            addPacket("Threshold Distance", INTAKE_DISTANCE_THRESHOLD);
+            addPacket("intakeFull", intakeSensor.getDistance(DistanceUnit.MM) < INTAKE_DISTANCE_THRESHOLD);
             sendPacket();
         }
     }

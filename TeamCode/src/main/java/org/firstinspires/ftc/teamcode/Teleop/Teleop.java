@@ -156,7 +156,7 @@ public class Teleop extends LinearOpMode {
 
             robot.turret.turretOffset += 0.008 * gamepad2.left_stick_x;
             robot.deposit.slidesOffset -= 1.5 * gamepad2.left_stick_y;
-            robot.deposit.armOffset += 2 * gamepad2.right_stick_y;
+            robot.deposit.armOffset += 10 * gamepad2.right_stick_y;
 
             // Odo Reset
             if (gamepad2.x) {
