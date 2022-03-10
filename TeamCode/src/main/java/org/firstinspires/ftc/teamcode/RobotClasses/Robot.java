@@ -360,7 +360,7 @@ public class Robot {
                     depositScore();
                     automationStep("Extend Slides/Arm");
                     extendTime = curTime;
-                } else if ((clearCarousel() || !carousel.home || !isRed) && !depositExtendCommands && depositOpenTime == -1) {
+                } else if (clearCarousel() && !depositExtendCommands && depositOpenTime == -1) {
                     turretScore();
                     automationStep("Align Turret");
                     depositExtendCommands = true;

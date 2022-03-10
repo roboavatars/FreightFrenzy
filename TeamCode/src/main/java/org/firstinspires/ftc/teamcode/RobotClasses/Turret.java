@@ -66,7 +66,6 @@ public class Turret {
     }
 
     public void update(boolean armHome) {
-
         if (home && !armHome) {
             turretTargetTheta = (0.5*PI) + turretOffset;
         } else if (home) {

@@ -17,7 +17,7 @@ public class TurretPDFTuning extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Turret deposit = new Turret(this, false, PI/2);
+        Turret turret = new Turret(this, false, PI/2);
         Drivetrain dt = new Drivetrain(this, 0, 0, PI/2);
 
         waitForStart();
@@ -29,7 +29,7 @@ public class TurretPDFTuning extends LinearOpMode {
             dt.updatePose();
 
             if (enabled) {
-                targetTheta = (lockTheta * PI - dt.theta + PI/2) % (2 * PI);
+                targetTheta = (Math.atan2(30 - dt.y, dt.x) - dt.theta + PI/2) % (2 * PI);
                 if (targetTheta < 0) {
                     targetTheta += 2 * PI;
                 }
@@ -39,15 +39,15 @@ public class TurretPDFTuning extends LinearOpMode {
                     targetTheta -= 2*PI;
                 }
 //                deposit.setTurretTheta(targetTheta);
-                deposit.setTurretThetaFF(targetTheta, dt.commandedW);
+                turret.setTurretThetaFF(targetTheta, dt.commandedW);
             } else {
-                deposit.setPower(0);
+                turret.setPower(0);
             }
 
             addPacket("1 dt theta", dt.theta);
             addPacket("2 lock theta", lockTheta * PI);
-            addPacket("3 global current theta", dt.theta + deposit.getTheta() - PI/2);
-            addPacket("4 current theta", deposit.getTheta());
+            addPacket("3 global current theta", dt.theta + turret.getTheta() - PI/2);
+            addPacket("4 current theta", turret.getTheta());
             addPacket("5 target theta", targetTheta);
             sendPacket();
         }
