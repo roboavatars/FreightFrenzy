@@ -6,7 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 public class Constants {
 
     // Drivetrain
-    public static double ODO_NORMAL_POS = 0.4;
+    public static double ODO_NORMAL_POS = 0.45;
     public static double ODO_RETRACT_POS = 0.7;
 
     // Intake
@@ -20,7 +20,7 @@ public class Constants {
 
     // Intake Servo
     public static double INTAKE_UP_POS = 0.42;
-    public static double INTAKE_DOWN_POS = 0.83;
+    public static double INTAKE_DOWN_POS = 0.85;
 
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.2;
@@ -33,7 +33,7 @@ public class Constants {
     public static int DEPOSIT_ARM_MID = 645;
     public static int DEPOSIT_ARM_HIGH = 540;
     public static int DEPOSIT_ARM_MIDWAY = 350;
-    public static int ARM_ON_HUB_THRESHOLD = DEPOSIT_ARM_HIGH;
+    public static int ARM_ON_HUB_THRESHOLD = DEPOSIT_ARM_HIGH - 20;
 
     // Deposit Slides
     public static double SLIDES_DISTANCE_HOME = 0;
@@ -47,7 +47,7 @@ public class Constants {
     public static double ARM_DISTANCE = 25;
 
     // Turret
-    public static double TURRET_HOME_THETA = 0.49; // changed from 0.54 for quack
+    public static double TURRET_HOME_THETA = 0.48; // changed from 0.54 for quack
     public static double TURRET_ALLIANCE_RED_CYCLE_LOW_THETA = 0.18;
     public static double TURRET_ALLIANCE_RED_CYCLE_MID_THETA = 0.19;
     public static double TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA = 0.18;
@@ -56,7 +56,7 @@ public class Constants {
 
     // Carousel
     public static double CAROUSEL_POWER = 0.55;
-    public static double CAROUSEL_HOME = 0.9;
+    public static double CAROUSEL_HOME = 0.85;
     public static double CAROUSEL_OUT = 0.2;
 
     // Anti-Tip

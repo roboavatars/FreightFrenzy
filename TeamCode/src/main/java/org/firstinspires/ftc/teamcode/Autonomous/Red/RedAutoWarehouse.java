@@ -46,7 +46,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         // Segment Times
         double cycleScoreTime = 0.7;
-        double parkThreshold = 5;
+        double parkThreshold = 6;
 
         // Paths
         Path cycleScorePath = null;
@@ -54,7 +54,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         int cycleCounter = 0;
         double passLineTime = 0;
-        int odoDriftAdjustment = 3;
+        double odoDriftAdjustment = 3;
 
         waitForStart();
 
@@ -103,16 +103,23 @@ public class RedAutoWarehouse extends LinearOpMode {
             }
 
             else if (!goToWarehouse) {
-                if (robot.y < 105) {
-                    robot.drivetrain.constantStrafeConstant = -0.3;
+                if (robot.y < 105 - odoDriftAdjustment * cycleCounter) {
+                    robot.drivetrain.constantStrafeConstant = -0.15;
                     robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI/2 > PI/10 ? -0.5 : 0);
                     passLineTime = time.seconds();
 
                     addPacket("path", "going to warehouse right rn");
-                } else if (timeLeft > parkThreshold) {
+                } else if (timeLeft > parkThreshold && !(robot.x <= 135 && robot.intakeFull)) {
                     robot.drivetrain.constantStrafeConstant = 0;
-                    double y = Math.min(107 + 3 * (time.seconds() - passLineTime), 116);
-                    robot.setTargetPoint(new Target(138, y, PI/2));
+                    if (cycleCounter < 2) {
+                        double y = Math.min(107 + 3 * (time.seconds() - passLineTime), 116);
+                        robot.setTargetPoint(new Target(138, y, PI / 2));
+                    } else {
+                        double x = Math.max(138 - 2 * (time.seconds() - passLineTime) * (time.seconds() - passLineTime), 130);
+                        double y = Math.min(107 + 3 * (time.seconds() - passLineTime), 116);
+                        double theta = Math.min(PI/2 + PI/8 * (time.seconds() - passLineTime),3 * PI/4);
+                        robot.setTargetPoint(new Target(x, y, theta));
+                    }
 
                     addPacket("path", "creeping right rn");
                 } else {
@@ -126,7 +133,9 @@ public class RedAutoWarehouse extends LinearOpMode {
                     resetOdo = true;
                 }
 
-                if (robot.intakeFull && robot.y >= 107) {
+                if (robot.x <= 130 && robot.intakeFull) {
+                    robot.setTargetPoint(new Target(140, 108, PI/2));
+                } else if (robot.intakeFull && robot.y >= 107 - odoDriftAdjustment * cycleCounter) {
                     resetOdo = false;
 
                     robot.depositApproval = true;
@@ -147,7 +156,7 @@ public class RedAutoWarehouse extends LinearOpMode {
             }
 
             else if (!cycleScore) {
-                robot.drivetrain.constantStrafeConstant = robot.y > 105 ? -0.4 : 0;
+                robot.drivetrain.constantStrafeConstant = robot.y > 105 ? -0.15 : 0;
 
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
                 robot.setTargetPoint(new Target(curPose).theta(robot.y >= 83 ? PI/2 : curPose.theta + PI));
@@ -163,7 +172,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                     robot.cancelAutomation();
                 }
 
-                if (time.seconds() > cycleScoreTime && robot.y <= 90 && !robot.intakeTransfer && robot.slidesInCommand) {
+                if (time.seconds() > cycleScoreTime && robot.y <= 90 - odoDriftAdjustment * cycleCounter && !robot.intakeTransfer && robot.slidesInCommand) {
                     cycleCounter++;
                     if (cycleCounter == 2) robot.noExtend = false;
 

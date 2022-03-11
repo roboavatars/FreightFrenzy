@@ -369,11 +369,11 @@ public class Robot {
                     depositOpenTime = curTime;
                     automationStep("Score Freight");
                     log("@deposit: arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
-                } else if ((deposit.getSlidesDistInches() > 4 || ((defenseMode || cycleHub == DepositTarget.neutral) && !slidesInCommand)) && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
+                } else if (!slidesInCommand && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
                     depositHome();
                     slidesInCommand = true;
                     automationStep("Home Slides/Arm");
-                } else if ((deposit.getSlidesDistInches() <= 4 || ((defenseMode || cycleHub == DepositTarget.neutral) && slidesInCommand)) && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
+                } else if (slidesInCommand && deposit.getSlidesDistInches() <= 4 && depositOpenTime != -1 && curTime - depositOpenTime > releaseThreshold) {
                     turretHome();
 
                     automationStep("Home Turret + Cycle Done");
@@ -386,6 +386,7 @@ public class Robot {
                     slidesAtPosTime = -1;
                     extendTime = -1;
                     depositExtendCommands = false;
+                    slidesInCommand = false;
                 } else {
                     log("going to pos arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
                 }
@@ -406,7 +407,8 @@ public class Robot {
                 antiStallStep = "Jam Detected";
                 automationStep(antiStallStep);
             } else if (curTime - stallStartTime > stallThreshold) {
-                intake.reverse();
+                if (curTime % 400 > 200) intake.reverse();
+                else intake.on();
                 // antiStallStep = "Reverse Intake";
                 automationStep(antiStallStep);
             }
@@ -529,8 +531,9 @@ public class Robot {
         intakeRev = false;
         depositApproval = false;
         depositOpenTime = -1;
-        slidesInCommand = true;
+        slidesInCommand = isAuto;
         depositingFreight = false;
+        depositExtendCommands = false;
         automationStep("Automation Cancelled");
     }
 

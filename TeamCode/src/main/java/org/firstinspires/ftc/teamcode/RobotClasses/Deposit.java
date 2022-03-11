@@ -49,7 +49,7 @@ public class Deposit {
 
     public static double pArmDown = 0.0015;
     public static double dArmDown = 0.002;
-    public static double fGravityDown = 0.2;
+    public static double fGravityDown = 0.3;
 
     public static double pArmUpPreload = 0.003;
     public static double dArmUpPreload = 0.035;
@@ -131,11 +131,13 @@ public class Deposit {
     public void update(boolean intakeTransfer, boolean turretHome) {
         if (!depositing) {
             if (target == Robot.DepositTarget.allianceHigh && getSlidesDistInches() >= maxSlidesDistBeforeLoweringArm) {
+                setArmPIDCoefficients(pArmDown, dArmDown, fGravityDown);
                 setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
             } else if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm && !armHome() && turretHome) {
+                setArmPIDCoefficients(pArmDown, dArmDown, 0);
                 setArmControls(Constants.DEPOSIT_ARM_HOME);
             } else if (getArmVelocity() > 3 && armHome()) { // constant power to make sure arm does all the way home
-                armMotor.setPower(-0.1);
+                armMotor.setPower(-0.15);
             } else if (armSlidesHome()){
                 armMotor.setPower(0);
             }
@@ -200,7 +202,7 @@ public class Deposit {
     }
 
     public double getArmAngle() {
-        return getArmPosition() / ARM_TICKS_PER_RADIAN + initialArmAngle;
+        return Math.min(getArmPosition(), 800) / ARM_TICKS_PER_RADIAN + initialArmAngle;
     }
 
     public boolean armAtPosPercent(double percent) {
