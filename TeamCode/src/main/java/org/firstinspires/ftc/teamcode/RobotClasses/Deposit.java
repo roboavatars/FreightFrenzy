@@ -292,7 +292,8 @@ public class Deposit {
     }
 
     public boolean depositCleared() {
-        return getSlidesPosition() > Math.round(DEPOSIT_SLIDES_TICKS_PER_INCH * Constants.SLIDES_DISTANCE_CLEAR);
+        return getSlidesPosition() > Math.round(DEPOSIT_SLIDES_TICKS_PER_INCH * Constants.SLIDES_DISTANCE_CLEAR)
+                || getArmPosition() > Constants.ARM_OVER_CAROUSEL;
     }
 
     public boolean armSlidesAtPose() {

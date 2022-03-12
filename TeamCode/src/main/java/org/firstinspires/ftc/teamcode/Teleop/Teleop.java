@@ -125,8 +125,8 @@ public class Teleop extends LinearOpMode {
                 robot.cycleHub = Robot.DepositTarget.neutral;
             }
 
-            if ( robot.cycleHub == Robot.DepositTarget.neutral) {
-                robot.carousel.out();
+            if (robot.cycleHub == Robot.DepositTarget.neutral) {
+//                robot.carousel.out();
             } else if (gamepad1.x && !duckToggle) {
                 robot.cycleHub = Robot.DepositTarget.duck;
                 duckToggle = true;

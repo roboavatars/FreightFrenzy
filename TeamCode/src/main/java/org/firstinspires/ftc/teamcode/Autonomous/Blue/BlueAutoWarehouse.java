@@ -104,7 +104,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
             }
 
             else if (!goToWarehouse) {
-                if (Math.abs(robot.y - 105) < 0.5 && !resetOdo) {
+                if (Math.abs(robot.y - (105 - odoDriftAdjustment * cycleCounter)) < 0.5 && !resetOdo) {
                     robot.resetOdo(138, robot.y, PI/2);
                     resetOdo = true;
                 }
@@ -122,18 +122,18 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 } else if (robot.x < 9 || !robot.intakeFull) {
                     robot.drivetrain.constantStrafeConstant = 0;
                     if ((cycleCounter + 1) % 4 < 3) {
-                        double y = Math.min(107 + 3 * (time.seconds() - passLineTime), 121);
+                        double y = Math.min(107 + 5 * (time.seconds() - passLineTime), 121);
                         robot.setTargetPoint(new Target(6, y, PI/2));
                     } else {
                         double x = Math.min(6 + 1.2 * (time.seconds() - passLineTime) * (time.seconds() - passLineTime), 14);
-                        double y = Math.min(107 + 3 * (time.seconds() - passLineTime), 121);
+                        double y = Math.min(107 + 5 * (time.seconds() - passLineTime), 121) - odoDriftAdjustment * cycleCounter;
                         double theta = Math.min(PI/2 - PI/10 * (time.seconds() - passLineTime), PI/3);
                         robot.setTargetPoint(new Target(x, y, theta));
                     }
 
                     addPacket("path", "creeping right rn");
                 } else if (robot.x >= 9 && robot.intakeFull) {
-                    robot.setTargetPoint(4, 108, PI/2);
+                    robot.setTargetPoint(4, 108 - odoDriftAdjustment * cycleCounter, PI/2);
                     addPacket("path", "course correcting into wall");
                 }
 
@@ -154,10 +154,10 @@ public class BlueAutoWarehouse extends LinearOpMode {
             }
 
             else if (!cycleScore) {
-                robot.drivetrain.constantStrafeConstant = robot.y > 105 ? 0.075 : 0;
+                robot.drivetrain.constantStrafeConstant = robot.y > 105 - odoDriftAdjustment * cycleCounter ? 0.075 : 0;
 
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
-                robot.setTargetPoint(new Target(curPose).theta(robot.y >= 83 ? PI/2 : curPose.theta + PI));
+                robot.setTargetPoint(new Target(curPose).theta(robot.y >= 83 - odoDriftAdjustment * cycleCounter ? PI/2 : curPose.theta + PI));
 
                 addPacket("path", "going to deposit right rn");
 

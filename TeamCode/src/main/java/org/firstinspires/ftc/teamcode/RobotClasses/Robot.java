@@ -164,7 +164,9 @@ public class Robot {
             turret = new Turret(op, isAuto, theta);
             deposit = new Deposit(op, isAuto);
         }
-//        tapeDetector = new TapeDetector(op);
+        //        tapeDetector = new TapeDetector(op);
+
+        if (!isAuto && !isRed) carousel.out();
 
         // set up bulk read
         allHubs = op.hardwareMap.getAll(LynxModule.class);
@@ -232,6 +234,8 @@ public class Robot {
             lastCycleTime = curTime;
             firstLoop = false;
         }
+
+        if ((isRed && cycleHub == DepositTarget.neutral) || (!isRed && cycleHub != DepositTarget.neutral)) carousel.out();
 
         if (isAuto) {
             // Auto-Intaking
@@ -599,8 +603,22 @@ public class Robot {
         deposit.setDepositHome();
     }
 
-    public boolean clearCarousel(){
-        return deposit.depositCleared() || !carousel.home || defenseMode || autoNoTurret;
+    public boolean clearCarousel() {
+        if (defenseMode || autoNoTurret) {
+            return true;
+        } else if (isRed) {
+            if (cycleHub != DepositTarget.neutral) {
+                return deposit.depositCleared();
+            } else {
+                return !carousel.home;
+            }
+        } else {
+            if (cycleHub == DepositTarget.neutral) {
+                return deposit.depositCleared();
+            } else {
+                return !carousel.home;
+            }
+        }
     }
 
     // Set Turret Controls
