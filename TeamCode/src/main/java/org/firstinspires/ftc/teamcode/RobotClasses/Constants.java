@@ -19,8 +19,8 @@ public class Constants {
     public static double INTAKE_HOME_POS = 0.63;
 
     // Intake Servo
-    public static double INTAKE_UP_POS = 0.42;
-    public static double INTAKE_DOWN_POS = 0.85;
+    public static double INTAKE_UP_POS = 0.74;
+    public static double INTAKE_DOWN_POS = 0.05;
 
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.2;
@@ -39,7 +39,7 @@ public class Constants {
     public static double SLIDES_DISTANCE_HOME = 0;
     public static double SLIDES_DISTANCE_CLEAR = 2;
     public static double SLIDES_DISTANCE_LOW = 19;
-    public static double SLIDES_DISTANCE_MID = 18;
+    public static double SLIDES_DISTANCE_MID = 15.5;
     public static double SLIDES_DISTANCE_HIGH = 19;
     public static double SLIDES_DISTANCE_HIGH_AUTO = 8;
     public static double SLIDES_DISTANCE_DUCK = 21;

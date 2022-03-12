@@ -77,10 +77,10 @@ public class Teleop extends LinearOpMode {
             double[] initialData = Logger.readPos();
             telemetry.addData("Starting Position", Arrays.toString(initialData));
             telemetry.update();
-            robot = new Robot(this, initialData[1], initialData[2], initialData[3], false, initialData[0] == 1);
+            robot = new Robot(this, initialData[1], initialData[2], initialData[3], false, initialData[0] == 1, true);
             robot.logger.startLogging(false, initialData[0] == 1);
         } else {
-            robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
+            robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed, false);
             robot.logger.startLogging(false, isRed);
         }
         imu = new IMU(robot.theta, this);

@@ -66,7 +66,13 @@ public class Deposit {
     private boolean isAuto;
     public boolean preload = false;
 
+    private int initialArmPos;
+    private int initialSlidesPos;
+
     public Deposit(LinearOpMode op, boolean isAuto) {
+        this(op, isAuto, 0, 0);
+    }
+    public Deposit(LinearOpMode op, boolean isAuto, int initialArmPos, int initialSlidesPos) {
         this.isAuto = isAuto;
 
         // Deposit Servo
@@ -92,6 +98,9 @@ public class Deposit {
         slidesMotor.setPositionPIDFCoefficients(pSlides);
 
         setDepositHome();
+
+        this.initialArmPos = initialArmPos;
+        this.initialSlidesPos = initialSlidesPos;
 
         op.telemetry.addData("Status", "Deposit Initialized");
     }
@@ -174,7 +183,7 @@ public class Deposit {
         double fArm = fGravity * Math.cos(getArmAngle());
         armMotor.setPower(pArm * armError + dArm * armErrorChange + fArm);
 
-        Log.w("deposit-log", "arm set to: " + targetArmPos + ", current position: " + getArmPosition());
+        Log.w("deposit-log", "arm set to: " + targetArmPos + ", current position: " + getArmPosition() + ", power " + (pArm * armError + dArm * armErrorChange + fArm));
     }
 
     public void setArmControls() {
@@ -185,8 +194,8 @@ public class Deposit {
         targetArmPos = Math.min(Math.max(targetPos + armOffset, 0), Constants.DEPOSIT_ARM_LOW);
     }
 
-    public double getArmPosition() {
-        return armMotor.getCurrentPosition();
+    public int getArmPosition() {
+        return armMotor.getCurrentPosition() + initialArmPos;
     }
 
     public double getArmVelocity() {
@@ -238,8 +247,8 @@ public class Deposit {
         targetSlidesTicks = Math.min(Math.max(targetPos, 0), DEPOSIT_SLIDES_MAX_TICKS);
     }
 
-    public double getSlidesPosition() {
-        return slidesMotor.getCurrentPosition();
+    public int getSlidesPosition() {
+        return slidesMotor.getCurrentPosition() + initialSlidesPos;
     }
 
     public double getSlidesDistInches() {

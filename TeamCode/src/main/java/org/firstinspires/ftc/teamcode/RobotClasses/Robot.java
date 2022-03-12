@@ -142,6 +142,9 @@ public class Robot {
 
     // Constructor
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed) {
+        this(op, x, y, theta, isAuto, isRed, false);
+    }
+    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean useAutoLoggedDepositPos) {
         this.x = x;
         this.y = y;
         this.theta = theta;
@@ -152,10 +155,15 @@ public class Robot {
         // init subsystems
         drivetrain = new Drivetrain(op, x, y, theta);
         intake = new Intake(op, isAuto);
-        turret = new Turret(op, isAuto, theta);
-        deposit = new Deposit(op, isAuto);
         carousel = new Carousel(op, isRed);
         logger = new Logger();
+        if(useAutoLoggedDepositPos) {
+            turret = new Turret(op, isAuto, Logger.readPos()[4]);
+            deposit = new Deposit(op, isAuto, (int) Logger.readPos()[5], (int) Logger.readPos()[6]);
+        } else {
+            turret = new Turret(op, isAuto, theta);
+            deposit = new Deposit(op, isAuto);
+        }
 //        tapeDetector = new TapeDetector(op);
 
         // set up bulk read
@@ -177,6 +185,7 @@ public class Robot {
             op.telemetry.addData("0 DISTANCE SENSOR", "> 1000!!!");
             op.telemetry.update();
         }
+
         drawField();
         drawRobot(this);
         sendPacket();
@@ -246,7 +255,7 @@ public class Robot {
                     intake.flipUp();
                     intakeFlipTime = curTime;
                     automationStep("Intake Home/Flip");
-                } else if (intakeFull && intake.slidesIsHome() && !intakeRev && curTime - intakeFlipTime > autoFlipUpThreshold) {
+                } else if (intakeFull && intake.slidesIsHome() && !intakeRev && curTime - intakeFlipTime > autoFlipUpThreshold && deposit.armSlidesHome()) {
                     intake.setPower(cycleHub != DepositTarget.duck ? -1 : -0.5);
                     intakeRev = true;
                     automationStep("Transfer Freight");
@@ -276,7 +285,7 @@ public class Robot {
                 boolean timeOverride = !deposit.armSlidesAtPose() && deposit.getArmError() < 75 && deposit.getArmVelocity() < 5 && curTime - extendTime > convergeThreshold && extendTime != -1;
                 addPacket("time override", timeOverride);
 
-                if (!noDeposit && deposit.armSlidesHome() && depositOpenTime == -1) {
+                if (!noDeposit && deposit.armSlidesHome() && depositOpenTime == -1  && y < 105) {
                     depositScore();
                     automationStep("Extend Slides/Arm");
                     extendTime = curTime;
@@ -386,7 +395,6 @@ public class Robot {
                     slidesAtPosTime = -1;
                     extendTime = -1;
                     depositExtendCommands = false;
-                    slidesInCommand = false;
                 } else {
                     log("going to pos arm error: " + deposit.getArmError() + ", slides error: " + deposit.getSlidesError());
                 }
@@ -473,7 +481,7 @@ public class Robot {
         if (loopCounter % loggerUpdatePeriod == 0) {
             logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a,
                     turretGlobalTheta, deposit.getSlidesDistInches(), cycleHub, intake.slidesIsHome(), intakeTransfer, depositingFreight,
-                    cycles.size(), cycleAvg);
+                    cycles.size(), cycleAvg, deposit.getArmPosition(), deposit.getSlidesPosition());
         }
 
         profile(10);
@@ -518,23 +526,42 @@ public class Robot {
 
     // Cancel auto-intaking/depositing
     public void cancelAutomation() {
-        intake.off();
-        intake.home();
-        intake.flipDown();
-        deposit.open();
-        depositHome();
-        turretHome();
+        if (isAuto) {
+            intake.off();
+            intake.home();
+            intake.flipDown();
+            deposit.open();
+            depositHome();
+            turretHome();
 
-        intakeApproval = false;
-        intakeTransfer = false;
-        intakeFlipTime = -1;
-        intakeRev = false;
-        depositApproval = false;
-        depositOpenTime = -1;
-        slidesInCommand = isAuto;
-        depositingFreight = false;
-        depositExtendCommands = false;
-        automationStep("Automation Cancelled");
+            intakeApproval = false;
+            intakeTransfer = false;
+            intakeFlipTime = -1;
+            intakeRev = false;
+            depositApproval = false;
+            depositOpenTime = -1;
+            slidesInCommand = true;
+            depositingFreight = false;
+            automationStep("Automation Cancelled");
+        } else {
+            intake.off();
+            intake.home();
+            intake.flipDown();
+            deposit.open();
+            depositHome();
+            turretHome();
+
+            intakeApproval = false;
+            intakeTransfer = false;
+            intakeFlipTime = -1;
+            intakeRev = false;
+            depositApproval = false;
+            depositOpenTime = -1;
+            slidesInCommand = false;
+            depositingFreight = false;
+            depositExtendCommands = false;
+            automationStep("Automation Cancelled");
+        }
     }
 
     // Set Arm + Slides Control
