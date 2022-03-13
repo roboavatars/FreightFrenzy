@@ -34,7 +34,7 @@ public class RedAutoWarehouse extends LinearOpMode {
             park in warehouse
         */
 
-        Robot robot = new Robot(this, 138, 84, PI/2, true, true);
+        Robot robot = new Robot(this, 138, 39, 3*PI/2, true, true);
         robot.logger.startLogging(true, true);
 
         BarcodeDetector barcodeDetector = new BarcodeDetector(this, true);

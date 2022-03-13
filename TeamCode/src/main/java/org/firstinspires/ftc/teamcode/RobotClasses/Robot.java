@@ -105,6 +105,7 @@ public class Robot {
     public boolean noExtend = false;
     public boolean noDeposit = false;
     public boolean autoNoTurret = false;
+    public boolean carouselAuto = false;
 
     // Cycle Tracker
     public ArrayList<Double> cycles = new ArrayList<>();
@@ -591,6 +592,7 @@ public class Robot {
             } else if (cycleHub == DepositTarget.duck) {
                 slidesDist = Constants.SLIDES_DISTANCE_DUCK;
             }
+            if (cycleHub != DepositTarget.duck && carouselAuto) slidesDist += 2;
         }
         if (cycleHub == DepositTarget.neutral || defenseMode) {
             slidesDist = 0;
@@ -640,6 +642,7 @@ public class Robot {
             else if (cycleHub == DepositTarget.duck)
                 depositTheta = Constants.TURRET_DUCK_RED_CYCLE_THETA;
             if (autoNoTurret) depositTheta = 0.5;
+            if (carouselAuto) depositTheta = Constants.TURRET_RED_CAROUSEL_THETA;
             turret.setDepositing(isRed ? depositTheta * PI : (1 - depositTheta) * PI);
         }
     }

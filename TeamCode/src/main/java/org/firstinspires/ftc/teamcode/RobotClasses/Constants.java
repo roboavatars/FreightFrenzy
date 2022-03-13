@@ -54,6 +54,7 @@ public class Constants {
     public static double TURRET_ALLIANCE_RED_CYCLE_LOW_THETA = 0.18;
     public static double TURRET_ALLIANCE_RED_CYCLE_MID_THETA = 0.19;
     public static double TURRET_ALLIANCE_RED_CYCLE_HIGH_THETA = 0.18;
+    public static double TURRET_RED_CAROUSEL_THETA = 0.7;
     public static double TURRET_NEUTRAL_RED_CYCLE_THETA = 0.8;
     public static double TURRET_DUCK_RED_CYCLE_THETA = 0.5;
 
