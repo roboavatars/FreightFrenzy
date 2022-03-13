@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Localization.TapeDetector.TapeDetector;
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 
 @Config
-@TeleOp(name = "Tape Detector Test")
+@TeleOp(name = "Tape Detector Color Sensor Test")
 public class TapeDetectorTest extends LinearOpMode {
     double x, y, theta;
     public static boolean entering = false;

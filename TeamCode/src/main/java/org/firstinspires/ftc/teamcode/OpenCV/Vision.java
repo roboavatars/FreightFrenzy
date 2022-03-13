@@ -5,33 +5,41 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.OpenCV.AprilTag.AprilTagPipeline;
 import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodePipeline;
 import org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.FreightLocatorPipeline;
+import org.firstinspires.ftc.teamcode.OpenCV.TapeDetector.TapeDetectorPipeline;
 
 public class Vision extends BaseDetector {
+    private AprilTagPipeline aprilTagPipeline;
     private BarcodePipeline barcodePipeline;
     private FreightLocatorPipeline freightLocatorPipeline;
-    private AprilTagPipeline aprilTagPipeline;
-    public static double TAG_SIZE = 0.079;
+    private TapeDetectorPipeline tapeDetectorPipeline;
 
-    public enum Pipeline {AprilTag, Barcode, Freight}
+    public enum Pipeline {AprilTag, Barcode, Freight, Tape}
 
     public Vision(LinearOpMode op, Pipeline pipeline, boolean isRed) {
         super(op, pipeline);
 
+        aprilTagPipeline = new AprilTagPipeline();
         barcodePipeline = new BarcodePipeline(isRed);
         freightLocatorPipeline = new FreightLocatorPipeline();
-        aprilTagPipeline = new AprilTagPipeline(TAG_SIZE);
+        tapeDetectorPipeline = new TapeDetectorPipeline();
 
         setPipeline(pipeline);
     }
 
     public void setPipeline(Pipeline pipeline) {
-        if (pipeline == Pipeline.Barcode) {
+        if (pipeline == Pipeline.AprilTag) {
+            setPipeline(aprilTagPipeline);
+        } else if (pipeline == Pipeline.Barcode) {
             setPipeline(barcodePipeline);
         } else if (pipeline == Pipeline.Freight) {
             setPipeline(freightLocatorPipeline);
-        } else if (pipeline == Pipeline.AprilTag) {
-            setPipeline(aprilTagPipeline);
+        } else if (pipeline == Pipeline.Tape) {
+            setPipeline(tapeDetectorPipeline);
         }
+    }
+
+    public AprilTagPipeline getAprilTagPipe() {
+        return aprilTagPipeline;
     }
 
     public BarcodePipeline getBarcodePipeline() {
@@ -42,7 +50,7 @@ public class Vision extends BaseDetector {
         return freightLocatorPipeline;
     }
 
-    public AprilTagPipeline getAprilTagPipe() {
-        return aprilTagPipeline;
+    public TapeDetectorPipeline getTapeDetectorPipeline() {
+        return tapeDetectorPipeline;
     }
 }

@@ -15,21 +15,21 @@ import org.opencv.imgproc.Imgproc;
 public class FreightProcessor {
 
     // Color Filtering Thresholds
-    public static double minHWhite = 0;
+    public static double minHWhite = 80;
     public static double minSWhite = 0;
-    public static double minVWhite = 167;
-    public static double maxHWhite = 177;
-    public static double maxSWhite = 66;
+    public static double minVWhite = 160;
+    public static double maxHWhite = 255;
+    public static double maxSWhite = 20;
     public static double maxVWhite = 255;
 
-    public static int i = 0;
-
-    public static double minHYellow = 16;
-    public static double minSYellow = 85;
-    public static double minVYellow = 139;
-    public static double maxHYellow = 32;
+    public static double minHYellow = 80;
+    public static double minSYellow = 70;
+    public static double minVYellow = 55;
+    public static double maxHYellow = 130;
     public static double maxSYellow = 255;
     public static double maxVYellow = 255;
+
+    private int i = 0;
 
     // Image Processing Mats
     private Mat hsv = new Mat();
@@ -39,7 +39,7 @@ public class FreightProcessor {
     private Mat mask = new Mat();
     private Mat save;
 
-    private String path = "/sdcard/EasyOpenCV/";
+    private String path = "/sdcard/OpenCV/freight/";
 
     public FreightProcessor(String prefix) {
         path += prefix + '-';
@@ -68,7 +68,11 @@ public class FreightProcessor {
         saveMatToDisk("filtered", filtered);
         saveMatToDisk("mask", mask);
 
-        i++;
+        if (i == 500) {
+            i = 0;
+        } else {
+            i++;
+        }
 
         return new Mat[] {filteredWhite, filteredYellow, filtered, mask};
     }

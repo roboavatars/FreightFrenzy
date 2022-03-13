@@ -24,13 +24,13 @@ public class FreightLocator extends BaseDetector {
         setPipeline(pipeline);
     }
 
-    // Return freights
-    public ArrayList<Freight> getRawFreights() {
-        return new ArrayList<>(pipeline.getRawFreights());
+    // Return raw freight
+    public ArrayList<Freight> getRawFreight() {
+        return new ArrayList<>(pipeline.getRawFreight());
     }
 
     // Return a list of coordinate-filtered freight
-    public ArrayList<Freight> getFreights(double robotX, double robotY, double robotTheta) {
+    public ArrayList<Freight> getFreight(double robotX, double robotY, double robotTheta) {
         return pipeline.getFilteredFreight(robotX, robotY, robotTheta);
     }
 }

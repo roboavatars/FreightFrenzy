@@ -52,7 +52,7 @@ public class AutoFreightDetectionTest extends LinearOpMode {
             theta = robot.theta;
 
             // Get Freight Positions
-            freights = locator.getFreights(x, y, theta);
+            freights = locator.getFreight(x, y, theta);
             for (int i = 0; i < freights.size(); i++) {
                 if (i == 0) {
                     drawFreight(freights.get(i), "yellow");

@@ -34,7 +34,7 @@ public class FreightLocatorTest extends LinearOpMode {
             dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
             dt.updatePose();
 
-            freights = detector.getFreights(dt.x, dt.y, dt.theta);
+            freights = detector.getRawFreight();
 
             for (int i = 0; i < freights.size(); i++) {
                 if (i == 0) {

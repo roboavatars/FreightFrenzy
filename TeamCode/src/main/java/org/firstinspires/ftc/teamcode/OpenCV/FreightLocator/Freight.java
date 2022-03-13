@@ -5,15 +5,11 @@ import static java.lang.Math.sin;
 
 import android.annotation.SuppressLint;
 
-import org.firstinspires.ftc.teamcode.RobotClasses.Turret;
-
 public class Freight {
     private double relX;
     private double relY;
     private double absX;
     private double absY;
-
-    private static double DIST_THRESH = 1.5;
 
     public Freight(double relX, double relY, double absX, double absY) {
         this.relX = relX;
@@ -30,11 +26,6 @@ public class Freight {
     public Freight(double relX, double relY) {
         this.relX = relX;
         this.relY = relY;
-    }
-
-    public Freight(double startX, double startY, double theta) {
-        this.absX = startX + Turret.TURRET_Y_OFFSET * cos(theta);
-        this.absY = startY + Turret.TURRET_Y_OFFSET * sin(theta);
     }
 
     @SuppressLint("DefaultLocale")

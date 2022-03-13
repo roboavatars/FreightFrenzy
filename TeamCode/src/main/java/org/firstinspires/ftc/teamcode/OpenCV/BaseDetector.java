@@ -17,7 +17,7 @@ public class BaseDetector {
     public BaseDetector(LinearOpMode op, Vision.Pipeline pipeline) {
         this.pipeline = pipeline;
         String cameraName = "";
-        if (pipeline == Vision.Pipeline.Freight) cameraName = "Freight Webcam";
+        if (pipeline == Vision.Pipeline.Freight || pipeline == Vision.Pipeline.Tape) cameraName = "Freight Webcam";
         else cameraName = "TSE Webcam";
 
         int cameraMonitorViewId = op.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", op.hardwareMap.appContext.getPackageName());
@@ -28,8 +28,7 @@ public class BaseDetector {
         cam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                cam.startStreaming(320, 240,
-                        pipeline == Vision.Pipeline.Freight ? OpenCvCameraRotation.SIDEWAYS_LEFT : OpenCvCameraRotation.UPRIGHT);
+                cam.startStreaming(320, 240, pipeline == Vision.Pipeline.Freight ? OpenCvCameraRotation.SIDEWAYS_RIGHT : OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override

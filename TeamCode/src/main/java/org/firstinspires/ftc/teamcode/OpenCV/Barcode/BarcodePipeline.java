@@ -62,7 +62,7 @@ public class BarcodePipeline extends OpenCvPipeline {
     private Mat right = new Mat();
     private Mat blank = new Mat();
 
-    private String path = "/sdcard/EasyOpenCV/";
+    private String path = "/sdcard/OpenCV/barcode/";
 
     public BarcodePipeline(boolean isRed) {
         if (isRed) {
@@ -76,37 +76,31 @@ public class BarcodePipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-
         // Crop Input Image
         //input = new Mat(input, new Rect(RECT_X, RECT_Y, RECT_WIDTH, RECT_HEIGHT));
-        saveMatToDisk("input.jpg", input);
+        saveMatToDisk("input", input);
 
         // Draw Three Red Rectangles
         if (debug) {
             Imgproc.rectangle(input, new Point(0, 0), new Point(leftDivider, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
             Imgproc.rectangle(input, new Point(leftDivider, 0), new Point(rightDivider, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
             Imgproc.rectangle(input, new Point(rightDivider, 0), new Point(RECT_WIDTH, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
-//            saveMatToDisk("redRect.jpg", input);
+//            saveMatToDisk("redRect", input);
         }
 
         // Convert to HSV Color Space
         Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2HSV);
-//        saveMatToDisk("hsv.jpg", hsv);
         Core.inRange(hsv, new Scalar(MIN_H, MIN_S, MIN_V), new Scalar(MAX_H, MAX_S, MAX_V), processed);
-//        saveMatToDisk("processed.jpg", processed);
 
         // Remove Noise
         Imgproc.morphologyEx(processed, processed, Imgproc.MORPH_OPEN, blank);
         Imgproc.morphologyEx(processed, processed, Imgproc.MORPH_CLOSE, blank);
-        saveMatToDisk("processed2.jpg", processed);
+        saveMatToDisk("processed", processed);
 
         // Split Into Three Regions
         left = new Mat(processed, new Rect(0, 0, leftDivider, RECT_HEIGHT));
         middle = new Mat(processed, new Rect(leftDivider, 0, rightDivider - leftDivider, RECT_HEIGHT));
         right = new Mat(processed, new Rect(rightDivider, 0, RECT_WIDTH - rightDivider, RECT_HEIGHT));
-//        saveMatToDisk("left.jpg", left);
-//        saveMatToDisk("middle.jpg", middle);
-//        saveMatToDisk("right.jpg", right);
 
         // Compute White Area for each Region
         int leftArea = Core.countNonZero(left);
@@ -142,7 +136,7 @@ public class BarcodePipeline extends OpenCvPipeline {
                 Imgproc.rectangle(input, new Point(rightDivider, 0), new Point(RECT_WIDTH, RECT_HEIGHT), new Scalar(0, 255, 0), 4);
             }
         }
-        saveMatToDisk("greenRect.jpg", input);
+        saveMatToDisk("greenRect", input);
 
         log("Case: " + outputCase.name());
 
@@ -180,6 +174,6 @@ public class BarcodePipeline extends OpenCvPipeline {
     public void saveMatToDisk(String name, Mat mat) {
         save = mat.clone();
         Imgproc.cvtColor(mat, save, Imgproc.COLOR_BGR2RGB);
-        Imgcodecs.imwrite(path + name, save);
+        Imgcodecs.imwrite(path + name + ".jpg", save);
     }
 }
