@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Disabled
-@Autonomous(name = "1 Red Auto Carousel", preselectTeleOp = "1 Teleop", group = "Red")
+@Autonomous(name = "1 Red Auto Carousel", preselectTeleOp = "0 Red Teleop", group = "Red")
 public class RedAutoCarousel extends LinearOpMode {
     public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Right;
     private boolean warehousePark = true;

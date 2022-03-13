@@ -33,7 +33,7 @@ public class Carousel {
     }
 
     public void on() {
-        setPower(Constants.CAROUSEL_POWER * (isRed ? 1 : -1));
+        setPower(Constants.CAROUSEL_POWER * (isRed ? -1 : 1));
     }
 
     public void stop() {

@@ -17,12 +17,12 @@ import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Config
-@Autonomous(name = "0 0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
+@Autonomous(name = "0 0 Red Auto Warehouse", preselectTeleOp = "0 Red Teleop", group = "Red")
 public class RedAutoWarehouse extends LinearOpMode {
     public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Right;
     public static double strafeConstant = -0.075;
     public static double parkThreshold = 5;
-    public static double odoDriftAdjustment = 0.5;
+    public static double odoDriftAdjustment = 1.5;
 
     @Override
     public void runOpMode() {
@@ -34,7 +34,7 @@ public class RedAutoWarehouse extends LinearOpMode {
             park in warehouse
         */
 
-        Robot robot = new Robot(this, 138, 39, 3*PI/2, true, true);
+        Robot robot = new Robot(this, 138, 84, PI/2, true, true);
         robot.logger.startLogging(true, true);
 
         BarcodeDetector barcodeDetector = new BarcodeDetector(this, true);
@@ -82,6 +82,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         robot.depositingFreight = true;
         robot.depositApproval = true;
+        robot.autoFirstCycle = true;
 
         while (opModeIsActive()) {
             double timeLeft = 30 - (System.currentTimeMillis() - robot.startTime) / 1000;
@@ -172,6 +173,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
                 if (time.seconds() > cycleScoreTime && robot.y <= 90 - odoDriftAdjustment * cycleCounter && !robot.intakeTransfer && robot.slidesInCommand) {
                     cycleCounter++;
+                    robot.autoFirstCycle = false;
                     if (cycleCounter == 2) robot.noExtend = false;
 
                     resetOdo = false;

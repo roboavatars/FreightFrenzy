@@ -35,6 +35,7 @@ public class Constants {
     public static int DEPOSIT_ARM_MID = 645;
     public static int DEPOSIT_ARM_HIGH = 540;
     public static int DEPOSIT_ARM_MIDWAY = 350;
+    public static int DEPOSIT_ARM_NEUTRAL = 500;
     public static int ARM_ON_HUB_THRESHOLD = DEPOSIT_ARM_HIGH - 20;
     public static int ARM_OVER_CAROUSEL = 100;
 
@@ -43,7 +44,7 @@ public class Constants {
     public static double SLIDES_DISTANCE_CLEAR = 2;
     public static double SLIDES_DISTANCE_LOW = 19;
     public static double SLIDES_DISTANCE_MID = 15.5;
-    public static double SLIDES_DISTANCE_HIGH = 19;
+    public static double SLIDES_DISTANCE_HIGH = 18;
     public static double SLIDES_DISTANCE_HIGH_AUTO = 8;
     public static double SLIDES_DISTANCE_DUCK = 21;
 

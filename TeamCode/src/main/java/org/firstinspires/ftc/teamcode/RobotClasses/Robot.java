@@ -112,6 +112,7 @@ public class Robot {
     public double cycleAvg = 0;
     public double lastCycleTime;
     public double longestCycle = 0;
+    public boolean autoFirstCycle = false;
 
     // Time and Delay Variables
     public double curTime;
@@ -143,9 +144,9 @@ public class Robot {
 
     // Constructor
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed) {
-        this(op, x, y, theta, isAuto, isRed, false);
+        this(op, x, y, theta, isAuto, isRed, false, 0, 0, 0);
     }
-    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean useAutoLoggedDepositPos) {
+    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean useAutoLoggedDepositPos, double turretTheta, int armPos, int slidesPos) {
         this.x = x;
         this.y = y;
         this.theta = theta;
@@ -159,8 +160,8 @@ public class Robot {
         carousel = new Carousel(op, isRed);
         logger = new Logger();
         if(useAutoLoggedDepositPos) {
-            turret = new Turret(op, isAuto, Logger.readPos()[4]);
-            deposit = new Deposit(op, isAuto, (int) Logger.readPos()[5], (int) Logger.readPos()[6]);
+            turret = new Turret(op, isAuto, turretTheta - theta + PI/2);
+            deposit = new Deposit(op, isAuto, armPos, slidesPos);
         } else {
             turret = new Turret(op, isAuto, theta);
             deposit = new Deposit(op, isAuto);
@@ -168,6 +169,8 @@ public class Robot {
         //        tapeDetector = new TapeDetector(op);
 
         if (!isAuto && !isRed) carousel.out(Constants.CAROUSEL_HALFWAY);
+
+        if (!isAuto) drivetrain.retractOdo();
 
         // set up bulk read
         allHubs = op.hardwareMap.getAll(LynxModule.class);
@@ -210,7 +213,6 @@ public class Robot {
     }
 
     public void update() {
-
         loopCounter++;
         profiler.reset();
         curTime = System.currentTimeMillis();
@@ -235,7 +237,14 @@ public class Robot {
             lastCycleTime = curTime;
         }
 
-        if ((isRed && cycleHub == DepositTarget.neutral) || (!isRed && cycleHub != DepositTarget.neutral)) carousel.out(Constants.CAROUSEL_HALFWAY);
+        if ((isRed && cycleHub == DepositTarget.neutral) || (!isRed && cycleHub != DepositTarget.neutral)) {
+            carousel.out(Constants.CAROUSEL_HALFWAY);
+        } else if ((!isRed && cycleHub == DepositTarget.neutral) || (isRed && cycleHub != DepositTarget.neutral && cycleHub != DepositTarget.duck)) {
+            carousel.home();
+        }
+
+        if (cycleHub == DepositTarget.neutral) deposit.armMaxPower = 0.5;
+        else deposit.armMaxPower = 1;
 
         if (isAuto) {
             // Auto-Intaking
@@ -253,7 +262,7 @@ public class Robot {
                 automationStep("Intake Extend/On");
                 automationStepTime = curTime;
             } else if (intakeTransfer) {
-                if (intakeFull && !intake.slidesIsHome() && intakeFlipTime == -1) {
+                if (intakeFull && !intake.slidesIsHome() && intakeFlipTime == -1  && (!autoFirstCycle || deposit.armSlidesHome())) {
                     intake.setPower(0.2);
                     intake.home();
                     intake.flipUp();

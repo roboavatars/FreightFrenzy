@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Disabled
 @Config
-@Autonomous(name = "Red Auto Warehouse (no turret)", preselectTeleOp = "1 Teleop", group = "Red")
+@Autonomous(name = "Red Auto Warehouse (no turret)", preselectTeleOp = "0 Red Teleop", group = "Red")
 public class RedAutoWarehouseNoTurret extends LinearOpMode {
     public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Middle;
 

@@ -14,17 +14,17 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.Arrays;
 
-@TeleOp(name = "0 Teleop")
+@TeleOp(name = "0 Red Teleop")
 @SuppressWarnings("FieldCanBeLocal")
 @Config
-public class Teleop extends LinearOpMode {
+public class RedTeleop extends LinearOpMode {
 
     // Backup Starting Position
     public static double startX = 138;
     public static double startY = 81;
     public static double startTheta = PI/2;
 
-    public static boolean useAutoPos = false;
+    public static boolean useAutoPos = false; //TODO: ajsdhfklahsdkfhaskfa.kuu.haffkhak
     public static boolean isRed = true;
 
     private Robot robot;
@@ -46,42 +46,40 @@ public class Teleop extends LinearOpMode {
     private boolean endgameRumble = false;
 
     /*
-    Controller Button Mappings:
-    Gamepad 1
-    Left/Right Sticks - Drivetrain Controls
-    Left Bumper - Start Auto Intake
-    Right Bumper - Approve Freight Deposit
-    Left Trigger - Verify Transfer
-    Right Trigger - Override Intake Sensor
-    Dpad Up - High Goal
-    Dpad Left - Mid Goal
-    Dpad Down - Low Goal
-    Dpad Right - Neutral Goal
-    X - Duck Cycling
-    A - Cancel Automation
-    Y/B - Intake Slides Offset
+    Controller Button Mappings: *updated 3/13/22*
+    gamepad 1:
+    y - carousel on
+    a - cancel automation
+    b - defense mode
+    x - duck cycle
+    dpad up - high goal
+    dpad left - mid goal
+    dpad down - low goal
+    dpad right - neutral
 
-    Gamepad 2
-    Left Stick - Turret, Deposit Slides Offset
-    Right Stick - Arm Offset
-    Right Trigger - Slow Mode
-    X - Odo Reset
-    Y - Retract Odo
-    B - Defense Mode
-    A - Carousel On/Off
+    gamepad 2:
+    left trigger - deposit
+    right trigger - intake
+    left stick x - turret offset
+    left stick y - slides offset
+    right stick y - arm offset
+    x - reset odo/imu
+    y - retract odo
     */
 
     @Override
     public void runOpMode() {
         if (useAutoPos) {
             double[] initialData = Logger.readPos();
-            telemetry.addData("Starting Position", Arrays.toString(initialData));
+            telemetry.addData("Starting Data", Arrays.toString(initialData));
             telemetry.update();
-            robot = new Robot(this, initialData[1], initialData[2], initialData[3], false, initialData[0] == 1, true);
+            Robot.log("Starting Data " + Arrays.toString(initialData));
+            robot = new Robot(this, initialData[1], initialData[2], initialData[3], false, initialData[0] == 1, true, initialData[4], (int) initialData[5], (int) initialData[6]);
             robot.logger.startLogging(false, initialData[0] == 1);
         } else {
-            robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed, false);
+            robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
             robot.logger.startLogging(false, isRed);
+            robot.turret.initialTheta = Constants.TURRET_HOME_THETA * PI;
         }
         imu = new IMU(robot.theta, this);
 
@@ -134,8 +132,8 @@ public class Teleop extends LinearOpMode {
                     robot.carousel.out();
 //                    xyGain = 0.25;
 //                    wGain = 0.3;
-                    if (isRed) robot.resetOdo(138, 18, 3 * PI/2);
-                    else robot.resetOdo(6, 18, 3 * PI/2);
+//                    if (isRed) robot.resetOdo(138, 18, 3 * PI/2);
+//                    else robot.resetOdo(6, 18, 3 * PI/2);
                 } else {
                     robot.carousel.home();
 //                    xyGain = 1;
@@ -146,15 +144,16 @@ public class Teleop extends LinearOpMode {
                 duckToggle = false;
             }
 
-            if (duckActive) {
-                if (Math.abs(gamepad1.right_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1) {
-                    duckActive = false;
-                    robot.carousel.home();
-                } else {
-                    if (isRed) robot.setTargetPoint(130, 24, -PI / 4);
-                    else robot.setTargetPoint(14, 24, 5 * PI / 4);
-                }
-            }
+
+//            if (duckActive) {
+//                if (Math.abs(gamepad1.right_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1) {
+//                    duckActive = false;
+//                    robot.carousel.home();
+//                } else {
+//                    if (isRed) robot.setTargetPoint(130, 24, -PI / 6);
+//                    else robot.setTargetPoint(14, 24, 5 * PI / 4);
+//                }
+//            }
 
             if (gamepad1.dpad_up || gamepad1.dpad_left || gamepad1.dpad_down || gamepad1.dpad_right || gamepad1.x) {
                 robot.deposit.armOffset = 0;
@@ -163,11 +162,11 @@ public class Teleop extends LinearOpMode {
             }
 
             // Offsets
-            if (gamepad1.y) robot.intake.intakeOffset += 0.025;
-            else if (gamepad1.b) robot.intake.intakeOffset -= 0.025;
+//            if (gamepad1.y) robot.intake.intakeOffset += 0.025;
+//            else if (gamepad1.b) robot.intake.intakeOffset -= 0.025;
 
             robot.turret.turretOffset += 0.008 * gamepad2.left_stick_x;
-            robot.deposit.slidesOffset -= 1.5 * gamepad2.left_stick_y;
+            robot.deposit.slidesOffset -= 0.16 * gamepad2.left_stick_y;
             robot.deposit.armOffset += 6 * gamepad2.right_stick_y;
 
             // Odo Reset
@@ -181,17 +180,21 @@ public class Teleop extends LinearOpMode {
                 robot.drivetrain.retractOdo();
             }
 
-            if (!defenseModeToggle && gamepad2.b) {
+            if (!defenseModeToggle && gamepad1.b) {
                 robot.defenseMode = !robot.defenseMode;
                 defenseModeToggle = true;
-            } else if (defenseModeToggle && !gamepad2.b) {
+            } else if (defenseModeToggle && !gamepad1.b) {
                 defenseModeToggle = false;
             }
 
-            if (gamepad2.a) {
-                robot.carousel.on();
-            } else {
-                robot.carousel.stop();
+            if (duckActive) {
+                if (gamepad1.y) {
+                    robot.carousel.on();
+                    robot.deposit.hold();
+                } else {
+                    robot.carousel.stop();
+                    robot.deposit.open();
+                }
             }
 
 //            // Slow Mode

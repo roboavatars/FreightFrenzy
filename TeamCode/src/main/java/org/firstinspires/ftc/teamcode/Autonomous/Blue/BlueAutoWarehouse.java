@@ -17,12 +17,12 @@ import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Config
-@Autonomous(name = "0 0 Blue Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Blue")
+@Autonomous(name = "0 0 Blue Auto Warehouse", preselectTeleOp = "0 Blue Teleop", group = "Blue")
 public class BlueAutoWarehouse extends LinearOpMode {
     public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Right;
     public static double strafeConstant = 0.075;
     public static double parkThreshold = 5;
-    public static double odoDriftAdjustment = 2;
+    public static double odoDriftAdjustment = 3;
 
     @Override
     public void runOpMode() {
@@ -82,6 +82,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
         robot.depositingFreight = true;
         robot.depositApproval = true;
+        robot.autoFirstCycle = false;
 
         while (opModeIsActive()) {
             double timeLeft = 30 - (System.currentTimeMillis() - robot.startTime) / 1000;
@@ -172,6 +173,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
                 if (time.seconds() > cycleScoreTime && robot.y <= 90 - odoDriftAdjustment * cycleCounter && !robot.intakeTransfer && robot.slidesInCommand) {
                     cycleCounter++;
+                    robot.autoFirstCycle = false;
                     if (cycleCounter == 2) robot.noExtend = false;
 
                     resetOdo = false;
