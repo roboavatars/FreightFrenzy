@@ -17,10 +17,12 @@ public class Constants {
     public static double INTAKE_EXTEND_POS = 0.3;
     public static double INTAKE_MIDWAY_POS = 0.6;
     public static double INTAKE_HOME_POS = 0.63;
+    public static double INTAKE_HOME_INIT_POS = 0.8;
 
     // Intake Servo
     public static double INTAKE_UP_POS = 0.74;
     public static double INTAKE_DOWN_POS = 0.05;
+    public static double INTAKE_UP_INIT_POS = 0.8;
 
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.2;
@@ -59,6 +61,7 @@ public class Constants {
     public static double CAROUSEL_POWER = 0.55;
     public static double CAROUSEL_HOME = 0.85;
     public static double CAROUSEL_OUT = 0.2;
+    public static double CAROUSEL_HALFWAY = 0.5;
 
     // Anti-Tip
     public static double TIP_THRESHOLD = 0.1;

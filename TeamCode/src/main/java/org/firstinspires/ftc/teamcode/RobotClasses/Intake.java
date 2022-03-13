@@ -32,13 +32,18 @@ public class Intake {
 
         // Slides Motor
         slidesServo = op.hardwareMap.get(Servo.class, "intakeSlides");
-        home();
+        if (isAuto) {
+            slidesHome = true;
+            slidesTargetPos = Constants.INTAKE_HOME_INIT_POS;
+        } else {
+            home();
+        }
         setSlidesPosition(slidesTargetPos);
 
         // Intake Servo
         intakeServo = op.hardwareMap.get(Servo.class, "intakeServo");
         if (isAuto) {
-            flipUp();
+            intakeServo.setPosition(Constants.INTAKE_UP_INIT_POS);
         } else {
             flipDown();
         }

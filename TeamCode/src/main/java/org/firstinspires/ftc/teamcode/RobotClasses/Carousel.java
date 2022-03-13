@@ -53,7 +53,11 @@ public class Carousel {
     }
 
     public void out() {
-        setPosition(Constants.CAROUSEL_OUT);
+        out(Constants.CAROUSEL_OUT);
+    }
+
+    public void out(double pos) {
+        setPosition(pos);
         home = false;
     }
 }

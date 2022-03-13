@@ -20,21 +20,24 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Autonomous(name = "0 0 Blue Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Blue")
 public class BlueAutoWarehouse extends LinearOpMode {
     public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Right;
+    public static double strafeConstant = 0.075;
+    public static double parkThreshold = 5;
+    public static double odoDriftAdjustment = 2;
 
     @Override
     public void runOpMode() {
         /*
         Timeline:
             detect barcode
-            deliver preloaded freight on alliance shipping hub
-            cycle
+            deliver preloaded freight to alliance shipping hub
+            cycle 5 freight
             park in warehouse
         */
 
         Robot robot = new Robot(this, 6, 84, PI/2, true, false);
-        robot.logger.startLogging(true, true);
+        robot.logger.startLogging(true, false);
 
-        BarcodeDetector barcodeDetector = new BarcodeDetector(this, true);
+        BarcodeDetector barcodeDetector = new BarcodeDetector(this, false);
         barcodeDetector.start();
 
         // Segments
@@ -46,16 +49,13 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
         // Segment Times
         double cycleScoreTime = 0.7;
-        double parkThreshold = 6;
         double parkTime = 3;
 
         // Paths
         Path cycleScorePath = null;
-        Path parkPath = null;
 
         int cycleCounter = 0;
         double passLineTime = 0;
-        double odoDriftAdjustment = 1;
 
         waitForStart();
 
@@ -105,16 +105,16 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
             else if (!goToWarehouse) {
                 if (Math.abs(robot.y - (105 - odoDriftAdjustment * cycleCounter)) < 0.5 && !resetOdo) {
-                    robot.resetOdo(138, robot.y, PI/2);
+                    robot.resetOdo(6, robot.y, PI/2);
                     resetOdo = true;
                 }
 
-                if (timeLeft < parkThreshold) {
+                if (timeLeft < parkThreshold || cycleCounter == 5) {
                     goToWarehouse = true;
                     cycleScore = true;
                     time.reset();
                 } else if (robot.y < 105 - odoDriftAdjustment * cycleCounter) {
-                    robot.drivetrain.constantStrafeConstant = 0.075;
+                    robot.drivetrain.constantStrafeConstant = strafeConstant;
                     robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI/2 < -PI/10 ? 0.5 : 0);
                     passLineTime = time.seconds();
 
@@ -122,12 +122,12 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 } else if (robot.x < 9 || !robot.intakeFull) {
                     robot.drivetrain.constantStrafeConstant = 0;
                     if ((cycleCounter + 1) % 4 < 3) {
-                        double y = Math.min(107 + 5 * (time.seconds() - passLineTime), 121);
+                        double y = Math.min(107 + cycleCounter + 5 * (time.seconds() - passLineTime), 121);
                         robot.setTargetPoint(new Target(6, y, PI/2));
                     } else {
-                        double x = Math.min(6 + 1.2 * (time.seconds() - passLineTime) * (time.seconds() - passLineTime), 14);
-                        double y = Math.min(107 + 5 * (time.seconds() - passLineTime), 121) - odoDriftAdjustment * cycleCounter;
-                        double theta = Math.min(PI/2 - PI/10 * (time.seconds() - passLineTime), PI/3);
+                        double x = Math.min(6 + 1 * (time.seconds() - passLineTime) * (time.seconds() - passLineTime), 14);
+                        double y = Math.min(107 + cycleCounter + 5 * (time.seconds() - passLineTime), 121) - odoDriftAdjustment * cycleCounter;
+                        double theta = Math.max(PI/2 - PI/11 * (time.seconds() - passLineTime), PI/3);
                         robot.setTargetPoint(new Target(x, y, theta));
                     }
 
@@ -144,7 +144,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
                     Waypoint[] cycleScoreWaypoints = new Waypoint[] {
                             new Waypoint(4, robot.y, 3*PI/2, 10, 10, 0, 0),
-                            new Waypoint(4 + cycleCounter, 86 - odoDriftAdjustment * cycleCounter, 3*PI/2, 5, -5, 0, cycleScoreTime),
+                            new Waypoint(4 - cycleCounter, 86 - odoDriftAdjustment * cycleCounter, 3*PI/2, 5, -5, 0, cycleScoreTime),
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 
@@ -154,7 +154,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
             }
 
             else if (!cycleScore) {
-                robot.drivetrain.constantStrafeConstant = robot.y > 105 - odoDriftAdjustment * cycleCounter ? 0.075 : 0;
+                robot.drivetrain.constantStrafeConstant = robot.y > 105 - odoDriftAdjustment * cycleCounter ? strafeConstant : 0;
 
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
                 robot.setTargetPoint(new Target(curPose).theta(robot.y >= 83 - odoDriftAdjustment * cycleCounter ? PI/2 : curPose.theta + PI));

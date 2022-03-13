@@ -166,7 +166,7 @@ public class Robot {
         }
         //        tapeDetector = new TapeDetector(op);
 
-        if (!isAuto && !isRed) carousel.out();
+        if (!isAuto && !isRed) carousel.out(Constants.CAROUSEL_HALFWAY);
 
         // set up bulk read
         allHubs = op.hardwareMap.getAll(LynxModule.class);
@@ -232,10 +232,9 @@ public class Robot {
         if (firstLoop) {
             startTime = curTime;
             lastCycleTime = curTime;
-            firstLoop = false;
         }
 
-        if ((isRed && cycleHub == DepositTarget.neutral) || (!isRed && cycleHub != DepositTarget.neutral)) carousel.out();
+        if ((isRed && cycleHub == DepositTarget.neutral) || (!isRed && cycleHub != DepositTarget.neutral)) carousel.out(Constants.CAROUSEL_HALFWAY);
 
         if (isAuto) {
             // Auto-Intaking
@@ -289,7 +288,7 @@ public class Robot {
                 boolean timeOverride = !deposit.armSlidesAtPose() && deposit.getArmError() < 75 && deposit.getArmVelocity() < 5 && curTime - extendTime > convergeThreshold && extendTime != -1;
                 addPacket("time override", timeOverride);
 
-                if (!noDeposit && deposit.armSlidesHome() && depositOpenTime == -1  && y < 105) {
+                if (!noDeposit && (deposit.armSlidesHome() || firstLoop) && depositOpenTime == -1  && y < 105) {
                     depositScore();
                     automationStep("Extend Slides/Arm");
                     extendTime = curTime;
@@ -526,6 +525,8 @@ public class Robot {
             hub.clearBulkCache();
         }
         profile(12);
+
+        firstLoop = false;
     }
 
     // Cancel auto-intaking/depositing

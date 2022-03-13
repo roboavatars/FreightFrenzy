@@ -20,14 +20,17 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Autonomous(name = "0 0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoWarehouse extends LinearOpMode {
     public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Right;
+    public static double strafeConstant = -0.075;
+    public static double parkThreshold = 5;
+    public static double odoDriftAdjustment = 0.5;
 
     @Override
     public void runOpMode() {
         /*
         Timeline:
             detect barcode
-            deliver preloaded freight on alliance shipping hub
-            cycle
+            deliver preloaded freight to alliance shipping hub
+            cycle 5 freight
             park in warehouse
         */
 
@@ -46,16 +49,13 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         // Segment Times
         double cycleScoreTime = 0.7;
-        double parkThreshold = 6;
         double parkTime = 3;
 
         // Paths
         Path cycleScorePath = null;
-        Path parkPath = null;
 
         int cycleCounter = 0;
         double passLineTime = 0;
-        double odoDriftAdjustment = 1;
 
         waitForStart();
 
@@ -109,25 +109,25 @@ public class RedAutoWarehouse extends LinearOpMode {
                     resetOdo = true;
                 }
 
-                if (timeLeft < parkThreshold) {
+                if (timeLeft < parkThreshold || cycleCounter == 5) {
                     goToWarehouse = true;
                     cycleScore = true;
                     time.reset();
                 } else if (robot.y < 105 - odoDriftAdjustment * cycleCounter) {
-                    robot.drivetrain.constantStrafeConstant = -0.075;
-                    robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI/2 > PI/10 ? -0.5 : 0);
+                    robot.drivetrain.constantStrafeConstant = strafeConstant;
+                    robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI/2 < -PI/10 ? 0.5 : 0);
                     passLineTime = time.seconds();
 
                     addPacket("path", "going to warehouse right rn");
                 } else if (robot.x > 135 || !robot.intakeFull) {
                     robot.drivetrain.constantStrafeConstant = 0;
                     if ((cycleCounter + 1) % 4 < 3) {
-                        double y = Math.min(107 + 5 * (time.seconds() - passLineTime), 121);
+                        double y = Math.min(107 + cycleCounter + 5 * (time.seconds() - passLineTime), 121);
                         robot.setTargetPoint(new Target(138, y, PI/2));
                     } else {
-                        double x = Math.max(138 - 1.2 * (time.seconds() - passLineTime) * (time.seconds() - passLineTime), 130);
-                        double y = Math.min(107 + 5 * (time.seconds() - passLineTime), 121) - odoDriftAdjustment * cycleCounter;
-                        double theta = Math.min(PI/2 + PI/10 * (time.seconds() - passLineTime),2 * PI/3);
+                        double x = Math.max(138 - 1 * (time.seconds() - passLineTime) * (time.seconds() - passLineTime), 130);
+                        double y = Math.min(107 + cycleCounter + 5 * (time.seconds() - passLineTime), 121) - odoDriftAdjustment * cycleCounter;
+                        double theta = Math.min(PI/2 + PI/11 * (time.seconds() - passLineTime), 2 * PI/3);
                         robot.setTargetPoint(new Target(x, y, theta));
                     }
 
@@ -154,7 +154,7 @@ public class RedAutoWarehouse extends LinearOpMode {
             }
 
             else if (!cycleScore) {
-                robot.drivetrain.constantStrafeConstant = robot.y > 105 - odoDriftAdjustment * cycleCounter ? -0.075 : 0;
+                robot.drivetrain.constantStrafeConstant = robot.y > 105 - odoDriftAdjustment * cycleCounter ? strafeConstant : 0;
 
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
                 robot.setTargetPoint(new Target(curPose).theta(robot.y >= 83 - odoDriftAdjustment * cycleCounter ? PI/2 : curPose.theta + PI));

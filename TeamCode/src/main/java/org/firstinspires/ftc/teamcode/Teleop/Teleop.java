@@ -132,16 +132,28 @@ public class Teleop extends LinearOpMode {
                 duckToggle = true;
                 if (!duckActive) {
                     robot.carousel.out();
-                    xyGain = 0.25;
-                    wGain = 0.3;
+//                    xyGain = 0.25;
+//                    wGain = 0.3;
+                    if (isRed) robot.resetOdo(138, 18, 3 * PI/2);
+                    else robot.resetOdo(6, 18, 3 * PI/2);
                 } else {
                     robot.carousel.home();
-                    xyGain = 1;
-                    wGain = 0.6;
+//                    xyGain = 1;
+//                    wGain = 0.6;
                 }
                 duckActive = !duckActive;
             } else if (!gamepad1.x && duckToggle) {
                 duckToggle = false;
+            }
+
+            if (duckActive) {
+                if (Math.abs(gamepad1.right_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1) {
+                    duckActive = false;
+                    robot.carousel.home();
+                } else {
+                    if (isRed) robot.setTargetPoint(130, 24, -PI / 4);
+                    else robot.setTargetPoint(14, 24, 5 * PI / 4);
+                }
             }
 
             if (gamepad1.dpad_up || gamepad1.dpad_left || gamepad1.dpad_down || gamepad1.dpad_right || gamepad1.x) {

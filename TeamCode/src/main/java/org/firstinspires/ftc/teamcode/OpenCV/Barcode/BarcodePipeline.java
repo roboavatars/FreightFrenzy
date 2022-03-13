@@ -28,8 +28,8 @@ public class BarcodePipeline extends OpenCvPipeline {
     public static int RECT_Y = 0;
     public static int RECT_WIDTH = 320;
     public static int RECT_HEIGHT = 240;
-    public static int BLUE_LEFT_DIVIDER = 100;
-    public static int BLUE_RIGHT_DIVIDER = 200;
+    public static int BLUE_LEFT_DIVIDER = 80;
+    public static int BLUE_RIGHT_DIVIDER = 180;
     public static int RED_LEFT_DIVIDER = 140;
     public static int RED_RIGHT_DIVIDER = 230;
     public static int RETURN_IMAGE = 1;
@@ -65,7 +65,7 @@ public class BarcodePipeline extends OpenCvPipeline {
     private String path = "/sdcard/EasyOpenCV/";
 
     public BarcodePipeline(boolean isRed) {
-        if (isRed){
+        if (isRed) {
             leftDivider = RED_LEFT_DIVIDER;
             rightDivider = RED_RIGHT_DIVIDER;
         } else {
