@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode.OpenCV.AprilTag;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.RobotClasses.Robot.cameraRelativeToRobot;
 import static java.lang.Math.PI;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.CvType;
@@ -22,6 +21,8 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 
 public class AprilTagPipeline extends OpenCvPipeline {
+    private static double TAG_SIZE = 0.079;
+
     private long nativeApriltagPtr;
     private Mat grey = new Mat();
     private ArrayList<AprilTagDetection> detections = new ArrayList<>();
@@ -71,6 +72,10 @@ public class AprilTagPipeline extends OpenCvPipeline {
         constructMatrix();
     }
 
+    public AprilTagPipeline() {
+        this(TAG_SIZE);
+    }
+
     public double getFx() {
         return fx;
     }
@@ -118,7 +123,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
         return pose;
     }
 
-    public void runAprilTag () {
+    public void runAprilTag() {
         ArrayList<AprilTagDetection> detections = this.getDetectionsUpdate();
 
         if(detections != null) {
