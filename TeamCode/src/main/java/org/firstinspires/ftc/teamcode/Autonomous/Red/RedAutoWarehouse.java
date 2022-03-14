@@ -22,7 +22,7 @@ public class RedAutoWarehouse extends LinearOpMode {
     public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Right;
     public static double strafeConstant = -0.075;
     public static double parkThreshold = 5;
-    public static double odoDriftAdjustment = 1.5;
+    public static double odoDriftAdjustment = 3;
 
     @Override
     public void runOpMode() {
@@ -110,7 +110,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                     resetOdo = true;
                 }
 
-                if (timeLeft < parkThreshold || cycleCounter == 5) {
+                if (timeLeft < parkThreshold || cycleCounter == 3) {
                     goToWarehouse = true;
                     cycleScore = true;
                     time.reset();

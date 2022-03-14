@@ -70,8 +70,10 @@ public class Deposit {
     private boolean isAuto;
     public boolean preload = false;
 
-    private int initialArmPos;
-    private int initialSlidesPos;
+    public int initialArmPos;
+    public int initialSlidesPos;
+
+    public boolean reset = false;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
         this(op, isAuto, 0, 0);
@@ -124,7 +126,7 @@ public class Deposit {
         this.target = target;
         this.slidesDist = slidesDist;
 
-        if (preload) setArmPIDCoefficients(pArmUpPreload, dArmUpPreload, fGravityUp);
+        if (preload && target != Robot.DepositTarget.allianceHigh) setArmPIDCoefficients(pArmUpPreload, dArmUpPreload, fGravityUp);
         else setArmPIDCoefficients(pArmUp, dArmUp, fGravityUp);
 
         if (target == Robot.DepositTarget.allianceLow) {
@@ -146,35 +148,40 @@ public class Deposit {
     }
 
     public void update(boolean intakeTransfer, boolean turretHome) {
-        if (!depositing) {
-            if (target == Robot.DepositTarget.allianceHigh && getSlidesDistInches() >= maxSlidesDistBeforeLoweringArm) {
-                setArmPIDCoefficients(pArmDown, dArmDown, fGravityDown);
-                setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
-            } else if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm && !armHome() && turretHome) {
-                setArmPIDCoefficients(pArmDown, dArmDown, 0);
-                setArmControls(Constants.DEPOSIT_ARM_HOME);
-            } else if (getArmVelocity() > 3 && armHome()) { // constant power to make sure arm does all the way home
-                armMotor.setPower(-0.15);
-            } else if (armSlidesHome()){
-                armMotor.setPower(0);
-            }
-            if (target != Robot.DepositTarget.allianceHigh || !isAuto || getArmPosition() <= Constants.ARM_ON_HUB_THRESHOLD) {
-                if (intakeTransfer && slidesHome()) slidesMotor.setPower(-0.25); // constant power so slides dont come out when robot slowing down
-                else setSlidesControls();
+        if (!reset) {
+            if (!depositing) {
+                if (target == Robot.DepositTarget.allianceHigh && getSlidesDistInches() >= maxSlidesDistBeforeLoweringArm) {
+                    setArmPIDCoefficients(pArmDown, dArmDown, fGravityDown);
+                    setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
+                } else if (getSlidesDistInches() < maxSlidesDistBeforeLoweringArm && !armHome() && turretHome) {
+                    setArmPIDCoefficients(pArmDown, dArmDown, 0);
+                    setArmControls(Constants.DEPOSIT_ARM_HOME);
+                } else if (getArmVelocity() > 3 && armHome()) { // constant power to make sure arm does all the way home
+                    armMotor.setPower(-0.15);
+                } else if (armSlidesHome()) {
+                    armMotor.setPower(0);
+                }
+                if (target != Robot.DepositTarget.allianceHigh || !isAuto || getArmPosition() <= Constants.ARM_ON_HUB_THRESHOLD) {
+                    if (intakeTransfer && slidesHome())
+                        slidesMotor.setPower(-0.25); // constant power so slides dont come out when robot slowing down
+                    else setSlidesControls();
+                }
+            } else {
+                setSlidesInches(slidesDist); // Reset target every update to change with offset
+                setArmTarget(targetArmPosNoOffset);
+                // arm out first if low or mid goal
+                if (!(target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.allianceMid) || armAtPosPercent(0.75)) {
+                    setSlidesControls();
+                }
+                // midway arm pos if high or duck
+                if ((target == Robot.DepositTarget.allianceHigh || target == Robot.DepositTarget.duck) && !slidesAtPosPercent(0.9)) {
+                    setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
+                } else {
+                    setArmControls();
+                }
             }
         } else {
-            setSlidesInches(slidesDist); // Reset target every update to change with offset
-            setArmTarget(targetArmPosNoOffset);
-            // arm out first if low or mid goal
-            if (!(target == Robot.DepositTarget.allianceLow || target == Robot.DepositTarget.allianceMid) || armAtPosPercent(0.75)) {
-                setSlidesControls();
-            }
-            // midway arm pos if high or duck
-            if ((target == Robot.DepositTarget.allianceHigh || target == Robot.DepositTarget.duck) && !slidesAtPosPercent(0.9)) {
-                setArmControls(Constants.DEPOSIT_ARM_MIDWAY);
-            } else {
-                setArmControls();
-            }
+            armMotor.setPower(-0.5);
         }
 
         lastArmPos = getArmPosition();
@@ -238,7 +245,7 @@ public class Deposit {
 
     // Slides
     public void setSlidesControls(int targetSlidesPos) {
-        slidesMotor.setTargetPosition(targetSlidesPos);
+        slidesMotor.setTargetPosition(targetSlidesPos + initialSlidesPos);
         slidesMotor.setPower(slidesPower);
         Log.w("deposit-log", "slides set to: " + targetSlidesPos + ", current position: " + getSlidesPosition());
     }
@@ -283,6 +290,12 @@ public class Deposit {
         slidesMotor.setPositionPIDFCoefficients(p);
     }
 
+    public void resetSlidesEncoder () {
+        slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slidesMotor.setTargetPosition(0);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
     // Deposit
     private void setServoPosition(double pos) {
         if (pos != lastServoPos) {
@@ -310,5 +323,10 @@ public class Deposit {
 
     public boolean armSlidesHome() {
         return getArmPosition() < 50 && slidesHome();
+    }
+
+    public void resetArmEncoder () {
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 }

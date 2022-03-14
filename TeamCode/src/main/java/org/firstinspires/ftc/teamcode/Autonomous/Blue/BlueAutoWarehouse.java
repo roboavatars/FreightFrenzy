@@ -20,9 +20,9 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Autonomous(name = "0 0 Blue Auto Warehouse", preselectTeleOp = "0 Blue Teleop", group = "Blue")
 public class BlueAutoWarehouse extends LinearOpMode {
     public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Right;
-    public static double strafeConstant = 0.075;
+    public static double strafeConstant = 0.15;
     public static double parkThreshold = 5;
-    public static double odoDriftAdjustment = 3;
+    public static double odoDriftAdjustment = 5;
 
     @Override
     public void runOpMode() {
@@ -110,7 +110,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     resetOdo = true;
                 }
 
-                if (timeLeft < parkThreshold || cycleCounter == 5) {
+                if (timeLeft < parkThreshold || cycleCounter == 3) {
                     goToWarehouse = true;
                     cycleScore = true;
                     time.reset();

@@ -579,6 +579,15 @@ public class Robot {
         }
     }
 
+    public void resetDeposit() {
+        deposit.initialSlidesPos = 0;
+        deposit.initialArmPos = 0;
+        deposit.resetArmEncoder();
+        deposit.resetSlidesEncoder();
+
+        turret.reset(Constants.TURRET_HOME_THETA * PI);
+    }
+
     // Set Arm + Slides Control
     public void depositScore() {
         if (cycleHub == DepositTarget.neutral) {

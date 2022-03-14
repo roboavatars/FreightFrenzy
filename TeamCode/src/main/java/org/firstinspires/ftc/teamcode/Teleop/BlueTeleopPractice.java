@@ -24,7 +24,7 @@ public class BlueTeleopPractice extends LinearOpMode {
     public static double startY = 81;
     public static double startTheta = PI/2;
 
-    public static boolean useAutoPos = false; //TODO: ajsdhfklahsdkfhaskfa.kuu.haffkhak
+    public static boolean useAutoPos = false;
     public static boolean isRed = false;
 
     private Robot robot;
@@ -46,10 +46,10 @@ public class BlueTeleopPractice extends LinearOpMode {
     private boolean endgameRumble = false;
 
     /*
-    Controller Button Mappings: *updated 3/13/22*
+    Controller Button Mappings: *updated 3/13/22 12:30 PM*
     gamepad 1:
     y - carousel on
-    a - cancel automation
+    left bumper - cancel automation
     b - defense mode
     x - duck cycle
     dpad up - high goal
@@ -60,9 +60,12 @@ public class BlueTeleopPractice extends LinearOpMode {
     gamepad 2:
     left trigger - deposit
     right trigger - intake
+    right bumper - enable deposit reset mode
+    left bumper - disable deposit reset mode
     left stick x - turret offset
     left stick y - slides offset
     right stick y - arm offset
+    a = reset deposit offsets
     x - reset odo/imu
     y - retract odo
     */
@@ -107,7 +110,7 @@ public class BlueTeleopPractice extends LinearOpMode {
 
             // robot.intakeReverse = gamepad1.right_trigger > 0.1;
 
-            if (gamepad1.a) {
+            if (gamepad1.left_bumper) {
                 robot.cancelAutomation();
             }
 
@@ -164,9 +167,24 @@ public class BlueTeleopPractice extends LinearOpMode {
 //            if (gamepad1.y) robot.intake.intakeOffset += 0.025;
 //            else if (gamepad1.b) robot.intake.intakeOffset -= 0.025;
 
-            robot.turret.turretOffset += 0.008 * gamepad2.left_stick_x;
-            robot.deposit.slidesOffset -= 0.16 * gamepad2.left_stick_y;
-            robot.deposit.armOffset += 6 * gamepad2.right_stick_y;
+            if (robot.depositingFreight) {
+                robot.turret.turretOffset += 0.008 * gamepad2.left_stick_x;
+                robot.deposit.slidesOffset -= 0.16 * gamepad2.left_stick_y;
+                robot.deposit.armOffset += 6 * gamepad2.right_stick_y;
+            } else {
+                robot.turret.initialTheta += 0.008 * gamepad2.left_stick_x;
+//                robot.deposit.initialSlidesPos += Math.round(0.16 * gamepad2.left_stick_y);
+//                robot.deposit.initialArmPos -= Math.round(6 * gamepad2.right_stick_y);
+                if (gamepad2.right_bumper) {
+                    robot.deposit.reset = true;
+                } else if (gamepad2.left_bumper) {
+                    robot.deposit.reset = false;
+                }
+            }
+
+            if (gamepad2.a) {
+                robot.resetDeposit();
+            }
 
             // Odo Reset
             if (gamepad2.x) {
