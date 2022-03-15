@@ -71,7 +71,8 @@ public class RedAutoCarousel extends LinearOpMode {
         Robot.log("Barcode Case: " + barcodeCase);
         try {
             barcodeDetector.stop();
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
 
         robot.intake.flipDown();
         robot.depositingFreight = true;
@@ -97,9 +98,9 @@ public class RedAutoCarousel extends LinearOpMode {
 
             // Go to Carousel
             else if (!spinCarousel) {
-                robot.setTargetPoint(130, 24, -PI/4);
+                robot.setTargetPoint(130, 24, -PI / 4);
 
-                if (robot.isAtPose(130, 24, -PI/4) && !carouselStart) {
+                if (robot.isAtPose(130, 24, -PI / 4) && !carouselStart) {
                     robot.carousel.on();
                     carouselStart = true;
                     carouselStartTime = time.seconds();
@@ -139,7 +140,7 @@ public class RedAutoCarousel extends LinearOpMode {
             else if (!park) {
                 if (warehousePark) {
                     Pose curPose = parkPath.getRobotPose(Math.min(time.seconds(), parkTime));
-                    robot.setTargetPoint(new Target(curPose).theta(curPose.theta+PI));
+                    robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
                 } else {
                     robot.setTargetPoint(36, 18, 0);
                 }

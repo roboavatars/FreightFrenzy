@@ -20,7 +20,7 @@ public class T265Test extends LinearOpMode {
 
     public static double startX = 111;
     public static double startY = 63;
-    public static double startTheta = Math.PI/2;
+    public static double startTheta = Math.PI / 2;
     private double x;
     private double y;
     private double theta;
@@ -34,14 +34,14 @@ public class T265Test extends LinearOpMode {
         waitForStart();
         t265.startCam();
 
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
 
             dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
 
             if (gamepad1.x) {
                 t265.setCameraPose(startX, startY, startTheta);
             }
-            
+
             if (gamepad1.a) {
                 t265.exportMap();
             }

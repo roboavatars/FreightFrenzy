@@ -8,7 +8,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 
 import org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.Freight;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
-import org.firstinspires.ftc.teamcode.RobotClasses.Turret;
 
 public class Dashboard {
     public static FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -68,7 +67,8 @@ public class Dashboard {
         drawPolygon(rightSlidesX, rightSlidesY, "red");
     }
 
-    public static void drawFreight(Freight freight, String color) {}
+    public static void drawFreight(Freight freight, String color) {
+    }
 
     public static void drawField() {
         outlineRect(0, 0, 144, 144, "black");

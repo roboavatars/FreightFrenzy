@@ -7,7 +7,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
+import org.firstinspires.ftc.teamcode.RobotClasses.Arm;
 
 @TeleOp
 @Config
@@ -23,14 +23,14 @@ public class ArmGravityPIDTest extends LinearOpMode {
     public static double f = 0.1;
 
     @Override
-    public void runOpMode(){
-        Deposit deposit = new Deposit(this, false);
+    public void runOpMode() {
+        Arm deposit = new Arm(this, false);
 
         waitForStart();
         while (opModeIsActive()) {
-            Deposit.pArm = armUp ? pUp : pDown;
-            Deposit.dArm = armUp ? dUp : dDown;
-            Deposit.fGravity = f;
+            Arm.pArm = armUp ? pUp : pDown;
+            Arm.dArm = armUp ? dUp : dDown;
+            Arm.fGravity = f;
             if (depositClose) deposit.hold();
             else deposit.open();
 

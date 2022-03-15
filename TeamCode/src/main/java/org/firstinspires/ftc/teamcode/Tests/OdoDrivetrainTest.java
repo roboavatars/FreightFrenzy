@@ -17,15 +17,15 @@ public class OdoDrivetrainTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Drivetrain dt = new Drivetrain(this, 90, 9, PI/2);
+        Drivetrain dt = new Drivetrain(this, 90, 9, PI / 2);
 
         waitForStart();
 
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
             dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
 
             if (gamepad1.x) {
-                dt.resetOdo(90, 9, PI/2);
+                dt.resetOdo(90, 9, PI / 2);
             }
 
             if (gamepad1.dpad_right || gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left) {

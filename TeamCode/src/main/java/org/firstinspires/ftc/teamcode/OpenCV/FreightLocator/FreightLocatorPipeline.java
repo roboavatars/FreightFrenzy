@@ -137,7 +137,7 @@ public class FreightLocatorPipeline extends OpenCvPipeline {
 //        if (1 < w && w < 60 && 1 < h && h < 60) {
 //            int[] center = {x + w / 2, y + h};
 //            if (center[1] > 38 * center[0] / 11 - 475) {
-                return rect;
+            return rect;
 //            } else {
 //                return null;
 //            }
@@ -217,7 +217,7 @@ public class FreightLocatorPipeline extends OpenCvPipeline {
         for (Rect rect : rects) {
 //            int[] center = {rect.x + rect.width / 2, rect.y + rect.height};
 //            if (center[1] > 38 * center[0] / 11 - 475) {
-                filteredRects.add(rect);
+            filteredRects.add(rect);
 //            }
         }
 
@@ -233,7 +233,7 @@ public class FreightLocatorPipeline extends OpenCvPipeline {
         double den = (Math.sin(-CAM_PHI - vfov)) / (2 * Math.sin(vfov)) + yPix * Math.cos(CAM_PHI);
         double y = -CAM_HEIGHT * num / den;
         double x = Math.tan(hfov) * xPix * Math.hypot(CAM_HEIGHT, y);
-        return new double[] {x + CAM_RIGHT, y + CAM_FRONT};
+        return new double[]{x + CAM_RIGHT, y + CAM_FRONT};
         // TODO: fix eventually
 //        double s = Math.sin(CAM_HEADING);
 //        double c = Math.cos(CAM_HEADING);
@@ -260,8 +260,8 @@ public class FreightLocatorPipeline extends OpenCvPipeline {
 
         // Save Freight Position
 //        if (curFreight.getRelY() > 0) {
-            freights.add(curFreight);
-            log("(" + curFreight.getRelX() + ", " + curFreight.getRelY() + ") " + curFreight.getRelDist());
+        freights.add(curFreight);
+        log("(" + curFreight.getRelX() + ", " + curFreight.getRelY() + ") " + curFreight.getRelDist());
 //        }
     }
 

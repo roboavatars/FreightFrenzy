@@ -110,14 +110,21 @@ public class Logger extends Thread {
                         int numCycles, double avgCycleTime, int armPos, int slidesPos) {
         df = new SimpleDateFormat("HH:mm:ss.SSS");
         this.timeSinceSt = timeSinceSt;
-        this.x = x; this.y = y; this.theta = theta;
-        this.vx = vx; this.vy = vy; this.w = w;
-        this.ax = ax; this.ay = ay; this.alpha = alpha;
+        this.x = x;
+        this.y = y;
+        this.theta = theta;
+        this.vx = vx;
+        this.vy = vy;
+        this.w = w;
+        this.ax = ax;
+        this.ay = ay;
+        this.alpha = alpha;
         this.turretTheta = turretTheta;
         this.depositSlidesDist = depositSlidesDist;
         this.depositTarget = depositTarget;
         this.intakeSlidesExtend = intakeSlidesExtend;
-        this.intakeTransfer = intakeTransfer; this.depositingFreight = depositingFreight;
+        this.intakeTransfer = intakeTransfer;
+        this.depositingFreight = depositingFreight;
         this.numCycles = numCycles;
         this.avgCycleTime = avgCycleTime;
         this.armPos = armPos;
@@ -142,14 +149,14 @@ public class Logger extends Thread {
      * Reads position from last written file
      */
     public static double[] readPos() {
-        double[] robotPos = new double[] {1, 0, 0, 0, Math.PI/2, 0, 0};
+        double[] robotPos = new double[]{1, 0, 0, 0, Math.PI / 2, 0, 0};
 
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(getLogName(false)));
             List<String> lines = bufferedReader.lines().collect(Collectors.toList());
             int isRed = lines.get(1).contains("Red") ? 1 : 0;
             String[] data = lines.get(lines.size() - 3).split(",");
-            robotPos = new double[] {isRed, Double.parseDouble(data[2]), Double.parseDouble(data[3]), Double.parseDouble(data[4]), Double.parseDouble(data[5]), Double.parseDouble(data[11]), Double.parseDouble(data[19]), Double.parseDouble(data[20])};
+            robotPos = new double[]{isRed, Double.parseDouble(data[2]), Double.parseDouble(data[3]), Double.parseDouble(data[4]), Double.parseDouble(data[5]), Double.parseDouble(data[11]), Double.parseDouble(data[19]), Double.parseDouble(data[20])};
 
             bufferedReader.close();
             Robot.log("Starting At " + Arrays.toString(robotPos));

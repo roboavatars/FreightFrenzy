@@ -29,8 +29,8 @@ public class MotorRunToTest extends LinearOpMode {
 
         waitForStart();
 
-        while(opModeIsActive()) {
-            if (runToPos){
+        while (opModeIsActive()) {
+            if (runToPos) {
                 motor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                 motor.setPower(power);
                 motor.setTargetPosition(ticks);

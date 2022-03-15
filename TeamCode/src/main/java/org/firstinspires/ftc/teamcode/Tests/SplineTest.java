@@ -21,13 +21,13 @@ public class SplineTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Robot robot = new Robot(this, 90, 9, PI/2, false, true);
+        Robot robot = new Robot(this, 90, 9, PI / 2, false, true);
 
         waitForStart();
 
         ElapsedTime timer = new ElapsedTime();
 
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
             if (followSpline) {
                 double curTime = Math.min(timer.seconds(), pathTime);
                 robot.setTargetPoint(path.getRobotPose(curTime));
@@ -47,12 +47,12 @@ public class SplineTest extends LinearOpMode {
                 }
 
                 if (gamepad1.x) {
-                    robot.drivetrain.resetOdo(90, 9, PI/2);
+                    robot.drivetrain.resetOdo(90, 9, PI / 2);
                 }
 
-                Waypoint[] pathWaypoints = new Waypoint[] {
+                Waypoint[] pathWaypoints = new Waypoint[]{
                         new Waypoint(robot.x, robot.y, robot.theta, 40, 40, 0, 0),
-                        new Waypoint(90, 60, PI/2, 40, 10, 0, 2),
+                        new Waypoint(90, 60, PI / 2, 40, 10, 0, 2),
                         new Waypoint(60, 70, PI, 30, -5, 0, pathTime)
                 };
                 path = new Path(pathWaypoints);
@@ -68,7 +68,8 @@ public class SplineTest extends LinearOpMode {
             for (double i = (followSpline ? driveTime : 0); i < pathTime; i += pathTime / 100) {
                 try {
                     drawPoint(path.getRobotPose(i).x, path.getRobotPose(i).y, "blue");
-                } catch (ArrayIndexOutOfBoundsException ignore) {}
+                } catch (ArrayIndexOutOfBoundsException ignore) {
+                }
             }
 
             addPacket("followSpline", followSpline);

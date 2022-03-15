@@ -39,7 +39,7 @@ public class AutoFreightDetectionTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot = new Robot(this, 138, 81, PI/2, false, true);
+        robot = new Robot(this, 138, 81, PI / 2, false, true);
         locator = new FreightLocator(this);
         locator.start();
 
@@ -67,14 +67,14 @@ public class AutoFreightDetectionTest extends LinearOpMode {
                 } else if (freights.size() >= 1 && curTime < 1.5) {
                     robot.setTargetPoint(new Target(freightPath.getRobotPose(curTime)).thetaW0(freightIntakeTheta[0]));
                 } else {
-                    robot.setTargetPoint(new Target(freightPath.getRobotPose(curTime)).thetaW0(PI/2));
+                    robot.setTargetPoint(new Target(freightPath.getRobotPose(curTime)).thetaW0(PI / 2));
                 }
 
                 intakePower = 1;
                 driveTime = (double) System.currentTimeMillis() / 1000 - startTime;
 
                 // Stop Following if Done
-                if (curTime == freightTime && (robot.notMoving() || robot.isAtPose(111, 63, PI/2))) {
+                if (curTime == freightTime && (robot.notMoving() || robot.isAtPose(111, 63, PI / 2))) {
                     start = false;
                     intakePower = 0;
                 }
@@ -93,7 +93,7 @@ public class AutoFreightDetectionTest extends LinearOpMode {
 
                 // Reset Odo
                 if (gamepad1.x) {
-                    robot.resetOdo(138, 81, PI/2);
+                    robot.resetOdo(138, 81, PI / 2);
                 }
 
                 // Start Path Following
@@ -113,7 +113,7 @@ public class AutoFreightDetectionTest extends LinearOpMode {
                     freightTime += 1.5;
                     if (freightPos[1] > 130) {
                         freightPos[2] = 0;
-                        freightIntakeTheta[0] = freightPos[0] - x < 0 ? 3*PI/4 : PI/4;
+                        freightIntakeTheta[0] = freightPos[0] - x < 0 ? 3 * PI / 4 : PI / 4;
                     } else {
                         freightIntakeTheta[0] = freightPos[2];
                     }
@@ -121,7 +121,7 @@ public class AutoFreightDetectionTest extends LinearOpMode {
                 }
 
                 freightTime += 1.5;
-                freightWaypoints.add(new Waypoint(138, 81, PI/2, -30, -60, 0, freightTime));
+                freightWaypoints.add(new Waypoint(138, 81, PI / 2, -30, -60, 0, freightTime));
                 freightPath = new Path(freightWaypoints);
             }
 
@@ -136,7 +136,8 @@ public class AutoFreightDetectionTest extends LinearOpMode {
             for (double i = (start ? driveTime : 0); i < freightTime; i += freightTime / 50) {
                 try {
                     drawPoint(freightPath.getRobotPose(i).x, freightPath.getRobotPose(i).y, "blue");
-                } catch (ArrayIndexOutOfBoundsException ignore) {}
+                } catch (ArrayIndexOutOfBoundsException ignore) {
+                }
             }
 
             addPacket("start", start);

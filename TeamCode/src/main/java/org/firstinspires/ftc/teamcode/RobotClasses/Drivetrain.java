@@ -12,7 +12,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@SuppressWarnings("FieldCanBeLocal") @Config
+@SuppressWarnings("FieldCanBeLocal")
+@Config
 public class Drivetrain {
 
     // Electronics
@@ -58,7 +59,7 @@ public class Drivetrain {
     public static double ODOMETRY_TRACK_WIDTH = 9.197804620631253;
     public static double ODOMETRY_HORIZONTAL_OFFSET = 0.15;
 
-    private final double ODOMETRY_HEADING_THRESHOLD = PI/8;
+    private final double ODOMETRY_HEADING_THRESHOLD = PI / 8;
 
     // PD controller constants
     public static double xKp = 0.41;

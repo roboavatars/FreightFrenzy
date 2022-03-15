@@ -27,18 +27,18 @@ public class Spline {
         // Known Coefficients
         this.a0 = startx;
         this.a1 = startv;
-        this.a2 = starta/2;
+        this.a2 = starta / 2;
 
         // Constants of System of Equation Matrix
-        double[][] barray = {{endx - startx - startv - starta/2, endv - startv - starta, enda - starta}};
+        double[][] barray = {{endx - startx - startv - starta / 2, endv - startv - starta, enda - starta}};
         SimpleMatrix b = new SimpleMatrix(barray);
 
         // Solve for Rest of Coefficients
         SimpleMatrix z = ainverse.mult(b.transpose());
 
-        this.a3 = z.get(0,0);
-        this.a4 = z.get(1,0);
-        this.a5 = z.get(2,0);
+        this.a3 = z.get(0, 0);
+        this.a4 = z.get(1, 0);
+        this.a5 = z.get(2, 0);
         this.timeScaling = 1 / time;
     }
 

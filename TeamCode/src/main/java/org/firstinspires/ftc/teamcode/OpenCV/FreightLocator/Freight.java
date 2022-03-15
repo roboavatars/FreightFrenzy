@@ -54,7 +54,7 @@ public class Freight {
     }
 
     public double[] getAbsCoords() {
-        return new double[] {absX, absY};
+        return new double[]{absX, absY};
     }
 
     public double getRelDist() {
@@ -66,7 +66,7 @@ public class Freight {
     }
 
     public double[] driveToFreight(double robotX, double robotY) {
-        return new double[] {absX, absY, Math.atan2(absY - robotY, absX - robotX)};
+        return new double[]{absX, absY, Math.atan2(absY - robotY, absX - robotX)};
     }
 
     // Calculate freight absolute coordinates using relative coordinates and robot position

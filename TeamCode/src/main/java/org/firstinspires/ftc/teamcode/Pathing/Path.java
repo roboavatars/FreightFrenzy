@@ -42,7 +42,7 @@ public class Path {
             double time = waypoint2.time - waypoint1.time;
 
             // Make Sure waypoints Are Correct
-            assert waypoint2.time > waypoint1.time: "Waypoint times are not correct";
+            assert waypoint2.time > waypoint1.time : "Waypoint times are not correct";
 
             // Generate Splines and Add Them to Array
             Spline[] segment = splinegen.SplineBetweenTwoPoints(startx, starty, endx, endy, starttheta, endtheta, startvx, endvx, startvy, endvy, startax, endax, startay, enday, time);

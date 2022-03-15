@@ -20,8 +20,8 @@ public class IMUTest extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        Drivetrain dt = new Drivetrain(this, 111, 63, PI/2);
-        IMU imu = new IMU(PI/2, this);
+        Drivetrain dt = new Drivetrain(this, 111, 63, PI / 2);
+        IMU imu = new IMU(PI / 2, this);
 
         double prevTime = 0;
 
@@ -33,7 +33,7 @@ public class IMUTest extends LinearOpMode {
             imu.updateHeading();
 
             if (gamepad1.x) {
-                imu.resetHeading(PI/2);
+                imu.resetHeading(PI / 2);
             }
 
             double curTime = (double) System.currentTimeMillis() / 1000;

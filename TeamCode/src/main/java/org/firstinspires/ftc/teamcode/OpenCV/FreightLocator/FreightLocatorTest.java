@@ -24,7 +24,7 @@ public class FreightLocatorTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        dt = new Drivetrain(this, 138, 81, PI/2);
+        dt = new Drivetrain(this, 138, 81, PI / 2);
         detector = new FreightLocator(this);
         detector.start();
 

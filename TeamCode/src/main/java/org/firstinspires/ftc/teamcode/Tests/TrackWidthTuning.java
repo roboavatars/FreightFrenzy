@@ -23,15 +23,15 @@ public class TrackWidthTuning extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Drivetrain dt = new Drivetrain(this, 90, 9, PI/2);
+        Drivetrain dt = new Drivetrain(this, 90, 9, PI / 2);
 
         waitForStart();
 
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
             dt.setControls(0, 0, Math.abs(gamepad1.right_stick_x));
 
             if (gamepad1.x) {
-                dt.resetOdo(90, 9, PI/2);
+                dt.resetOdo(90, 9, PI / 2);
             }
 
             if (gamepad1.dpad_right || gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left) {
@@ -43,14 +43,14 @@ public class TrackWidthTuning extends LinearOpMode {
             dt.updatePose();
             x = dt.x;
             y = dt.y;
-            theta = dt.theta - PI/2;
+            theta = dt.theta - PI / 2;
 
 
             double curTime = (double) System.currentTimeMillis() / 1000;
             double timeDiff = curTime - prevTime;
             prevTime = curTime;
 
-            double trackWidth = dt.ODOMETRY_TRACK_WIDTH * theta/ (rotations * 2*PI);
+            double trackWidth = dt.ODOMETRY_TRACK_WIDTH * theta / (rotations * 2 * PI);
 
             drawField();
             drawDrivetrain(x, y, theta, "green");

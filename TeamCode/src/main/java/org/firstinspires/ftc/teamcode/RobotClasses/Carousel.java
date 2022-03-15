@@ -20,8 +20,6 @@ public class Carousel {
         carousel = op.hardwareMap.get(CRServo.class, "carousel");
         carouselArm = op.hardwareMap.get(Servo.class, "carouselArm");
 
-        home();
-
         op.telemetry.addData("Status", "Carousel Initialized");
     }
 
@@ -33,31 +31,10 @@ public class Carousel {
     }
 
     public void on() {
-        setPower(Constants.CAROUSEL_POWER * (isRed ? -1 : 1));
+        setPower(Constants.CAROUSEL_POWER);
     }
 
     public void stop() {
         setPower(0);
-    }
-
-    private void setPosition(double position) {
-        if (position != lastPosition) {
-            carouselArm.setPosition(position);
-            lastPosition = position;
-        }
-    }
-
-    public void home() {
-        setPosition(Constants.CAROUSEL_HOME);
-        home = true;
-    }
-
-    public void out() {
-        out(Constants.CAROUSEL_OUT);
-    }
-
-    public void out(double pos) {
-        setPosition(pos);
-        home = false;
     }
 }

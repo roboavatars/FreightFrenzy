@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.Tests.T265Tests;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawField;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
+
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Transform2d;
@@ -11,11 +16,6 @@ import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawField;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
-
 @TeleOp(name = "Basic T265 Test")
 @Disabled
 public class DefaultT265Test extends LinearOpMode {
@@ -23,7 +23,7 @@ public class DefaultT265Test extends LinearOpMode {
 
     public static double startX = 111;
     public static double startY = 63;
-    public static double startTheta = Math.PI/2;
+    public static double startTheta = Math.PI / 2;
     private static final double INCH_TO_METER = 0.0254;
 
     @Override
@@ -38,7 +38,7 @@ public class DefaultT265Test extends LinearOpMode {
         slamra.start();
         slamra.setPose(new Pose2d(startX * INCH_TO_METER, startY * INCH_TO_METER, new Rotation2d(startTheta)));
 
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
 
             dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
 

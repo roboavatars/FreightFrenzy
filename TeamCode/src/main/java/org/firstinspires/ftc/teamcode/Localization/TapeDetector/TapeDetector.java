@@ -9,7 +9,7 @@ public class TapeDetector {
     public TapeColorSensor left;
     private boolean entering;
     private boolean resetOdo = false;
-    public static double TAPE_THETA_THRESHOLD = PI/20;
+    public static double TAPE_THETA_THRESHOLD = PI / 20;
     public static double TAPE_SENSORS_DIST = 10;
     public static double TAPE_SENSOR_CENTER_TO_ROBOT_CENTER = -4.5;
 

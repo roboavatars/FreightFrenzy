@@ -41,7 +41,7 @@ public class BarcodePipeline extends OpenCvPipeline {
 
     // Results
     private Case outputCase = Case.None;
-    private Case[] results = new Case[] {Case.None, Case.None, Case.None, Case.None, Case.None};
+    private Case[] results = new Case[]{Case.None, Case.None, Case.None, Case.None, Case.None};
     private int cycles = 0;
 
     // CV Thresholds

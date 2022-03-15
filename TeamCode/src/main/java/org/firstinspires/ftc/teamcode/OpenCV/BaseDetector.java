@@ -17,7 +17,8 @@ public class BaseDetector {
     public BaseDetector(LinearOpMode op, Vision.Pipeline pipeline) {
         this.pipeline = pipeline;
         String cameraName = "";
-        if (pipeline == Vision.Pipeline.Freight || pipeline == Vision.Pipeline.Tape) cameraName = "Freight Webcam";
+        if (pipeline == Vision.Pipeline.Freight || pipeline == Vision.Pipeline.Tape)
+            cameraName = "Freight Webcam";
         else cameraName = "TSE Webcam";
 
         int cameraMonitorViewId = op.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", op.hardwareMap.appContext.getPackageName());

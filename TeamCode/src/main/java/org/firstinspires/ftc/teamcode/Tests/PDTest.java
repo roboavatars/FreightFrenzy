@@ -24,23 +24,23 @@ public class PDTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Robot robot = new Robot(this, 78, 63, PI/2, false, true);
+        Robot robot = new Robot(this, 78, 63, PI / 2, false, true);
 
         waitForStart();
 
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
             if (gamepad1.x) {
-                robot.drivetrain.resetOdo(78, 63, PI/2);
+                robot.drivetrain.resetOdo(78, 63, PI / 2);
             }
 
             if (gamepad1.dpad_left) {
-                robot.setTargetPoint(30, 63, PI/2, 0, 0, 0, xKp, yKp, thetaKp, xKd, yKd, thetaKd);
+                robot.setTargetPoint(30, 63, PI / 2, 0, 0, 0, xKp, yKp, thetaKp, xKd, yKd, thetaKd);
             } else if (gamepad1.dpad_right) {
-                robot.setTargetPoint(126, 63, PI/2, 0, 0, 0, xKp, yKp, thetaKp, xKd, yKd, thetaKd);
+                robot.setTargetPoint(126, 63, PI / 2, 0, 0, 0, xKp, yKp, thetaKp, xKd, yKd, thetaKd);
             } else if (gamepad1.dpad_up) {
-                robot.setTargetPoint(78, 111, PI/2, 0, 0, 0, xKp, yKp, thetaKp, xKd, yKd, thetaKd);
+                robot.setTargetPoint(78, 111, PI / 2, 0, 0, 0, xKp, yKp, thetaKp, xKd, yKd, thetaKd);
             } else if (gamepad1.dpad_down) {
-                robot.setTargetPoint(78, 15, PI/2, 0, 0, 0, xKp, yKp, thetaKp, xKd, yKd, thetaKd);
+                robot.setTargetPoint(78, 15, PI / 2, 0, 0, 0, xKp, yKp, thetaKp, xKd, yKd, thetaKd);
             } else if (gamepad1.left_bumper) {
                 robot.setTargetPoint(78, 63, PI, 0, 0, 0, xKp, yKp, thetaKp, xKd, yKd, thetaKd);
             } else if (gamepad1.right_bumper) {

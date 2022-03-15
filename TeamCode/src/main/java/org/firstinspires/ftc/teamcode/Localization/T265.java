@@ -90,7 +90,7 @@ public class T265 {
 
     public void sendOdometryData(double vx, double vy, double theta, double w) {
         double r = Math.hypot(xOffset, yOffset);
-        theta += Math.atan2(yOffset, xOffset) - PI/2;
+        theta += Math.atan2(yOffset, xOffset) - PI / 2;
         t265Cam.sendOdometry(vy + r * w * Math.sin(theta), -vx - r * w * Math.cos(theta));
     }
 
@@ -161,7 +161,7 @@ public class T265 {
                 return "yellow";
             case 1:
                 return "orange";
-            default :
+            default:
                 return "red";
         }
     }

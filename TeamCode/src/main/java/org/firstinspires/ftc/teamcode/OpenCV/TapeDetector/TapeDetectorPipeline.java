@@ -44,7 +44,7 @@ public class TapeDetectorPipeline extends OpenCvPipeline {
     // Image Cropping
     public static int RETURN_IMAGE = 0;
     public static boolean debug = true;
-    private double[] output = new double[] {0, 0};
+    private double[] output = new double[]{0, 0};
 
     // Image Processing Mats
     private Mat hsv = new Mat();
@@ -54,7 +54,8 @@ public class TapeDetectorPipeline extends OpenCvPipeline {
 
     private String path = "/sdcard/OpenCV/tape/";
 
-    public TapeDetectorPipeline() {}
+    public TapeDetectorPipeline() {
+    }
 
     @Override
     public Mat processFrame(Mat input) {
@@ -98,7 +99,7 @@ public class TapeDetectorPipeline extends OpenCvPipeline {
             Imgproc.circle(input, bestCenter, 5, new Scalar(0, 255, 0), -1);
             output = map2Dto3D(bestCenter.x / 120.0 - 1, 1 - bestCenter.y / 320.0);
         } else {
-            output = new double[] {0, 0};
+            output = new double[]{0, 0};
         }
 
 //        // Draw Green Rectangle Depending on Region
@@ -134,7 +135,7 @@ public class TapeDetectorPipeline extends OpenCvPipeline {
         double x = Math.tan(hfov) * xPix * Math.hypot(CAM_HEIGHT, y);
         double s = Math.sin(CAM_HEADING);
         double c = Math.cos(CAM_HEADING);
-        return new double[] {-s*x + c*y + CAM_RIGHT, c*x + s*y + CAM_FRONT};
+        return new double[]{-s * x + c * y + CAM_RIGHT, c * x + s * y + CAM_FRONT};
     }
 
     private void log(String message) {

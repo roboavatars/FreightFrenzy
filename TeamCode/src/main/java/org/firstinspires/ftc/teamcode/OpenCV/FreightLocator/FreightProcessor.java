@@ -74,7 +74,7 @@ public class FreightProcessor {
             i++;
         }
 
-        return new Mat[] {filteredWhite, filteredYellow, filtered, mask};
+        return new Mat[]{filteredWhite, filteredYellow, filtered, mask};
     }
 
     public void saveMatToDisk(String name, Mat mat) {

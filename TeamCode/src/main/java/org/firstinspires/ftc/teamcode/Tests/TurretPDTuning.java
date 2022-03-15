@@ -7,8 +7,6 @@ import static java.lang.Math.PI;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.RobotClasses.Turret;
-
 @TeleOp
 public class TurretPDTuning extends LinearOpMode {
     public static boolean enabled = true;
@@ -16,7 +14,7 @@ public class TurretPDTuning extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Turret deposit = new Turret(this, false, PI/2);
+        Turret deposit = new Turret(this, false, PI / 2);
 
         waitForStart();
 

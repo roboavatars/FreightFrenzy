@@ -19,14 +19,15 @@ public class TapeDetectorTest extends LinearOpMode {
     public static boolean entering = false;
     public static boolean exiting = false;
     private double lastTime;
+
     @Override
     public void runOpMode() throws InterruptedException {
-        Drivetrain drivetrain = new Drivetrain(this, 138, 83, Math.PI/2);
+        Drivetrain drivetrain = new Drivetrain(this, 138, 83, Math.PI / 2);
         TapeDetector tapeDetector = new TapeDetector(this);
         tapeDetector.entering();
 
         waitForStart();
-        while (opModeIsActive()){
+        while (opModeIsActive()) {
             drivetrain.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
             drivetrain.updatePose();
 
@@ -34,10 +35,10 @@ public class TapeDetectorTest extends LinearOpMode {
             y = drivetrain.y;
             theta = drivetrain.theta;
 
-            if (entering){
+            if (entering) {
                 entering = false;
                 tapeDetector.entering();
-            } else if (exiting){
+            } else if (exiting) {
                 exiting = false;
                 tapeDetector.exiting();
             }
@@ -61,7 +62,7 @@ public class TapeDetectorTest extends LinearOpMode {
             drawField();
             drawRobot(x, y, theta, false, 0, theta, "grey");
 
-            addPacket("7 loop time", 1000/(System.currentTimeMillis() - lastTime));
+            addPacket("7 loop time", 1000 / (System.currentTimeMillis() - lastTime));
             lastTime = System.currentTimeMillis();
 
             sendPacket();

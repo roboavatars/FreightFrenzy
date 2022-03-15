@@ -20,8 +20,8 @@ public class AntiTipTest extends LinearOpMode {
         Drivetrain dt = new Drivetrain(this, 0, 0, 0);
 
         waitForStart();
-        while (opModeIsActive()){
-            double [] adjustedControls = antiTip.update();
+        while (opModeIsActive()) {
+            double[] adjustedControls = antiTip.update();
 
             dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
             dt.updatePose();

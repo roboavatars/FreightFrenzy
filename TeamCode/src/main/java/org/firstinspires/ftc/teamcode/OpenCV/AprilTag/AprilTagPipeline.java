@@ -34,10 +34,10 @@ public class AprilTagPipeline extends OpenCvPipeline {
 
     Mat cameraMatrix;
 
-    Scalar blue = new Scalar(7,197,235,255);
-    Scalar red = new Scalar(255,0,0,255);
-    Scalar green = new Scalar(0,255,0,255);
-    Scalar white = new Scalar(255,255,255,255);
+    Scalar blue = new Scalar(7, 197, 235, 255);
+    Scalar red = new Scalar(255, 0, 0, 255);
+    Scalar green = new Scalar(0, 255, 0, 255);
+    Scalar white = new Scalar(255, 255, 255, 255);
 
     double fx = 578.272;
     double fy = 578.272;
@@ -96,13 +96,13 @@ public class AprilTagPipeline extends OpenCvPipeline {
         return tagsize;
     }
 
-    public double[] getLocation () {
+    public double[] getLocation() {
         return location;
     }
 
     public double[] getCenterOfMarker() {
         if (ClosestDetection == null) {
-            return new double[] {-1, -1, -1};
+            return new double[]{-1, -1, -1};
         } else {
             return getCenterOfMarker(ClosestDetection.pose.x * INCHES_PER_METER, ClosestDetection.pose.z * INCHES_PER_METER, ClosestDetection.pose.yaw, ClosestDetection.id);
         }
@@ -111,13 +111,13 @@ public class AprilTagPipeline extends OpenCvPipeline {
     public double[] getCenterOfMarker(double tagX, double tagY, double tagTheta, double tagID) {
         double[] pose = new double[3];
 
-        pose[0] = 2*Math.cos(tagTheta + PI/2) + tagX;
-        pose[1] = 2*Math.sin(tagTheta + PI/2) + tagY;
+        pose[0] = 2 * Math.cos(tagTheta + PI / 2) + tagX;
+        pose[1] = 2 * Math.sin(tagTheta + PI / 2) + tagY;
 
-        pose[2] = tagTheta - tagID*PI/2;
-        pose[2] %= 2*PI;
+        pose[2] = tagTheta - tagID * PI / 2;
+        pose[2] %= 2 * PI;
         if (pose[2] < 0) {
-            pose[2] += 2*PI;
+            pose[2] += 2 * PI;
         }
 
         return pose;
@@ -126,14 +126,14 @@ public class AprilTagPipeline extends OpenCvPipeline {
     public void runAprilTag() {
         ArrayList<AprilTagDetection> detections = this.getDetectionsUpdate();
 
-        if(detections != null) {
+        if (detections != null) {
 
             // if we don't see any tags
-            if(detections.size() == 0) {
+            if (detections.size() == 0) {
                 numFramesWithoutDetection++;
 
                 // if we haven't seen a tag for a few frames, lower the decimation to increase changes of seeing the tag
-                if(numFramesWithoutDetection >= THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION) {
+                if (numFramesWithoutDetection >= THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION) {
                     this.setDecimation(DECIMATION_LOW);
                 }
                 ClosestDetection = null;
@@ -143,14 +143,14 @@ public class AprilTagPipeline extends OpenCvPipeline {
                 numFramesWithoutDetection = 0;
 
                 // if the target is within 1 meter, turn on high decimation to increase the frame rate
-                if(detections.get(0).pose.z < THRESHOLD_HIGH_DECIMATION_RANGE_METERS) {
+                if (detections.get(0).pose.z < THRESHOLD_HIGH_DECIMATION_RANGE_METERS) {
                     this.setDecimation(DECIMATION_HIGH);
                 }
 
                 //Find the closest detection and record its position
                 ClosestDetection = detections.get(0);
-                for(AprilTagDetection detection : detections) {
-                    if (Math.hypot(detection.pose.x, detection.pose.y) < Math.hypot(ClosestDetection.pose.x, ClosestDetection.pose.y)){
+                for (AprilTagDetection detection : detections) {
+                    if (Math.hypot(detection.pose.x, detection.pose.y) < Math.hypot(ClosestDetection.pose.x, ClosestDetection.pose.y)) {
                         ClosestDetection = detection;
                     }
                 }
@@ -181,7 +181,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
         Imgproc.cvtColor(input, grey, Imgproc.COLOR_RGBA2GRAY);
 
         synchronized (decimationSync) {
-            if(needToSetDecimation) {
+            if (needToSetDecimation) {
                 AprilTagDetectorJNI.setApriltagDetectorDecimation(nativeApriltagPtr, (float) decimation);
                 needToSetDecimation = false;
             }
@@ -198,7 +198,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
         // OpenCV because I haven't yet figured out how to re-use AprilTag's pose in OpenCV.
         for (AprilTagDetection detection : detections) {
             Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
-            drawAxisMarker(input, tagsizeY/2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
+            drawAxisMarker(input, tagsizeY / 2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
             draw3dCubeMarker(input, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
         }
 
@@ -238,22 +238,22 @@ public class AprilTagPipeline extends OpenCvPipeline {
         addPacket("offset theta", offsetTheta);
 
         //find the coords of the camera
-        camera_x = starting_marker[0] + -current_marker[0]*Math.cos(offsetTheta) - -current_marker[1]*Math.sin(offsetTheta);
-        camera_y = starting_marker[1] + -current_marker[0]*Math.sin(offsetTheta) + -current_marker[1]*Math.cos(offsetTheta);
+        camera_x = starting_marker[0] + -current_marker[0] * Math.cos(offsetTheta) - -current_marker[1] * Math.sin(offsetTheta);
+        camera_y = starting_marker[1] + -current_marker[0] * Math.sin(offsetTheta) + -current_marker[1] * Math.cos(offsetTheta);
 
         addPacket("camera y", camera_y);
         addPacket("camera x", camera_x);
 
         //find robot heading
-        pose[2] = PI - (Math.atan2(current_marker[1],current_marker[0])-PI/2) + Math.atan2(camera_y,camera_x);
-        pose[2] = pose[2] % 2*PI;
-        if (pose[2] < 0 ){
-            pose[2] += 2*PI;
+        pose[2] = PI - (Math.atan2(current_marker[1], current_marker[0]) - PI / 2) + Math.atan2(camera_y, camera_x);
+        pose[2] = pose[2] % 2 * PI;
+        if (pose[2] < 0) {
+            pose[2] += 2 * PI;
         }
 
         //find the coords of the center of the robot
-        pose[0] = camera_x + -cameraRelativeToRobot[0]*Math.cos(pose[2]) - -cameraRelativeToRobot[1]*Math.sin(pose[2]);
-        pose[1] = camera_x + -cameraRelativeToRobot[0]*Math.sin(pose[2]) + -cameraRelativeToRobot[1]*Math.cos(pose[2]);
+        pose[0] = camera_x + -cameraRelativeToRobot[0] * Math.cos(pose[2]) - -cameraRelativeToRobot[1] * Math.sin(pose[2]);
+        pose[1] = camera_x + -cameraRelativeToRobot[0] * Math.sin(pose[2]) + -cameraRelativeToRobot[1] * Math.cos(pose[2]);
 
         return pose;
     }
@@ -268,38 +268,38 @@ public class AprilTagPipeline extends OpenCvPipeline {
         //      --         --
         //
 
-        cameraMatrix = new Mat(3,3, CvType.CV_32FC1);
+        cameraMatrix = new Mat(3, 3, CvType.CV_32FC1);
 
-        cameraMatrix.put(0,0, fx);
-        cameraMatrix.put(0,1,0);
-        cameraMatrix.put(0,2, cx);
+        cameraMatrix.put(0, 0, fx);
+        cameraMatrix.put(0, 1, 0);
+        cameraMatrix.put(0, 2, cx);
 
-        cameraMatrix.put(1,0,0);
-        cameraMatrix.put(1,1,fy);
-        cameraMatrix.put(1,2,cy);
+        cameraMatrix.put(1, 0, 0);
+        cameraMatrix.put(1, 1, fy);
+        cameraMatrix.put(1, 2, cy);
 
         cameraMatrix.put(2, 0, 0);
-        cameraMatrix.put(2,1,0);
-        cameraMatrix.put(2,2,1);
+        cameraMatrix.put(2, 1, 0);
+        cameraMatrix.put(2, 2, 1);
     }
 
     /**
      * Draw a 3D axis marker on a detection. (Similar to what Vuforia does)
      *
-     * @param buf the RGB buffer on which to draw the marker
-     * @param length the length of each of the marker 'poles'
-     * @param rvec the rotation vector of the detection
-     * @param tvec the translation vector of the detection
+     * @param buf          the RGB buffer on which to draw the marker
+     * @param length       the length of each of the marker 'poles'
+     * @param rvec         the rotation vector of the detection
+     * @param tvec         the translation vector of the detection
      * @param cameraMatrix the camera matrix used when finding the detection
      */
     void drawAxisMarker(Mat buf, double length, int thickness, Mat rvec, Mat tvec, Mat cameraMatrix) {
         // The points in 3D space we wish to project onto the 2D image plane.
         // The origin of the coordinate space is assumed to be in the center of the detection.
         MatOfPoint3f axis = new MatOfPoint3f(
-                new Point3(0,0,0),
-                new Point3(length,0,0),
-                new Point3(0,length,0),
-                new Point3(0,0,-length)
+                new Point3(0, 0, 0),
+                new Point3(length, 0, 0),
+                new Point3(0, length, 0),
+                new Point3(0, 0, -length)
         );
 
         // Project those points
@@ -322,14 +322,14 @@ public class AprilTagPipeline extends OpenCvPipeline {
         // The points in 3D space we wish to project onto the 2D image plane.
         // The origin of the coordinate space is assumed to be in the center of the detection.
         MatOfPoint3f axis = new MatOfPoint3f(
-                new Point3(-tagWidth/2, tagHeight/2,0),
-                new Point3( tagWidth/2, tagHeight/2,0),
-                new Point3( tagWidth/2,-tagHeight/2,0),
-                new Point3(-tagWidth/2,-tagHeight/2,0),
-                new Point3(-tagWidth/2, tagHeight/2,-length),
-                new Point3( tagWidth/2, tagHeight/2,-length),
-                new Point3( tagWidth/2,-tagHeight/2,-length),
-                new Point3(-tagWidth/2,-tagHeight/2,-length));
+                new Point3(-tagWidth / 2, tagHeight / 2, 0),
+                new Point3(tagWidth / 2, tagHeight / 2, 0),
+                new Point3(tagWidth / 2, -tagHeight / 2, 0),
+                new Point3(-tagWidth / 2, -tagHeight / 2, 0),
+                new Point3(-tagWidth / 2, tagHeight / 2, -length),
+                new Point3(tagWidth / 2, tagHeight / 2, -length),
+                new Point3(tagWidth / 2, -tagHeight / 2, -length),
+                new Point3(-tagWidth / 2, -tagHeight / 2, -length));
 
         // Project those points
         MatOfPoint2f matProjectedPoints = new MatOfPoint2f();
@@ -337,8 +337,8 @@ public class AprilTagPipeline extends OpenCvPipeline {
         Point[] projectedPoints = matProjectedPoints.toArray();
 
         // Pillars
-        for(int i = 0; i < 4; i++) {
-            Imgproc.line(buf, projectedPoints[i], projectedPoints[i+4], blue, thickness);
+        for (int i = 0; i < 4; i++) {
+            Imgproc.line(buf, projectedPoints[i], projectedPoints[i + 4], blue, thickness);
         }
 
         // Base lines
@@ -358,22 +358,22 @@ public class AprilTagPipeline extends OpenCvPipeline {
      * Extracts 6DOF pose from a trapezoid, using a camera intrinsics matrix and the
      * original size of the tag.
      *
-     * @param points the points which form the trapezoid
+     * @param points       the points which form the trapezoid
      * @param cameraMatrix the camera intrinsics matrix
-     * @param tagsizeX the original width of the tag
-     * @param tagsizeY the original height of the tag
+     * @param tagsizeX     the original width of the tag
+     * @param tagsizeY     the original height of the tag
      * @return the 6DOF pose of the camera relative to the tag
      */
-    Pose poseFromTrapezoid(Point[] points, Mat cameraMatrix, double tagsizeX , double tagsizeY) {
+    Pose poseFromTrapezoid(Point[] points, Mat cameraMatrix, double tagsizeX, double tagsizeY) {
         // The actual 2d points of the tag detected in the image
         MatOfPoint2f points2d = new MatOfPoint2f(points);
 
         // The 3d points of the tag in an 'ideal projection'
         Point3[] arrayPoints3d = new Point3[4];
-        arrayPoints3d[0] = new Point3(-tagsizeX/2, tagsizeY/2, 0);
-        arrayPoints3d[1] = new Point3(tagsizeX/2, tagsizeY/2, 0);
-        arrayPoints3d[2] = new Point3(tagsizeX/2, -tagsizeY/2, 0);
-        arrayPoints3d[3] = new Point3(-tagsizeX/2, -tagsizeY/2, 0);
+        arrayPoints3d[0] = new Point3(-tagsizeX / 2, tagsizeY / 2, 0);
+        arrayPoints3d[1] = new Point3(tagsizeX / 2, tagsizeY / 2, 0);
+        arrayPoints3d[2] = new Point3(tagsizeX / 2, -tagsizeY / 2, 0);
+        arrayPoints3d[3] = new Point3(-tagsizeX / 2, -tagsizeY / 2, 0);
         MatOfPoint3f points3d = new MatOfPoint3f(arrayPoints3d);
 
         // Using this information, actually solve for pose
