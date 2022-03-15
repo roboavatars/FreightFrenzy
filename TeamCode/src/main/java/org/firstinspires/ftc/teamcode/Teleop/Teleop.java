@@ -90,19 +90,17 @@ public class Teleop extends LinearOpMode {
         cycleTimer.reset();
 
         while (opModeIsActive()) {
-            if (gamepad2.left_trigger > 0.1) {
-                robot.depositApproval = true;
-            }
+            robot.depositApproval = gamepad1.left_trigger > 0.1;
 
-            if (!intakeToggle && gamepad2.right_trigger > 0.1) {
+            if (!intakeToggle && gamepad1.right_trigger > 0.1) {
                 robot.intakeApproval = !robot.intakeApproval;
                 intakeToggle = true;
-            } else if (intakeToggle && gamepad2.right_trigger <= 0.1) {
+            } else if (intakeToggle && gamepad1.right_trigger <= 0.1) {
                 intakeToggle = false;
             }
 
             // Odo Reset
-            if (gamepad2.x) {
+            if (gamepad1.x) {
                 robot.resetOdo(138, 81, PI / 2);
                 imu.resetHeading(PI / 2);
             }
