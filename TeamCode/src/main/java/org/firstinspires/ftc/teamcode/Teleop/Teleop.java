@@ -25,6 +25,7 @@ public class Teleop extends LinearOpMode {
 
     public static boolean useAutoPos = false;
     public static boolean isRed = true;
+    public static boolean fieldCentric = true;
 
     private Robot robot;
     private IMU imu;
@@ -129,11 +130,15 @@ public class Teleop extends LinearOpMode {
 
             // Drivetrain Controls
             // Field Centric Driving
-            imu.updateHeading();
-            double theta = imu.getTheta();
-            double xControls = gamepad1.left_stick_x * xyGain;
-            double yControls = gamepad1.left_stick_y * xyGain;
-            robot.drivetrain.setControls(xControls * Math.sin(theta) + yControls * Math.cos(theta), xControls * Math.cos(theta) - yControls * Math.sin(theta), -gamepad1.right_stick_x * wGain);
+            if (fieldCentric) {
+                imu.updateHeading();
+                double theta = imu.getTheta();
+                double xControls = gamepad1.left_stick_x * xyGain;
+                double yControls = gamepad1.left_stick_y * xyGain;
+                robot.drivetrain.setControls(xControls * Math.sin(theta) + yControls * Math.cos(theta), xControls * Math.cos(theta) - yControls * Math.sin(theta), -gamepad1.right_stick_x * wGain);
+            } else {
+                robot.drivetrain.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
+            }
 
             // Update Robot
             robot.update();
