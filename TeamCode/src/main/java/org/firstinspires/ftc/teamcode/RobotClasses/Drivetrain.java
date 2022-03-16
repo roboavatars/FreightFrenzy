@@ -81,6 +81,10 @@ public class Drivetrain {
 
     // Constructor
     public Drivetrain(LinearOpMode op, double initialX, double initialY, double initialTheta) {
+        this(op, initialX, initialY, initialTheta, true);
+    }
+
+    public Drivetrain(LinearOpMode op, double initialX, double initialY, double initialTheta, boolean isAuto) {
         this.op = op;
         HardwareMap hardwareMap = op.hardwareMap;
 
@@ -103,6 +107,13 @@ public class Drivetrain {
 
         motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        if(!isAuto) {
+            motorFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motorFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
 
         odoRetractServo = hardwareMap.get(Servo.class, "odoRetractServo");
         odoRetractServo.setPosition(Constants.ODO_NORMAL_POS);

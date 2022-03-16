@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
+import static java.lang.Math.PI;
+
 import com.acmerobotics.dashboard.config.Config;
 
 @Config
@@ -29,9 +31,11 @@ public class Constants {
     public static double DEPOSIT_HOLD_POS = 0.52;
 
     // Deposit Arm
-    public static int ARM_DEPOSIT_POS = 540;
-    public static int ARM_HOME_POS = 540;
-    public static int ARM_ON_HUB_THRESHOLD = ARM_DEPOSIT_POS - 20;
+    public static int ARM_HIGH_POS = 540;
+    public static int ARM_NEUTRAL_POS = 650;
+    public static int ARM_HOME_POS = 0;
+    public static int ARM_ON_HUB_THRESHOLD = ARM_HIGH_POS - 20;
+    public static int ARM_ROTATE_TURRET_THRESHOLD = 600;
 
     // Carousel
     public static double CAROUSEL_POWER = -1;
@@ -42,4 +46,7 @@ public class Constants {
 
     // Tape Detector
     public static double COLOR_SENSOR_THRESHOLD = 400;
+
+    //Turret?
+    public static double TURRET_NETRUAL_THETA = PI;
 }

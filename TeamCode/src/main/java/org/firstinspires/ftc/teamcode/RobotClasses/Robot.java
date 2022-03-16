@@ -29,6 +29,9 @@ import java.util.List;
 @Config
 public class Robot {
 
+    public static boolean turretFunctionality = false;
+    public boolean neutralGoal = false;
+
     // Robot Classes
     public Drivetrain drivetrain;
     public Intake intake;
@@ -36,6 +39,7 @@ public class Robot {
     public Carousel carousel;
     // public TapeDetector tapeDetector;
     public Logger logger;
+    public Turret turret;
 
     private final ElapsedTime profiler;
     private final List<LynxModule> allHubs;
@@ -76,9 +80,9 @@ public class Robot {
     public boolean armExtendCommands = false;
     public boolean intakeRev = false;
     private double intakeFlipTime = -1;
-    private double armOpenTime = -1;
-    private double slidesAtPosTime = -1;
-    private double extendTime = -1;
+    private final double armOpenTime = -1;
+    private final double slidesAtPosTime = -1;
+    private final double extendTime = -1;
     public boolean noExtend = false;
     public boolean autoNoTurret = false;
     public boolean carouselAuto = false;
@@ -139,7 +143,7 @@ public class Robot {
         this.isRed = isRed;
 
         // init subsystems
-        drivetrain = new Drivetrain(op, x, y, theta);
+        drivetrain = new Drivetrain(op, x, y, theta, isAuto);
         intake = new Intake(op, isAuto);
         carousel = new Carousel(op, isRed);
         logger = new Logger();
@@ -148,6 +152,10 @@ public class Robot {
         } else {
             arm = new Arm(op, isAuto);
         }
+        if (turretFunctionality) {
+            turret = new Turret(op, isAuto);
+        }
+
         //        tapeDetector = new TapeDetector(op);
 
         // set up bulk read
@@ -259,11 +267,45 @@ public class Robot {
 
         // Auto-depositing
 
-        if (depositEnabled) {
-            if (depositingFreight) {
+        if (depositingFreight && depositEnabled) {
+            if (neutralGoal) {
                 switch (depositState) {
                     case 1:
-                        arm.setDepositControls();
+                        turret.setNeutral();
+                        depositState++;
+                    case 2:
+                        if (turret.isAtNeutral()) {
+                            arm.setNeutral();
+                            depositState++;
+                        }
+                        break;
+                    case 3:
+                        if (depositApproval) {
+                            depositTime = curTime;
+                            arm.open();
+                            markCycle();
+                            depositState++;
+                        }
+                        break;
+                    case 4:
+                        if (curTime - depositTime > releaseThreshold) {
+                            arm.setHome();
+                            depositState++;
+                        }
+                        break;
+                    case 5:
+                        if (arm.clearNeutralPipe()) {
+                            turret.setHome();
+                            depositingFreight = false;
+                            depositState = 1;
+                        }
+                        break;
+                }
+            } else {
+                switch (depositState) {
+                    case 1:
+                        arm.setHigh();
+                        depositState++;
                         break;
                     case 2:
                         if (!isAuto || arm.armAtDeposit()) {
@@ -280,16 +322,22 @@ public class Robot {
                         break;
                     case 4:
                         if (curTime - depositTime > releaseThreshold) {
-                            arm.armHome();
+                            arm.setHome();
                             depositingFreight = false;
                             depositState = 1;
                         }
                         break;
                 }
+                if (turretFunctionality) turret.setHome();
             }
         } else {
             arm.setHome();
+            if (turretFunctionality) turret.setHome();
         }
+
+        arm.update();
+        if (turretFunctionality) turret.update();
+
 
         profile(4);
 
@@ -316,8 +364,6 @@ public class Robot {
 
         // Update Intake Slides
         intake.update();
-
-        arm.update();
 
         profile(8);
 

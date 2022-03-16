@@ -21,7 +21,7 @@ public class Arm {
     public double ARM_TICKS_PER_RADIAN = 540 / PI;
     public static int DEPOSIT_ARM_ERROR_THRESHOLD = 20;
 
-    public int targetArmPos;
+    public int targetArmPos = 0;
 
     private double initialArmAngle = -PI / 6;
 
@@ -87,21 +87,17 @@ public class Arm {
         setArmTarget(Constants.ARM_HOME_POS);
     }
 
-    public void setDepositControls() {
-        depositing = true;
+    public void setHigh() {
+        targetArmPos = Constants.ARM_HIGH_POS;
+        setArmPIDCoefficients(pArmUp, dArmUp, fGravityUp);
+    }
+
+    public void setNeutral() {
+        targetArmPos = Constants.ARM_NEUTRAL_POS;
+        setArmPIDCoefficients(pArmUp, dArmUp, fGravityUp);
     }
 
     public void update() {
-        if (depositing) {
-            setArmControls(Constants.ARM_DEPOSIT_POS);
-        } else {
-            setArmControls(Constants.ARM_HOME_POS);
-        }
-    }
-
-
-    // Arm
-    public void setArmControls(int targetArmPos) {
         double targetTicks = targetArmPos;
         double currentTicks = getArmPosition();
         armErrorChange = targetTicks - currentTicks - armError;
@@ -113,12 +109,8 @@ public class Arm {
         Log.w("deposit-log", "arm set to: " + targetArmPos + ", current position: " + getArmPosition() + ", power " + (pArm * armError + dArm * armErrorChange + fArm));
     }
 
-    public void setArmControls() {
-        setArmControls(targetArmPos);
-    }
-
     public void setArmTarget(int targetPos) {
-        targetArmPos = Math.min(Math.max(targetPos, 0), Constants.ARM_DEPOSIT_POS);
+        targetArmPos = Math.min(Math.max(targetPos, 0), Constants.ARM_HIGH_POS);
     }
 
     public int getArmPosition() {
@@ -131,6 +123,10 @@ public class Arm {
 
     public boolean armAtPos() {
         return Math.abs(getArmPosition() - targetArmPos) < DEPOSIT_ARM_ERROR_THRESHOLD;
+    }
+
+    public boolean clearNeutralPipe() {
+        return getArmPosition() < Constants.ARM_ROTATE_TURRET_THRESHOLD;
     }
 
     public boolean armHome() {
@@ -172,7 +168,7 @@ public class Arm {
     }
 
     public boolean armAtDeposit() {
-        return getArmPosition() > Constants.ARM_DEPOSIT_POS - DEPOSIT_ARM_ERROR_THRESHOLD;
+        return getArmPosition() > Constants.ARM_HIGH_POS - DEPOSIT_ARM_ERROR_THRESHOLD;
     }
 
     public boolean armSlidesHome() {

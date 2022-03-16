@@ -8,6 +8,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 
 import org.firstinspires.ftc.teamcode.OpenCV.FreightLocator.Freight;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
+import org.firstinspires.ftc.teamcode.RobotClasses.Turret;
 
 public class Dashboard {
     public static FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -18,7 +19,7 @@ public class Dashboard {
     }
 
     public static void drawRobot(Robot robot, String drivetrainColor) {
-        drawRobot(robot.x, robot.y, robot.theta, !robot.intake.slidesIsHome(), robot.deposit.getSlidesDistInches(), robot.turret.getTheta(), drivetrainColor);
+        drawRobot(robot.x, robot.y, robot.theta, !robot.intake.slidesIsHome(), 0, robot.turret.getTheta(), drivetrainColor);
     }
 
     public static void drawRobot(double robotX, double robotY, double robotTheta, boolean intakeSlidesExtend, double depositSlidesDist, double turretTheta, String drivetrainColor) {
