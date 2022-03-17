@@ -25,7 +25,7 @@ public class Teleop extends LinearOpMode {
 
     public static boolean useAutoPos = false;
     public static boolean isRed = true;
-    public static boolean fieldCentric = true;
+    public static boolean fieldCentric = false;
 
     private Robot robot;
     private IMU imu;

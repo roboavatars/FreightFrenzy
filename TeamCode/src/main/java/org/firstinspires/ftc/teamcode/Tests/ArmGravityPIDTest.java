@@ -35,6 +35,7 @@ public class ArmGravityPIDTest extends LinearOpMode {
             else deposit.open();
 
             deposit.targetArmPos = armUp ? armUpTarget : 0;
+            deposit.update();
 
             addPacket("arm ticks", deposit.getArmPosition());
             addPacket("arm theta", deposit.getArmAngle());

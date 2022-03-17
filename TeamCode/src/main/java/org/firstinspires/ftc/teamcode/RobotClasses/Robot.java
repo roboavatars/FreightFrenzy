@@ -101,7 +101,7 @@ public class Robot {
     public static int flipUpThreshold = 900;
     public static int transferThreshold = flipUpThreshold + 600;
     public static int transferThresholdDuck = flipUpThreshold + 400;
-    public static int releaseThreshold = 150;
+    public static int releaseThreshold = 500;
     public static int hubTipThreshold = 300;
 
     //Auto Time Delays
@@ -152,9 +152,7 @@ public class Robot {
         } else {
             arm = new Arm(op, isAuto);
         }
-        if (turretFunctionality) {
-            turret = new Turret(op, isAuto);
-        }
+        turret = new Turret(op, isAuto);
 
         //        tapeDetector = new TapeDetector(op);
 
@@ -224,47 +222,88 @@ public class Robot {
         }
 
         // Auto-Intaking
-        if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && (y > 90 || intakeApproval)) {
-            if (!noExtend) {
-                intake.extend(Constants.INTAKE_MIDWAY_POS);
-            } else {
-                intake.extend(Constants.INTAKE_HOME_POS);
-            }
-            intake.on();
+        if (isAuto) {
+            if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && (y > 90 || intakeApproval)) {
+                if (!noExtend) {
+                    intake.extend(Constants.INTAKE_MIDWAY_POS);
+                } else {
+                    intake.extend(Constants.INTAKE_HOME_POS);
+                }
+                intake.on();
 
-            intakeTransfer = true;
-            intakeApproval = false;
-            slidesInCommand = false;
-            automationStep("Intake Extend/On");
-            automationStepTime = curTime;
-        } else if (intakeTransfer) {
-            if (intakeFull && !intake.slidesIsHome() && intakeFlipTime == -1 && (!autoFirstCycle || arm.armSlidesHome())) {
-                intake.setPower(0.2);
-                intake.home();
-                intake.flipUp();
-                intakeFlipTime = curTime;
-                automationStep("Intake Home/Flip");
-            } else if (intakeFull && intake.slidesIsHome() && !intakeRev && curTime - intakeFlipTime > autoFlipUpThreshold && arm.armSlidesHome()) {
-                intake.setPower(-1);
-                intakeRev = true;
-                automationStep("Transfer Freight");
-            } else if (intake.slidesIsHome() && intakeRev && curTime - intakeFlipTime > autoTransferThreshold) {
-                arm.hold();
-                intake.off();
-                intake.flipDown();
-
-                automationStep("Intake/Transfer Done");
-                log("Intake done after: " + (curTime - automationStepTime) + "ms");
+                intakeTransfer = true;
+                intakeApproval = false;
+                slidesInCommand = false;
+                automationStep("Intake Extend/On");
                 automationStepTime = curTime;
+            } else if (intakeTransfer) {
+                if (intakeFull && !intake.slidesIsHome() && intakeFlipTime == -1 && (!autoFirstCycle || arm.armSlidesHome())) {
+                    intake.setPower(0.2);
+                    intake.home();
+                    intake.flipUp();
+                    intakeFlipTime = curTime;
+                    automationStep("Intake Home/Flip");
+                } else if (intakeFull && intake.slidesIsHome() && !intakeRev && curTime - intakeFlipTime > autoFlipUpThreshold && arm.armSlidesHome()) {
+                    intake.setPower(-1);
+                    intakeRev = true;
+                    automationStep("Transfer Freight");
+                } else if (intake.slidesIsHome() && intakeRev && curTime - intakeFlipTime > autoTransferThreshold) {
+                    arm.hold();
+                    intake.off();
+                    intake.flipDown();
 
-                intakeTransfer = false;
+                    automationStep("Intake/Transfer Done");
+                    log("Intake done after: " + (curTime - automationStepTime) + "ms");
+                    automationStepTime = curTime;
+
+                    intakeTransfer = false;
+                    intakeFlipTime = -1;
+                    intakeRev = false;
+                    depositingFreight = true;
+                }
+                // Robot.log(transferVerify + " " + (curTime - intakeFlipTime > transferThreshold));
+            }
+        } else {
+            // Auto-Intaking
+            if (!intakeTransfer && intake.slidesIsHome() && intakeApproval) {
+                intake.extend();
+                intake.on();
+
+                intakeTransfer = true;
+                slidesInCommand = false;
+                automationStep("Intake Extend/On");
+                automationStepTime = curTime;
                 intakeFlipTime = -1;
                 intakeRev = false;
-                depositingFreight = true;
-            }
-            // Robot.log(transferVerify + " " + (curTime - intakeFlipTime > transferThreshold));
-        }
+            } else if (intakeTransfer) {
+                if (!intakeApproval && !intake.slidesIsHome() && intakeFlipTime == -1) {
+                    intake.setPower(0.2);
+                    intake.home();
+                    intake.flipUp();
+                    intakeFlipTime = curTime;
+                    automationStep("Intake Home/Flip");
+                } else if (!intakeApproval && intake.slidesIsHome() && arm.armSlidesHome() && turret.isHome() && !intakeRev && curTime - intakeFlipTime > flipUpThreshold) {
+                    intake.setPower(-1);
+                    intakeRev = true;
+                    automationStep("Transfer Freight");
+                } else if (intake.slidesIsHome() && intakeRev &&
+                        curTime - intakeFlipTime > transferThreshold) {
+                    arm.hold();
+                    intake.off();
+                    intake.flipDown();
 
+                    automationStep("Intake/Transfer Done");
+                    log("Intake done after: " + (curTime - automationStepTime) + "ms");
+                    automationStepTime = curTime;
+
+                    intakeTransfer = false;
+                    intakeFlipTime = -1;
+                    intakeRev = false;
+                    depositingFreight = true;
+                }
+                // Robot.log(transferVerify + " " + (curTime - intakeFlipTime > transferThreshold));
+            }
+        }
         // Auto-depositing
 
         if (depositingFreight && depositEnabled) {

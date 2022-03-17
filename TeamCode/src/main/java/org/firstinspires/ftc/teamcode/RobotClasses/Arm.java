@@ -27,13 +27,13 @@ public class Arm {
 
     // Arm PD
     double armErrorChange = 0, armError = 0;
-    public static double pArmUp = 0.003;
-    public static double dArmUp = 0.0055;
+    public static double pArmUp = 0.004;
+    public static double dArmUp = 0.04;
     public static double fGravityUp = 0.1;
 
-    public static double pArmDown = 0.0015;
-    public static double dArmDown = 0.002;
-    public static double fGravityDown = 0.3;
+    public static double pArmDown = 0.002;
+    public static double dArmDown = 0.005;
+    public static double fGravityDown = 0;
 
     public static double pArm = pArmUp;
     public static double dArm = dArmUp;

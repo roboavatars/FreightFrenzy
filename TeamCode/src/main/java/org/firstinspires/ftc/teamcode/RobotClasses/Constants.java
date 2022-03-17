@@ -31,7 +31,7 @@ public class Constants {
     public static double DEPOSIT_HOLD_POS = 0.52;
 
     // Deposit Arm
-    public static int ARM_HIGH_POS = 540;
+    public static int ARM_HIGH_POS = 535;
     public static int ARM_NEUTRAL_POS = 650;
     public static int ARM_HOME_POS = 0;
     public static int ARM_ON_HUB_THRESHOLD = ARM_HIGH_POS - 20;
