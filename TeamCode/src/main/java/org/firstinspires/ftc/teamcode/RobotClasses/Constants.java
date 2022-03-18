@@ -38,7 +38,7 @@ public class Constants {
     public static int ARM_ROTATE_TURRET_THRESHOLD = 600;
 
     // Carousel
-    public static double CAROUSEL_POWER = -1;
+    public static double CAROUSEL_POWER = 0.825;
 
     // Anti-Tip
     public static double TIP_THRESHOLD = 0.1;

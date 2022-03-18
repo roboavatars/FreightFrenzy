@@ -4,14 +4,15 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
 @Config
 public class HardwareTest extends LinearOpMode {
-    public static String motorName1 = "carousel";
-    //    public static String motorName2 = "depositSlides";
-    public static String servoName1 = "carouselArm";
+    public static String motorName1 = "carouselMotor";
+//    public static String motorName2 = "depositSlides";
+//    public static String servoName1 = "carouselArm";
 //    public static String servoName2 = "depositServo";
 
     public static double motor1Power = 0;
@@ -25,21 +26,21 @@ public class HardwareTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        CRServo motor1 = hardwareMap.get(CRServo.class, motorName1);
+        DcMotor motor1 = hardwareMap.get(DcMotor.class, motorName1);
 //        DcMotor motor2 = hardwareMap.get(DcMotor.class, motorName2);
-        Servo servo1 = hardwareMap.get(Servo.class, servoName1);
+//        Servo servo1 = hardwareMap.get(Servo.class, servoName1);
 //        Servo servo2 = hardwareMap.get(Servo.class, servoName2);
 
         waitForStart();
 
         while (opModeIsActive()) {
-            if (home) {
-                servo1.setPosition(servo1Home);
+//            if (home) {
+//                servo1.setPosition(servo1Home);
 //                servo2.setPosition(servo2Home);
-            } else {
-                servo1.setPosition(servo1Out);
+//            } else {
+//                servo1.setPosition(servo1Out);
 //                servo2.setPosition(servo2Out);
-            }
+//            }
 
             motor1.setPower(motor1Power);
 //            motor2.setPower(motor2Power);
