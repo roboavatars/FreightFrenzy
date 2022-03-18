@@ -27,8 +27,8 @@ public class Constants {
     public static double INTAKE_UP_INIT_POS = 0.8;
 
     // Deposit Servo
-    public static double DEPOSIT_OPEN_POS = 0.2;
-    public static double DEPOSIT_HOLD_POS = 0.52;
+    public static double DEPOSIT_OPEN_POS = 1;
+    public static double DEPOSIT_HOLD_POS = 0.5;
 
     // Deposit Arm
     public static int ARM_HIGH_POS = 535;

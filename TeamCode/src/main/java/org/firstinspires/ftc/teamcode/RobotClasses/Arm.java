@@ -19,7 +19,7 @@ public class Arm {
     private double lastServoPos = 0;
 
     public double ARM_TICKS_PER_RADIAN = 540 / PI;
-    public static int DEPOSIT_ARM_ERROR_THRESHOLD = 20;
+    public static int DEPOSIT_ARM_ERROR_THRESHOLD = 30;
 
     public int targetArmPos = 0;
 
@@ -28,11 +28,11 @@ public class Arm {
     // Arm PD
     double armErrorChange = 0, armError = 0;
     public static double pArmUp = 0.004;
-    public static double dArmUp = 0.04;
+    public static double dArmUp = 0.02;
     public static double fGravityUp = 0.1;
 
     public static double pArmDown = 0.002;
-    public static double dArmDown = 0.005;
+    public static double dArmDown = 0.05;
     public static double fGravityDown = 0;
 
     public static double pArm = pArmUp;
