@@ -100,15 +100,13 @@ public class Robot {
     public double curTime;
     public static int flipUpThreshold = 700;
     public static int transferThreshold = flipUpThreshold + 600;
-    public static int transferThresholdDuck = flipUpThreshold + 400;
-    public static int releaseThreshold = 500;
-    public static int hubTipThreshold = 300;
+    public static int releaseThreshold = 1000;
+//    public static int hubTipThreshold = 300;
 
     //Auto Time Delays
-    public static int autoFlipUpThreshold = 1500;
+    public static int autoFlipUpThreshold = 1000;
     public static int autoTransferThreshold = autoFlipUpThreshold + 600;
-    public static int autoTransferThresholdDuck = autoFlipUpThreshold + 400;
-    public static int autoReleaseThreshold = 500;
+    public static int autoReleaseThreshold = 1000;
 
     public static int convergeThreshold = 1500;
 
@@ -225,7 +223,7 @@ public class Robot {
         if (isAuto) {
             if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && (y > 90 || intakeApproval)) {
                 if (!noExtend) {
-                    intake.extend(Constants.INTAKE_MIDWAY_POS);
+                    intake.extend(Constants.INTAKE_EXTEND_POS);
                 } else {
                     intake.extend(Constants.INTAKE_HOME_POS);
                 }
@@ -244,7 +242,7 @@ public class Robot {
                     intakeFlipTime = curTime;
                     automationStep("Intake Home/Flip");
                 } else if (intakeFull && intake.slidesIsHome() && !intakeRev && curTime - intakeFlipTime > autoFlipUpThreshold && arm.armSlidesHome()) {
-                    intake.setPower(-1);
+                    intake.setPower(Constants.INTAKE_TRANSFER_POWER);
                     intakeRev = true;
                     automationStep("Transfer Freight");
                 } else if (intake.slidesIsHome() && intakeRev && curTime - intakeFlipTime > autoTransferThreshold) {
@@ -283,7 +281,7 @@ public class Robot {
                     intakeFlipTime = curTime;
                     automationStep("Intake Home/Flip");
                 } else if (!intakeApproval && intake.slidesIsHome() && arm.armSlidesHome() && turret.isHome() && !intakeRev && curTime - intakeFlipTime > flipUpThreshold) {
-                    intake.setPower(-1);
+                    intake.setPower(Constants.INTAKE_TRANSFER_POWER);
                     intakeRev = true;
                     automationStep("Transfer Freight");
                 } else if (intake.slidesIsHome() && intakeRev &&
@@ -360,12 +358,16 @@ public class Robot {
                         }
                         break;
                     case 4:
-                        if (curTime - depositTime > releaseThreshold) {
+                        if (curTime - depositTime > (isAuto ? autoReleaseThreshold : releaseThreshold)) {
                             arm.setHome();
-                            depositingFreight = false;
-                            depositState = 1;
+                            depositState++;
                         }
                         break;
+                    case 5:
+                        depositingFreight = false;
+                        depositState = 1;
+                        break;
+
                 }
                 if (turretFunctionality) turret.setHome();
             }

@@ -14,16 +14,17 @@ public class Constants {
     // Intake
     public static double INTAKE_DISTANCE_THRESHOLD = 70;
     public static double STALL_THRESHOLD = 6;
+    public static double INTAKE_TRANSFER_POWER = -1;
 
     // Intake Slides
     public static double INTAKE_EXTEND_POS = 0.3;
     public static double INTAKE_MIDWAY_POS = 0.6;
-    public static double INTAKE_HOME_POS = 0.63;
+    public static double INTAKE_HOME_POS = 0.6;
     public static double INTAKE_HOME_INIT_POS = 0.8;
 
     // Intake Servo
-    public static double INTAKE_UP_POS = 0.76;
-    public static double INTAKE_DOWN_POS = 0.05;
+    public static double INTAKE_UP_POS = 0.8;
+    public static double INTAKE_DOWN_POS = 0.15;
     public static double INTAKE_UP_INIT_POS = 0.8;
 
     // Deposit Servo
