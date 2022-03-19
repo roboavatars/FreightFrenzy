@@ -93,8 +93,15 @@ public class RedAutoWarehouse extends LinearOpMode {
                     addPacket("path", "going to warehouse right rn");
                 } else if (timeLeft > parkThreshold) {
                     robot.drivetrain.constantStrafeConstant = 0;
-                    double y = Math.min(107 + 3 * (time.seconds() - passLineTime), 116);
-                    robot.setTargetPoint(new Target(138, y, PI / 2));
+                    if ((cycleCounter + 1) % 4 < 3) {
+                        double y = Math.min(107 + cycleCounter + 5 * (time.seconds() - passLineTime), 121);
+                        robot.setTargetPoint(new Target(138, y, PI/2));
+                    } else {
+                        double x = Math.max(138 - 1 * (time.seconds() - passLineTime) * (time.seconds() - passLineTime), 130);
+                        double y = Math.min(107 + cycleCounter + 5 * (time.seconds() - passLineTime), 121) * cycleCounter;
+                        double theta = Math.min(PI/2 + PI/11 * (time.seconds() - passLineTime), 2 * PI/3);
+                        robot.setTargetPoint(new Target(x, y, theta));
+                    }
 
                     addPacket("path", "creeping right rn");
                 } else {
