@@ -19,7 +19,8 @@ public class Arm {
     private double lastServoPos = 0;
 
     public double ARM_TICKS_PER_RADIAN = 540 / PI;
-    public static int DEPOSIT_ARM_ERROR_THRESHOLD = 30;
+    public static int DEPOSIT_ARM_HOME_THRESHOLD = 30;
+    public static int DEPOSIT_ARM_DEPOSIT_THRESHOLD = 10;
 
     public int targetArmPos = 0;
 
@@ -28,7 +29,7 @@ public class Arm {
     // Arm PD
     double armErrorChange = 0, armError = 0;
     public static double pArmUp = 0.004;
-    public static double dArmUp = 0.02;
+    public static double dArmUp = 0.035;
     public static double fGravityUp = 0.1;
 
     public static double pArmDown = 0.002;
@@ -121,16 +122,12 @@ public class Arm {
         return armMotor.getVelocity();
     }
 
-    public boolean armAtPos() {
-        return Math.abs(getArmPosition() - targetArmPos) < DEPOSIT_ARM_ERROR_THRESHOLD;
-    }
-
     public boolean clearNeutralPipe() {
         return getArmPosition() < Constants.ARM_ROTATE_TURRET_THRESHOLD;
     }
 
     public boolean armHome() {
-        return Math.abs(getArmPosition() - Constants.ARM_HOME_POS) < DEPOSIT_ARM_ERROR_THRESHOLD;
+        return Math.abs(getArmPosition() - Constants.ARM_HOME_POS) < DEPOSIT_ARM_HOME_THRESHOLD;
     }
 
     public double getArmAngle() {
@@ -168,11 +165,11 @@ public class Arm {
     }
 
     public boolean armAtDeposit() {
-        return getArmPosition() > Constants.ARM_HIGH_POS - DEPOSIT_ARM_ERROR_THRESHOLD;
+        return getArmPosition() > Constants.ARM_HIGH_POS - DEPOSIT_ARM_DEPOSIT_THRESHOLD;
     }
 
     public boolean armSlidesHome() {
-        return getArmPosition() < DEPOSIT_ARM_ERROR_THRESHOLD;
+        return armHome();
     }
 
     public void resetArmEncoder() {

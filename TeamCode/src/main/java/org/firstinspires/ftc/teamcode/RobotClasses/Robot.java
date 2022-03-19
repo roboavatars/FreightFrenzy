@@ -98,14 +98,14 @@ public class Robot {
 
     // Time and Delay Variables
     public double curTime;
-    public static int flipUpThreshold = 900;
+    public static int flipUpThreshold = 700;
     public static int transferThreshold = flipUpThreshold + 600;
     public static int transferThresholdDuck = flipUpThreshold + 400;
     public static int releaseThreshold = 500;
     public static int hubTipThreshold = 300;
 
     //Auto Time Delays
-    public static int autoFlipUpThreshold = 1100;
+    public static int autoFlipUpThreshold = 1500;
     public static int autoTransferThreshold = autoFlipUpThreshold + 600;
     public static int autoTransferThresholdDuck = autoFlipUpThreshold + 400;
     public static int autoReleaseThreshold = 500;
@@ -457,6 +457,7 @@ public class Robot {
         addPacket("7 Automation", intakeTransfer + "; " + depositingFreight);
         addPacket("8 Intake Full", intakeFull);
         addPacket("9 Intake Stalling", intakeStalling);
+        addPacket("Carousel Velocity", carousel.getVelocity());
         addPacket("91 Run Time", (curTime - startTime) / 1000);
         addPacket("92 Update Frequency (Hz)", round(1 / timeDiff));
         addPacket("pod zeroes", drivetrain.zero1 + " " + drivetrain.zero2 + " " + drivetrain.zero3);

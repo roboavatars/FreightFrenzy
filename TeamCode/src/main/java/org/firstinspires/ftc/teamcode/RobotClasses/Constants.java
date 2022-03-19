@@ -22,12 +22,12 @@ public class Constants {
     public static double INTAKE_HOME_INIT_POS = 0.8;
 
     // Intake Servo
-    public static double INTAKE_UP_POS = 0.74;
+    public static double INTAKE_UP_POS = 0.76;
     public static double INTAKE_DOWN_POS = 0.05;
     public static double INTAKE_UP_INIT_POS = 0.8;
 
     // Deposit Servo
-    public static double DEPOSIT_OPEN_POS = 1;
+    public static double DEPOSIT_OPEN_POS = 0.23;
     public static double DEPOSIT_HOLD_POS = 0.5;
 
     // Deposit Arm
@@ -38,7 +38,7 @@ public class Constants {
     public static int ARM_ROTATE_TURRET_THRESHOLD = 600;
 
     // Carousel
-    public static double CAROUSEL_POWER = 0.825;
+    public static double CAROUSEL_VELOCITY = 2400;
 
     // Anti-Tip
     public static double TIP_THRESHOLD = 0.1;

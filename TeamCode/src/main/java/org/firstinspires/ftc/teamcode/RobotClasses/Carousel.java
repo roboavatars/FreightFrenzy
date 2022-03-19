@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Carousel {
@@ -23,18 +20,26 @@ public class Carousel {
         op.telemetry.addData("Status", "Carousel Initialized");
     }
 
-    private void setPower(double power) {
-        if (power != lastPower) {
-            carouselMotor.setPower(power);
-            lastPower = power;
+    private void setVelocity(double velocity) {
+        if (velocity != lastPower) {
+            carouselMotor.setVelocity(velocity);
+            lastPower = velocity;
         }
     }
 
+    public double getVelocity() {
+        return carouselMotor.getVelocity();
+    }
+
     public void on() {
-        setPower(Constants.CAROUSEL_POWER);
+        on(Constants.CAROUSEL_VELOCITY);
+    }
+
+    public void on(double velocity) {
+        setVelocity(velocity);
     }
 
     public void stop() {
-        setPower(0);
+        setVelocity(0);
     }
 }

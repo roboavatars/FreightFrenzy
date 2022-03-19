@@ -45,6 +45,8 @@ public class Teleop extends LinearOpMode {
     private boolean midTeleRumble = false;
     private boolean endgameRumble = false;
 
+    private double starCarouselTime = 0;
+
     /*
     Controller Button Mappings: *updated 3/13/22 12:30 PM*
     gamepad 1:
@@ -109,9 +111,10 @@ public class Teleop extends LinearOpMode {
 
 
             if (gamepad1.y) {
-                robot.carousel.on();
+                robot.carousel.on(2400 + Math.pow(1.65,(starCarouselTime - robot.curTime)));
             } else {
                 robot.carousel.stop();
+                starCarouselTime = robot.curTime;
             }
 
             // Rumble

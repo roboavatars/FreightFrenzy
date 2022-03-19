@@ -5,6 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
+
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
@@ -26,7 +30,7 @@ public class HardwareTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        DcMotor motor1 = hardwareMap.get(DcMotor.class, motorName1);
+        DcMotorEx motor1 = hardwareMap.get(DcMotorEx.class, motorName1);
 //        DcMotor motor2 = hardwareMap.get(DcMotor.class, motorName2);
 //        Servo servo1 = hardwareMap.get(Servo.class, servoName1);
 //        Servo servo2 = hardwareMap.get(Servo.class, servoName2);
@@ -42,8 +46,11 @@ public class HardwareTest extends LinearOpMode {
 //                servo2.setPosition(servo2Out);
 //            }
 
-            motor1.setPower(motor1Power);
+//            motor1.setPower(motor1Power);
+            motor1.setVelocity(motor1Power);
 //            motor2.setPower(motor2Power);
+            addPacket("Motor Velocity", motor1.getVelocity());
+            sendPacket();
         }
     }
 }

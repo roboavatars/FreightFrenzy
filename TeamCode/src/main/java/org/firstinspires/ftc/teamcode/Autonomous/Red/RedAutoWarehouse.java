@@ -16,9 +16,8 @@ import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-@Disabled
 @Config
-@Autonomous(name = "Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
+@Autonomous(name = "0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoWarehouse extends LinearOpMode {
     public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Middle;
 
@@ -48,14 +47,14 @@ public class RedAutoWarehouse extends LinearOpMode {
         // Segment Times
         double cycleScoreTime = 1.5;
         double parkThreshold = 5;
-        double preloadScoreTime = 2;
+        double preloadScoreTime = 1;
 
         // Paths
         Path cycleScorePath = null;
         Path parkPath = null;
         Waypoint[] preloadScoreWaypoints = new Waypoint[]{
                 new Waypoint(robot.x, robot.y, 3 * PI / 2, 10, 10, 0, 0),
-                new Waypoint(130, 78.5, 0.70 + PI, 5, 5, 0, preloadScoreTime),
+                new Waypoint(120, 76, 0.70 + PI, 5, 5, 0, preloadScoreTime),
         };
         Path preloadScorePath = new Path(preloadScoreWaypoints);
 
@@ -106,7 +105,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                     addPacket("path", "going to warehouse right rn");
                 } else if (timeLeft > parkThreshold) {
                     robot.drivetrain.constantStrafeConstant = 0;
-                    if ((cycleCounter + 1) % 4 < 3) {
+                    if ((cycleCounter + 1) % 4 < 5) {
                         double y = Math.min(107 + cycleCounter + 5 * (time.seconds() - passLineTime), 121);
                         robot.setTargetPoint(new Target(138, y, PI/2));
                     } else {
@@ -134,7 +133,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                     Waypoint[] cycleScoreWaypoints = new Waypoint[]{
                             new Waypoint(140, robot.y, 3 * PI / 2, 10, 10, 0, 0),
                             new Waypoint(140, 83, 3 * PI / 2, 5, 1, 0, 0.75),
-                            new Waypoint(130, 78.5, 0.70 + PI, 5, 5, 0, cycleScoreTime),
+                            new Waypoint(120, 76, 0.70 + PI, 5, 5, 0, cycleScoreTime),
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 
