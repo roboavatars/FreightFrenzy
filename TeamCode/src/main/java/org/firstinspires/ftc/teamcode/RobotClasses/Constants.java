@@ -40,8 +40,8 @@ public class Constants {
 
     // Carousel
     public static double CAROUSEL_VELOCITY_SLOW = 300;
-    public static double CAROUSEL_VELOCITY_FAST = 1780;
-    public static double CAROUSEL_SPEED_UP_THRESHOLD = 1200;
+    public static double CAROUSEL_VELOCITY_FAST = 1270;
+    public static double CAROUSEL_SPEED_UP_THRESHOLD = 1100;
 
     // Anti-Tip
     public static double TIP_THRESHOLD = 0.1;
