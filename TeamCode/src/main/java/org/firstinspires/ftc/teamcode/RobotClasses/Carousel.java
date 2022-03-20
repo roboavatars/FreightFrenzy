@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @SuppressWarnings("FieldCanBeLocal")
@@ -16,6 +17,7 @@ public class Carousel {
         this.isRed = isRed;
 
         carouselMotor = op.hardwareMap.get(DcMotorEx.class, "carouselMotor");
+        carouselMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         op.telemetry.addData("Status", "Carousel Initialized");
     }
@@ -30,10 +32,10 @@ public class Carousel {
     public double getVelocity() {
         return carouselMotor.getVelocity();
     }
-
-    public void on() {
-        on(Constants.CAROUSEL_VELOCITY);
-    }
+//
+//    public void on() {
+//        on(Constants.CAROUSEL_VELOCITY);
+//    }
 
     public void on(double velocity) {
         setVelocity(velocity);

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.Localization.IMU;
+import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.Arrays;
@@ -111,11 +113,18 @@ public class Teleop extends LinearOpMode {
 
 
             if (gamepad1.y) {
-                robot.carousel.on(2400 + Math.pow(1.65,(starCarouselTime - robot.curTime)));
+                if (robot.curTime - starCarouselTime < Constants.CAROUSEL_SPEED_UP_THRESHOLD)
+                    robot.carousel.on(Constants.CAROUSEL_VELOCITY_SLOW);
+                else
+                    robot.carousel.on(Constants.CAROUSEL_VELOCITY_FAST);
             } else {
                 robot.carousel.stop();
                 starCarouselTime = robot.curTime;
             }
+
+            addPacket("carousel start time", starCarouselTime);
+            addPacket("robot time", robot.curTime);
+
 
             // Rumble
             if (!teleRumble1 && 120 - (System.currentTimeMillis() - robot.startTime) / 1000 < 90) {

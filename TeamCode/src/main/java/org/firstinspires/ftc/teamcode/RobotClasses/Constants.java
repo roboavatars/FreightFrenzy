@@ -18,7 +18,7 @@ public class Constants {
 
     // Intake Slides
     public static double INTAKE_EXTEND_POS = 0.3;
-    public static double INTAKE_MIDWAY_POS = 0.6;
+//    public static double INTAKE_MIDWAY_POS = 0.6;
     public static double INTAKE_HOME_POS = 0.6;
     public static double INTAKE_HOME_INIT_POS = 0.8;
 
@@ -35,11 +35,13 @@ public class Constants {
     public static int ARM_HIGH_POS = 535;
     public static int ARM_NEUTRAL_POS = 650;
     public static int ARM_HOME_POS = 0;
-    public static int ARM_ON_HUB_THRESHOLD = ARM_HIGH_POS - 20;
+//    public static int ARM_ON_HUB_THRESHOLD = ARM_HIGH_POS - 20;
     public static int ARM_ROTATE_TURRET_THRESHOLD = 600;
 
     // Carousel
-    public static double CAROUSEL_VELOCITY = 2400;
+    public static double CAROUSEL_VELOCITY_SLOW = 300;
+    public static double CAROUSEL_VELOCITY_FAST = 1780;
+    public static double CAROUSEL_SPEED_UP_THRESHOLD = 1200;
 
     // Anti-Tip
     public static double TIP_THRESHOLD = 0.1;

@@ -84,7 +84,8 @@ public class RedAutoWarehouse extends LinearOpMode {
                 Pose curPose = preloadScorePath.getRobotPose(Math.min(preloadScoreTime, time.seconds()));
                 robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
 
-                robot.depositApproval = time.seconds() > preloadScoreTime;
+                robot.depositApproval = time.seconds() > preloadScoreTime ||
+                        robot.isAtPose(depositPos[0], depositPos[1], depositPos[2], 5, 5, PI/10);
 
                 if (robot.depositState == 5) {
                     time.reset();
