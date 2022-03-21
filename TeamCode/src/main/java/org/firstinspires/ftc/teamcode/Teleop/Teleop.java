@@ -111,7 +111,6 @@ public class Teleop extends LinearOpMode {
                 imu.resetHeading(PI / 2);
             }
 
-
             if (gamepad1.y) {
                 if (robot.curTime - starCarouselTime < Constants.CAROUSEL_SPEED_UP_THRESHOLD)
                     robot.carousel.on(Constants.CAROUSEL_VELOCITY_SLOW);

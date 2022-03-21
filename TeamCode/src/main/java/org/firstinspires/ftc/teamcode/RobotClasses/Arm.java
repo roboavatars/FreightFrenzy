@@ -15,8 +15,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Arm {
     private DcMotorEx armMotor;
     private Servo depositServo;
+    private Servo limitServo;
 
-    private double lastServoPos = 0;
+    private double lastServoPos = 0; // deposit servo
+    private double lastServoPos2 = 0; // limit servo
 
     public double ARM_TICKS_PER_RADIAN = 540 / PI;
     public static int DEPOSIT_ARM_HOME_THRESHOLD = 50;
@@ -62,11 +64,15 @@ public class Arm {
 
         // Deposit Servo
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
+        limitServo = op.hardwareMap.get(Servo.class, "limitServo");
+
         if (isAuto) {
             hold();
         } else {
             open();
         }
+
+        limitArm(true);
 
         // Arm Motor
         armMotor = op.hardwareMap.get(DcMotorEx.class, "arm");
@@ -149,19 +155,40 @@ public class Arm {
     }
 
     // Deposit
-    private void setServoPosition(double pos) {
+    private void setDepositServoPosition(double pos) {
         if (pos != lastServoPos) {
             depositServo.setPosition(pos);
             lastServoPos = pos;
         }
     }
 
+    private void setLimitServoPosition(double pos) {
+        if (pos != lastServoPos) {
+            limitServo.setPosition(pos);
+            lastServoPos2 = pos;
+        }
+    }
+
     public void open() {
-        setServoPosition(Constants.DEPOSIT_OPEN_POS);
+        setDepositServoPosition(Constants.DEPOSIT_OPEN_POS);
     }
 
     public void hold() {
-        setServoPosition(Constants.DEPOSIT_HOLD_POS);
+        setDepositServoPosition(Constants.DEPOSIT_HOLD_POS);
+    }
+
+    public void release() {
+        setDepositServoPosition(Constants.DEPOSIT_RELEASE_POS);
+    }
+
+    public void limitArm(boolean limit) {
+        if (limit) {
+            setLimitServoPosition(Constants.LIMIT_OPEN);
+        }
+
+        if (!limit) {
+            setLimitServoPosition(Constants.LIMIT_CLOSE);
+        }
     }
 
     public boolean armAtDeposit() {

@@ -219,6 +219,8 @@ public class Robot {
             lastCycleTime = curTime;
         }
 
+        arm.limitArm(!neutralGoal);
+
         // Auto-Intaking
         if (isAuto) {
             if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && (y > 90 || intakeApproval)) {
@@ -352,7 +354,7 @@ public class Robot {
                     case 3:
                         if (depositApproval) {
                             depositTime = curTime;
-                            arm.open();
+                            arm.release();
                             markCycle();
                             depositState++;
                         }
@@ -360,6 +362,7 @@ public class Robot {
                     case 4:
                         if (curTime - depositTime > (isAuto ? autoReleaseThreshold : releaseThreshold)) {
                             arm.setHome();
+                            arm.open();
                             depositState++;
                         }
                         break;

@@ -29,7 +29,12 @@ public class Constants {
 
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.23;
-    public static double DEPOSIT_HOLD_POS = 0.5;
+    public static double DEPOSIT_HOLD_POS = 0.45;
+    public static double DEPOSIT_RELEASE_POS = 0.1;
+
+    // Limit Servo
+    public static double LIMIT_OPEN = 0.38;
+    public static double LIMIT_CLOSE = 0.1;
 
     // Deposit Arm
     public static int ARM_HIGH_POS = 535;
