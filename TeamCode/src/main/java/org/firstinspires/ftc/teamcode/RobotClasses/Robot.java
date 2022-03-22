@@ -30,7 +30,6 @@ import java.util.List;
 public class Robot {
 
     public static boolean turretEnabled = false;
-    public boolean neutralGoal = false;
 
     // Robot Classes
     public Drivetrain drivetrain;
@@ -223,8 +222,6 @@ public class Robot {
             startTime = curTime;
             lastCycleTime = curTime;
         }
-
-        arm.limitArm(!neutralGoal);
 
         // Auto-Intaking
         if (isAuto) {
