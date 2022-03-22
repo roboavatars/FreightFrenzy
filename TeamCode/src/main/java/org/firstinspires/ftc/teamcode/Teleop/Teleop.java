@@ -105,6 +105,18 @@ public class Teleop extends LinearOpMode {
 //                intakeToggle = false;
 //            }
 
+            if (gamepad1.b) {
+                robot.setCycleHub(Robot.DepositTarget.neutral);
+            }
+
+            if (gamepad1.dpad_down) {
+                robot.setCycleHub(Robot.DepositTarget.capping);
+            }
+
+            if (gamepad1.dpad_up && robot.cycleHub == Robot.DepositTarget.capping) {
+                robot.depositState = 2;
+            }
+
             // Odo Reset
             if (gamepad1.x) {
                 robot.resetOdo(138, 81, PI / 2);

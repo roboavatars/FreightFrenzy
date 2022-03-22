@@ -29,7 +29,7 @@ import java.util.List;
 @Config
 public class Robot {
 
-    public static boolean turretFunctionality = false;
+    public static boolean turretEnabled = false;
     public boolean neutralGoal = false;
 
     // Robot Classes
@@ -124,8 +124,11 @@ public class Robot {
     private final LinearOpMode op;
 
     public enum DepositTarget {
-        RIPbozo
+        high,
+        capping,
+        neutral
     }
+    public DepositTarget cycleHub;
 
     // Constructor
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed) {
@@ -177,6 +180,8 @@ public class Robot {
         drawField();
         drawRobot(this);
         sendPacket();
+
+        cycleHub = DepositTarget.high;
     }
 
     // Stop logger
@@ -304,10 +309,13 @@ public class Robot {
                 // Robot.log(transferVerify + " " + (curTime - intakeFlipTime > transferThreshold));
             }
         }
-        // Auto-depositing
 
+        //Arm Servo Limit
+        arm.limitArm(cycleHub == DepositTarget.high);
+
+        // Auto-depositing
         if (depositingFreight && depositEnabled) {
-            if (neutralGoal) {
+            if (cycleHub == DepositTarget.neutral) {
                 switch (depositState) {
                     case 1:
                         turret.setNeutral();
@@ -340,7 +348,7 @@ public class Robot {
                         }
                         break;
                 }
-            } else {
+            } else if (cycleHub == DepositTarget.high) {
                 switch (depositState) {
                     case 1:
                         arm.setHigh();
@@ -372,15 +380,24 @@ public class Robot {
                         break;
 
                 }
-                if (turretFunctionality) turret.setHome();
+                turret.setHome();
             }
         } else {
             arm.setHome();
-            if (turretFunctionality) turret.setHome();
+            turret.setHome();
+        }
+
+        if (cycleHub == DepositTarget.capping) {
+            arm.servoCapPos();
+            if (depositState == 1) {
+                arm.setCapping(Constants.ARM_CAP_DOWN_POS);
+            } else {
+                arm.setCapping(Constants.ARM_CAP_UP_POS);
+            }
         }
 
         arm.update();
-        if (turretFunctionality) turret.update();
+        if (turretEnabled) turret.update();
 
 
         profile(4);
@@ -446,7 +463,7 @@ public class Robot {
         // Log Data
         if (loopCounter % loggerUpdatePeriod == 0) {
             logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a,
-                    turretGlobalTheta, 0, DepositTarget.RIPbozo, intake.slidesIsHome(), intakeTransfer, depositingFreight,
+                    turretGlobalTheta, 0, cycleHub, intake.slidesIsHome(), intakeTransfer, depositingFreight,
                     cycles.size(), cycleAvg, arm.getArmPosition(), arm.getArmPosition());
         }
 
@@ -488,6 +505,16 @@ public class Robot {
         profile(12);
 
         firstLoop = false;
+    }
+
+    public void setCycleHub(DepositTarget cycleHub) {
+        this.cycleHub = cycleHub;
+        depositState = 1;
+
+        if (cycleHub == DepositTarget.high || cycleHub == DepositTarget.neutral) {
+            turret.setHome();
+            arm.setHome();
+        }
     }
 
     // Keep track of cycles

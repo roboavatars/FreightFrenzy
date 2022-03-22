@@ -104,6 +104,11 @@ public class Arm {
         setArmPIDCoefficients(pArmUp, dArmUp, fGravityUp);
     }
 
+    public void setCapping(int armPos) {
+        setArmTarget(armPos);
+        setArmPIDCoefficients(pArmUp, dArmUp, fGravityUp);
+    }
+
     public void update() {
         double targetTicks = targetArmPos;
         double currentTicks = getArmPosition();
@@ -179,6 +184,9 @@ public class Arm {
 
     public void release() {
         setDepositServoPosition(Constants.DEPOSIT_RELEASE_POS);
+    }
+    public void servoCapPos() {
+        setDepositServoPosition(Constants.DEPOSIT_CAP_POS);
     }
 
     public void limitArm(boolean limit) {
