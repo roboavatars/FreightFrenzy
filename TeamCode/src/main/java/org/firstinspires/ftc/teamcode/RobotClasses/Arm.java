@@ -104,9 +104,13 @@ public class Arm {
         setArmPIDCoefficients(pArmUp, dArmUp, fGravityUp);
     }
 
-    public void setCapping(int armPos) {
+    public void setCapping(int armPos, double pArm, double dArm, double fArm) {
         setArmTarget(armPos);
-        setArmPIDCoefficients(pArmUp, dArmUp, fGravityUp);
+        setArmPIDCoefficients(pArm, dArm, fArm);
+    }
+
+    public void setCapping(int armPos) {
+        setCapping(armPos, pArmUp, dArmUp, fGravityUp);
     }
 
     public void update() {
@@ -122,7 +126,7 @@ public class Arm {
     }
 
     public void setArmTarget(int targetPos) {
-        targetArmPos = Math.min(Math.max(targetPos, 0), Constants.ARM_HIGH_POS);
+        targetArmPos = Math.max(targetPos, 0);
     }
 
     public int getArmPosition() {

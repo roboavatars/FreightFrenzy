@@ -30,6 +30,8 @@ import java.util.List;
 public class Robot {
 
     public static boolean turretEnabled = false;
+    public double capUpOffset = 0;
+    public double capDownOffset = 0;
 
     // Robot Classes
     public Drivetrain drivetrain;
@@ -99,13 +101,13 @@ public class Robot {
     public double curTime;
     public static int flipUpThreshold = 700;
     public static int transferThreshold = flipUpThreshold + 600;
-    public static int releaseThreshold = 1000;
+    public static int releaseThreshold = 500;
 //    public static int hubTipThreshold = 300;
 
     //Auto Time Delays
     public static int autoFlipUpThreshold = 1000;
     public static int autoTransferThreshold = autoFlipUpThreshold + 600;
-    public static int autoReleaseThreshold = 1000;
+    public static int autoReleaseThreshold = 500;
 
     public static int convergeThreshold = 1500;
 
@@ -387,9 +389,10 @@ public class Robot {
         if (cycleHub == DepositTarget.capping) {
             arm.servoCapPos();
             if (depositState == 1) {
-                arm.setCapping(Constants.ARM_CAP_DOWN_POS);
+                arm.setCapping(Constants.ARM_CAP_DOWN_POS + (int) Math.round(capDownOffset));
             } else {
-                arm.setCapping(Constants.ARM_CAP_UP_POS);
+                if (capUpOffset == 0) arm.setCapping(Constants.ARM_CAP_UP_POS, 0.003, 0.04, 0.1);
+                else arm.setCapping(Constants.ARM_CAP_UP_POS + (int) Math.round(capUpOffset));
             }
         }
 

@@ -28,10 +28,10 @@ public class Constants {
     public static double INTAKE_UP_INIT_POS = 0.8;
 
     // Deposit Servo
-    public static double DEPOSIT_OPEN_POS = 0.2;
-    public static double DEPOSIT_HOLD_POS = 0.4;
-    public static double DEPOSIT_RELEASE_POS = 0.2;
-    public static double DEPOSIT_CAP_POS = 0;
+    public static double DEPOSIT_OPEN_POS = 0.57;
+    public static double DEPOSIT_HOLD_POS = 0.775;
+    public static double DEPOSIT_RELEASE_POS = 0.57;
+    public static double DEPOSIT_CAP_POS = 0.2;
 
     // Limit Servo
     public static double LIMIT_OPEN = 0.38;
@@ -43,8 +43,8 @@ public class Constants {
     public static int ARM_HOME_POS = 0;
 //    public static int ARM_ON_HUB_THRESHOLD = ARM_HIGH_POS - 20;
     public static int ARM_ROTATE_TURRET_THRESHOLD = 600;
-    public static int ARM_CAP_DOWN_POS = 600;
-    public static int ARM_CAP_UP_POS = 300;
+    public static int ARM_CAP_DOWN_POS = 725;
+    public static int ARM_CAP_UP_POS = 450;
 
     // Carousel
     public static double CAROUSEL_VELOCITY_SLOW = 300;

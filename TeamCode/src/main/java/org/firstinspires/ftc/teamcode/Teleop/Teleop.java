@@ -40,7 +40,7 @@ public class Teleop extends LinearOpMode {
 
     // Control Gains
     private double xyGain = 1;
-    private double wGain = 0.6;
+    private double wGain = 1;
 
     // Rumbles
     private boolean teleRumble1 = false;
@@ -109,12 +109,27 @@ public class Teleop extends LinearOpMode {
                 robot.setCycleHub(Robot.DepositTarget.neutral);
             }
 
+            if (gamepad1.back) {
+                robot.setCycleHub(Robot.DepositTarget.high);
+            }
+
+            //Capping
             if (gamepad1.dpad_down) {
                 robot.setCycleHub(Robot.DepositTarget.capping);
             }
 
             if (gamepad1.dpad_up && robot.cycleHub == Robot.DepositTarget.capping) {
                 robot.depositState = 2;
+            }
+
+            if (robot.cycleHub == Robot.DepositTarget.capping) {
+                if (gamepad1.right_bumper) {
+                    if (robot.depositState == 1) robot.capDownOffset -= 0.75;
+                    else robot.capUpOffset--;
+                } else if (gamepad1.left_bumper) {
+                    if (robot.depositState == 1) robot.capDownOffset += 0.75;
+                    else robot.capUpOffset++;
+                }
             }
 
             // Odo Reset
@@ -151,6 +166,14 @@ public class Teleop extends LinearOpMode {
                 endgameRumble = true;
             }
 
+            if (robot.cycleHub == Robot.DepositTarget.capping) {
+                xyGain = 1;
+                wGain = 0.5;
+            } else {
+                xyGain = 1;
+                wGain = 0.5;
+            }
+
             // Drivetrain Controls
             // Field Centric Driving
             if (fieldCentric) {
@@ -160,7 +183,7 @@ public class Teleop extends LinearOpMode {
                 double yControls = gamepad1.left_stick_y * xyGain;
                 robot.drivetrain.setControls(xControls * Math.sin(theta) + yControls * Math.cos(theta), xControls * Math.cos(theta) - yControls * Math.sin(theta), -gamepad1.right_stick_x * wGain);
             } else {
-                robot.drivetrain.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
+                robot.drivetrain.setControls(xyGain * -gamepad1.left_stick_y, xyGain * -gamepad1.left_stick_x, wGain * -gamepad1.right_stick_x);
             }
 
             // Update Robot
