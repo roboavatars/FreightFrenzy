@@ -60,4 +60,10 @@ public class Constants {
 
     //Turret?
     public static double TURRET_NETRUAL_THETA = PI;
+
+    //Stick Capping
+    public static double SERVO_CAP_DOWN = 0.14;
+    public static double SERVO_CAP_UP = 0.43;
+    public static double SERVO_CAP_HOME = 0.97;
+
 }

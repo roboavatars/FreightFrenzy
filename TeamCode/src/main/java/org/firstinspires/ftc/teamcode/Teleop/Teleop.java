@@ -49,6 +49,10 @@ public class Teleop extends LinearOpMode {
 
     private double starCarouselTime = 0;
 
+    private double capUpOffset = 0;
+    private double capDownOffset = 0;
+    private boolean cappingDown = true;
+
     /*
     Controller Button Mappings: *updated 3/13/22 12:30 PM*
     gamepad 1:
@@ -113,22 +117,45 @@ public class Teleop extends LinearOpMode {
                 robot.setCycleHub(Robot.DepositTarget.high);
             }
 
-            //Capping
-            if (gamepad1.dpad_down) {
-                robot.setCycleHub(Robot.DepositTarget.capping);
-            }
+//            //Capping
+//            if (gamepad1.dpad_down) {
+//                robot.setCycleHub(Robot.DepositTarget.capping);
+//            }
+//
+//            if (gamepad1.dpad_up && robot.cycleHub == Robot.DepositTarget.capping) {
+//                robot.depositState = 2;
+//            }
+//
+//            if (robot.cycleHub == Robot.DepositTarget.capping) {
+//                if (gamepad1.right_bumper) {
+//                    if (robot.depositState == 1) robot.capDownOffset -= 0.75;
+//                    else robot.capUpOffset--;
+//                } else if (gamepad1.left_bumper) {
+//                    if (robot.depositState == 1) robot.capDownOffset += 0.75;
+//                    else robot.capUpOffset++;
+//                }
+//            }
 
-            if (gamepad1.dpad_up && robot.cycleHub == Robot.DepositTarget.capping) {
-                robot.depositState = 2;
+            if (gamepad1.dpad_down) {
+                cappingDown = true;
+                robot.setCycleHub(Robot.DepositTarget.capping);
+            } else if (gamepad1.dpad_up) {
+                cappingDown = false;
+                robot.setCycleHub(Robot.DepositTarget.capping);
             }
 
             if (robot.cycleHub == Robot.DepositTarget.capping) {
                 if (gamepad1.right_bumper) {
-                    if (robot.depositState == 1) robot.capDownOffset -= 0.75;
-                    else robot.capUpOffset--;
+                    if (cappingDown) capDownOffset += 0.001;
+                    else capUpOffset += 0.001;
                 } else if (gamepad1.left_bumper) {
-                    if (robot.depositState == 1) robot.capDownOffset += 0.75;
-                    else robot.capUpOffset++;
+                    if (cappingDown) capDownOffset -= 0.001;
+                    else capUpOffset -= 0.001;
+                }
+                if (cappingDown) {
+                    robot.arm.cap(Math.max(Math.min(Constants.SERVO_CAP_DOWN + capDownOffset, 1), 0));
+                } else {
+                    robot.arm.cap(Math.max(Math.min(Constants.SERVO_CAP_UP + capUpOffset, 1), 0));
                 }
             }
 

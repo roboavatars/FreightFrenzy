@@ -387,13 +387,13 @@ public class Robot {
         }
 
         if (cycleHub == DepositTarget.capping) {
-            arm.servoCapPos();
-            if (depositState == 1) {
-                arm.setCapping(Constants.ARM_CAP_DOWN_POS + (int) Math.round(capDownOffset));
-            } else {
-                if (capUpOffset == 0) arm.setCapping(Constants.ARM_CAP_UP_POS, 0.003, 0.04, 0.1);
-                else arm.setCapping(Constants.ARM_CAP_UP_POS + (int) Math.round(capUpOffset));
-            }
+//            arm.servoCapPos();
+//            if (depositState == 1) {
+//                arm.setCapping(Constants.ARM_CAP_DOWN_POS + (int) Math.round(capDownOffset));
+//            } else {
+//                if (capUpOffset == 0) arm.setCapping(Constants.ARM_CAP_UP_POS, 0.003, 0.04, 0.1);
+//                else arm.setCapping(Constants.ARM_CAP_UP_POS + (int) Math.round(capUpOffset));
+//            }
         }
 
         arm.update();

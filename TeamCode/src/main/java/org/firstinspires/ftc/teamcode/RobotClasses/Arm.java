@@ -16,6 +16,7 @@ public class Arm {
     private DcMotorEx armMotor;
     private Servo depositServo;
     private Servo limitServo;
+    private Servo capServo;
 
     private double lastServoPos = 0; // deposit servo
     private double lastServoPos2 = 0; // limit servo
@@ -79,6 +80,9 @@ public class Arm {
         armMotor.setDirection(DcMotorEx.Direction.REVERSE);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        capServo = op.hardwareMap.get(Servo.class, "capServo");
+        cap(Constants.SERVO_CAP_HOME);
 
         setHome();
 
@@ -209,6 +213,10 @@ public class Arm {
 
     public boolean armSlidesHome() {
         return armHome();
+    }
+
+    public void cap(double pos) {
+        capServo.setPosition(pos);
     }
 
     public void resetArmEncoder() {
