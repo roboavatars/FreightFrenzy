@@ -111,9 +111,9 @@ public class RedAutoWarehouse extends LinearOpMode {
                         double y = Math.min(107 + 3 * cycleCounter + 5 * (time.seconds() - passLineTime), 121);
                         robot.setTargetPoint(new Target(138, y, PI/2));
                     } else {
-                        double x = Math.max(138 - 3 * (time.seconds() - passLineTime) * (time.seconds() - passLineTime), 130);
-                        double y = Math.min(107 + 1 * cycleCounter + 5 * (time.seconds() - passLineTime), 121);
-                        double theta = Math.min(PI/2 + PI/12 * (time.seconds() - passLineTime), 2 * PI/3);
+                        double x = Math.max(138 - 3 * (time.seconds() - passLineTime), 130);
+                        double y = Math.min(107 + 3 * cycleCounter + 5 * (time.seconds() - passLineTime), 121);
+                        double theta = Math.min(PI/2 + PI/11 * (time.seconds() - passLineTime), 2 * PI/3);
                         robot.setTargetPoint(new Target(x, y, theta));
                     }
 
