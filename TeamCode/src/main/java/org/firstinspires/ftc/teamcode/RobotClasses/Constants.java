@@ -19,7 +19,7 @@ public class Constants {
     // Intake Slides
     public static double INTAKE_EXTEND_POS = 0.3;
 //    public static double INTAKE_MIDWAY_POS = 0.6;
-    public static double INTAKE_HOME_POS = 0.6;
+    public static double INTAKE_HOME_POS = 0.59;
     public static double INTAKE_HOME_INIT_POS = 0.8;
 
     // Intake Servo
@@ -29,7 +29,7 @@ public class Constants {
 
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.5;
-    public static double DEPOSIT_HOLD_POS = 0.775;
+    public static double DEPOSIT_HOLD_POS = 0.76;
     public static double DEPOSIT_RELEASE_POS = 0.5;
     public static double DEPOSIT_CAP_POS = 0.2;
 
@@ -38,7 +38,7 @@ public class Constants {
     public static double LIMIT_CLOSE = 0.1;
 
     // Deposit Arm
-    public static int ARM_HIGH_POS = 535;
+    public static int ARM_HIGH_POS = 570;
     public static int ARM_NEUTRAL_POS = 650;
     public static int ARM_HOME_POS = 0;
 //    public static int ARM_ON_HUB_THRESHOLD = ARM_HIGH_POS - 20;
@@ -62,7 +62,7 @@ public class Constants {
     public static double TURRET_NETRUAL_THETA = PI;
 
     //Stick Capping
-    public static double SERVO_CAP_DOWN = 0.14;
+    public static double SERVO_CAP_DOWN = 0.11;
     public static double SERVO_CAP_UP = 0.43;
     public static double SERVO_CAP_HOME = 0.97;
 
