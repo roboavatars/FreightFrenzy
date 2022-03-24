@@ -105,8 +105,8 @@ public class Robot {
 //    public static int hubTipThreshold = 300;
 
     //Auto Time Delays
-    public static int autoFlipUpThreshold = 1000;
-    public static int autoTransferThreshold = autoFlipUpThreshold + 600;
+    public static int autoFlipUpThreshold = 800;
+    public static int autoTransferThreshold = autoFlipUpThreshold + 400;
     public static int autoReleaseThreshold = 500;
 
     public static int convergeThreshold = 1500;

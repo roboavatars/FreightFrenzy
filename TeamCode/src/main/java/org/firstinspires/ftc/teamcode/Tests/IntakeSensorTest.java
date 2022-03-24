@@ -24,6 +24,11 @@ public class IntakeSensorTest extends LinearOpMode {
             addPacket("Threshold Distance", INTAKE_DISTANCE_THRESHOLD);
             addPacket("intakeFull", intakeSensor.getDistance(DistanceUnit.MM) < INTAKE_DISTANCE_THRESHOLD);
             sendPacket();
+
+            telemetry.addData("Measured Distance", intakeSensor.getDistance(DistanceUnit.MM));
+            telemetry.addData("Threshold Distance", INTAKE_DISTANCE_THRESHOLD);
+            telemetry.addData("intakeFull", intakeSensor.getDistance(DistanceUnit.MM) < INTAKE_DISTANCE_THRESHOLD);
+            telemetry.update();
         }
     }
 }
