@@ -321,7 +321,7 @@ public class Robot {
                         depositState++;
                     case 2:
                         if (turret.isAtNeutral()) {
-                            arm.setNeutral();
+//                            arm.setNeutral();
                             depositState++;
                         }
                         break;

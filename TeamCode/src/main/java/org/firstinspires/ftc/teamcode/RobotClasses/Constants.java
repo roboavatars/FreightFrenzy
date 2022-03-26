@@ -45,6 +45,7 @@ public class Constants {
     public static int ARM_ROTATE_TURRET_THRESHOLD = 600;
     public static int ARM_CAP_DOWN_POS = 725;
     public static int ARM_CAP_UP_POS = 450;
+    public static double ARM_HOLD_DEPOSIT_POWER = 0.3;
 
     // Carousel
     public static double CAROUSEL_VELOCITY_SLOW = 300;

@@ -23,7 +23,7 @@ public class Arm {
 
     public double ARM_TICKS_PER_RADIAN = 540 / PI;
     public static int DEPOSIT_ARM_HOME_THRESHOLD = 50;
-    public static int DEPOSIT_ARM_DEPOSIT_THRESHOLD = 15;
+    public static int DEPOSIT_ARM_DEPOSIT_THRESHOLD = 30;
 
     public int targetArmPos = 0;
 
@@ -99,23 +99,25 @@ public class Arm {
     }
 
     public void setHigh() {
+        depositing = true;
         targetArmPos = Constants.ARM_HIGH_POS;
         setArmPIDCoefficients(pArmUp, dArmUp, fGravityUp);
     }
 
-    public void setNeutral() {
-        targetArmPos = Constants.ARM_NEUTRAL_POS;
-        setArmPIDCoefficients(pArmUp, dArmUp, fGravityUp);
-    }
-
-    public void setCapping(int armPos, double pArm, double dArm, double fArm) {
-        setArmTarget(armPos);
-        setArmPIDCoefficients(pArm, dArm, fArm);
-    }
-
-    public void setCapping(int armPos) {
-        setCapping(armPos, pArmUp, dArmUp, fGravityUp);
-    }
+//    public void setNeutral() {
+//        depositing = true;
+//        targetArmPos = Constants.ARM_NEUTRAL_POS;
+//        setArmPIDCoefficients(pArmUp, dArmUp, fGravityUp);
+//    }
+//
+//    public void setCapping(int armPos, double pArm, double dArm, double fArm) {
+//        setArmTarget(armPos);
+//        setArmPIDCoefficients(pArm, dArm, fArm);
+//    }
+//
+//    public void setCapping(int armPos) {
+//        setCapping(armPos, pArmUp, dArmUp, fGravityUp);
+//    }
 
     public void update() {
         double targetTicks = targetArmPos;
@@ -124,7 +126,9 @@ public class Arm {
         armError = targetTicks - currentTicks;
 
         double fArm = fGravity * Math.cos(getArmAngle());
-        armMotor.setPower(Math.min(pArm * armError + dArm * armErrorChange + fArm, armMaxPower));
+        if (!depositing || !armAtDeposit())
+                armMotor.setPower(Math.min(pArm * armError + dArm * armErrorChange + fArm, armMaxPower));
+        else armMotor.setPower(Constants.ARM_HOLD_DEPOSIT_POWER);
 
         Log.w("deposit-log", "arm set to: " + targetArmPos + ", current position: " + getArmPosition() + ", power " + (pArm * armError + dArm * armErrorChange + fArm));
     }

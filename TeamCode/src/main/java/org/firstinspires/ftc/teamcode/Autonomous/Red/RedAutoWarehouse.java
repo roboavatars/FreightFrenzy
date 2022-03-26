@@ -48,14 +48,14 @@ public class RedAutoWarehouse extends LinearOpMode {
         double parkThreshold = 3;
         double preloadScoreTime = 1;
 
-        double[] depositPos = new double[]{120, 80, 0.70};
+        double[] depositPos = new double[]{120, 70, 0.3};
 
         // Paths
         Path cycleScorePath = null;
         Path parkPath = null;
         Waypoint[] preloadScoreWaypoints = new Waypoint[]{
                 new Waypoint(robot.x, robot.y, 3 * PI / 2, 10, 10, 0, 0),
-                new Waypoint(depositPos[0], depositPos[1] - 4, depositPos[2] + PI, 5, -5, 0, preloadScoreTime),
+                new Waypoint(depositPos[0], depositPos[1], depositPos[2] + PI, 5, -5, 0, preloadScoreTime),
         };
         Path preloadScorePath = new Path(preloadScoreWaypoints);
 
@@ -84,8 +84,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 Pose curPose = preloadScorePath.getRobotPose(Math.min(preloadScoreTime, time.seconds()));
                 robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
 
-                robot.depositApproval = time.seconds() > preloadScoreTime ||
-                        robot.isAtPose(depositPos[0], depositPos[1] - 4, depositPos[2], 5, 5, PI/10);
+                robot.depositApproval = robot.isAtPose(depositPos[0], depositPos[1], depositPos[2], 2, 2, PI/15);
 
                 if (robot.depositState == 5) {
                     time.reset();
@@ -107,12 +106,12 @@ public class RedAutoWarehouse extends LinearOpMode {
                     addPacket("path", "going to warehouse right rn");
                 } else if (timeLeft > parkThreshold) {
                     robot.drivetrain.constantStrafeConstant = 0;
-                    if (cycleCounter % 2 < 1) {
-                        double y = Math.min(107 + 3 * cycleCounter + 5 * (time.seconds() - passLineTime), 121);
+                    if (cycleCounter < 3) {
+                        double y = Math.min(107 + 3.5 * cycleCounter + 5 * (time.seconds() - passLineTime), 121);
                         robot.setTargetPoint(new Target(138, y, PI/2));
                     } else {
                         double x = Math.max(138 - 3 * (time.seconds() - passLineTime), 130);
-                        double y = Math.min(107 + 3 * cycleCounter + 5 * (time.seconds() - passLineTime), 121);
+                        double y = Math.min(110 + 3 * (cycleCounter - 3) + 3 * (time.seconds() - passLineTime), 125);
                         double theta = Math.min(PI/2 + PI/11 * (time.seconds() - passLineTime), 2 * PI/3);
                         robot.setTargetPoint(new Target(x, y, theta));
                     }
@@ -135,7 +134,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                     Waypoint[] cycleScoreWaypoints = new Waypoint[]{
                             new Waypoint(140, robot.y, 3 * PI / 2, 10, 10, 0, 0),
                             new Waypoint(140, 79, 3 * PI / 2, 5, 1, 0, 0.75),
-                            new Waypoint(depositPos[0], depositPos[1], depositPos[2] + PI  - 0.03 * cycleCounter, 5, 5, 0, cycleScoreTime),
+                            new Waypoint(depositPos[0], depositPos[1], depositPos[2] + PI  /*- 0.03 * cycleCounter*/, 5, 5, 0, cycleScoreTime),
                     };
                     cycleScorePath = new Path(cycleScoreWaypoints);
 

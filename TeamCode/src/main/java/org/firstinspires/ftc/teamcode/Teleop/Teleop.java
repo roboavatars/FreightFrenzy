@@ -113,8 +113,10 @@ public class Teleop extends LinearOpMode {
                 robot.setCycleHub(Robot.DepositTarget.neutral);
             }
 
-            if (gamepad1.back) {
+            if (robot.cycleHub != Robot.DepositTarget.high && gamepad1.left_trigger > 0.1) {
                 robot.setCycleHub(Robot.DepositTarget.high);
+                capDownOffset = 0;
+                capUpOffset = 0;
             }
 
 //            //Capping
@@ -157,6 +159,8 @@ public class Teleop extends LinearOpMode {
                 } else {
                     robot.arm.cap(Math.max(Math.min(Constants.SERVO_CAP_UP + capUpOffset, 1), 0));
                 }
+            } else {
+                robot.arm.cap(Constants.SERVO_CAP_HOME);
             }
 
             // Odo Reset
@@ -194,11 +198,11 @@ public class Teleop extends LinearOpMode {
             }
 
             if (robot.cycleHub == Robot.DepositTarget.capping) {
-                xyGain = 1;
+                xyGain = 0.6;
                 wGain = 0.5;
             } else {
                 xyGain = 1;
-                wGain = 0.5;
+                wGain = 0.7;
             }
 
             // Drivetrain Controls
