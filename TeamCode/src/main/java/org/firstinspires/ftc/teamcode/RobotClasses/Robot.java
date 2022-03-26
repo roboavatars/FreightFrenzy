@@ -68,7 +68,7 @@ public class Robot {
     public boolean intakeFull;
     public boolean intakeStalling;
     public double turretGlobalTheta;
-    public boolean intakeReverse = false;
+    public boolean reverseIntake = false;
 
 
     // Automation Variables
@@ -421,7 +421,12 @@ public class Robot {
             }
         }
 
-        profile(5);
+        if (!isAuto && intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
+            if (reverseIntake) intake.reverse();
+            else intake.on();
+        }
+
+            profile(5);
 
         // Update Intake Slides
         intake.update();
