@@ -109,11 +109,17 @@ public class Teleop extends LinearOpMode {
 //                intakeToggle = false;
 //            }
 
+//            if (gamepad1.b) {
+//                robot.setCycleHub(Robot.DepositTarget.neutral);
+//            }
+
             if (gamepad1.b) {
-                robot.setCycleHub(Robot.DepositTarget.neutral);
+                robot.reverseIntake = true;
+            } else {
+                robot.reverseIntake = false;
             }
 
-            if (robot.cycleHub != Robot.DepositTarget.high && gamepad1.left_trigger > 0.1) {
+            if (gamepad1.x) {
                 robot.setCycleHub(Robot.DepositTarget.high);
                 capDownOffset = 0;
                 capUpOffset = 0;
@@ -145,6 +151,9 @@ public class Teleop extends LinearOpMode {
                 cappingDown = false;
                 robot.setCycleHub(Robot.DepositTarget.capping);
             }
+//            else if (gamepad1.dpad_right) {
+//                robot.setCycleHub(Robot.DepositTarget.mid);
+//            }
 
             if (robot.cycleHub == Robot.DepositTarget.capping) {
                 if (gamepad1.right_bumper) {
@@ -164,10 +173,10 @@ public class Teleop extends LinearOpMode {
             }
 
             // Odo Reset
-            if (gamepad1.x) {
-                robot.resetOdo(138, 81, PI / 2);
-                imu.resetHeading(PI / 2);
-            }
+//            if (gamepad1.x) {
+//                robot.resetOdo(138, 81, PI / 2);
+//                imu.resetHeading(PI / 2);
+//            }
 
             if (gamepad1.y) {
                 if (robot.curTime - starCarouselTime < Constants.CAROUSEL_SPEED_UP_THRESHOLD)

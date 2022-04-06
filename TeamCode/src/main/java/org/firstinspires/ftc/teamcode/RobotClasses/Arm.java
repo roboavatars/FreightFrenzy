@@ -118,6 +118,24 @@ public class Arm {
 //    public void setCapping(int armPos) {
 //        setCapping(armPos, pArmUp, dArmUp, fGravityUp);
 //    }
+    public void setMid() {
+        targetArmPos = Constants.ARM_MID_POS;
+        setArmPIDCoefficients(pArmUp, dArmUp, fGravityUp);
+    }
+
+    public void setNeutral() {
+        targetArmPos = Constants.ARM_NEUTRAL_POS;
+        setArmPIDCoefficients(pArmUp, dArmUp, fGravityUp);
+    }
+
+    public void setCapping(int armPos, double pArm, double dArm, double fArm) {
+        setArmTarget(armPos);
+        setArmPIDCoefficients(pArm, dArm, fArm);
+    }
+
+    public void setCapping(int armPos) {
+        setCapping(armPos, pArmUp, dArmUp, fGravityUp);
+    }
 
     public void update() {
         double targetTicks = targetArmPos;
@@ -126,7 +144,7 @@ public class Arm {
         armError = targetTicks - currentTicks;
 
         double fArm = fGravity * Math.cos(getArmAngle());
-        if (!depositing || !armAtDeposit())
+        if (!depositing || !armAtDeposit() || targetTicks > Constants.ARM_HIGH_POS)
                 armMotor.setPower(Math.min(pArm * armError + dArm * armErrorChange + fArm, armMaxPower));
         else armMotor.setPower(Constants.ARM_HOLD_DEPOSIT_POWER);
 

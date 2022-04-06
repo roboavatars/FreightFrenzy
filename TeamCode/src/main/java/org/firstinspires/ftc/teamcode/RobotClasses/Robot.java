@@ -126,6 +126,7 @@ public class Robot {
 
     public enum DepositTarget {
         high,
+        mid,
         capping,
         neutral
     }
@@ -347,10 +348,11 @@ public class Robot {
                         }
                         break;
                 }
-            } else if (cycleHub == DepositTarget.high) {
+            } else if (cycleHub == DepositTarget.high || cycleHub == DepositTarget.mid) {
                 switch (depositState) {
                     case 1:
-                        arm.setHigh();
+                        if (cycleHub == DepositTarget.high) arm.setHigh();
+                        else arm.setMid();
                         depositState++;
                         break;
                     case 2:
