@@ -19,13 +19,13 @@ public class Dashboard {
     }
 
     public static void drawRobot(Robot robot, String drivetrainColor) {
-        drawRobot(robot.x, robot.y, robot.theta, !robot.intake.slidesIsHome(), 0, robot.turret.getTheta(), drivetrainColor);
+        drawRobot(robot.x, robot.y, robot.theta, !robot.intake.slidesIsHome(), 0, robot.turret.getTheta(), robot.arm.getArmAngle(), drivetrainColor);
     }
 
-    public static void drawRobot(double robotX, double robotY, double robotTheta, boolean intakeSlidesExtend, double depositSlidesDist, double turretTheta, String drivetrainColor) {
+    public static void drawRobot(double robotX, double robotY, double robotTheta, boolean intakeSlidesExtend, double depositSlidesDist, double turretTheta, double armTheta, String drivetrainColor) {
         drawDrivetrain(robotX, robotY, robotTheta, drivetrainColor);
 //        drawIntakeSlides(robotX, robotY, robotTheta, intakeSlidesExtend);
-        drawDepositTurretSlides(robotX, robotY, robotTheta, turretTheta, depositSlidesDist);
+        drawDepositTurretSlidesArm(robotX, robotY, robotTheta, turretTheta, depositSlidesDist, armTheta);
     }
 
     public static void drawDrivetrain(double robotX, double robotY, double robotTheta, String color) {
@@ -40,8 +40,8 @@ public class Dashboard {
         packet.fieldOverlay().setFill("green").fillCircle(-4.5 * cos(theta) + 6.5 * sin(theta) + x, -4.5 * sin(theta) - 6.5 * cos(theta) + y, 2.25);
     }
 
-    public static void drawIntakeSlides(double x, double y, double theta, boolean extended) {
-        double extendedPos = extended ? 13.5 : 0;
+    public static void drawIntakeSlides(double x, double y, double theta, double slidesPos) {
+        double extendedPos =  slidesPos * 2;
         double[] leftX = {-2.5 * sin(theta) - 9 * cos(theta) + x, -2.5 * sin(theta) - (9 + extendedPos) * cos(theta) + x, -3 * sin(theta) - (9 + extendedPos) * sin(theta) + x, -3 * sin(theta) - 9 * cos(theta) + x};
         double[] leftY = {-2.5 * cos(theta) + 9 * sin(theta) + y, -2.5 * cos(theta) + (9 + extendedPos) * sin(theta) + y, -3 * cos(theta) + (9 + extendedPos) * cos(theta) + y, -3 * cos(theta) + 9 * sin(theta) + y};
 
@@ -52,7 +52,7 @@ public class Dashboard {
         drawPolygon(rightX, rightY, "orange");
     }
 
-    public static void drawDepositTurretSlides(double x, double y, double robotTheta, double turretTheta, double slidesDist) {
+    public static void drawDepositTurretSlidesArm(double x, double y, double robotTheta, double turretTheta, double slidesDist, double armTheta) {
         double extendedPos = 11.5 + slidesDist;
         double theta = robotTheta + turretTheta;
         double turretCenterX = x + Turret.TURRET_Y_OFFSET * cos(robotTheta);
@@ -64,8 +64,18 @@ public class Dashboard {
         double[] rightSlidesX = {2 * cos(theta) - -4.5 * sin(theta) + turretCenterX, 2 * cos(theta) - extendedPos * sin(theta) + turretCenterX, 3.5 * cos(theta) - extendedPos * sin(theta) + turretCenterX, 3.5 * cos(theta) - -4.5 * sin(theta) + turretCenterX};
         double[] rightSlidesY = {2 * sin(theta) + -4.5 * cos(theta) + turretCenterY, 2 * sin(theta) + extendedPos * cos(theta) + turretCenterY, 3.5 * sin(theta) + extendedPos * cos(theta) + turretCenterY, 3.5 * sin(theta) + -4.5 * cos(theta) + turretCenterY};
 
+        double[] armX = {0.5 * cos(theta) - extendedPos * sin(theta) + turretCenterX,
+                0.5 * cos(theta) - (extendedPos + (-cos(armTheta)))  * sin(theta) + turretCenterX,
+                -0.5 * cos(theta) - (extendedPos + (-cos(armTheta))) * sin(theta) + turretCenterX,
+                -0.5 * cos(theta) - extendedPos * sin(theta) + turretCenterX};
+        double[] armY = {0.5 * sin(theta) + extendedPos * cos(theta) + turretCenterY,
+                0.5 * sin(theta) + (extendedPos + (-cos(armTheta))) * cos(theta) + turretCenterY,
+                -0.5 * sin(theta) + (extendedPos + (-cos(armTheta))) * cos(theta) + turretCenterY,
+                -0.5 * sin(theta) + extendedPos * cos(theta) + turretCenterY};
+
         drawPolygon(leftSlidesX, leftSlidesY, "red");
         drawPolygon(rightSlidesX, rightSlidesY, "red");
+        drawPolygon(armX, armY, "black");
     }
 
     public static void drawFreight(Freight freight, String color) {

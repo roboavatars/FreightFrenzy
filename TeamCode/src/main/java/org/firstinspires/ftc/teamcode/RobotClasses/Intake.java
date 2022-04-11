@@ -9,11 +9,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.RobotClasses.Servo.ServoPosEstimation;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Intake {
     private DcMotorEx intakeMotor;
-    private Servo slidesServo;
+    private ServoPosEstimation slidesServo;
     private Servo intakeServo;
     private DistanceSensor intakeSensor;
 
@@ -24,6 +25,8 @@ public class Intake {
     private double lastSlidesPos = 0;
     private double slidesTargetPos = 0;
 
+    public double INTAKE_SLIDES_SERVO_SPEED = 0.1;
+
     private LinearOpMode op;
 
     public Intake(LinearOpMode op, boolean isAuto) {
@@ -31,12 +34,11 @@ public class Intake {
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
 
         // Slides Motor
-        slidesServo = op.hardwareMap.get(Servo.class, "intakeSlides");
         if (isAuto) {
             slidesHome = true;
-            slidesTargetPos = Constants.INTAKE_HOME_INIT_POS;
+            slidesServo = new ServoPosEstimation(op, "intakeSlides", Constants.INTAKE_HOME_INIT_POS, INTAKE_SLIDES_SERVO_SPEED);
         } else {
-            home();
+            slidesServo = new ServoPosEstimation(op, "intakeSlides", Constants.INTAKE_EXTEND_POS, INTAKE_SLIDES_SERVO_SPEED);
         }
         setSlidesPosition(slidesTargetPos);
 
@@ -104,6 +106,10 @@ public class Intake {
             slidesServo.setPosition(position);
             lastSlidesPos = position;
         }
+    }
+
+    public double getSlidesPos() {
+        return slidesServo.getPos();
     }
 
     public void update() {

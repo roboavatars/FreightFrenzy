@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.Tests;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawField;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawRobot;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -60,7 +59,7 @@ public class TapeDetectorTest extends LinearOpMode {
             addPacket("6 y", y);
             addPacket("6 theta", theta);
             drawField();
-            drawRobot(x, y, theta, false, 0, theta, "grey");
+//            drawRobot(x, y, theta, false, 0, theta, "grey");
 
             addPacket("7 loop time", 1000 / (System.currentTimeMillis() - lastTime));
             lastTime = System.currentTimeMillis();
