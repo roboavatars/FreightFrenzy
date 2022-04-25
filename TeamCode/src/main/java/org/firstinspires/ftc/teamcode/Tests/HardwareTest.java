@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class HardwareTest extends LinearOpMode {
 //    public static String motorName1 = "carouselMotor";
 //    public static String motorName2 = "depositSlides";
-    public static String servoName1 = "limitServo";
+    public static String servoName1 = "intakeServo";
 //    public static String servoName2 = "depositServo";
 
 //    public static double motor1Power = 0;
