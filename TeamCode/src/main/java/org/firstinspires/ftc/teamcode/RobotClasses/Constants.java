@@ -17,14 +17,15 @@ public class Constants {
     public static double INTAKE_TRANSFER_POWER = -1;
 
     // Intake Slides
-    public static double INTAKE_EXTEND_POS = 0.3;
+    public static int INTAKE_SLIDES_EXTEND_TICKS = 100;
 //    public static double INTAKE_MIDWAY_POS = 0.6;
-    public static double INTAKE_HOME_POS = 0.59;
+    public static int INTAKE_SLIDES_HOME_TICKS = 0;
     public static double INTAKE_HOME_INIT_POS = 0.8;
+    public static double INTAKE_SLIDES_POWER = 1;
 
     // Intake Servo
-    public static double INTAKE_UP_POS = 0.8;
-    public static double INTAKE_DOWN_POS = 0.15;
+    public static double INTAKE_UP_POS = 0.75;
+    public static double INTAKE_DOWN_POS = 0.13;
     public static double INTAKE_UP_INIT_POS = 0.8;
 
     // Deposit Servo

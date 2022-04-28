@@ -229,11 +229,11 @@ public class Robot {
         // Auto-Intaking
         if (isAuto) {
             if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && (y > 90 || intakeApproval)) {
-                if (!noExtend) {
-                    intake.extend(Constants.INTAKE_EXTEND_POS);
-                } else {
-                    intake.extend(Constants.INTAKE_HOME_POS);
-                }
+//                if (!noExtend) {
+//                    intake.extend(Constants.INTAKE_EXTEND_POS);
+//                } else {
+//                    intake.extend(Constants.INTAKE_HOME_POS);
+//                }
                 intake.on();
 
                 intakeTransfer = true;
@@ -431,7 +431,7 @@ public class Robot {
             profile(5);
 
         // Update Intake Slides
-        intake.update();
+//        intake.update();
 
         profile(8);
 

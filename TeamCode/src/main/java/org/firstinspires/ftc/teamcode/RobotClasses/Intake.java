@@ -3,19 +3,19 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.RobotClasses.Servo.ServoPosEstimation;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Intake {
     private DcMotorEx intakeMotor;
-    private ServoPosEstimation slidesServo;
-    private Servo intakeServo;
+    private DcMotorEx slidesMotor;
+    private Servo flipServo;
     private DistanceSensor intakeSensor;
 
     private double lastIntakePow = 0;
@@ -26,44 +26,28 @@ public class Intake {
     private double slidesTargetPos = 0;
 
     public double INTAKE_SLIDES_SERVO_SPEED = 0.1;
+    public double HOME_THRESHOLD = 20;
 
     private LinearOpMode op;
 
     public Intake(LinearOpMode op, boolean isAuto) {
-        // Intake Motor
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
 
-        // Slides Motor
-        if (isAuto) {
-            slidesHome = true;
-            slidesServo = new ServoPosEstimation(op, "intakeSlides", Constants.INTAKE_HOME_INIT_POS, INTAKE_SLIDES_SERVO_SPEED);
-        } else {
-            slidesServo = new ServoPosEstimation(op, "intakeSlides", Constants.INTAKE_EXTEND_POS, INTAKE_SLIDES_SERVO_SPEED);
-        }
-        setSlidesPosition(slidesTargetPos);
+        flipServo = op.hardwareMap.get(Servo.class, "intakeServo");
 
-        // Intake Servo
-        intakeServo = op.hardwareMap.get(Servo.class, "intakeServo");
-        if (isAuto) {
-            intakeServo.setPosition(Constants.INTAKE_UP_INIT_POS);
-        } else {
-            flipDown();
-        }
-
-        // Intake Distance Sensor
-        intakeSensor = op.hardwareMap.get(DistanceSensor.class, "intakeSensor");
-
-        this.op = op;
-        op.telemetry.addData("Status", "Intake Initialized");
+        slidesMotor = op.hardwareMap.get(DcMotorEx.class, "intakeSlides");
+        slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slidesMotor.setTargetPosition(0);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     // Intake Motor
     public void on() {
-        setPower(1);
+        setPower(-1);
     }
 
     public void reverse() {
-        setPower(-1);
+        setPower(1);
     }
 
     public void off() {
@@ -87,46 +71,33 @@ public class Intake {
 
     // Intake Slides
     public void extend() {
-        slidesHome = false;
-        slidesTargetPos = Constants.INTAKE_EXTEND_POS;
-    }
-
-    public void extend(double extendPos) {
-        slidesHome = false;
-        slidesTargetPos = extendPos;
+        setSlidesPosition(Constants.INTAKE_SLIDES_EXTEND_TICKS);
     }
 
     public void home() {
-        slidesHome = true;
-        slidesTargetPos = Constants.INTAKE_HOME_POS;
+        setSlidesPosition(Constants.INTAKE_SLIDES_HOME_TICKS);
     }
 
-    public void setSlidesPosition(double position) {
-        if (position != lastSlidesPos) {
-            slidesServo.setPosition(position);
-            lastSlidesPos = position;
-        }
+    public void setSlidesPosition(int position) {
+        slidesMotor.setTargetPosition(position);
+        slidesMotor.setPower(Constants.INTAKE_SLIDES_POWER);
     }
 
     public double getSlidesPos() {
-        return slidesServo.getPos();
-    }
-
-    public void update() {
-        setSlidesPosition(slidesTargetPos + intakeOffset);
+        return slidesMotor.getCurrentPosition();
     }
 
     public boolean slidesIsHome() {
-        return slidesHome;
+        return getSlidesPos() - Constants.INTAKE_SLIDES_HOME_TICKS < HOME_THRESHOLD;
     }
 
     // Intake Servo
     public void flipUp() {
-        intakeServo.setPosition(Constants.INTAKE_UP_POS);
+        flipServo.setPosition(Constants.INTAKE_UP_POS);
     }
 
     public void flipDown() {
-        intakeServo.setPosition(Constants.INTAKE_DOWN_POS);
+        flipServo.setPosition(Constants.INTAKE_DOWN_POS);
     }
 
     // Distance Sensor
