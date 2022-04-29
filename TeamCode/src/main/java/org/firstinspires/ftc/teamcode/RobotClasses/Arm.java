@@ -95,7 +95,7 @@ public class Arm {
     public void setHome() {
         depositing = false;
         setArmPIDCoefficients(pArmDown, dArmDown, fGravityDown);
-        setArmTarget(Constants.ARM_HOME_POS);
+        setArmTarget(Constants.FAKE_ARM_HOME_POS);
     }
 
     public void setHigh() {
@@ -168,7 +168,7 @@ public class Arm {
     }
 
     public boolean armHome() {
-        return Math.abs(getArmPosition() - Constants.ARM_HOME_POS) < DEPOSIT_ARM_HOME_THRESHOLD;
+        return Math.abs(getArmPosition() - Constants.FAKE_ARM_HOME_POS) < DEPOSIT_ARM_HOME_THRESHOLD;
     }
 
     public double getArmAngle() {

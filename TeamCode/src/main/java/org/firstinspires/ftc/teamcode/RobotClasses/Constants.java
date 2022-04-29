@@ -42,12 +42,19 @@ public class Constants {
     public static int ARM_HIGH_POS = 570;
     public static int ARM_MID_POS = 640;
     public static int ARM_NEUTRAL_POS = 650;
-    public static int ARM_HOME_POS = 0;
+    public static int FAKE_ARM_HOME_POS = 0;
 //    public static int ARM_ON_HUB_THRESHOLD = ARM_HIGH_POS - 20;
     public static int ARM_ROTATE_TURRET_THRESHOLD = 600;
     public static int ARM_CAP_DOWN_POS = 725;
     public static int ARM_CAP_UP_POS = 450;
     public static double ARM_HOLD_DEPOSIT_POWER = 0.3;
+
+    public static double ARM_DEPOSIT_POS = 1;
+    public static double ARM_HOME_POS = 0.3;
+
+    public static int DEPOSIT_SLIDES_HOME_TICKS = 0;
+    public static int DEPOSIT_SLIDES_EXTEND_TICKS = 170;
+    public static double DEPOSIT_SLIDES_POWER = 1;
 
     // Carousel
     public static double CAROUSEL_VELOCITY_SLOW = 300;
