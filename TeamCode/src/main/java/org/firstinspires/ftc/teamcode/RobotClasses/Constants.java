@@ -19,13 +19,13 @@ public class Constants {
     // Intake Slides
     public static int INTAKE_SLIDES_EXTEND_TICKS = 100;
 //    public static double INTAKE_MIDWAY_POS = 0.6;
-    public static int INTAKE_SLIDES_HOME_TICKS = 0;
+    public static int INTAKE_SLIDES_HOME_TICKS = 10;
     public static double INTAKE_HOME_INIT_POS = 0.8;
     public static double INTAKE_SLIDES_POWER = 1;
 
     // Intake Servo
     public static double INTAKE_UP_POS = 0.75;
-    public static double INTAKE_DOWN_POS = 0.13;
+    public static double INTAKE_DOWN_POS = 0.1;
     public static double INTAKE_UP_INIT_POS = 0.8;
 
     // Deposit Servo
@@ -50,7 +50,7 @@ public class Constants {
     public static double ARM_HOLD_DEPOSIT_POWER = 0.3;
 
     public static double ARM_DEPOSIT_POS = 1;
-    public static double ARM_HOME_POS = 0.3;
+    public static double ARM_HOME_POS = 0.32;
 
     public static int DEPOSIT_SLIDES_HOME_TICKS = 0;
     public static int DEPOSIT_SLIDES_EXTEND_TICKS = 170;
@@ -70,6 +70,9 @@ public class Constants {
 
     //Turret?
     public static double TURRET_NETRUAL_THETA = PI;
+
+    public static double TURRET_HOME = 0.485;
+    public static double TURRET_TURN_DIST = 0.35;
 
     //Stick Capping
     public static double SERVO_CAP_DOWN = 0.11;

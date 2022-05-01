@@ -14,13 +14,14 @@ public class Deposit {
     private DcMotorEx slidesMotor;
     private Servo armServo1;
     private Servo armServo2;
+    private Servo turretServo;
     //private Servo depositServo;
 
     private double lastServoPos = 0; // deposit servo
     private double lastServoPos2 = 0; // limit servo
 
     public double ARM_TICKS_PER_RADIAN = 540 / PI;
-    public static int DEPOSIT_ARM_HOME_THRESHOLD = 50;
+    public static int SLIDES_HOME_THRESHOLD = 20;
     public static int DEPOSIT_ARM_DEPOSIT_THRESHOLD = 30;
 
     public int targetArmPos = 0;
@@ -61,7 +62,11 @@ public class Deposit {
 
         armServo1 = op.hardwareMap.get(Servo.class, "arm1");
         armServo2 = op.hardwareMap.get(Servo.class, "arm2");
+        turretServo = op.hardwareMap.get(Servo.class, "turret");
         //depositServo = op.hardwareMap.get(Servo.class, "depositServo");
+
+        turretHome();
+        armHome();
 
         // Arm Motor
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
@@ -92,5 +97,25 @@ public class Deposit {
     public void armHome() {
         armServo1.setPosition(Constants.ARM_HOME_POS);
         armServo2.setPosition(1 - Constants.ARM_HOME_POS);
+    }
+
+    public int getSlidesPos() {
+        return slidesMotor.getCurrentPosition();
+    }
+
+    public boolean slidesisHome() {
+        return getSlidesPos() < SLIDES_HOME_THRESHOLD;
+    }
+
+    public void turretHome() {
+        turretServo.setPosition(Constants.TURRET_HOME);
+    }
+
+    public void turretLeft() {
+        turretServo.setPosition(Constants.TURRET_HOME - Constants.TURRET_TURN_DIST);
+    }
+
+    public void turretRight() {
+        turretServo.setPosition(Constants.TURRET_HOME + Constants.TURRET_TURN_DIST);
     }
 }
