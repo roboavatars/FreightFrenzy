@@ -17,7 +17,7 @@ public class Constants {
     public static double INTAKE_TRANSFER_POWER = -1;
 
     // Intake Slides
-    public static int INTAKE_SLIDES_EXTEND_TICKS = 100;
+    public static int INTAKE_SLIDES_EXTEND_TICKS = 90;
 //    public static double INTAKE_MIDWAY_POS = 0.6;
     public static int INTAKE_SLIDES_HOME_TICKS = 10;
     public static double INTAKE_HOME_INIT_POS = 0.8;
