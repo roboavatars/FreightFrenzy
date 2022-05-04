@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -28,26 +29,34 @@ public class Intake {
     public double INTAKE_SLIDES_SERVO_SPEED = 0.1;
     public double HOME_THRESHOLD = 20;
 
+    public int slidesErrorChange = 0;
+    public int slidesError = 0;
+    public int slidesTarget = 0;
+
+    public double slidesKp = 0.2;
+    public double slidesKd = 0;
+
     private LinearOpMode op;
 
     public Intake(LinearOpMode op, boolean isAuto) {
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         flipServo = op.hardwareMap.get(Servo.class, "intakeServo");
 
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "intakeSlides");
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slidesMotor.setTargetPosition(0);
-        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     // Intake Motor
     public void on() {
-        setPower(-1);
+        setPower(1);
     }
 
     public void reverse() {
-        setPower(1);
+        setPower(-1);
     }
 
     public void off() {
@@ -79,11 +88,20 @@ public class Intake {
     }
 
     public void setSlidesPosition(int position) {
-        slidesMotor.setTargetPosition(position);
-        slidesMotor.setPower(Constants.INTAKE_SLIDES_POWER);
+//        slidesMotor.setTargetPosition(position);
+//        slidesMotor.setPower(Constants.INTAKE_SLIDES_POWER);
+        slidesTarget = position;
     }
 
-    public double getSlidesPos() {
+    public void updateSlides(){
+        int currentTicks = getSlidesPos();
+        slidesErrorChange = slidesTarget - currentTicks - slidesError;
+        slidesError = slidesTarget - currentTicks;
+
+        slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange);
+    }
+
+    public int getSlidesPos() {
         return slidesMotor.getCurrentPosition();
     }
 

@@ -21,7 +21,7 @@ public class Deposit {
     private double lastServoPos2 = 0; // limit servo
 
     public double ARM_TICKS_PER_RADIAN = 540 / PI;
-    public static int SLIDES_HOME_THRESHOLD = 20;
+    public static int SLIDES_HOME_THRESHOLD = 5;
     public static int DEPOSIT_ARM_DEPOSIT_THRESHOLD = 30;
 
     public int targetArmPos = 0;

@@ -16,7 +16,7 @@ public class CycleTest extends LinearOpMode {
     int depositCase = 0;
     private double lastTime;
     private int intakeCase = 1;
-    public static double transferThreshold = 1000;
+    public static double transferThreshold = 500;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -29,6 +29,7 @@ public class CycleTest extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
+            intake.updateSlides();
             //intake states
             if (gamepad1.right_trigger > .1) {
                 intakeCase = 2;
@@ -47,7 +48,7 @@ public class CycleTest extends LinearOpMode {
                     break;
                 case 3:
                     intake.home();
-                    intake.setPower(-.25);
+                    intake.setPower(.5);
                     intake.flipUp();
                     if (intake.slidesIsHome() && deposit.slidesisHome()) {
                         intakeCase ++;

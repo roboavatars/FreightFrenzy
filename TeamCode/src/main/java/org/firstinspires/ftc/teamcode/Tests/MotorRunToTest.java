@@ -7,7 +7,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
 @Config
@@ -18,14 +17,14 @@ public class MotorRunToTest extends LinearOpMode {
     public static double power = 0;
     public static boolean runToPos = false;
     public static int ticks = 0;
+    public static double P = 50;
 
     @Override
     public void runOpMode() {
         motor = hardwareMap.get(DcMotorEx.class, motorName);
-        motor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        motor.setDirection(DcMotorSimple.Direction.REVERSE);
         motor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         motor.setTargetPosition(0);
-        motor.setPositionPIDFCoefficients(50);
 
         waitForStart();
 
@@ -38,6 +37,7 @@ public class MotorRunToTest extends LinearOpMode {
                 motor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 //                motor.setPower(power);
             }
+            motor.setPositionPIDFCoefficients(P);
 
             addPacket("ticks", motor.getCurrentPosition());
             addPacket("velocity", motor.getVelocity());
