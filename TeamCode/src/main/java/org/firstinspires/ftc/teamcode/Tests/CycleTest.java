@@ -12,11 +12,17 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Intake;
 @Config
 public class CycleTest extends LinearOpMode {
     public static boolean extend = false;
+    public static boolean shared = false;
 
     int depositCase = 0;
-    private double lastTime;
+    int sharedCase = 0;
+    private double transferStart;
+    private double sharedDepositStart;
+    private double sharedRetractStart;
     private int intakeCase = 1;
     public static double transferThreshold = 500;
+    public static double turretDepositThreshold = 1000;
+    public static double turretHomeThreshold = 1000;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -44,38 +50,66 @@ public class CycleTest extends LinearOpMode {
                     intake.extend();
                     intake.on();
                     intake.flipDown();
-                    if (gamepad1.right_trigger < .1) intakeCase ++;
+                    if (gamepad1.right_trigger < .1) intakeCase++;
                     break;
                 case 3:
                     intake.home();
                     intake.setPower(.5);
                     intake.flipUp();
                     if (intake.slidesIsHome() && deposit.slidesisHome()) {
-                        intakeCase ++;
-                        lastTime = System.currentTimeMillis();
+                        intakeCase++;
+                        transferStart = System.currentTimeMillis();
                     }
                     break;
                 case 4:
                     intake.reverse();
-                    if (System.currentTimeMillis() - lastTime > transferThreshold) {
+                    if (System.currentTimeMillis() - transferStart > transferThreshold) {
                         intakeCase = 1;
                         depositCase = 2;
+                        sharedCase = 2;
                     }
                     break;
             }
 
             //deposit states
-            switch (depositCase) {
-                case 1:
-                    deposit.retractSlides();
-                    deposit.armHome();
-                    break;
-                case 2:
-                    deposit.extendSlides();
-                    deposit.armOut();
-                    if (gamepad1.a) {
-                        depositCase = 1;
-                    }
+            if (shared) {
+                switch (sharedCase) {
+                    case 1:
+                        deposit.armHome();
+                        sharedDepositStart = System.currentTimeMillis();
+                        break;
+                    case 2:
+                        deposit.armOut();
+                        if (System.currentTimeMillis() - sharedDepositStart > turretDepositThreshold) sharedCase ++;
+                        break;
+                    case 3:
+                        deposit.turretRight();
+                        sharedRetractStart = System.currentTimeMillis();
+                        if (gamepad1.a) {
+                            depositCase++;
+                        }
+                        break;
+                    case 4:
+                        deposit.turretHome();
+                        if (System.currentTimeMillis() - sharedRetractStart > turretHomeThreshold) {
+                            depositCase = 1;
+                        }
+                }
+            } else {
+                deposit.turretHome();
+                switch (depositCase) {
+                    case 1:
+                        deposit.retractSlides();
+                        deposit.armHome();
+                        break;
+                    case 2:
+                        deposit.extendSlides();
+                        deposit.armOut();
+                        if (gamepad1.a) {
+                            depositCase = 1;
+                        }
+                        break;
+                }
             }
         }
     }

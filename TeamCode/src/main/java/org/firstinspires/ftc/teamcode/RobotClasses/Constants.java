@@ -53,7 +53,7 @@ public class Constants {
     public static double ARM_HOME_POS = 0.32;
 
     public static int DEPOSIT_SLIDES_HOME_TICKS = 0;
-    public static int DEPOSIT_SLIDES_EXTEND_TICKS = 170;
+    public static int DEPOSIT_SLIDES_EXTEND_TICKS = 480;
     public static double DEPOSIT_SLIDES_POWER = 1;
 
     // Carousel
