@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
+import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.RobotClasses.Intake;
 
 //Config in Constants.java
@@ -28,6 +29,7 @@ public class CycleTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Deposit deposit = new Deposit(this,false, 0, 0);
         Intake intake = new Intake(this,false);
+        Drivetrain dt = new Drivetrain(this, 0,0,0);
 
         intake.flipDown();
         intake.home();
@@ -35,6 +37,8 @@ public class CycleTest extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
+            dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
+
             intake.updateSlides();
             //intake states
             if (gamepad1.right_trigger > .1) {
