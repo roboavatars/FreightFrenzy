@@ -1,12 +1,19 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.RobotClasses.Intake;
+
+import java.util.List;
 
 //Config in Constants.java
 @TeleOp(name = "Cycle Test")
@@ -35,8 +42,17 @@ public class CycleTest extends LinearOpMode {
         intake.home();
         intake.off();
 
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+
         waitForStart();
         while (opModeIsActive()) {
+            int i = 1;
+            for (LynxModule hub : allHubs) {
+                addPacket("hub " + i, hub.getCurrent(CurrentUnit.AMPS));
+                i++;
+            }
+            sendPacket();
+
             dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
 
             intake.updateSlides();
@@ -105,10 +121,12 @@ public class CycleTest extends LinearOpMode {
                     case 1:
                         deposit.retractSlides();
                         deposit.armHome();
+                        deposit.open();
                         break;
                     case 2:
                         deposit.extendSlides();
                         deposit.armOut();
+                        deposit.hold();
                         if (gamepad1.a) {
                             depositCase = 1;
                         }

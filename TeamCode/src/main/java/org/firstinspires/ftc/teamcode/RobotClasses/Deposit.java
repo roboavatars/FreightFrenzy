@@ -15,6 +15,7 @@ public class Deposit {
     private Servo armServo1;
     private Servo armServo2;
     private Servo turretServo;
+    private Servo depositServo;
     //private Servo depositServo;
 
     private double lastServoPos = 0; // deposit servo
@@ -60,6 +61,7 @@ public class Deposit {
 
         // Deposit Servo
 
+        depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         armServo1 = op.hardwareMap.get(Servo.class, "arm1");
         armServo2 = op.hardwareMap.get(Servo.class, "arm2");
         turretServo = op.hardwareMap.get(Servo.class, "turret");
@@ -117,5 +119,13 @@ public class Deposit {
 
     public void turretRight() {
         turretServo.setPosition(Constants.TURRET_HOME + Constants.TURRET_TURN_DIST);
+    }
+
+    //Deposit Servo
+    public void hold() {
+        depositServo.setPosition(Constants.DEPOSIT_HOLD_POS);
+    }
+    public void open() {
+        depositServo.setPosition(Constants.DEPOSIT_OPEN_POS);
     }
 }
