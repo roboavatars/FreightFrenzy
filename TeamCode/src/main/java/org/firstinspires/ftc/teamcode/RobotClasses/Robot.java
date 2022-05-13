@@ -384,6 +384,7 @@ public class Robot {
                     }
                     break;
                 case 3:
+                    deposit.release();
                     if (System.currentTimeMillis() - depositStart > releaseThreshold) {
                         depositState = 1;
                     }

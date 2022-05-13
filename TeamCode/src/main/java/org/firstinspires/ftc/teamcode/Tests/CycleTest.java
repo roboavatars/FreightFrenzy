@@ -121,7 +121,7 @@ public class CycleTest extends LinearOpMode {
                     case 1:
                         deposit.retractSlides();
                         deposit.armHome();
-                        deposit.open();
+                        deposit.release();
                         break;
                     case 2:
                         deposit.extendSlides();

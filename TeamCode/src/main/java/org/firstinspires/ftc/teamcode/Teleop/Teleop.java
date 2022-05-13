@@ -87,7 +87,7 @@ public class Teleop extends LinearOpMode {
             robot.logger.startLogging(false, initialData[0] == 1);
         } else {
             robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
-//            robot.logger.startLogging(false, isRed);
+            robot.logger.startLogging(false, isRed);
         }
 
 //        imu = new IMU(robot.theta, this);

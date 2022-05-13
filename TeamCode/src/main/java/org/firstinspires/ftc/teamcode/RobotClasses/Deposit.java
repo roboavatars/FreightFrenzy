@@ -125,7 +125,11 @@ public class Deposit {
     public void hold() {
         depositServo.setPosition(Constants.DEPOSIT_HOLD_POS);
     }
+    public void release() {
+        depositServo.setPosition(Constants.DEPOSIT_RELEASE_POS);
+    }
     public void open() {
         depositServo.setPosition(Constants.DEPOSIT_OPEN_POS);
     }
+
 }
