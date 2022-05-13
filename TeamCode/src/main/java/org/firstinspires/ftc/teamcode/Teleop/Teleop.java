@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -10,7 +9,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.Localization.IMU;
-import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 import java.util.Arrays;
@@ -79,7 +77,7 @@ public class Teleop extends LinearOpMode {
     */
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         if (useAutoPos) {
             double[] initialData = Logger.readPos();
             telemetry.addData("Starting Data", Arrays.toString(initialData));
@@ -89,130 +87,19 @@ public class Teleop extends LinearOpMode {
             robot.logger.startLogging(false, initialData[0] == 1);
         } else {
             robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
-            robot.logger.startLogging(false, isRed);
+//            robot.logger.startLogging(false, isRed);
         }
 
-        imu = new IMU(robot.theta, this);
+//        imu = new IMU(robot.theta, this);
         waitForStart();
 
         ElapsedTime cycleTimer = new ElapsedTime();
         cycleTimer.reset();
 
         while (opModeIsActive()) {
-            robot.depositApproval = gamepad1.left_trigger > 0.1;
-            robot.intakeApproval = gamepad1.right_trigger > 0.1;
+            robot.intakeApproval = gamepad1.right_trigger > .1;
+            robot.depositApproval = gamepad1.left_trigger > .1;
 
-//            if (!intakeToggle && gamepad1.right_trigger > 0.1) {
-//                robot.intakeApproval = !robot.intakeApproval;
-//                intakeToggle = true;
-//            } else if (intakeToggle && gamepad1.right_trigger <= 0.1) {
-//                intakeToggle = false;
-//            }
-
-//            if (gamepad1.b) {
-//                robot.setCycleHub(Robot.DepositTarget.neutral);
-//            }
-
-            if (gamepad1.b) {
-                robot.reverseIntake = true;
-            } else {
-                robot.reverseIntake = false;
-            }
-
-            if (gamepad1.x) {
-                robot.setCycleHub(Robot.DepositTarget.high);
-                capDownOffset = 0;
-                capUpOffset = 0;
-            }
-
-//            //Capping
-//            if (gamepad1.dpad_down) {
-//                robot.setCycleHub(Robot.DepositTarget.capping);
-//            }
-//
-//            if (gamepad1.dpad_up && robot.cycleHub == Robot.DepositTarget.capping) {
-//                robot.depositState = 2;
-//            }
-//
-//            if (robot.cycleHub == Robot.DepositTarget.capping) {
-//                if (gamepad1.right_bumper) {
-//                    if (robot.depositState == 1) robot.capDownOffset -= 0.75;
-//                    else robot.capUpOffset--;
-//                } else if (gamepad1.left_bumper) {
-//                    if (robot.depositState == 1) robot.capDownOffset += 0.75;
-//                    else robot.capUpOffset++;
-//                }
-//            }
-
-            if (gamepad1.dpad_down) {
-                cappingDown = true;
-                robot.setCycleHub(Robot.DepositTarget.capping);
-            } else if (gamepad1.dpad_up) {
-                cappingDown = false;
-                robot.setCycleHub(Robot.DepositTarget.capping);
-            }
-//            else if (gamepad1.dpad_right) {
-//                robot.setCycleHub(Robot.DepositTarget.mid);
-//            }
-
-            if (robot.cycleHub == Robot.DepositTarget.capping) {
-                if (gamepad1.right_bumper) {
-                    if (cappingDown) capDownOffset += 0.001;
-                    else capUpOffset += 0.001;
-                } else if (gamepad1.left_bumper) {
-                    if (cappingDown) capDownOffset -= 0.001;
-                    else capUpOffset -= 0.001;
-                }
-                if (cappingDown) {
-                    robot.arm.cap(Math.max(Math.min(Constants.SERVO_CAP_DOWN + capDownOffset, 1), 0));
-                } else {
-                    robot.arm.cap(Math.max(Math.min(Constants.SERVO_CAP_UP + capUpOffset, 1), 0));
-                }
-            } else {
-                robot.arm.cap(Constants.SERVO_CAP_HOME);
-            }
-
-            // Odo Reset
-//            if (gamepad1.x) {
-//                robot.resetOdo(138, 81, PI / 2);
-//                imu.resetHeading(PI / 2);
-//            }
-
-            if (gamepad1.y) {
-                if (robot.curTime - starCarouselTime < Constants.CAROUSEL_SPEED_UP_THRESHOLD)
-                    robot.carousel.on(Constants.CAROUSEL_VELOCITY_SLOW);
-                else
-                    robot.carousel.on(Constants.CAROUSEL_VELOCITY_FAST);
-            } else {
-                robot.carousel.stop();
-                starCarouselTime = robot.curTime;
-            }
-
-            addPacket("carousel start time", starCarouselTime);
-            addPacket("robot time", robot.curTime);
-
-
-            // Rumble
-            if (!teleRumble1 && 120 - (System.currentTimeMillis() - robot.startTime) / 1000 < 90) {
-                gamepad1.rumble(0.5, 0.5, 1000);
-                teleRumble1 = true;
-            }
-            if (!midTeleRumble && 120 - (System.currentTimeMillis() - robot.startTime) / 1000 < 60) {
-                gamepad1.rumble(0.5, 0.5, 1000);
-                midTeleRumble = true;
-            }
-            if (!endgameRumble && 120 - (System.currentTimeMillis() - robot.startTime) / 1000 < 35) {
-                gamepad1.rumble(0.5, 0.5, 1000);
-                endgameRumble = true;
-            }
-
-            if (robot.cycleHub == Robot.DepositTarget.capping) {
-                xyGain = 0.6;
-                wGain = 0.5;
-            } else {
-                xyGain = 1;
-                wGain = 0.7;
-            }
 
             // Drivetrain Controls
             // Field Centric Driving

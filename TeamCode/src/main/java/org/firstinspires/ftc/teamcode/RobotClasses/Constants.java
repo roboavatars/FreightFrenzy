@@ -49,8 +49,8 @@ public class Constants {
     public static int ARM_CAP_UP_POS = 450;
     public static double ARM_HOLD_DEPOSIT_POWER = 0.3;
 
-    public static double ARM_DEPOSIT_POS = 1;
-    public static double ARM_HOME_POS = 0.32;
+    public static double ARM_DEPOSIT_POS = 0.85;
+    public static double ARM_HOME_POS = 0.13;
 
     public static int DEPOSIT_SLIDES_HOME_TICKS = 0;
     public static int DEPOSIT_SLIDES_EXTEND_TICKS = 480;
@@ -71,7 +71,7 @@ public class Constants {
     //Turret?
     public static double TURRET_NETRUAL_THETA = PI;
 
-    public static double TURRET_HOME = 0.485;
+    public static double TURRET_HOME = .51;
     public static double TURRET_TURN_DIST = 0.35;
 
     //Stick Capping
