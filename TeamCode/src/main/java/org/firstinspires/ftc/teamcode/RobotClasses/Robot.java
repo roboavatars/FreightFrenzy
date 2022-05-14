@@ -87,8 +87,8 @@ public class Robot {
 //    public boolean carouselAuto = false;
     public boolean depositEnabled = true;
 
-    public int depositState = 1;
-    public int sharedState = 1;
+    public int depositState = 0;
+    public int sharedState = 0;
     private double transferStart;
     private double sharedDepositStart;
     private double sharedRetractStart;
@@ -105,7 +105,7 @@ public class Robot {
     public double lastCycleTime;
     public double longestCycle = 0;
     public boolean autoFirstCycle = false;
-    public boolean shared = false;
+    public static boolean shared = false;
 
     // Time and Delay Variables
     public double curTime;
@@ -177,11 +177,14 @@ public class Robot {
 //        profiler = new ElapsedTime();
 
         // Initial Dashboard Drawings
-        if (intake.getDistance() > 1000) {
-            addPacket("0 DISTANCE SENSOR", "> 1000!!!");
-            op.telemetry.addData("0 DISTANCE SENSOR", "> 1000!!!");
-            op.telemetry.update();
-        }
+//        if (intake.getDistance() > 1000) {
+//            addPacket("0 DISTANCE SENSOR", "> 1000!!!");
+//            op.telemetry.addData("0 DISTANCE SENSOR", "> 1000!!!");
+//            op.telemetry.update();
+//        }
+
+        addPacket("asdfa", "");
+        sendPacket();
 
         drawField();
         drawRobot(this);
@@ -310,6 +313,7 @@ public class Robot {
 //        profile(12);
 
         firstLoop = false;
+        if (intakeApproval) intakeCase = 2;
 
         switch (intakeCase) {
             case 1:
@@ -320,7 +324,7 @@ public class Robot {
                 intake.extend();
                 intake.on();
                 intake.flipDown();
-                if (intakeApproval) intakeCase++;
+                if (!intakeApproval) intakeCase++;
                 break;
             case 3:
                 intake.home();

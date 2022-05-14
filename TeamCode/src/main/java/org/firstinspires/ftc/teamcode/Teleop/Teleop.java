@@ -14,7 +14,6 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 import java.util.Arrays;
 
 @TeleOp(name = "1 Teleop")
-@SuppressWarnings("FieldCanBeLocal")
 @Config
 public class Teleop extends LinearOpMode {
 

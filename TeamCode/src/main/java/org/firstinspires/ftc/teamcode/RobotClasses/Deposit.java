@@ -65,10 +65,12 @@ public class Deposit {
         armServo1 = op.hardwareMap.get(Servo.class, "arm1");
         armServo2 = op.hardwareMap.get(Servo.class, "arm2");
         turretServo = op.hardwareMap.get(Servo.class, "turret");
-        //depositServo = op.hardwareMap.get(Servo.class, "depositServo");
 
         turretHome();
         armHome();
+
+        if (isAuto) hold();
+        else open();
 
         // Arm Motor
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
