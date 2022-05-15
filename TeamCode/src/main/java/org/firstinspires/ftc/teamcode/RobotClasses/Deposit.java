@@ -14,7 +14,7 @@ public class Deposit {
     private DcMotorEx slidesMotor;
     private Servo armServo1;
     private Servo armServo2;
-    private Servo turretServo;
+//    private Servo turretServo;
     private Servo depositServo;
     //private Servo depositServo;
 
@@ -22,30 +22,23 @@ public class Deposit {
     private double lastServoPos2 = 0; // limit servo
 
     public double ARM_TICKS_PER_RADIAN = 540 / PI;
-    public static int SLIDES_HOME_THRESHOLD = 5;
+    public static int SLIDES_HOME_THRESHOLD = 20;
     public static int DEPOSIT_ARM_DEPOSIT_THRESHOLD = 30;
 
     public int targetArmPos = 0;
 
     private double initialArmAngle = -PI / 6;
 
-    // Arm PD
-    double armErrorChange = 0, armError = 0;
-    public static double pArmUp = 0.004;
-    public static double dArmUp = 0.045;
-    public static double fGravityUp = 0.1;
+    // Slides PD
+    public int slidesErrorChange = 0;
+    public int slidesError = 0;
+    public int slidesTarget = 0;
 
-    public static double pArmDown = 0.002;
-    public static double dArmDown = 0.05;
-    public static double fGravityDown = 0;
+    public double slidesKp = 0.03;
+    public double slidesKd = 0;
 
-    public static double pArm = pArmUp;
-    public static double dArm = dArmUp;
-    public static double fGravity = fGravityUp;
+    public double slidesG = .3;
 
-    public static double armMaxPower = 1;
-
-    public boolean depositing = false;
 
     public double lastArmPos = 0;
 
@@ -64,9 +57,9 @@ public class Deposit {
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
         armServo1 = op.hardwareMap.get(Servo.class, "arm1");
         armServo2 = op.hardwareMap.get(Servo.class, "arm2");
-        turretServo = op.hardwareMap.get(Servo.class, "turret");
+//        turretServo = op.hardwareMap.get(Servo.class, "turret");
 
-        turretHome();
+//        turretHome();
         armHome();
 
         if (isAuto) hold();
@@ -76,21 +69,33 @@ public class Deposit {
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slidesMotor.setTargetPosition(0);
-        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         this.initialArmPos = initialArmPos;
 
         op.telemetry.addData("Status", "Deposit Initialized");
     }
 
-    public void extendSlides(){
-        slidesMotor.setTargetPosition(Constants.DEPOSIT_SLIDES_EXTEND_TICKS);
-        slidesMotor.setPower(1);
+    public void extendSlides () {extendSlides(Robot.DepositTarget.high);}
+
+    public void extendSlides(Robot.DepositTarget hub){
+        slidesTarget = Constants.DEPOSIT_SLIDES_EXTEND_TICKS;
     }
 
     public void retractSlides(){
-        slidesMotor.setTargetPosition(Constants.DEPOSIT_SLIDES_HOME_TICKS);
-        slidesMotor.setPower(1);
+        slidesTarget = Constants.DEPOSIT_SLIDES_HOME_TICKS;
+
+    }
+
+    public void updateSlides(){
+        int currentTicks = getSlidesPos();
+        slidesErrorChange = slidesTarget - currentTicks - slidesError;
+        slidesError = slidesTarget - currentTicks;
+
+        slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + slidesG);
+//        addPacket("slides power", slidesKp * slidesError + slidesKd * slidesErrorChange + slidesG);
+//        addPacket("slides pos", currentTicks);
+//        addPacket("slides target", slidesTarget);
     }
 
     public void armOut() {
@@ -111,17 +116,17 @@ public class Deposit {
         return getSlidesPos() < SLIDES_HOME_THRESHOLD;
     }
 
-    public void turretHome() {
-        turretServo.setPosition(Constants.TURRET_HOME);
-    }
-
-    public void turretLeft() {
-        turretServo.setPosition(Constants.TURRET_HOME - Constants.TURRET_TURN_DIST);
-    }
-
-    public void turretRight() {
-        turretServo.setPosition(Constants.TURRET_HOME + Constants.TURRET_TURN_DIST);
-    }
+//    public void turretHome() {
+//        turretServo.setPosition(Constants.TURRET_HOME);
+//    }
+//
+//    public void turretLeft() {
+//        turretServo.setPosition(Constants.TURRET_HOME - Constants.TURRET_TURN_DIST);
+//    }
+//
+//    public void turretRight() {
+//        turretServo.setPosition(Constants.TURRET_HOME + Constants.TURRET_TURN_DIST);
+//    }
 
     //Deposit Servo
     public void hold() {

@@ -33,7 +33,7 @@ public class Intake {
     public int slidesError = 0;
     public int slidesTarget = 0;
 
-    public double slidesKp = 0.2;
+    public double slidesKp = 0.1;
     public double slidesKd = 0;
 
     private LinearOpMode op;
@@ -125,7 +125,13 @@ public class Intake {
         return intakeSensor.getDistance(DistanceUnit.MM);
     }
 
-    public boolean intakeFull() {
+    public boolean isFull() {
         return getDistance() < Constants.INTAKE_DISTANCE_THRESHOLD;
+    }
+
+    public String getColor() {
+        String color;
+        color = "white"; //TODO: add color sensor code
+        return color;
     }
 }

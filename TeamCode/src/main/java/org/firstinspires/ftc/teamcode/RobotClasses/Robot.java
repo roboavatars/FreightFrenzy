@@ -17,6 +17,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
@@ -35,7 +36,7 @@ public class Robot {
     // Robot Classes
     public Drivetrain drivetrain;
     public Intake intake;
-////    public Carousel carousel;
+    ////    public Carousel carousel;
     // public TapeDetector tapeDetector;
     public Logger logger;
     public Deposit deposit;
@@ -84,7 +85,7 @@ public class Robot {
     private final double extendTime = -1;
     public boolean noExtend = false;
     public boolean autoNoTurret = false;
-//    public boolean carouselAuto = false;
+    //    public boolean carouselAuto = false;
     public boolean depositEnabled = true;
 
     public int depositState = 0;
@@ -93,11 +94,13 @@ public class Robot {
     private double sharedDepositStart;
     private double sharedRetractStart;
     private double depositStart;
-    private int intakeCase = 1;
+    private double intakeRetractStart;
+    private int intakeState = 1;
     public static double transferThreshold = 500;
     public static double turretDepositThreshold = 1000;
     public static double turretHomeThreshold = 1000;
     public static double releaseThreshold = 500;
+    public static double intakeFlipThreshold = 500;
 
     // Cycle Tracker
     public ArrayList<Double> cycles = new ArrayList<>();
@@ -215,7 +218,7 @@ public class Robot {
 
         // Don't check states every loop
         if (loopCounter % sensorUpdatePeriod == 0 && intakeTransfer) {
-            intakeFull = intake.intakeFull();
+            intakeFull = intake.isFull();
         }
 //        profile(1);
         if (loopCounter % stallUpdatePeriod == 0 && intakeTransfer) {
@@ -306,16 +309,25 @@ public class Robot {
 
 //        profile(11);
 
-        // Clear bulk cache
+        // Clear bulk cache/ print current
+        List<Double> hubCurrents = new ArrayList<>();
         for (LynxModule hub : allHubs) {
+            hubCurrents.add(hub.getCurrent(CurrentUnit.AMPS));
             hub.clearBulkCache();
         }
+        Log.w("hub current draw", "1: " + hubCurrents.get(1) + "; 2: " + hubCurrents.get(hubCurrents.size() - 1));
+        addPacket("hub current draw", "1: " + hubCurrents.get(1) + "; 2: " + hubCurrents.get(hubCurrents.size() - 1));
+
 //        profile(12);
 
         firstLoop = false;
-        if (intakeApproval) intakeCase = 2;
+        if (intakeApproval) {
+            intakeState = 2;
+            depositState = 1;
+        }
 
-        switch (intakeCase) {
+        boolean waitForIntakeFlip = false;
+        switch (intakeState) {
             case 1:
                 intake.flipDown();
                 intake.off();
@@ -324,79 +336,75 @@ public class Robot {
                 intake.extend();
                 intake.on();
                 intake.flipDown();
-                if (!intakeApproval) intakeCase++;
+                if (!intakeApproval || (isAuto && intake.isFull())) {
+                    intakeState++;
+                    intakeRetractStart = System.currentTimeMillis();
+                }
+                if (intakeState == 3) {
+                    if (intake.getColor() == "white") cycleHub = DepositTarget.mid;
+                    else cycleHub = DepositTarget.high;
+                }
                 break;
-            case 3:
+            case 3: //wait for flip sevo
                 intake.home();
                 intake.setPower(.5);
                 intake.flipUp();
+                if(System.currentTimeMillis() - intakeRetractStart > intakeFlipThreshold) intakeState++;
+                break;
+            case 4: //wait for intake and deposit slides
                 if (intake.slidesIsHome() && deposit.slidesisHome()) {
-                    intakeCase++;
+                    intakeState++;
                     transferStart = System.currentTimeMillis();
                 }
                 break;
-            case 4:
+            case 5:
                 intake.reverse();
                 if (System.currentTimeMillis() - transferStart > transferThreshold) {
-                    intakeCase = 1;
+                    intakeState = 1;
                     depositState = 2;
                     sharedState = 2;
                 }
                 break;
         }
+        intake.updateSlides();
 
         //deposit states
-        if (shared) {
-            switch (sharedState) {
-                case 1:
-                    deposit.armHome();
-                    sharedDepositStart = System.currentTimeMillis();
-                    break;
-                case 2:
-                    deposit.armOut();
-                    if (System.currentTimeMillis() - sharedDepositStart > turretDepositThreshold)
-                        sharedState++;
-                    break;
-                case 3:
-                    deposit.turretRight();
-                    sharedRetractStart = System.currentTimeMillis();
-                    if (depositApproval) {
-                        depositState++;
-                    }
-                    break;
-                case 4:
-                    deposit.turretHome();
-                    if (System.currentTimeMillis() - sharedRetractStart > turretHomeThreshold) {
-                        depositState = 1;
-                    }
-            }
-        } else {
-            deposit.turretHome();
-            switch (depositState) {
-                case 1:
-                    deposit.retractSlides();
-                    deposit.armHome();
-                    deposit.open();
-                    break;
-                case 2:
-                    deposit.extendSlides();
-                    deposit.armOut();
-                    deposit.hold();
-                    if (depositApproval) {
-                        depositState++;
-                        depositStart = System.currentTimeMillis();
-                    }
-                    break;
-                case 3:
-                    deposit.release();
-                    if (System.currentTimeMillis() - depositStart > releaseThreshold) {
-                        depositState = 1;
-                    }
-                    break;
-            }
+//        deposit.turretHome();
+        switch (depositState) {
+            case 1:
+                deposit.retractSlides();
+                deposit.armHome();
+                deposit.open();
+                break;
+            case 2:
+                deposit.hold();
+                if (depositApproval) depositState++;
+                break;
+            case 3:
+                deposit.extendSlides(cycleHub);
+                deposit.armOut();
+                deposit.hold();
+                if (!depositApproval) depositState++;
+                break;
+            case 4:
+                if (depositApproval) {
+                    depositState++;
+                    depositStart = System.currentTimeMillis();
+                }
+                break;
+            case 5:
+                deposit.release();
+                if (System.currentTimeMillis() - depositStart > releaseThreshold) {
+                    depositState = 1;
+                }
+                break;
         }
+        deposit.updateSlides();
+        addPacket("deposit state", depositState);
+        addPacket("intake state", intakeState);
+        addPacket("intake slides pos", intake.getSlidesPos());
+        addPacket("deposit slides pos", deposit.getSlidesPos());
 
-        intake.updateSlides();
     }
 
 //    public void setCycleHub(DepositTarget cycleHub) {

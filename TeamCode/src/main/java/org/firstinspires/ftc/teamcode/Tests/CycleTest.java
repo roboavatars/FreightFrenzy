@@ -103,20 +103,20 @@ public class CycleTest extends LinearOpMode {
                         if (System.currentTimeMillis() - sharedDepositStart > turretDepositThreshold) sharedCase ++;
                         break;
                     case 3:
-                        deposit.turretRight();
+//                        deposit.turretRight();
                         sharedRetractStart = System.currentTimeMillis();
                         if (gamepad1.a) {
                             depositCase++;
                         }
                         break;
                     case 4:
-                        deposit.turretHome();
+//                        deposit.turretHome();
                         if (System.currentTimeMillis() - sharedRetractStart > turretHomeThreshold) {
                             depositCase = 1;
                         }
                 }
             } else {
-                deposit.turretHome();
+//                deposit.turretHome();
                 switch (depositCase) {
                     case 1:
                         deposit.retractSlides();
