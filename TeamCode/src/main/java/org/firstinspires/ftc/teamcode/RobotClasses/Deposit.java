@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
-import static java.lang.Math.PI;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,20 +12,10 @@ public class Deposit {
     private DcMotorEx slidesMotor;
     private Servo armServo1;
     private Servo armServo2;
-//    private Servo turretServo;
     private Servo depositServo;
-    //private Servo depositServo;
 
-    private double lastServoPos = 0; // deposit servo
-    private double lastServoPos2 = 0; // limit servo
-
-    public double ARM_TICKS_PER_RADIAN = 540 / PI;
     public static int SLIDES_HOME_THRESHOLD = 20;
-    public static int DEPOSIT_ARM_DEPOSIT_THRESHOLD = 30;
-
-    public int targetArmPos = 0;
-
-    private double initialArmAngle = -PI / 6;
+    public static int SLIDES_ERROR_THRESHOLD = 10;
 
     // Slides PD
     public int slidesErrorChange = 0;
@@ -93,9 +81,6 @@ public class Deposit {
         slidesError = slidesTarget - currentTicks;
 
         slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + slidesG);
-//        addPacket("slides power", slidesKp * slidesError + slidesKd * slidesErrorChange + slidesG);
-//        addPacket("slides pos", currentTicks);
-//        addPacket("slides target", slidesTarget);
     }
 
     public void armOut() {
@@ -113,7 +98,11 @@ public class Deposit {
     }
 
     public boolean slidesisHome() {
-        return getSlidesPos() < SLIDES_HOME_THRESHOLD;
+        return getSlidesPos() - Constants.DEPOSIT_SLIDES_HOME_TICKS < SLIDES_HOME_THRESHOLD;
+    }
+
+    public boolean slidesAtPos() {
+        return slidesError < SLIDES_ERROR_THRESHOLD;
     }
 
 //    public void turretHome() {

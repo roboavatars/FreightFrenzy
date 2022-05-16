@@ -328,11 +328,11 @@ public class Robot {
 
         boolean waitForIntakeFlip = false;
         switch (intakeState) {
-            case 1:
+            case 1: //intake home
                 intake.flipDown();
                 intake.off();
                 break;
-            case 2:
+            case 2: //intake freight
                 intake.extend();
                 intake.on();
                 intake.flipDown();
@@ -345,7 +345,7 @@ public class Robot {
                     else cycleHub = DepositTarget.high;
                 }
                 break;
-            case 3: //wait for flip sevo
+            case 3: //wait for flip servo
                 intake.home();
                 intake.setPower(.5);
                 intake.flipUp();
@@ -357,7 +357,7 @@ public class Robot {
                     transferStart = System.currentTimeMillis();
                 }
                 break;
-            case 5:
+            case 5: //transfer
                 intake.reverse();
                 if (System.currentTimeMillis() - transferStart > transferThreshold) {
                     intakeState = 1;
@@ -371,28 +371,28 @@ public class Robot {
         //deposit states
 //        deposit.turretHome();
         switch (depositState) {
-            case 1:
+            case 1: //deposit home
                 deposit.retractSlides();
                 deposit.armHome();
                 deposit.open();
                 break;
-            case 2:
+            case 2: //once transfer done, hold freight
                 deposit.hold();
-                if (depositApproval) depositState++;
+                if (isAuto || depositApproval) depositState++;
                 break;
-            case 3:
+            case 3: //extend deposit
                 deposit.extendSlides(cycleHub);
                 deposit.armOut();
                 deposit.hold();
-                if (!depositApproval) depositState++;
+                if (isAuto || !depositApproval) depositState++;
                 break;
-            case 4:
-                if (depositApproval) {
+            case 4: //wait for driver approval for release
+                if (deposit.slidesAtPos() && depositApproval) {
                     depositState++;
                     depositStart = System.currentTimeMillis();
                 }
                 break;
-            case 5:
+            case 5: //release & wait for freight to drop
                 deposit.release();
                 if (System.currentTimeMillis() - depositStart > releaseThreshold) {
                     depositState = 1;
