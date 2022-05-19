@@ -19,7 +19,7 @@ public class Constants {
     // Intake Slides
     public static int INTAKE_SLIDES_EXTEND_TICKS = 100;
 //    public static double INTAKE_MIDWAY_POS = 0.6;
-    public static int INTAKE_SLIDES_HOME_TICKS = 20;
+    public static int INTAKE_SLIDES_HOME_TICKS = 10;
     public static double INTAKE_HOME_INIT_POS = 0.8;
     public static double INTAKE_SLIDES_POWER = 1;
 
@@ -34,7 +34,7 @@ public class Constants {
     public static double DEPOSIT_RELEASE_POS = 0.5;
 
     // Deposit Arm
-    public static double ARM_DEPOSIT_POS = 0.15;
+    public static double ARM_DEPOSIT_POS = 0.2;
     public static double ARM_HOME_POS = 0.87;
 
     public static int DEPOSIT_SLIDES_HOME_TICKS = 0;
