@@ -366,7 +366,7 @@ public class Robot {
                 }
                 break;
         }
-        intake.updateSlides();
+        intake.updateSlides(ay);
 
         //deposit states
 //        deposit.turretHome();

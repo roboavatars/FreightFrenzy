@@ -24,8 +24,7 @@ public class Deposit {
 
     public double slidesKp = 0.03;
     public double slidesKd = 0;
-
-    public double slidesG = .3;
+    public double gravityFF = .3;
 
 
     public double lastArmPos = 0;
@@ -80,7 +79,7 @@ public class Deposit {
         slidesErrorChange = slidesTarget - currentTicks - slidesError;
         slidesError = slidesTarget - currentTicks;
 
-        slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + slidesG);
+        slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + gravityFF);
     }
 
     public void armOut() {

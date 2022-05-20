@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,6 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+@Config
 @SuppressWarnings("FieldCanBeLocal")
 public class Intake {
     private DcMotorEx intakeMotor;
@@ -34,7 +36,8 @@ public class Intake {
     public int slidesTarget = 0;
 
     public double slidesKp = 0.1;
-    public double slidesKd = 0;
+    public double slidesKd = 0.045;
+    public static double accelFF = 0.0008;
 
     private LinearOpMode op;
 
@@ -95,12 +98,14 @@ public class Intake {
         slidesTarget = position;
     }
 
-    public void updateSlides(){
+    public void updateSlides(double ay){
         int currentTicks = getSlidesPos();
         slidesErrorChange = slidesTarget - currentTicks - slidesError;
         slidesError = slidesTarget - currentTicks;
 
-        slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange);
+        slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + accelFF * ay);
+        addPacket("ay", ay);
+        addPacket("ff", accelFF * ay);
     }
 
     public int getSlidesPos() {
