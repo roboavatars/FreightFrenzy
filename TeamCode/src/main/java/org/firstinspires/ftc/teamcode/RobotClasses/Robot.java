@@ -341,7 +341,7 @@ public class Robot {
                     intakeRetractStart = System.currentTimeMillis();
                 }
                 if (intakeState == 3) {
-                    if (intake.getColor() == "white") cycleHub = DepositTarget.mid;
+                    if (intake.getElement() == "ball") cycleHub = DepositTarget.mid;
                     else cycleHub = DepositTarget.high;
                 }
                 break;

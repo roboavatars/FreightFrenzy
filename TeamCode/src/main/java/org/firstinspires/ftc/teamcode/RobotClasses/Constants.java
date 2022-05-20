@@ -12,16 +12,15 @@ public class Constants {
     public static double ODO_RETRACT_POS = 0.7;
 
     // Intake
-    public static double INTAKE_DISTANCE_THRESHOLD = 70;
+    public static double INTAKE_DISTANCE_THRESHOLD = 15;
     public static double STALL_THRESHOLD = 6;
-    public static double INTAKE_TRANSFER_POWER = -1;
+    public static double INTAKE_COLOR_THRESHOLD = 5000;
 
     // Intake Slides
     public static int INTAKE_SLIDES_EXTEND_TICKS = 100;
 //    public static double INTAKE_MIDWAY_POS = 0.6;
-    public static int INTAKE_SLIDES_HOME_TICKS = 10;
-    public static double INTAKE_HOME_INIT_POS = 0.8;
-    public static double INTAKE_SLIDES_POWER = 1;
+    public static int INTAKE_SLIDES_HOME_TICKS = 20;
+
 
     // Intake Servo
     public static double INTAKE_UP_POS = 0.75;
@@ -29,12 +28,12 @@ public class Constants {
     public static double INTAKE_UP_INIT_POS = 0.8;
 
     // Deposit Servo
-    public static double DEPOSIT_OPEN_POS = 0.75;
-    public static double DEPOSIT_HOLD_POS = 1;
-    public static double DEPOSIT_RELEASE_POS = 0.5;
+    public static double DEPOSIT_OPEN_POS = 0.5;
+    public static double DEPOSIT_HOLD_POS = 0;
+    public static double DEPOSIT_RELEASE_POS = 1;
 
     // Deposit Arm
-    public static double ARM_DEPOSIT_POS = 0.2;
+    public static double ARM_DEPOSIT_POS = 0.15;
     public static double ARM_HOME_POS = 0.87;
 
     public static int DEPOSIT_SLIDES_HOME_TICKS = 0;

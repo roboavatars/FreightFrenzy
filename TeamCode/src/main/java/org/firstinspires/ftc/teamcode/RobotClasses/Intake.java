@@ -2,24 +2,22 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 
-import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@Config
 @SuppressWarnings("FieldCanBeLocal")
 public class Intake {
     private DcMotorEx intakeMotor;
     private DcMotorEx slidesMotor;
     private Servo flipServo;
-    private DistanceSensor intakeSensor;
+    private RevColorSensorV3 intakeSensor;
 
     private double lastIntakePow = 0;
 
@@ -35,8 +33,8 @@ public class Intake {
     public int slidesError = 0;
     public int slidesTarget = 0;
 
-    public static double slidesKp = 0.1;
-    public static double slidesKd = 0.045;
+    public double slidesKp = 0.1;
+    public double slidesKd = 0;
 
     private LinearOpMode op;
 
@@ -50,6 +48,8 @@ public class Intake {
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slidesMotor.setTargetPosition(0);
         slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        intakeSensor = op.hardwareMap.get(RevColorSensorV3.class, "intakeSensor");
     }
 
     // Intake Motor
@@ -131,9 +131,12 @@ public class Intake {
         return getDistance() < Constants.INTAKE_DISTANCE_THRESHOLD;
     }
 
-    public String getColor() {
-        String color;
-        color = "white"; //TODO: add color sensor code
-        return color;
+    public String getElement() {
+        if (intakeSensor.blue() < Constants.COLOR_SENSOR_THRESHOLD)
+            return "cube";
+        else
+            return "ball";
+
+
     }
 }
