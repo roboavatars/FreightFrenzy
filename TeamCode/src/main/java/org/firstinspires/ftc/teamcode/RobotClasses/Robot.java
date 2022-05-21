@@ -17,7 +17,6 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
@@ -176,7 +175,7 @@ public class Robot {
         battery = op.hardwareMap.voltageSensor.iterator().next();
         voltage = round(battery.getVoltage());
         log("Battery Voltage: " + voltage + "v");
-        startVoltage = voltage;
+        startVoltage = voltage; //TODO: MAYBE HERE?
 //        profiler = new ElapsedTime();
 
         // Initial Dashboard Drawings
@@ -209,7 +208,6 @@ public class Robot {
     }
 
     public void update() {
-        loopCounter++;
 //        profiler.reset();
         curTime = System.currentTimeMillis();
 
@@ -225,6 +223,9 @@ public class Robot {
         if (loopCounter % voltageUpdatePeriod == 0) {
             voltage = round(battery.getVoltage());
         }
+
+        loopCounter++;
+
 //        profile(3);
 
         // Track time after start
@@ -277,7 +278,7 @@ public class Robot {
 //        profile(10);
 
         // Dashboard Telemetry
-        addPacket("1 Voltage", startVoltage + " -> " + voltage);
+        //addPacket("1 Voltage", startVoltage + " -> " + voltage);
         addPacket("2 X", round(x));
         addPacket("3 Y", round(y));
         addPacket("4 Theta", round(theta));
@@ -307,13 +308,13 @@ public class Robot {
 //        profile(11);
 
         // Clear bulk cache/ print current
-        List<Double> hubCurrents = new ArrayList<>();
+//        List<Double> hubCurrents = new ArrayList<>();
         for (LynxModule hub : allHubs) {
-            hubCurrents.add(hub.getCurrent(CurrentUnit.AMPS));
+//            hubCurrents.add(hub.getCurrent(CurrentUnit.AMPS));
             hub.clearBulkCache();
         }
-        Log.w("hub current draw", "1: " + hubCurrents.get(1) + "; 2: " + hubCurrents.get(hubCurrents.size() - 1));
-        addPacket("hub current draw", "1: " + hubCurrents.get(1) + "; 2: " + hubCurrents.get(hubCurrents.size() - 1));
+//        Log.w("hub current draw", "1: " + hubCurrents.get(1) + "; 2: " + hubCurrents.get(hubCurrents.size() - 1));
+//        addPacket("hub current draw", "1: " + hubCurrents.get(1) + "; 2: " + hubCurrents.get(hubCurrents.size() - 1));
 
 //        profile(12);
 
@@ -336,7 +337,7 @@ public class Robot {
                 intake.extend();
                 intake.on();
                 intake.flipDown();
-                if ((!isAuto && !intakeApproval) || (isAuto && intake.isFull())) {
+                if ((!isAuto && !intakeApproval) || (isAuto && intakeFull)) {
                     intakeState++;
                     intakeRetractStart = System.currentTimeMillis();
                 }
