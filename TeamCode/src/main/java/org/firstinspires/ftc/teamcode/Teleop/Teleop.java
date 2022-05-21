@@ -37,7 +37,7 @@ public class Teleop extends LinearOpMode {
 
     // Control Gains
     private double xyGain = 1;
-    private double wGain = 0.6;
+    private double wGain = 1;
 
     // Rumbles
     private boolean teleRumble1 = false;

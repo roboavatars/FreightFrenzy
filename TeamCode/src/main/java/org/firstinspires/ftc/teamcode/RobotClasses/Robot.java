@@ -126,6 +126,7 @@ public class Robot {
     public static int stallThreshold = 750;
     public double automationStepTime;
     public double depositTime = 0;
+    public double startIntakingAutoY = 95;
 
     // Motion Variables
     public double x, y, theta, vx, vy, w;
@@ -138,8 +139,7 @@ public class Robot {
     public enum DepositTarget {
         high,
         mid,
-        capping,
-        neutral
+        low
     }
 
     public DepositTarget cycleHub;
@@ -185,9 +185,6 @@ public class Robot {
 //            op.telemetry.addData("0 DISTANCE SENSOR", "> 1000!!!");
 //            op.telemetry.update();
 //        }
-
-        addPacket("asdfa", "");
-        sendPacket();
 
         drawField();
         drawRobot(this);
@@ -326,17 +323,20 @@ public class Robot {
             depositState = 1;
         }
 
+        if (isAuto && intakeApproval && y < startIntakingAutoY) intakeApproval = false;
+
         boolean waitForIntakeFlip = false;
         switch (intakeState) {
             case 1: //intake home
                 intake.flipDown();
                 intake.off();
+                if (isAuto && y > startIntakingAutoY) intakeState++;
                 break;
             case 2: //intake freight
                 intake.extend();
                 intake.on();
                 intake.flipDown();
-                if (!intakeApproval || (isAuto && intake.isFull())) {
+                if ((!isAuto && !intakeApproval) || (isAuto && intake.isFull())) {
                     intakeState++;
                     intakeRetractStart = System.currentTimeMillis();
                 }
@@ -387,7 +387,7 @@ public class Robot {
                 if (isAuto || !depositApproval) depositState++;
                 break;
             case 4: //wait for driver approval for release
-                if (deposit.slidesAtPos() && depositApproval) {
+                if ((!isAuto || deposit.slidesAtPos()) && depositApproval) {
                     depositState++;
                     depositStart = System.currentTimeMillis();
                 }
@@ -395,8 +395,11 @@ public class Robot {
             case 5: //release & wait for freight to drop
                 deposit.release();
                 if (System.currentTimeMillis() - depositStart > releaseThreshold) {
-                    depositState = 1;
+                    depositState++;
                 }
+                break;
+            case 6:
+                depositState = 1;
                 break;
         }
         deposit.updateSlides();

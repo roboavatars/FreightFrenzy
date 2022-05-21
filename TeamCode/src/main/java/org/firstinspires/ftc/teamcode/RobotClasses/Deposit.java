@@ -15,7 +15,7 @@ public class Deposit {
     private Servo depositServo;
 
     public static int SLIDES_HOME_THRESHOLD = 20;
-    public static int SLIDES_ERROR_THRESHOLD = 10;
+    public static int SLIDES_ERROR_THRESHOLD = 20;
 
     // Slides PD
     public int slidesErrorChange = 0;
@@ -66,7 +66,11 @@ public class Deposit {
     public void extendSlides () {extendSlides(Robot.DepositTarget.high);}
 
     public void extendSlides(Robot.DepositTarget hub){
-        slidesTarget = Constants.DEPOSIT_SLIDES_EXTEND_TICKS;
+        if (hub == Robot.DepositTarget.high) slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS;
+        else if (hub == Robot.DepositTarget.mid) slidesTarget = Constants.DEPOSIT_SLIDES_MID_TICKS;
+        else slidesTarget = Constants.DEPOSIT_SLIDES_LOW_TICKS;
+
+        slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS; //TODO: temporary
     }
 
     public void retractSlides(){
