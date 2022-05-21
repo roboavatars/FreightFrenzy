@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -128,8 +127,6 @@ public class Intake {
 
     // Distance Sensor
     public double getDistance() {
-        addPacket("0 DISTANCE SENSOR", "> 1000!!!");
-        op.telemetry.addData("0 DISTANCE SENSOR", "> 1000!!!");
         return intakeSensor.getDistance(DistanceUnit.MM);
     }
 
@@ -145,7 +142,6 @@ public class Intake {
             element =  "ball";
 
         addPacket("element", element);
-        sendPacket();
         return element;
     }
 }

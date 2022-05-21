@@ -47,7 +47,8 @@ public class Deposit {
 //        turretServo = op.hardwareMap.get(Servo.class, "turret");
 
 //        turretHome();
-        armHome();
+        if (isAuto) setArmControls(Constants.ARM_INIT_POS);
+        else armHome();
 
         if (isAuto) hold();
         else open();
@@ -87,13 +88,17 @@ public class Deposit {
     }
 
     public void armOut() {
-        armServo1.setPosition(Constants.ARM_DEPOSIT_POS);
-        armServo2.setPosition(1 - Constants.ARM_DEPOSIT_POS);
+        setArmControls(Constants.ARM_DEPOSIT_POS);
+
     }
 
     public void armHome() {
-        armServo1.setPosition(Constants.ARM_HOME_POS);
-        armServo2.setPosition(1 - Constants.ARM_HOME_POS);
+        setArmControls(Constants.ARM_HOME_POS);
+    }
+
+    private void setArmControls(double pos) {
+        armServo1.setPosition(pos);
+        armServo2.setPosition(1 - pos);
     }
 
     public int getSlidesPos() {

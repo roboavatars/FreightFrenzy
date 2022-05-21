@@ -48,7 +48,9 @@ public class RedAutoWarehouse extends LinearOpMode {
         double parkThreshold = 3;
         double preloadScoreTime = 1;
 
-        double[] depositPos = new double[]{126, 70, 0.3};
+        double[] depositPos = new double[]{126, 68, 0.3};
+
+        int goToWarehouseSteps = 1;
 
         // Paths
         Path cycleScorePath = null;
@@ -71,7 +73,6 @@ public class RedAutoWarehouse extends LinearOpMode {
         robot.depositState = 2;
 
 
-
         while (opModeIsActive()) {
             double timeLeft = 30 - (System.currentTimeMillis() - robot.startTime) / 1000;
             addPacket("time left", timeLeft);
@@ -82,69 +83,84 @@ public class RedAutoWarehouse extends LinearOpMode {
                 Pose curPose = preloadScorePath.getRobotPose(Math.min(preloadScoreTime, time.seconds()));
                 robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
 
-                robot.depositApproval = robot.isAtPose(depositPos[0], depositPos[1], depositPos[2], 2, 2, PI/15);
+                robot.depositApproval = robot.isAtPose(depositPos[0], depositPos[1], depositPos[2], 2, 2, PI / 10);
+//                && robot.vx < 10 && robot.vy < 10 && robot.w < PI;
 
-                if (robot.depositState == 5) {
+                if (robot.depositState == 6) {
                     time.reset();
                     preloadScore = true;
+                    robot.intakeApproval = true;
                 }
             } else if (!goToWarehouse) {
                 robot.depositApproval = false;
+                if (robot.depositState != 1) robot.intakeApproval = false;
 
-                if (robot.y < 105 && robot.x < 137 && PI / 2 - robot.theta > PI / 10) {
-                    robot.drivetrain.constantStrafeConstant = -0.4;
-                    robot.setTargetPoint(new Target(141, 78, PI / 2).xKp(0.55).thetaKp(6));
+                switch (goToWarehouseSteps) {
+                    case 1:
+                        robot.drivetrain.constantStrafeConstant = 0;//-0.4
+                        robot.setTargetPoint(new Target(141, 78, PI / 2).xKp(0.55).thetaKp(6));
+                        addPacket("path", "going to the wall right rn");
+                        if (robot.x > 138 && Math.abs(PI / 2 - robot.theta) < PI / 10)
+                            goToWarehouseSteps++;
+                        break;
+                    case 2:
+                        robot.drivetrain.constantStrafeConstant = 0;
+                        robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 > PI / 10 ? -0.5 : 0);
+                        passLineTime = time.seconds();
+                        addPacket("path", "going to warehouse right rn");
+                        if (robot.y > Robot.startIntakingAutoY) goToWarehouseSteps++;
+                        break;
+                    case 3:
+                        if (timeLeft > parkThreshold) {
+                            robot.drivetrain.constantStrafeConstant = 0;
+                            if (cycleCounter < 3) {
+                                double y = Math.min(Robot.startIntakingAutoY + 3 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
+                                robot.setTargetPoint(new Target(138, y, PI / 2));
+                            } else {
+                                double x = Math.max(138 - 1 * (time.seconds() - passLineTime), 130);
+                                double y = Math.min(110 + 3 * (cycleCounter - 3) + 1 * (time.seconds() - passLineTime), 125);
+                                double theta = Math.min(PI / 2 + PI / 11 * (time.seconds() - passLineTime), 2 * PI / 3);
+                                robot.setTargetPoint(new Target(x, y, theta));
+                            }
 
-                    addPacket("path", "going to the wall right rn");
-                } else if (robot.y < 105) {
-                    robot.drivetrain.constantStrafeConstant = -0.3;
-                    robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 > PI / 10 ? -0.5 : 0);
-                    passLineTime = time.seconds();
+                            addPacket("path", "creeping right rn");
+                        } else {
+                            robot.depositEnabled = false;
+                            robot.setTargetPoint(new Target(140, 112, PI / 2));
+                            addPacket("path", "going to park right rn");
+                        }
 
-                    addPacket("path", "going to warehouse right rn");
-                } else if (timeLeft > parkThreshold) {
-                    robot.drivetrain.constantStrafeConstant = 0;
-                    if (cycleCounter < 3) {
-                        double y = Math.min(107 + 3.5 * cycleCounter + 5 * (time.seconds() - passLineTime), 121);
-                        robot.setTargetPoint(new Target(138, y, PI/2));
-                    } else {
-                        double x = Math.max(138 - 3 * (time.seconds() - passLineTime), 130);
-                        double y = Math.min(110 + 3 * (cycleCounter - 3) + 3 * (time.seconds() - passLineTime), 125);
-                        double theta = Math.min(PI/2 + PI/11 * (time.seconds() - passLineTime), 2 * PI/3);
-                        robot.setTargetPoint(new Target(x, y, theta));
-                    }
+                        if (robot.depositState != 1) goToWarehouseSteps++;
+                        break;
+                    case 4:
+                        if (timeLeft < parkThreshold && robot.y > 112) {
+                            time.reset();
+                            goToWarehouse = true;
+                            cycleScore = true;
+                        } else {
+                            goToWarehouseSteps = 1;
 
-                    addPacket("path", "creeping right rn");
-                } else {
-                    robot.depositEnabled = false;
-                    robot.setTargetPoint(new Target(140, 112, PI / 2));
-                    addPacket("path", "going to park right rn");
+                            resetOdo = false;
+
+                            Waypoint[] cycleScoreWaypoints = new Waypoint[]{
+                                    new Waypoint(140, robot.y, 3 * PI / 2, 10, 10, 0, 0),
+                                    new Waypoint(140, 79, 3 * PI / 2, 5, 1, 0, 0.75),
+                                    new Waypoint(depositPos[0], depositPos[1], depositPos[2] + PI, 2, -10, 0, cycleScoreTime),
+                            };
+                            cycleScorePath = new Path(cycleScoreWaypoints);
+
+                            time.reset();
+                            goToWarehouse = true;
+                        }
+                        break;
                 }
 
                 if (Math.abs(robot.y - 105) < 0.5 && !resetOdo) {
                     robot.resetOdo(138, robot.y, PI / 2);
                     resetOdo = true;
                 }
-
-                if (robot.depositState != 1 && robot.y >= 107) {
-                    resetOdo = false;
-
-                    Waypoint[] cycleScoreWaypoints = new Waypoint[]{
-                            new Waypoint(140, robot.y, 3 * PI / 2, 10, 10, 0, 0),
-                            new Waypoint(140, 79, 3 * PI / 2, 5, 1, 0, 0.75),
-                            new Waypoint(depositPos[0], depositPos[1], depositPos[2] + PI  /*- 0.03 * cycleCounter*/, 5, 5, 0, cycleScoreTime),
-                    };
-                    cycleScorePath = new Path(cycleScoreWaypoints);
-
-                    time.reset();
-                    goToWarehouse = true;
-                } else if (timeLeft < parkThreshold && robot.y > 112) {
-                    time.reset();
-                    goToWarehouse = true;
-                    cycleScore = true;
-                }
             } else if (!cycleScore) {
-                robot.drivetrain.constantStrafeConstant = robot.y > 105 ? -0.7 : 0;
+                robot.drivetrain.constantStrafeConstant = robot.y > Robot.startIntakingAutoY ? -0.7 : 0;
 
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
                 robot.setTargetPoint(new Target(curPose).theta(/* robot.y >= 83 ? PI / 2 : */ curPose.theta + PI));
@@ -156,15 +172,17 @@ public class RedAutoWarehouse extends LinearOpMode {
                     resetOdo = true;
                 }
 
-                robot.depositApproval = robot.isAtPose(depositPos[0], depositPos[1], depositPos[2], 2, 2, PI/10);
+                robot.depositApproval = robot.isAtPose(depositPos[0], depositPos[1], depositPos[2], 2, 2, PI / 10);
+//                        && robot.vx < 10 && robot.vy < 10 && robot.w < PI;
 
                 if (robot.depositState == 6) {
-//                    cycleCounter++;
+                    cycleCounter++;
 //                    if (cycleCounter == 2) robot.noExtend = false;
 
                     resetOdo = false;
                     goToWarehouse = false;
                     time.reset();
+                    robot.intakeApproval = true;
                 }
             } else {
                 robot.depositEnabled = false;

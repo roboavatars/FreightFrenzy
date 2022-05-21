@@ -48,7 +48,7 @@ public class Robot {
 
     // Class Constants
     private final int loggerUpdatePeriod = 2;
-    private final int sensorUpdatePeriod = 15;
+    private final int sensorUpdatePeriod = 10;
     private final int stallUpdatePeriod = 15;
     private final int voltageUpdatePeriod = 1000;
     private final double xyTolerance = 1;
@@ -125,7 +125,8 @@ public class Robot {
     public static int stallThreshold = 750;
     public double automationStepTime;
     public double depositTime = 0;
-    public double startIntakingAutoY = 95;
+    public static double startIntakingAutoY = 100;
+    public static double extendDepositAutoY = 95;
 
     // Motion Variables
     public double x, y, theta, vx, vy, w;
@@ -212,11 +213,11 @@ public class Robot {
         curTime = System.currentTimeMillis();
 
         // Don't check states every loop
-        if (loopCounter % sensorUpdatePeriod == 0 && intakeTransfer) {
+        if (loopCounter % sensorUpdatePeriod == 0 && intakeState != 1) {
             intakeFull = intake.isFull();
         }
 //        profile(1);
-        if (loopCounter % stallUpdatePeriod == 0 && intakeTransfer) {
+        if (loopCounter % stallUpdatePeriod == 0 && intakeState != 1) {
             intakeStalling = intake.checkIfStalling();
         }
 //        profile(2);
@@ -286,6 +287,7 @@ public class Robot {
         addPacket("7 Automation Step", automationStep + "; " + antiStallStep);
         addPacket("7 Automation", intakeTransfer + "; " + depositingFreight);
         addPacket("8 Intake Full", intakeFull);
+        addPacket("81 Intake Sensor Distance", intake.getDistance());
         addPacket("9 Intake Stalling", intakeStalling);
 //        addPacket("Carousel Velocity", carousel.getVelocity());
         addPacket("91 Run Time", (curTime - startTime) / 1000);
@@ -319,19 +321,17 @@ public class Robot {
 //        profile(12);
 
         firstLoop = false;
-        if (intakeApproval) {
+        if (intakeApproval && !isAuto) {
             intakeState = 2;
             depositState = 1;
         }
-
-        if (isAuto && intakeApproval && y < startIntakingAutoY) intakeApproval = false;
 
         boolean waitForIntakeFlip = false;
         switch (intakeState) {
             case 1: //intake home
                 intake.flipDown();
                 intake.off();
-                if (isAuto && y > startIntakingAutoY) intakeState++;
+                if (isAuto && intakeApproval && y >= startIntakingAutoY) intakeState++;
                 break;
             case 2: //intake freight
                 intake.extend();
@@ -344,6 +344,25 @@ public class Robot {
                 if (intakeState == 3) {
                     if (intake.getElement() == "ball") cycleHub = DepositTarget.mid;
                     else cycleHub = DepositTarget.high;
+                }
+
+                //anti-stall
+                if (isAuto) {
+                    if (!intakeStalling) {
+                        stallStartTime = -1;
+                        intake.on();
+                        antiStallStep = "Intake On";
+                        automationStep(antiStallStep);
+                    } else if (stallStartTime == -1) {
+                        stallStartTime = curTime;
+                        antiStallStep = "Jam Detected";
+                        automationStep(antiStallStep);
+                    } else if (curTime - stallStartTime > stallThreshold) {
+                        if (curTime % 400 > 200) intake.reverse();
+                        else intake.on();
+                        antiStallStep = "Reverse Intake";
+                        automationStep(antiStallStep);
+                    }
                 }
                 break;
             case 3: //wait for flip servo
@@ -379,7 +398,7 @@ public class Robot {
                 break;
             case 2: //once transfer done, hold freight
                 deposit.hold();
-                if (isAuto || depositApproval) depositState++;
+                if ((isAuto && y <= extendDepositAutoY) || depositApproval) depositState++;
                 break;
             case 3: //extend deposit
                 deposit.extendSlides(cycleHub);

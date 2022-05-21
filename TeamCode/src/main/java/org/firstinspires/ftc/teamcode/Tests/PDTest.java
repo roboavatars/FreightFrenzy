@@ -11,17 +11,17 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @TeleOp
 @Config
 public class PDTest extends LinearOpMode {
-    public static double xKp = 0.45;
-    public static double yKp = 0.34;
+    public static double xKp = 0.41;
+    public static double yKp = 0.3;
     public static double thetaKp = 2.5;
     public static double xKd = 0.035;
-    public static double yKd = 0.0315;
+    public static double yKd = 0.032;
     public static double thetaKd = 0.12;
 
     public static double targetX = 0;
     public static double targetY = 0;
     public static double targetTheta = 0;
-    public static double displacement = 24;
+    public static double displacement = 48;
 
     @Override
     public void runOpMode() {
