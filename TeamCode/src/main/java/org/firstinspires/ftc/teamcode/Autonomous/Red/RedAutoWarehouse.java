@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Autonomous.Red;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -51,6 +50,7 @@ public class RedAutoWarehouse extends LinearOpMode {
         double preloadScoreTime = 1;
 
         double[] depositPos = new double[]{130, 68, 0.3};
+        double[] preloadDepositPos = new double[]{128, 74, 0.8*PI/6};
 
         int goToWarehouseSteps = 1;
 
@@ -59,7 +59,7 @@ public class RedAutoWarehouse extends LinearOpMode {
         Path parkPath = null;
         Waypoint[] preloadScoreWaypoints = new Waypoint[]{
                 new Waypoint(robot.x, robot.y, 3 * PI / 2, 10, 10, 0, 0),
-                new Waypoint(depositPos[0], depositPos[1], depositPos[2] + PI, 2, -10, 0, preloadScoreTime),
+                new Waypoint(preloadDepositPos[0], preloadDepositPos[1], preloadDepositPos[2] + PI, 2, -10, 0, preloadScoreTime),
         };
         Path preloadScorePath = new Path(preloadScoreWaypoints);
 
@@ -93,8 +93,8 @@ public class RedAutoWarehouse extends LinearOpMode {
                 Pose curPose = preloadScorePath.getRobotPose(Math.min(preloadScoreTime, time.seconds()));
                 robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
 
-                robot.depositApproval = robot.isAtPose(depositPos[0], depositPos[1], depositPos[2], 2, 2, PI / 10)
-                        && robot.notMoving(3, 4);
+                robot.depositApproval = robot.isAtPose(preloadDepositPos[0], preloadDepositPos[1], preloadDepositPos[2], 2, 2, PI / 10)
+                        && robot.notMoving();
 //                && robot.vx < 10 && robot.vy < 10 && robot.w < PI;
 
                 if (robot.depositState == 6) {
@@ -111,7 +111,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                         robot.drivetrain.constantStrafeConstant = 0;//-0.4
                         robot.setTargetPoint(new Target(141, 78, PI / 2).thetaKp((Math.abs(robot.theta-PI/2)<PI / 6 )? Drivetrain.thetaKp : 10));
                         addPacket("path", "going to the wall right rn");
-                        if (robot.x > (cycleCounter==0? 140 : 137) && Math.abs(PI / 2 - robot.theta) < PI / 10)
+                        if (robot.x > 138 && Math.abs(PI / 2 - robot.theta) < PI / 10)
                             goToWarehouseSteps++;
                         break;
                     case 2:
@@ -135,7 +135,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                                 robot.setTargetPoint(new Target(x, y, theta));
                             }*/
                             double y = Math.min(Robot.startIntakingAutoY + 3 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
-                            double theta = PI/2 - (PI/ 12)*(Math.cos(2*passLineTime)-1);
+                            double theta = PI/2 - (PI/15)*(Math.cos(4*(time.seconds() - passLineTime))-1);
                             robot.setTargetPoint(new Target(138, y, theta));
 
                             addPacket("path", "creeping right rn");
@@ -148,6 +148,10 @@ public class RedAutoWarehouse extends LinearOpMode {
                         if (robot.intakeState == 3) goToWarehouseSteps++;
                         break;
                     case 4:
+                        robot.setTargetPoint(new Target(141, robot.startIntakingAutoY, PI/2));
+                        if (robot.x > 138 && Math.abs(PI / 2 - robot.theta) < PI / 10) goToWarehouseSteps++;
+                        break;
+                    case 5:
                         if (timeLeft < parkThreshold && robot.y > 112) {
                             time.reset();
                             goToWarehouse = true;
@@ -170,8 +174,8 @@ public class RedAutoWarehouse extends LinearOpMode {
                         break;
                 }
 
-                if (Math.abs(robot.y - 105) < 0.5 && !resetOdo) {
-                    robot.resetOdo(138, robot.y, PI / 2);
+                if (Math.abs(robot.y - 97) < 0.5 && !resetOdo) {
+                     robot.resetOdo(138, robot.y, PI / 2);
                     resetOdo = true;
                 }
             } else if (!cycleScore) {
@@ -182,7 +186,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
                 addPacket("path", "going to deposit right rn");
 
-                if (Math.abs(robot.y - 105) < 0.5 && !resetOdo) {
+                if (Math.abs(robot.y - 97) < 0.5 && !resetOdo) {
                     robot.resetOdo(138, robot.y, PI / 2);
                     resetOdo = true;
                 }
@@ -201,6 +205,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                     robot.intakeApproval = true;
                 }
             } else {
+                if (robot.depositState == 2) robot.intakeApproval = false;
                 robot.depositEnabled = false;
                 robot.drivetrain.stop();
                 addPacket("path", "stopped rn");

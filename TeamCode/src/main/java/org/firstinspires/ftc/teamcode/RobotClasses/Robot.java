@@ -82,7 +82,6 @@ public class Robot {
     private final double armOpenTime = -1;
     private final double slidesAtPosTime = -1;
     private final double extendTime = -1;
-    public boolean noExtend = false;
     public boolean autoNoTurret = false;
     //    public boolean carouselAuto = false;
     public boolean depositEnabled = true;
@@ -369,7 +368,8 @@ public class Robot {
                 intake.home();
                 intake.setPower(.5);
                 intake.flipUp();
-                if(System.currentTimeMillis() - intakeRetractStart > intakeFlipThreshold) intakeState++;
+                if (System.currentTimeMillis() - intakeRetractStart > intakeFlipThreshold)
+                    intakeState++;
                 break;
             case 4: //wait for intake and deposit slides
                 if (intake.slidesIsHome() && deposit.slidesisHome()) {
