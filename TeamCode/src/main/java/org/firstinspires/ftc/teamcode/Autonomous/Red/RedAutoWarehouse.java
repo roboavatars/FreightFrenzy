@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous.Red;
 
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
+import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Config
@@ -48,7 +50,7 @@ public class RedAutoWarehouse extends LinearOpMode {
         double parkThreshold = 3;
         double preloadScoreTime = 1;
 
-        double[] depositPos = new double[]{126, 68, 0.3};
+        double[] depositPos = new double[]{130, 68, 0.3};
 
         int goToWarehouseSteps = 1;
 
@@ -68,12 +70,20 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         ElapsedTime time = new ElapsedTime();
 
+        if (barcodeCase == BarcodePipeline.Case.Left) {
+            robot.cycleHub = Robot.DepositTarget.low;
+        } else if (barcodeCase == BarcodePipeline.Case.Middle) {
+            robot.cycleHub = Robot.DepositTarget.mid;
+        } else {
+            robot.cycleHub = Robot.DepositTarget.high;
+        }
+
         robot.depositingFreight = true;
         robot.depositApproval = false;
         robot.depositState = 2;
 
-
         while (opModeIsActive()) {
+            addPacket("w", robot.w);
             double timeLeft = 30 - (System.currentTimeMillis() - robot.startTime) / 1000;
             addPacket("time left", timeLeft);
 
@@ -83,7 +93,8 @@ public class RedAutoWarehouse extends LinearOpMode {
                 Pose curPose = preloadScorePath.getRobotPose(Math.min(preloadScoreTime, time.seconds()));
                 robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
 
-                robot.depositApproval = robot.isAtPose(depositPos[0], depositPos[1], depositPos[2], 2, 2, PI / 10);
+                robot.depositApproval = robot.isAtPose(depositPos[0], depositPos[1], depositPos[2], 2, 2, PI / 10)
+                        && robot.notMoving(3, 4);
 //                && robot.vx < 10 && robot.vy < 10 && robot.w < PI;
 
                 if (robot.depositState == 6) {
@@ -98,9 +109,9 @@ public class RedAutoWarehouse extends LinearOpMode {
                 switch (goToWarehouseSteps) {
                     case 1:
                         robot.drivetrain.constantStrafeConstant = 0;//-0.4
-                        robot.setTargetPoint(new Target(141, 78, PI / 2).xKp(0.55).thetaKp(6));
+                        robot.setTargetPoint(new Target(141, 78, PI / 2).thetaKp((Math.abs(robot.theta-PI/2)<PI / 6 )? Drivetrain.thetaKp : 10));
                         addPacket("path", "going to the wall right rn");
-                        if (robot.x > 138 && Math.abs(PI / 2 - robot.theta) < PI / 10)
+                        if (robot.x > (cycleCounter==0? 140 : 137) && Math.abs(PI / 2 - robot.theta) < PI / 10)
                             goToWarehouseSteps++;
                         break;
                     case 2:
@@ -108,11 +119,12 @@ public class RedAutoWarehouse extends LinearOpMode {
                         robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 > PI / 10 ? -0.5 : 0);
                         passLineTime = time.seconds();
                         addPacket("path", "going to warehouse right rn");
-                        if (robot.y > Robot.startIntakingAutoY) goToWarehouseSteps++;
+                        if (robot.y > Robot.startIntakingAutoY-1) goToWarehouseSteps++;
                         break;
                     case 3:
                         if (timeLeft > parkThreshold) {
                             robot.drivetrain.constantStrafeConstant = 0;
+                            /*
                             if (cycleCounter < 3) {
                                 double y = Math.min(Robot.startIntakingAutoY + 3 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
                                 robot.setTargetPoint(new Target(138, y, PI / 2));
@@ -121,7 +133,10 @@ public class RedAutoWarehouse extends LinearOpMode {
                                 double y = Math.min(110 + 3 * (cycleCounter - 3) + 1 * (time.seconds() - passLineTime), 125);
                                 double theta = Math.min(PI / 2 + PI / 11 * (time.seconds() - passLineTime), 2 * PI / 3);
                                 robot.setTargetPoint(new Target(x, y, theta));
-                            }
+                            }*/
+                            double y = Math.min(Robot.startIntakingAutoY + 3 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
+                            double theta = PI/2 - (PI/ 12)*(Math.cos(2*passLineTime)-1);
+                            robot.setTargetPoint(new Target(138, y, theta));
 
                             addPacket("path", "creeping right rn");
                         } else {
@@ -130,7 +145,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                             addPacket("path", "going to park right rn");
                         }
 
-                        if (robot.depositState != 1) goToWarehouseSteps++;
+                        if (robot.intakeState == 3) goToWarehouseSteps++;
                         break;
                     case 4:
                         if (timeLeft < parkThreshold && robot.y > 112) {
@@ -172,7 +187,8 @@ public class RedAutoWarehouse extends LinearOpMode {
                     resetOdo = true;
                 }
 
-                robot.depositApproval = robot.isAtPose(depositPos[0], depositPos[1], depositPos[2], 2, 2, PI / 10);
+                robot.depositApproval = robot.isAtPose(depositPos[0], depositPos[1], depositPos[2], 2, 2, PI / 10)
+                        && robot.notMoving();
 //                        && robot.vx < 10 && robot.vy < 10 && robot.w < PI;
 
                 if (robot.depositState == 6) {

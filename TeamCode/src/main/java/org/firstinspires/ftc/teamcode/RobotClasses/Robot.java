@@ -94,8 +94,8 @@ public class Robot {
     private double sharedRetractStart;
     private double depositStart;
     private double intakeRetractStart;
-    private int intakeState = 1;
-    public static double transferThreshold = 500;
+    public int intakeState = 1;
+    public static double transferThreshold = 750;
     public static double turretDepositThreshold = 1000;
     public static double turretHomeThreshold = 1000;
     public static double releaseThreshold = 500;
@@ -125,7 +125,7 @@ public class Robot {
     public static int stallThreshold = 750;
     public double automationStepTime;
     public double depositTime = 0;
-    public static double startIntakingAutoY = 100;
+    public static double startIntakingAutoY = 102;
     public static double extendDepositAutoY = 95;
 
     // Motion Variables
@@ -176,7 +176,7 @@ public class Robot {
         battery = op.hardwareMap.voltageSensor.iterator().next();
         voltage = round(battery.getVoltage());
         log("Battery Voltage: " + voltage + "v");
-        startVoltage = voltage; //TODO: MAYBE HERE?
+        startVoltage = voltage;
 //        profiler = new ElapsedTime();
 
         // Initial Dashboard Drawings
@@ -279,7 +279,7 @@ public class Robot {
 //        profile(10);
 
         // Dashboard Telemetry
-        //addPacket("1 Voltage", startVoltage + " -> " + voltage);
+        addPacket("1 Voltage", startVoltage + " -> " + voltage);
         addPacket("2 X", round(x));
         addPacket("3 Y", round(y));
         addPacket("4 Theta", round(theta));
@@ -342,7 +342,7 @@ public class Robot {
                     intakeRetractStart = System.currentTimeMillis();
                 }
                 if (intakeState == 3) {
-                    if (intake.getElement() == "ball") cycleHub = DepositTarget.mid;
+                    if (intake.getElement() == "ball" && !isAuto) cycleHub = DepositTarget.mid;
                     else cycleHub = DepositTarget.high;
                 }
 

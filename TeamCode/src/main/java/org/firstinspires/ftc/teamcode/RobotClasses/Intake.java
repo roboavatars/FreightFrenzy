@@ -104,8 +104,6 @@ public class Intake {
         slidesError = slidesTarget - currentTicks;
 
         slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + accelFF * ay);
-        addPacket("ay", ay);
-        addPacket("ff", accelFF * ay);
     }
 
     public int getSlidesPos() {
