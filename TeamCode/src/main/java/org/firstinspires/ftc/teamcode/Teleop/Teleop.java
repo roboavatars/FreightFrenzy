@@ -22,7 +22,7 @@ public class Teleop extends LinearOpMode {
     public static double startY = 81;
     public static double startTheta = PI / 2;
 
-    public static boolean useAutoPos = false;
+    public static boolean useAutoPos = true;
     public static boolean isRed = true;
     public static boolean fieldCentric = false;
 
@@ -78,15 +78,9 @@ public class Teleop extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         if (useAutoPos) {
-            double[] initialData = Logger.readPos();
-            telemetry.addData("Starting Data", Arrays.toString(initialData));
-            telemetry.update();
-            Robot.log("Starting Data " + Arrays.toString(initialData));
-            robot = new Robot(this, initialData[1], initialData[2], initialData[3], false, initialData[0] == 1, true, initialData[4], (int) initialData[5], (int) initialData[6]);
-            robot.logger.startLogging(false, initialData[0] == 1);
+            robot = new Robot(this);
         } else {
             robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
-            robot.logger.startLogging(false, isRed);
         }
 
 //        imu = new IMU(robot.theta, this);

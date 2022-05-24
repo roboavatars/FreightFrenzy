@@ -14,7 +14,7 @@ public class DepositTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Deposit deposit = new Deposit(this,false, 0, 0);
+        Deposit deposit = new Deposit(this,false, 0);
 
         waitForStart();
         while (opModeIsActive()) {

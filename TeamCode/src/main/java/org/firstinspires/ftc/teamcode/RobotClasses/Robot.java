@@ -124,7 +124,7 @@ public class Robot {
     public static int stallThreshold = 750;
     public double automationStepTime;
     public double depositTime = 0;
-    public static double startIntakingAutoY = 102;
+    public static double startIntakingAutoY = 100;
     public static double extendDepositAutoY = 95;
 
     // Motion Variables
@@ -145,10 +145,14 @@ public class Robot {
 
     // Constructor
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed) {
-        this(op, x, y, theta, isAuto, isRed, false, 0, 0, 0);
+        this(op, x, y, theta, isAuto, isRed, 0,0);
     }
 
-    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean useAutoLoggedarmPos, double turretTheta, int armPos, int slidesPos) {
+    public Robot(LinearOpMode op) {
+        this(op, Logger.readPos()[1], Logger.readPos()[2], Logger.readPos()[3], false, Logger.readPos()[0] == 1, (int) Logger.readPos()[6], (int) Logger.readPos()[7]);
+    }
+
+    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, int depositSlidesPos, int intakeSlidesPos) {
         this.x = x;
         this.y = y;
         this.theta = theta;
@@ -158,10 +162,15 @@ public class Robot {
 
         // init subsystems
         drivetrain = new Drivetrain(op, x, y, theta, isAuto);
-        intake = new Intake(op, isAuto);
 //        carousel = new Carousel(op, isRed);
         logger = new Logger();
-        deposit = new Deposit(op, isAuto, 0, 0);
+
+        deposit = new Deposit(op, isAuto, depositSlidesPos);
+        intake = new Intake(op, isAuto, intakeSlidesPos);
+
+        addPacket("depositSlides", depositSlidesPos);
+        addPacket("intakeSlides", intakeSlidesPos);
+
 
         //        tapeDetector = new TapeDetector(op);
 
@@ -190,6 +199,9 @@ public class Robot {
         sendPacket();
 
         cycleHub = DepositTarget.high;
+
+        logger.startLogging(isAuto, isRed);
+
     }
 
     // Stop logger
@@ -271,8 +283,8 @@ public class Robot {
         // Log Data
         if (loopCounter % loggerUpdatePeriod == 0) {
             logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a,
-                    turretGlobalTheta, 0, cycleHub, intake.slidesIsHome(), intakeTransfer, depositingFreight,
-                    cycles.size(), cycleAvg, 0, 0);
+                    deposit.getSlidesPos(), cycleHub, intake.getSlidesPos(), intakeState, depositState,
+                    cycles.size(), cycleAvg);
         }
 
 //        profile(10);

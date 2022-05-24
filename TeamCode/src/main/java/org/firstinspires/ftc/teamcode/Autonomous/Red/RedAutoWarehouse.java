@@ -32,7 +32,6 @@ public class RedAutoWarehouse extends LinearOpMode {
         */
 
         Robot robot = new Robot(this, 135.0, 78.5, 0, true, true);
-        robot.logger.startLogging(true, true);
 
 //        Vision detector = new Vision(this, true, Vision.Pipeline.Barcode);
 //        detector.start();
@@ -50,7 +49,7 @@ public class RedAutoWarehouse extends LinearOpMode {
         double preloadScoreTime = 1;
 
         double[] depositPos = new double[]{130, 68, 0.3};
-        double[] preloadDepositPos = new double[]{128, 74, 0.8*PI/6};
+        double[] preloadDepositPos = new double[]{126, 73, 0.8*PI/6};
 
         int goToWarehouseSteps = 1;
 
@@ -115,6 +114,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                             goToWarehouseSteps++;
                         break;
                     case 2:
+                        robot.intake.extend();
                         robot.drivetrain.constantStrafeConstant = 0;
                         robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 > PI / 10 ? -0.5 : 0);
                         passLineTime = time.seconds();
@@ -124,19 +124,17 @@ public class RedAutoWarehouse extends LinearOpMode {
                     case 3:
                         if (timeLeft > parkThreshold) {
                             robot.drivetrain.constantStrafeConstant = 0;
-                            /*
                             if (cycleCounter < 3) {
                                 double y = Math.min(Robot.startIntakingAutoY + 3 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
-                                robot.setTargetPoint(new Target(138, y, PI / 2));
+                                double theta = PI/2 - (PI/15)*(Math.cos(4*(time.seconds() - passLineTime))-1);
+                                robot.setTargetPoint(new Target(138, y, theta));
                             } else {
                                 double x = Math.max(138 - 1 * (time.seconds() - passLineTime), 130);
                                 double y = Math.min(110 + 3 * (cycleCounter - 3) + 1 * (time.seconds() - passLineTime), 125);
                                 double theta = Math.min(PI / 2 + PI / 11 * (time.seconds() - passLineTime), 2 * PI / 3);
                                 robot.setTargetPoint(new Target(x, y, theta));
-                            }*/
-                            double y = Math.min(Robot.startIntakingAutoY + 3 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
-                            double theta = PI/2 - (PI/15)*(Math.cos(4*(time.seconds() - passLineTime))-1);
-                            robot.setTargetPoint(new Target(138, y, theta));
+                            }
+
 
                             addPacket("path", "creeping right rn");
                         } else {
@@ -213,6 +211,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
             robot.update();
         }
+
         robot.stop();
 //        try {
 //            detector.stop();

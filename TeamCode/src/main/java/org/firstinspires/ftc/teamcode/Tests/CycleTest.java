@@ -34,7 +34,7 @@ public class CycleTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Deposit deposit = new Deposit(this,false, 0, 0);
+        Deposit deposit = new Deposit(this,false, 0);
         Intake intake = new Intake(this,false);
         Drivetrain dt = new Drivetrain(this, 0,0,0);
 

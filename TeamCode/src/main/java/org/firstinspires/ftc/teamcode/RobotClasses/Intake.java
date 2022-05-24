@@ -23,10 +23,7 @@ public class Intake {
 
     private double lastIntakePow = 0;
 
-    private boolean slidesHome = true;
-    public double intakeOffset = 0;
-    private double lastSlidesPos = 0;
-    private double slidesTargetPos = 0;
+    public int initialSlidesPos;
 
     public double INTAKE_SLIDES_SERVO_SPEED = 0.1;
     public double HOME_THRESHOLD = 20;
@@ -42,6 +39,10 @@ public class Intake {
     private LinearOpMode op;
 
     public Intake(LinearOpMode op, boolean isAuto) {
+        this(op, isAuto, 0);
+    }
+
+    public Intake(LinearOpMode op, boolean isAuto, int initialSlidesPos) {
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -51,6 +52,8 @@ public class Intake {
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slidesMotor.setTargetPosition(0);
         slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        this.initialSlidesPos = initialSlidesPos;
 
         intakeSensor = op.hardwareMap.get(RevColorSensorV3.class, "intakeSensor");
     }
@@ -107,7 +110,7 @@ public class Intake {
     }
 
     public int getSlidesPos() {
-        return slidesMotor.getCurrentPosition();
+        return slidesMotor.getCurrentPosition() + initialSlidesPos;
     }
 
     public boolean slidesIsHome() {

@@ -27,16 +27,16 @@ public class Deposit {
     public double gravityFF = .3;
 
 
-    public double lastArmPos = 0;
+    public int initialSlidesPos;
 
     private boolean isAuto;
-    public boolean preload = false;
 
     public boolean reset = false;
 
-    public int initialArmPos;
-
-    public Deposit(LinearOpMode op, boolean isAuto, int initialArmPos, int initialSlidesPos) {
+    public Deposit(LinearOpMode op, boolean isAuto) {
+        this(op, isAuto, 0);
+    }
+    public Deposit(LinearOpMode op, boolean isAuto, int initialSlidesPos) {
         this.isAuto = isAuto;
 
         // Deposit Servo
@@ -59,7 +59,7 @@ public class Deposit {
         slidesMotor.setTargetPosition(0);
         slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        this.initialArmPos = initialArmPos;
+        this.initialSlidesPos = initialSlidesPos;
 
         op.telemetry.addData("Status", "Deposit Initialized");
     }
@@ -102,7 +102,7 @@ public class Deposit {
     }
 
     public int getSlidesPos() {
-        return slidesMotor.getCurrentPosition();
+        return slidesMotor.getCurrentPosition() + initialSlidesPos;
     }
 
     public boolean slidesisHome() {
