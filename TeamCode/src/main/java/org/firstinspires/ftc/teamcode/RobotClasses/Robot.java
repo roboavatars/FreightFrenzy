@@ -145,14 +145,17 @@ public class Robot {
 
     // Constructor
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed) {
-        this(op, x, y, theta, isAuto, isRed, 0,0);
+        this(op, x, y, theta, isAuto, isRed, 0,0, false);
+    }
+    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean startLogger) {
+        this(op, x, y, theta, isAuto, isRed, 0,0, startLogger);
     }
 
-    public Robot(LinearOpMode op) {
-        this(op, Logger.readPos()[1], Logger.readPos()[2], Logger.readPos()[3], false, Logger.readPos()[0] == 1, (int) Logger.readPos()[6], (int) Logger.readPos()[7]);
+    public Robot(LinearOpMode op, boolean startLogger) {
+        this(op, Logger.readPos()[1], Logger.readPos()[2], Logger.readPos()[3], false, Logger.readPos()[0] == 1, (int) Logger.readPos()[6], (int) Logger.readPos()[7], startLogger);
     }
 
-    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, int depositSlidesPos, int intakeSlidesPos) {
+    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, int depositSlidesPos, int intakeSlidesPos, boolean startLogger) {
         this.x = x;
         this.y = y;
         this.theta = theta;
@@ -200,7 +203,7 @@ public class Robot {
 
         cycleHub = DepositTarget.high;
 
-        logger.startLogging(isAuto, isRed);
+        if(startLogger) logger.startLogging(isAuto, isRed);
 
     }
 
@@ -431,14 +434,13 @@ public class Robot {
                 }
                 break;
             case 6:
+                markCycle();
                 depositState = 1;
                 break;
         }
         deposit.updateSlides();
         addPacket("deposit state", depositState);
         addPacket("intake state", intakeState);
-        addPacket("intake slides pos", intake.getSlidesPos());
-        addPacket("deposit slides pos", deposit.getSlidesPos());
 
     }
 

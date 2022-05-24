@@ -90,7 +90,7 @@ public class Logger extends Thread {
             if (writeCounter < logCounter) {
                 try {
                     fileWriter.write(df.format(new Date()) + "," + timeSinceSt + "," + x + "," + y + "," + theta + "," + vx + "," + vy + "," + w + "," + ax + "," + ay + "," + alpha + ","
-                            + "," + depositSlidesPos + "," + depositHub + "," + intakeSlidesPos + "," + intakeState + "," + depositState + "," +
+                            + depositSlidesPos + "," + depositHub + "," + intakeSlidesPos + "," + intakeState + "," + depositState + "," +
                             numCycles + "," + avgCycleTime + "\n");
                     writeCounter++;
                 } catch (Exception e) {
@@ -144,7 +144,7 @@ public class Logger extends Thread {
      * Reads position from last written file
      */
     public static double[] readPos() {
-        double[] robotPos = new double[]{1, 0, 0, 0, Math.PI / 2, 0, 0};
+        double[] robotPos = new double[]{1, 0, 0, 0, Math.PI / 2, 0, 0, 0};
 
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(getLogName(false)));
@@ -154,7 +154,7 @@ public class Logger extends Thread {
                                     //side  x                           y                            vx                          vy                            w
             robotPos = new double[]{isRed, Double.parseDouble(data[2]), Double.parseDouble(data[3]), Double.parseDouble(data[4]), Double.parseDouble(data[5]), Double.parseDouble(data[6]),
                     //depositSlidesPos            intakeSlidesPos
-                    Double.parseDouble(data[10]), Double.parseDouble(data[12])};
+                    Double.parseDouble(data[11]), Double.parseDouble(data[13])};
 
             bufferedReader.close();
             Robot.log("Starting At " + Arrays.toString(robotPos));

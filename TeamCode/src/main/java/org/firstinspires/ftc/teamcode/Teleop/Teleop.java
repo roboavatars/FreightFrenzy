@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -10,8 +11,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.Localization.IMU;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
-
-import java.util.Arrays;
 
 @TeleOp(name = "1 Teleop")
 @Config
@@ -78,9 +77,11 @@ public class Teleop extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         if (useAutoPos) {
-            robot = new Robot(this);
+            for (int i = 0; i<Logger.readPos().length; i++)
+                addPacket("log " + i, Logger.readPos()[i]);
+            robot = new Robot(this, true);
         } else {
-            robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed);
+            robot = new Robot(this, (isRed ? startX : 144 - startX), startY, startTheta, false, isRed, true);
         }
 
 //        imu = new IMU(robot.theta, this);

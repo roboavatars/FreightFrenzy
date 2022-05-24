@@ -31,7 +31,7 @@ public class RedAutoWarehouse extends LinearOpMode {
             park in warehouse
         */
 
-        Robot robot = new Robot(this, 135.0, 78.5, 0, true, true);
+        Robot robot = new Robot(this, 135.0, 78.5, 0, true, true, true);
 
 //        Vision detector = new Vision(this, true, Vision.Pipeline.Barcode);
 //        detector.start();
