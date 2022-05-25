@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.Tests;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -20,6 +22,8 @@ public class IntakeSensorTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            float [] hsv = {0F, 0F, 0F};
+            Color.RGBToHSV(intakeSensor.red(), intakeSensor.green(),  intakeSensor.blue(), hsv);
             addPacket("Measured Distance", intakeSensor.getDistance(DistanceUnit.MM));
             addPacket("Threshold Distance", Constants.INTAKE_DISTANCE_THRESHOLD);
             addPacket("intakeFull", intakeSensor.getDistance(DistanceUnit.MM) < Constants.INTAKE_DISTANCE_THRESHOLD);
@@ -27,6 +31,10 @@ public class IntakeSensorTest extends LinearOpMode {
             addPacket("green", intakeSensor.green());
             addPacket("blue", intakeSensor.blue());
             addPacket("alpha", intakeSensor.alpha());
+            addPacket("1", hsv[0]);
+            addPacket("2", hsv[1]);
+            addPacket("3", hsv[2]);
+
             sendPacket();
 
             telemetry.addData("Measured Distance", intakeSensor.getDistance(DistanceUnit.MM));

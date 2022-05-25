@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Config
 @Autonomous(name = "0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
 public class RedAutoWarehouse extends LinearOpMode {
-    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Middle;
+    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Left;
 
     @Override
     public void runOpMode() {
@@ -45,22 +45,18 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         // Segment Times
         double cycleScoreTime = 1.5;
-        double parkThreshold = 3;
+        double parkThreshold = 6;
         double preloadScoreTime = 1;
 
-        double[] depositPos = new double[]{130, 68, 0.3};
-        double[] preloadDepositPos = new double[]{126, 73, 0.8*PI/6};
+        double[] highCyclePos = new double[]{130, 68, 0.3};
+        double[] midCyclePos = new double[]{127, 68, 0.3};
+        double[] preloadDepositPos;
 
         int goToWarehouseSteps = 1;
 
         // Paths
         Path cycleScorePath = null;
         Path parkPath = null;
-        Waypoint[] preloadScoreWaypoints = new Waypoint[]{
-                new Waypoint(robot.x, robot.y, 3 * PI / 2, 10, 10, 0, 0),
-                new Waypoint(preloadDepositPos[0], preloadDepositPos[1], preloadDepositPos[2] + PI, 2, -10, 0, preloadScoreTime),
-        };
-        Path preloadScorePath = new Path(preloadScoreWaypoints);
 
         int cycleCounter = 0;
         double passLineTime = 0;
@@ -71,11 +67,20 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         if (barcodeCase == BarcodePipeline.Case.Left) {
             robot.cycleHub = Robot.DepositTarget.low;
+            preloadDepositPos = new double[]{122, 69, 0.8*PI/6};
         } else if (barcodeCase == BarcodePipeline.Case.Middle) {
             robot.cycleHub = Robot.DepositTarget.mid;
+            preloadDepositPos = new double[]{124, 71, 0.8*PI/6};
         } else {
             robot.cycleHub = Robot.DepositTarget.high;
+            preloadDepositPos = new double[]{126, 73, 0.8*PI/6};
         }
+
+        Waypoint[] preloadScoreWaypoints = new Waypoint[]{
+                new Waypoint(robot.x, robot.y, 3 * PI / 2, 10, 10, 0, 0),
+                new Waypoint(preloadDepositPos[0], preloadDepositPos[1], preloadDepositPos[2] + PI, 2, -10, 0, preloadScoreTime),
+        };
+        Path preloadScorePath = new Path(preloadScoreWaypoints);
 
         robot.depositingFreight = true;
         robot.depositApproval = false;
@@ -159,11 +164,20 @@ public class RedAutoWarehouse extends LinearOpMode {
 
                             resetOdo = false;
 
-                            Waypoint[] cycleScoreWaypoints = new Waypoint[]{
-                                    new Waypoint(140, robot.y, 3 * PI / 2, 10, 10, 0, 0),
-                                    new Waypoint(140, 79, 3 * PI / 2, 5, 1, 0, 0.75),
-                                    new Waypoint(depositPos[0], depositPos[1], depositPos[2] + PI, 2, -10, 0, cycleScoreTime),
-                            };
+                            Waypoint[] cycleScoreWaypoints;
+                            if (robot.cycleHub == Robot.DepositTarget.high) {
+                                cycleScoreWaypoints = new Waypoint[]{
+                                        new Waypoint(140, robot.y, 3 * PI / 2, 10, 10, 0, 0),
+                                        new Waypoint(140, 79, 3 * PI / 2, 5, 1, 0, 0.75),
+                                        new Waypoint(highCyclePos[0], highCyclePos[1], highCyclePos[2] + PI, 2, -10, 0, cycleScoreTime),
+                                };
+                            } else {
+                                cycleScoreWaypoints = new Waypoint[]{
+                                        new Waypoint(140, robot.y, 3 * PI / 2, 10, 10, 0, 0),
+                                        new Waypoint(140, 79, 3 * PI / 2, 5, 1, 0, 0.75),
+                                        new Waypoint(midCyclePos[0], midCyclePos[1], midCyclePos[2] + PI, 2, -10, 0, cycleScoreTime),
+                                };
+                            }
                             cycleScorePath = new Path(cycleScoreWaypoints);
 
                             time.reset();
@@ -189,7 +203,8 @@ public class RedAutoWarehouse extends LinearOpMode {
                     resetOdo = true;
                 }
 
-                robot.depositApproval = robot.isAtPose(depositPos[0], depositPos[1], depositPos[2], 2, 2, PI / 10)
+                robot.depositApproval = (robot.cycleHub == Robot.DepositTarget.high && robot.isAtPose(highCyclePos[0], highCyclePos[1], highCyclePos[2], 2, 2, PI / 10))
+                        || (robot.cycleHub == Robot.DepositTarget.mid && robot.isAtPose(midCyclePos[0], midCyclePos[1], midCyclePos[2], 2, 2, PI / 10))
                         && robot.notMoving();
 //                        && robot.vx < 10 && robot.vy < 10 && robot.w < PI;
 

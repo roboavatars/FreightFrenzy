@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -34,7 +34,7 @@ public class Intake {
 
     public static double slidesKp = 0.1;
     public static double slidesKd = 0.045;
-    public static double accelFF = 0.0008;
+    public static double accelFF = 0;// 0.0008;
 
     private LinearOpMode op;
 
@@ -137,12 +137,12 @@ public class Intake {
 
     public String getElement() {
         String element;
-        if (intakeSensor.blue() < Constants.COLOR_SENSOR_THRESHOLD)
+        float [] hsv = {0F, 0F, 0F};
+        Color.RGBToHSV(intakeSensor.red(), intakeSensor.green(),  intakeSensor.blue(), hsv);
+        if (hsv[0] < Constants.COLOR_SENSOR_THRESHOLD)
             element = "cube";
         else
             element =  "ball";
-
-        addPacket("element", element);
         return element;
     }
 }

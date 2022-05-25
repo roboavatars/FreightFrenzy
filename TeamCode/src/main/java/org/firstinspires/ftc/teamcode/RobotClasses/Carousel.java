@@ -2,11 +2,8 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Carousel {
@@ -22,17 +19,14 @@ public class Carousel {
     public Carousel(LinearOpMode op, boolean isRed) {
         this.isRed = isRed;
 
-        carouselMotor = op.hardwareMap.get(DcMotorEx.class, "carouselMotor");
-        carouselMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        crServoImplEx1 = op.hardwareMap.get(CRServoImplEx.class, "servoOne");
+        crServoImplEx1 = op.hardwareMap.get(CRServoImplEx.class, "carousel1");
         if (isRed) {
             crServoImplEx1.setDirection(DcMotorSimple.Direction.FORWARD);
         } else {
             crServoImplEx1.setDirection(DcMotorSimple.Direction.REVERSE);
         }
 
-        crServoImplEx2 = op.hardwareMap.get(CRServoImplEx.class, "servoTwo");
+        crServoImplEx2 = op.hardwareMap.get(CRServoImplEx.class, "carousel2");
         if (isRed) {
             crServoImplEx2.setDirection(DcMotorSimple.Direction.FORWARD);
         } else {
@@ -54,13 +48,13 @@ public class Carousel {
     }
 
     public void turnon() {
-        crServoImplEx1.setPwmEnable();
-        crServoImplEx2.setPwmEnable();
+        crServoImplEx1.setPower(1);
+        crServoImplEx2.setPower(1);
     }
 
     public void turnoff() {
-        crServoImplEx1.setPwmDisable();
-        crServoImplEx2.setPwmDisable();
+        crServoImplEx1.setPower(0);
+        crServoImplEx2.setPower(0);
     }
 
 //
@@ -68,11 +62,4 @@ public class Carousel {
 //        on(Constants.CAROUSEL_VELOCITY);
 //    }
 
-    public void on(double velocity) {
-        setVelocity(velocity);
-    }
-
-    public void stop() {
-        setVelocity(0);
-    }
 }

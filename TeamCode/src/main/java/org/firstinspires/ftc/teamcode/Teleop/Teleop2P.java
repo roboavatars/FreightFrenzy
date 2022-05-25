@@ -10,11 +10,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.Localization.IMU;
+import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-@TeleOp(name = "1 Teleop")
+@TeleOp(name = "2 Teleop 2P")
 @Config
-public class Teleop extends LinearOpMode {
+public class Teleop2P extends LinearOpMode {
 
     // Backup Starting Position
     public static double startX = 138;
@@ -92,8 +93,16 @@ public class Teleop extends LinearOpMode {
 
         while (opModeIsActive()) {
             robot.intakeApproval = gamepad1.right_trigger > .1;
-            robot.depositApproval = gamepad1.left_trigger > .1;
+            robot.depositApproval = gamepad2.a;
 
+            if (gamepad2.dpad_up) robot.deposit.initialSlidesPos -= .4;
+            if (gamepad2.dpad_down) robot.deposit.initialSlidesPos += .4;
+
+            if (gamepad2.right_bumper) robot.carousel.turnon();
+            else  robot.carousel.turnoff();
+
+            robot.intakeExtendDist = Math.max(Constants.INTAKE_SLIDES_HOME_TICKS,Math.min(robot.intakeExtendDist + gamepad2.right_trigger - gamepad2.left_trigger, Constants.INTAKE_SLIDES_EXTEND_TICKS));
+            if (robot.depositState != 1) wGain = .5;
 
             // Drivetrain Controls
             // Field Centric Driving

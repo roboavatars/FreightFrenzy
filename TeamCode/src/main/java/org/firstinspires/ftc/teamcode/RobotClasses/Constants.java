@@ -53,7 +53,7 @@ public class Constants {
     public static double TIP_CONTROLS_GAIN = 5;
 
     // Tape Detector
-    public static double COLOR_SENSOR_THRESHOLD = 400;
+    public static double COLOR_SENSOR_THRESHOLD = 110;
 
     //Turret?
     public static double TURRET_NETRUAL_THETA = PI;

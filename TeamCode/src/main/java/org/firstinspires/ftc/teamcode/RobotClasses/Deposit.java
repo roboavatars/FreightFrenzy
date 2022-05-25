@@ -27,7 +27,7 @@ public class Deposit {
     public double gravityFF = .3;
 
 
-    public int initialSlidesPos;
+    public double initialSlidesPos;
 
     private boolean isAuto;
 
@@ -71,7 +71,7 @@ public class Deposit {
         else if (hub == Robot.DepositTarget.mid) slidesTarget = Constants.DEPOSIT_SLIDES_MID_TICKS;
         else slidesTarget = Constants.DEPOSIT_SLIDES_LOW_TICKS;
 
-        slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS; //TODO: temporary
+//        slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS;
     }
 
     public void retractSlides(){
@@ -102,7 +102,7 @@ public class Deposit {
     }
 
     public int getSlidesPos() {
-        return slidesMotor.getCurrentPosition() + initialSlidesPos;
+        return slidesMotor.getCurrentPosition() + (int) Math.round(initialSlidesPos);
     }
 
     public boolean slidesisHome() {

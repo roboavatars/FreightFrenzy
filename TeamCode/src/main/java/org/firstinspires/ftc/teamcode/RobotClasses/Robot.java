@@ -35,7 +35,7 @@ public class Robot {
     // Robot Classes
     public Drivetrain drivetrain;
     public Intake intake;
-    ////    public Carousel carousel;
+    public Carousel carousel;
     // public TapeDetector tapeDetector;
     public Logger logger;
     public Deposit deposit;
@@ -99,6 +99,8 @@ public class Robot {
     public static double turretHomeThreshold = 1000;
     public static double releaseThreshold = 500;
     public static double intakeFlipThreshold = 500;
+    public String element;
+    public static double intakeExtendDist = Constants.INTAKE_SLIDES_HOME_TICKS;
 
     // Cycle Tracker
     public ArrayList<Double> cycles = new ArrayList<>();
@@ -165,7 +167,7 @@ public class Robot {
 
         // init subsystems
         drivetrain = new Drivetrain(op, x, y, theta, isAuto);
-//        carousel = new Carousel(op, isRed);
+        carousel = new Carousel(op, isRed);
         logger = new Logger();
 
         deposit = new Deposit(op, isAuto, depositSlidesPos);
@@ -229,6 +231,7 @@ public class Robot {
         // Don't check states every loop
         if (loopCounter % sensorUpdatePeriod == 0 && intakeState != 1) {
             intakeFull = intake.isFull();
+            element = intake.getElement();
         }
 //        profile(1);
         if (loopCounter % stallUpdatePeriod == 0 && intakeState != 1) {
@@ -348,15 +351,16 @@ public class Robot {
                 if (isAuto && intakeApproval && y >= startIntakingAutoY) intakeState++;
                 break;
             case 2: //intake freight
-                intake.extend();
+                if (isAuto) intake.extend();
+                else intake.setSlidesPosition((int) Math.round(intakeExtendDist));
                 intake.on();
                 intake.flipDown();
-                if ((!isAuto && !intakeApproval) || (isAuto && intakeFull)) {
+                if (intakeFull || (!isAuto && !intakeApproval)) {
                     intakeState++;
                     intakeRetractStart = System.currentTimeMillis();
                 }
                 if (intakeState == 3) {
-                    if (intake.getElement() == "ball" && !isAuto) cycleHub = DepositTarget.mid;
+                    if (element == "ball") cycleHub = DepositTarget.mid;
                     else cycleHub = DepositTarget.high;
                 }
 
@@ -441,6 +445,7 @@ public class Robot {
         deposit.updateSlides();
         addPacket("deposit state", depositState);
         addPacket("intake state", intakeState);
+        addPacket("element", element == "ball"? 0:1);
 
     }
 
