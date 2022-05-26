@@ -34,7 +34,7 @@ public class Intake {
 
     public static double slidesKp = 0.1;
     public static double slidesKd = 0.045;
-    public static double accelFF = 0;// 0.0008;
+    public static double accelFF =  0.0008;
 
     private LinearOpMode op;
 
@@ -79,7 +79,7 @@ public class Intake {
     }
 
     public boolean checkIfStalling() {
-        return intakeMotor.getCurrent(CurrentUnit.AMPS) > Constants.STALL_THRESHOLD;
+        return getCurrent() > Constants.STALL_THRESHOLD;
     }
 
     public double getCurrent() {

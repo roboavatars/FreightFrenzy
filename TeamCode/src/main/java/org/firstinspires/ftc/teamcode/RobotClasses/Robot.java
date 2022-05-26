@@ -88,6 +88,8 @@ public class Robot {
 
     public int depositState = 0;
     public int sharedState = 0;
+    public boolean capping = false;
+    public int capState = 0;
     private double transferStart;
     private double sharedDepositStart;
     private double sharedRetractStart;
@@ -140,7 +142,8 @@ public class Robot {
     public enum DepositTarget {
         high,
         mid,
-        low
+        low,
+        cap
     }
 
     public DepositTarget cycleHub;
@@ -232,10 +235,11 @@ public class Robot {
         if (loopCounter % sensorUpdatePeriod == 0 && intakeState != 1) {
             intakeFull = intake.isFull();
             element = intake.getElement();
+            intakeStalling = intake.checkIfStalling();;
         }
+        addPacket("intake current", intake.getCurrent());
 //        profile(1);
         if (loopCounter % stallUpdatePeriod == 0 && intakeState != 1) {
-            intakeStalling = intake.checkIfStalling();
         }
 //        profile(2);
         if (loopCounter % voltageUpdatePeriod == 0) {
@@ -409,43 +413,58 @@ public class Robot {
 
         //deposit states
 //        deposit.turretHome();
-        switch (depositState) {
-            case 1: //deposit home
-                deposit.retractSlides();
-                deposit.armHome();
-                deposit.open();
-                break;
-            case 2: //once transfer done, hold freight
-                deposit.hold();
-                if ((isAuto && y <= extendDepositAutoY) || depositApproval) depositState++;
-                break;
-            case 3: //extend deposit
-                deposit.extendSlides(cycleHub);
-                deposit.armOut();
-                deposit.hold();
-                if (isAuto || !depositApproval) depositState++;
-                break;
-            case 4: //wait for driver approval for release
-                if ((!isAuto || deposit.slidesAtPos()) && depositApproval) {
-                    depositState++;
-                    depositStart = System.currentTimeMillis();
-                }
-                break;
-            case 5: //release & wait for freight to drop
-                deposit.release();
-                if (System.currentTimeMillis() - depositStart > releaseThreshold) {
-                    depositState++;
-                }
-                break;
-            case 6:
-                markCycle();
-                depositState = 1;
-                break;
+        if (capping) {
+            switch (capState) {
+                case 1:
+                    deposit.retractSlides();
+                    deposit.setArmControls(Constants.ARM_CAP_DOWN_POS - capDownOffset);
+                    deposit.setServoPos(Constants.DEPOSIT_CAP_POS);
+                    break;
+                case 2:
+                    deposit.extendSlides(cycleHub);
+                    deposit.setArmControls(Constants.ARM_CAP_UP_POS - capUpOffset);
+                    deposit.setServoPos(Constants.DEPOSIT_CAP_POS);
+                    break;
+            }
+        } else {
+            switch (depositState) {
+                case 1: //deposit home
+                    deposit.retractSlides();
+                    deposit.armHome();
+                    deposit.open();
+                    break;
+                case 2: //once transfer done, hold freight
+                    deposit.hold();
+                    if ((isAuto && y <= extendDepositAutoY) || depositApproval) depositState++;
+                    break;
+                case 3: //extend deposit
+                    deposit.extendSlides(cycleHub);
+                    deposit.armOut();
+                    deposit.hold();
+                    if (isAuto || !depositApproval) depositState++;
+                    break;
+                case 4: //wait for driver approval for release
+                    if ((!isAuto || deposit.slidesAtPos()) && depositApproval) {
+                        depositState++;
+                        depositStart = System.currentTimeMillis();
+                    }
+                    break;
+                case 5: //release & wait for freight to drop
+                    deposit.release();
+                    if (System.currentTimeMillis() - depositStart > releaseThreshold) {
+                        depositState++;
+                    }
+                    break;
+                case 6:
+                    markCycle();
+                    depositState = 1;
+                    break;
+            }
         }
         deposit.updateSlides();
         addPacket("deposit state", depositState);
         addPacket("intake state", intakeState);
-        addPacket("element", element == "ball"? 0:1);
+        addPacket("element", element == "ball" ? 0 : 1);
 
     }
 
@@ -458,6 +477,17 @@ public class Robot {
 //            arm.setHome();
 //        }
 //    }
+
+
+    public void advanceCapState() {
+        capping = true;
+        if (capState < 2)
+            capState++;
+        else {
+            capState = 0;
+            capping = false;
+        }
+    }
 
     // Keep track of cycles
     public void markCycle() {

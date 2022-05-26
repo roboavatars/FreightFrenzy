@@ -21,7 +21,8 @@ public class Drivetrain {
     private DcMotorEx motorFrontLeft;
     private DcMotorEx motorBackRight;
     private DcMotorEx motorBackLeft;
-    private Servo odoRetractServo;
+    private Servo vertOdoRetractServo;
+    private Servo latOdoRetractServo;
 
     // private IMU imu;
 
@@ -115,8 +116,15 @@ public class Drivetrain {
             motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
 
-        odoRetractServo = hardwareMap.get(Servo.class, "odoRetractServo");
-        odoRetractServo.setPosition(Constants.ODO_NORMAL_POS);
+        vertOdoRetractServo = hardwareMap.get(Servo.class, "vertOdo");
+        latOdoRetractServo = hardwareMap.get(Servo.class, "latOdo");
+        if(isAuto) {
+            vertOdoRetractServo.setPosition(Constants.VERT_ODO_NORMAL_POS);
+            latOdoRetractServo.setPosition(Constants.LAT_ODO_NORMAL_POS);
+        } else {
+            vertOdoRetractServo.setPosition(Constants.VERT_ODO_RETRACT_POS);
+            latOdoRetractServo.setPosition(Constants.LAT_ODO_RETRACT_POS);
+        }
 
         x = initialX;
         y = initialY;
@@ -127,9 +135,10 @@ public class Drivetrain {
         op.telemetry.addData("Status", "Drivetrain Initialized");
     }
 
-    // retract horizontal odometry pod
+    // retract odometry
     public void retractOdo() {
-        odoRetractServo.setPosition(Constants.ODO_RETRACT_POS);
+        vertOdoRetractServo.setPosition(Constants.VERT_ODO_RETRACT_POS);
+        latOdoRetractServo.setPosition(Constants.LAT_ODO_RETRACT_POS);
     }
 
     // reset odometry

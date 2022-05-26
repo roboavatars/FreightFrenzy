@@ -50,6 +50,8 @@ public class Teleop2P extends LinearOpMode {
     private double capDownOffset = 0;
     private boolean cappingDown = true;
 
+    private boolean capToggle = false;
+
     /*
     Controller Button Mappings: *updated 3/13/22 12:30 PM*
     gamepad 1:
@@ -95,11 +97,31 @@ public class Teleop2P extends LinearOpMode {
             robot.intakeApproval = gamepad1.right_trigger > .1;
             robot.depositApproval = gamepad2.a;
 
-            if (gamepad2.dpad_up) robot.deposit.initialSlidesPos -= .4;
-            if (gamepad2.dpad_down) robot.deposit.initialSlidesPos += .4;
-
             if (gamepad2.right_bumper) robot.carousel.turnon();
             else  robot.carousel.turnoff();
+
+            if (!capToggle && gamepad2.y) {
+                capToggle = true;
+                robot.advanceCapState();
+            } else if (capToggle && !gamepad2.y) {
+                capToggle = false;
+            }
+
+            if (robot.capping) {
+                if (robot.capState == 1) {
+                    if (gamepad2.dpad_up)
+                        robot.capDownOffset += 1;
+                    if (gamepad2.dpad_down)
+                        robot.capDownOffset -= 1;
+                } else if (robot.capState == 2)
+                    if (gamepad2.dpad_up)
+                        robot.capUpOffset += 1;
+                    if (gamepad2.dpad_down)
+                        robot.capUpOffset -= 1;
+            } else {
+                if (gamepad2.dpad_up) robot.deposit.initialSlidesPos -= .4;
+                if (gamepad2.dpad_down) robot.deposit.initialSlidesPos += .4;
+            }
 
             robot.intakeExtendDist = Math.max(Constants.INTAKE_SLIDES_HOME_TICKS,Math.min(robot.intakeExtendDist + gamepad2.right_trigger - gamepad2.left_trigger, Constants.INTAKE_SLIDES_EXTEND_TICKS));
             if (robot.depositState != 1) wGain = .5;

@@ -49,7 +49,7 @@ public class RedAutoWarehouse extends LinearOpMode {
         double preloadScoreTime = 1;
 
         double[] highCyclePos = new double[]{130, 68, 0.3};
-        double[] midCyclePos = new double[]{127, 68, 0.3};
+        double[] midCyclePos = new double[]{124, 68, 0.3};
         double[] preloadDepositPos;
 
         int goToWarehouseSteps = 1;
@@ -115,7 +115,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                         robot.drivetrain.constantStrafeConstant = 0;//-0.4
                         robot.setTargetPoint(new Target(141, 78, PI / 2).thetaKp((Math.abs(robot.theta-PI/2)<PI / 6 )? Drivetrain.thetaKp : 10));
                         addPacket("path", "going to the wall right rn");
-                        if (robot.x > 138 && Math.abs(PI / 2 - robot.theta) < PI / 10)
+                        if (robot.x > 137 && Math.abs(PI / 2 - robot.theta) < PI / 10)
                             goToWarehouseSteps++;
                         break;
                     case 2:
@@ -152,7 +152,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                         break;
                     case 4:
                         robot.setTargetPoint(new Target(141, robot.startIntakingAutoY, PI/2));
-                        if (robot.x > 138 && Math.abs(PI / 2 - robot.theta) < PI / 10) goToWarehouseSteps++;
+                        if (robot.x > 137 && Math.abs(PI / 2 - robot.theta) < PI / 10) goToWarehouseSteps++;
                         break;
                     case 5:
                         if (timeLeft < parkThreshold && robot.y > 112) {

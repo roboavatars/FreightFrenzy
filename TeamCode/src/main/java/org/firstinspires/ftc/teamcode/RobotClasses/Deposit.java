@@ -69,7 +69,8 @@ public class Deposit {
     public void extendSlides(Robot.DepositTarget hub){
         if (hub == Robot.DepositTarget.high) slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS;
         else if (hub == Robot.DepositTarget.mid) slidesTarget = Constants.DEPOSIT_SLIDES_MID_TICKS;
-        else slidesTarget = Constants.DEPOSIT_SLIDES_LOW_TICKS;
+        else if (hub == Robot.DepositTarget.low) slidesTarget = Constants.DEPOSIT_SLIDES_LOW_TICKS;
+        else if (hub == Robot.DepositTarget.cap) slidesTarget = Constants.DEPOSIT_SLIDES_CAP_TICKS;
 
 //        slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS;
     }
@@ -96,7 +97,7 @@ public class Deposit {
         setArmControls(Constants.ARM_HOME_POS);
     }
 
-    private void setArmControls(double pos) {
+    public void setArmControls(double pos) {
         armServo1.setPosition(pos);
         armServo2.setPosition(1 - pos);
     }
@@ -127,13 +128,16 @@ public class Deposit {
 
     //Deposit Servo
     public void hold() {
-        depositServo.setPosition(Constants.DEPOSIT_HOLD_POS);
+        setServoPos(Constants.DEPOSIT_HOLD_POS);
     }
     public void release() {
-        depositServo.setPosition(Constants.DEPOSIT_RELEASE_POS);
+        setServoPos(Constants.DEPOSIT_RELEASE_POS);
     }
     public void open() {
-        depositServo.setPosition(Constants.DEPOSIT_OPEN_POS);
+        setServoPos(Constants.DEPOSIT_OPEN_POS);
+    }
+    public void setServoPos(double pos) {
+        depositServo.setPosition(pos);
     }
 
 }
