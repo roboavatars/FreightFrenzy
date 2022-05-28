@@ -96,6 +96,7 @@ public class Teleop2P extends LinearOpMode {
         while (opModeIsActive()) {
             robot.intakeApproval = gamepad1.right_trigger > .1;
             robot.depositApproval = gamepad2.a;
+            robot.releaseApproval = gamepad1.left_trigger > .1;
 
             if (gamepad2.right_bumper) robot.carousel.turnon();
             else  robot.carousel.turnoff();
@@ -110,14 +111,14 @@ public class Teleop2P extends LinearOpMode {
             if (robot.capping) {
                 if (robot.capState == 1) {
                     if (gamepad2.dpad_up)
-                        robot.capDownOffset += 1;
+                        robot.capOffset -= .01;
                     if (gamepad2.dpad_down)
-                        robot.capDownOffset -= 1;
+                        robot.capOffset += .01;
                 } else if (robot.capState == 2)
                     if (gamepad2.dpad_up)
-                        robot.capUpOffset += 1;
+                        robot.capOffset -= .01;
                     if (gamepad2.dpad_down)
-                        robot.capUpOffset -= 1;
+                        robot.capOffset += .01;
             } else {
                 if (gamepad2.dpad_up) robot.deposit.initialSlidesPos -= .4;
                 if (gamepad2.dpad_down) robot.deposit.initialSlidesPos += .4;

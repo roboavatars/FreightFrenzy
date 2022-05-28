@@ -29,8 +29,7 @@ import java.util.List;
 public class Robot {
 
     public static boolean turretEnabled = false;
-    public double capUpOffset = 0;
-    public double capDownOffset = 0;
+    public double capOffset = 0;
 
     // Robot Classes
     public Drivetrain drivetrain;
@@ -71,6 +70,7 @@ public class Robot {
 
     // Automation Variables
     public boolean depositApproval = false;
+    public boolean releaseApproval = false;
     public boolean transferVerify = false;
     public boolean intakeApproval = false;
     public boolean intakeTransfer = false;
@@ -91,6 +91,7 @@ public class Robot {
     public boolean capping = false;
     public int capState = 0;
     private double transferStart;
+    private double startExtendTime;
     private double sharedDepositStart;
     private double sharedRetractStart;
     private double depositStart;
@@ -101,6 +102,7 @@ public class Robot {
     public static double turretHomeThreshold = 1000;
     public static double releaseThreshold = 500;
     public static double intakeFlipThreshold = 500;
+    public static double armFlipThreshold = 1000;
     public String element;
     public static double intakeExtendDist = Constants.INTAKE_SLIDES_HOME_TICKS;
 
@@ -128,7 +130,7 @@ public class Robot {
     public static int stallThreshold = 750;
     public double automationStepTime;
     public double depositTime = 0;
-    public static double startIntakingAutoY = 100;
+    public static double startIntakingAutoY = 106;
     public static double extendDepositAutoY = 95;
 
     // Motion Variables
@@ -417,12 +419,12 @@ public class Robot {
             switch (capState) {
                 case 1:
                     deposit.retractSlides();
-                    deposit.setArmControls(Constants.ARM_CAP_DOWN_POS - capDownOffset);
+                    deposit.setArmControls(Constants.ARM_CAP_DOWN_POS - capOffset);
                     deposit.setServoPos(Constants.DEPOSIT_CAP_POS);
                     break;
                 case 2:
                     deposit.extendSlides(cycleHub);
-                    deposit.setArmControls(Constants.ARM_CAP_UP_POS - capUpOffset);
+                    deposit.setArmControls(Constants.ARM_CAP_UP_POS - capOffset);
                     deposit.setServoPos(Constants.DEPOSIT_CAP_POS);
                     break;
             }
@@ -441,10 +443,11 @@ public class Robot {
                     deposit.extendSlides(cycleHub);
                     deposit.armOut();
                     deposit.hold();
+                    startExtendTime = curTime;
                     if (isAuto || !depositApproval) depositState++;
                     break;
                 case 4: //wait for driver approval for release
-                    if ((!isAuto || deposit.slidesAtPos()) && depositApproval) {
+                    if ((!isAuto || (deposit.slidesAtPos() && curTime - startExtendTime > armFlipThreshold)) && (depositApproval || releaseApproval)) {
                         depositState++;
                         depositStart = System.currentTimeMillis();
                     }
@@ -481,10 +484,12 @@ public class Robot {
 
     public void advanceCapState() {
         capping = true;
+        capOffset = 0;
         if (capState < 2)
             capState++;
         else {
             capState = 0;
+            depositState = 1;
             capping = false;
         }
     }

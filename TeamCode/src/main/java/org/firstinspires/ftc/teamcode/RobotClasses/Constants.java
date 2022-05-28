@@ -6,10 +6,10 @@ import com.acmerobotics.dashboard.config.Config;
 public class Constants {
 
     // Drivetrain
-    public static double VERT_ODO_NORMAL_POS = 0.45;
-    public static double VERT_ODO_RETRACT_POS = 0.7;
-    public static double LAT_ODO_NORMAL_POS = 0.45;
-    public static double LAT_ODO_RETRACT_POS = 0.7;
+    public static double VERT_ODO_NORMAL_POS = 1;
+    public static double VERT_ODO_RETRACT_POS = 0.28;
+    public static double LAT_ODO_NORMAL_POS = 0.75;
+    public static double LAT_ODO_RETRACT_POS = 0.48;
 
     // Intake
     public static double INTAKE_DISTANCE_THRESHOLD = 10;
@@ -35,7 +35,7 @@ public class Constants {
     public static double ARM_DEPOSIT_POS = 0.2;
     public static double ARM_HOME_POS = 0.87;
     public static double ARM_CAP_DOWN_POS = 0.15;
-    public static double ARM_CAP_UP_POS = 0.35;
+    public static double ARM_CAP_UP_POS = 0.15;
     public static double ARM_INIT_POS = 0.75;
 
     public static int DEPOSIT_SLIDES_HOME_TICKS = 0;

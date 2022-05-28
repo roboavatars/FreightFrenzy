@@ -22,6 +22,7 @@ public class Intake {
     private RevColorSensorV3 intakeSensor;
 
     private double lastIntakePow = 0;
+    public int slidesErrorThreshold = 3;
 
     public int initialSlidesPos;
 
@@ -106,7 +107,8 @@ public class Intake {
         slidesErrorChange = slidesTarget - currentTicks - slidesError;
         slidesError = slidesTarget - currentTicks;
 
-        slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + accelFF * ay);
+        if (Math.abs(slidesError) > slidesErrorThreshold) slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + accelFF * ay);
+        else slidesMotor.setPower(0);
     }
 
     public int getSlidesPos() {

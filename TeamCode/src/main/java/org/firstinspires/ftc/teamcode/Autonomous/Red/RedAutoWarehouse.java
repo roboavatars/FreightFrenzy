@@ -17,9 +17,9 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Config
-@Autonomous(name = "0 Red Auto Warehouse", preselectTeleOp = "1 Teleop", group = "Red")
+@Autonomous(name = "0 Red Auto Warehouse", preselectTeleOp = "2 Teleop 2P", group = "Red")
 public class RedAutoWarehouse extends LinearOpMode {
-    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Left;
+    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Middle;
 
     @Override
     public void runOpMode() {
@@ -49,7 +49,7 @@ public class RedAutoWarehouse extends LinearOpMode {
         double preloadScoreTime = 1;
 
         double[] highCyclePos = new double[]{130, 68, 0.3};
-        double[] midCyclePos = new double[]{124, 68, 0.3};
+        double[] midCyclePos = new double[]{127, 64, 0.3};
         double[] preloadDepositPos;
 
         int goToWarehouseSteps = 1;
@@ -130,12 +130,12 @@ public class RedAutoWarehouse extends LinearOpMode {
                         if (timeLeft > parkThreshold) {
                             robot.drivetrain.constantStrafeConstant = 0;
                             if (cycleCounter < 3) {
-                                double y = Math.min(Robot.startIntakingAutoY + 3 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
+                                double y = Math.min(Robot.startIntakingAutoY + 2 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
                                 double theta = PI/2 - (PI/15)*(Math.cos(4*(time.seconds() - passLineTime))-1);
                                 robot.setTargetPoint(new Target(138, y, theta));
                             } else {
                                 double x = Math.max(138 - 1 * (time.seconds() - passLineTime), 130);
-                                double y = Math.min(110 + 3 * (cycleCounter - 3) + 1 * (time.seconds() - passLineTime), 125);
+                                double y = Math.min(Robot.startIntakingAutoY + 2 * (cycleCounter - 3) + 1 * (time.seconds() - passLineTime), 125);
                                 double theta = Math.min(PI / 2 + PI / 11 * (time.seconds() - passLineTime), 2 * PI / 3);
                                 robot.setTargetPoint(new Target(x, y, theta));
                             }
