@@ -127,7 +127,7 @@ public class Robot {
     public static int convergeThreshold = 1500;
 
     public double stallStartTime = -1;
-    public static int stallThreshold = 750;
+    public static int stallThreshold = 500;
     public double automationStepTime;
     public double depositTime = 0;
     public static double startIntakingAutoY = 106;
@@ -237,11 +237,11 @@ public class Robot {
         if (loopCounter % sensorUpdatePeriod == 0 && intakeState != 1) {
             intakeFull = intake.isFull();
             element = intake.getElement();
-            intakeStalling = intake.checkIfStalling();;
         }
         addPacket("intake current", intake.getCurrent());
 //        profile(1);
         if (loopCounter % stallUpdatePeriod == 0 && intakeState != 1) {
+            intakeStalling = intake.checkIfStalling();;
         }
 //        profile(2);
         if (loopCounter % voltageUpdatePeriod == 0) {
