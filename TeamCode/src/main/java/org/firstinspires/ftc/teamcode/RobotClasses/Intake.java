@@ -22,7 +22,7 @@ public class Intake {
     private RevColorSensorV3 intakeSensor;
 
     private double lastIntakePow = 0;
-    public int slidesErrorThreshold = 3;
+    public static int slidesErrorThreshold = 3;
 
     public int initialSlidesPos;
 
@@ -33,9 +33,9 @@ public class Intake {
     public int slidesError = 0;
     public int slidesTarget = 0;
 
-    public static double slidesKp = 0.1;
-    public static double slidesKd = 0.045;
-    public static double accelFF =  0.0008;
+    public static double slidesKp = 0.05;
+    public static double slidesKd = 0.0;
+    public static double accelFF =  0;
 
     private LinearOpMode op;
 

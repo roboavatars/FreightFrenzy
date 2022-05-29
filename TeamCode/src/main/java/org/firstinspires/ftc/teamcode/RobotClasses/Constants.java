@@ -13,7 +13,7 @@ public class Constants {
 
     // Intake
     public static double INTAKE_DISTANCE_THRESHOLD = 10;
-    public static double STALL_THRESHOLD = 8;
+    public static double STALL_THRESHOLD = 6;
     public static double COLOR_SENSOR_THRESHOLD = 110;
 
     // Intake Slides
@@ -33,7 +33,7 @@ public class Constants {
 
     // Deposit Arm
     public static double ARM_DEPOSIT_POS = 0.2;
-    public static double ARM_HOME_POS = 0.87;
+    public static double ARM_HOME_POS = 0.85;
     public static double ARM_CAP_DOWN_POS = 0.15;
     public static double ARM_CAP_UP_POS = 0.15;
     public static double ARM_INIT_POS = 0.75;

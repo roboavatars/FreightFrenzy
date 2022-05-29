@@ -151,7 +151,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                         if (robot.intakeState == 3) goToWarehouseSteps++;
                         break;
                     case 4:
-                        robot.setTargetPoint(new Target(141, robot.startIntakingAutoY, PI/2));
+                        robot.setTargetPoint(new Target(141, robot.startIntakingAutoY, PI/2).thetaKp((Math.abs(robot.theta-PI/2)<PI / 6 )? Drivetrain.thetaKp : 10));
                         if (robot.x > 137 && Math.abs(PI / 2 - robot.theta) < PI / 10) goToWarehouseSteps++;
                         break;
                     case 5:

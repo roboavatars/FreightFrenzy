@@ -20,7 +20,7 @@ public class RedAutoCarousel extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Robot robot = new Robot(this, 135.0, 41, PI / 2, true, true);
+        Robot robot = new Robot(this, 135.0, 41, 0, true, true);
 
         double goToPreload = 1;
         double timeToCarousel = 1;
@@ -32,19 +32,13 @@ public class RedAutoCarousel extends LinearOpMode {
 
         Waypoint[] preload = new Waypoint[]{
                 new Waypoint(robot.x, robot.y, PI, 5, 10, 0, 0),
-                new Waypoint(118, 48, -7 * PI / 6, 10, 10, 0, 1)
+                new Waypoint(118, 48, - PI / 6, 10, 10, 0, 1)
         };
         Path preloadP = new Path(preload);
 
         Path preloadDuck = null;
         Path depoDuck = null;
-
-        Waypoint[] goToThePark = new Waypoint[]{
-                new Waypoint(118, 48, -7 * PI / 6, 10, 10, 0, 0),
-                new Waypoint(108, 10, 3 * PI / 2, 10, 10, 0, 1)
-        };
-
-        Path gotoP = new Path(goToThePark);
+        Path gotoP = null;
 
         waitForStart();
 
@@ -126,6 +120,11 @@ public class RedAutoCarousel extends LinearOpMode {
                     if (robot.depositState == 6) {
                         time.reset();
                         autoSteps++;
+                        Waypoint[] goToThePark = new Waypoint[]{
+                                new Waypoint(118, 48, -7 * PI / 6, 10, 10, 0, 0),
+                                new Waypoint(108, 10, 3 * PI / 2, 10, 10, 0, 1)
+                        };
+                        gotoP = new Path(goToThePark);
                     }
                     break;
                 case 4:

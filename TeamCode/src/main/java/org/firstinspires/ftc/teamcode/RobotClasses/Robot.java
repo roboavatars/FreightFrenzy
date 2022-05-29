@@ -48,7 +48,7 @@ public class Robot {
     // Class Constants
     private final int loggerUpdatePeriod = 2;
     private final int sensorUpdatePeriod = 10;
-    private final int stallUpdatePeriod = 15;
+    private final int stallUpdatePeriod = 5;
     private final int voltageUpdatePeriod = 1000;
     private final double xyTolerance = 1;
     private final double thetaTolerance = PI / 35;
@@ -95,16 +95,19 @@ public class Robot {
     private double sharedDepositStart;
     private double sharedRetractStart;
     private double depositStart;
+    private double depositStartRetract;
     private double intakeRetractStart;
     public int intakeState = 1;
-    public static double transferThreshold = 750;
+    public static double cubeTransferThreshold = 750;
+    public static double ballTransferThreshold = 1000;
     public static double turretDepositThreshold = 1000;
     public static double turretHomeThreshold = 1000;
     public static double releaseThreshold = 500;
     public static double intakeFlipThreshold = 500;
     public static double armFlipThreshold = 1000;
+    public static double armReturnThreshold = 1000;
     public String element;
-    public static double intakeExtendDist = Constants.INTAKE_SLIDES_HOME_TICKS;
+    public static double intakeExtendDist = (Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
 
     // Cycle Tracker
     public ArrayList<Double> cycles = new ArrayList<>();
@@ -119,10 +122,7 @@ public class Robot {
     public static int flipUpThreshold = 700;
 //    public static int hubTipThreshold = 300;
 
-    //Auto Time Delays
-    public static int autoFlipUpThreshold = 800;
-    public static int autoTransferThreshold = autoFlipUpThreshold + 400;
-    public static int autoReleaseThreshold = 500;
+
 
     public static int convergeThreshold = 1500;
 
@@ -359,7 +359,6 @@ public class Robot {
             case 2: //intake freight
                 if (isAuto) intake.extend();
                 else intake.setSlidesPosition((int) Math.round(intakeExtendDist));
-                intake.on();
                 intake.flipDown();
                 if (intakeFull || (!isAuto && !intakeApproval)) {
                     intakeState++;
@@ -382,29 +381,30 @@ public class Robot {
                         antiStallStep = "Jam Detected";
                         automationStep(antiStallStep);
                     } else if (curTime - stallStartTime > stallThreshold) {
-                        if (curTime % 400 > 200) intake.reverse();
-                        else intake.on();
+                        intake.reverse();
                         antiStallStep = "Reverse Intake";
                         automationStep(antiStallStep);
                     }
+                } else {
+                    intake.on();
                 }
                 break;
-            case 3: //wait for flip servo
+            case 3: //wait for flip servo and intake slides
                 intake.home();
                 intake.setPower(.5);
                 intake.flipUp();
-                if (System.currentTimeMillis() - intakeRetractStart > intakeFlipThreshold)
+                if (intake.slidesIsHome() && System.currentTimeMillis() - intakeRetractStart > intakeFlipThreshold)
                     intakeState++;
                 break;
-            case 4: //wait for intake and deposit slides
-                if (intake.slidesIsHome() && deposit.slidesisHome()) {
+            case 4: //wait for deposit to retract
+                if (depositState == 1) {
                     intakeState++;
                     transferStart = System.currentTimeMillis();
                 }
                 break;
             case 5: //transfer
                 intake.reverse();
-                if (System.currentTimeMillis() - transferStart > transferThreshold) {
+                if (System.currentTimeMillis() - transferStart > (cycleHub == DepositTarget.mid ? ballTransferThreshold : cubeTransferThreshold)) {
                     intakeState = 1;
                     depositState = 2;
                     sharedState = 2;
@@ -460,7 +460,15 @@ public class Robot {
                     break;
                 case 6:
                     markCycle();
-                    depositState = 1;
+                    depositStartRetract = curTime;
+                    depositState++;
+                    break;
+                case 7:
+                    deposit.retractSlides();
+                    deposit.armHome();
+                    if (curTime - depositStartRetract > armReturnThreshold) {
+                        depositState = 1;
+                    }
                     break;
             }
         }

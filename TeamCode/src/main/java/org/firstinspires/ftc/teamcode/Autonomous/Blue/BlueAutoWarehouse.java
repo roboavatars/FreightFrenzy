@@ -48,7 +48,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
         double parkThreshold = 6;
         double preloadScoreTime = 1;
 
-        double[] highCyclePos = new double[]{21, 73, PI - 0.3};
+        double[] highCyclePos = new double[]{19, 73, PI - 0.3};
         double[] midCyclePos = new double[]{25, 72, PI - 0.3};
         double[] preloadDepositPos;
 
@@ -67,7 +67,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
         if (barcodeCase == BarcodePipeline.Case.Left) {
             robot.cycleHub = Robot.DepositTarget.low;
-            preloadDepositPos = new double[]{22, 69, PI*(5.2/6)};
+            preloadDepositPos = new double[]{20, 69, PI*(5.2/6)};
         } else if (barcodeCase == BarcodePipeline.Case.Middle) {
             robot.cycleHub = Robot.DepositTarget.mid;
             preloadDepositPos = new double[]{20, 71, PI*(5.2/6)};
@@ -108,7 +108,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 }
             } else if (!goToWarehouse) {
                 robot.depositApproval = false;
-                if (robot.depositState != 1) robot.intakeApproval = false;
+                if (robot.depositState != 1 && robot.depositState != 7) robot.intakeApproval = false;
 
                 switch (goToWarehouseSteps) {
                     case 1:
@@ -151,7 +151,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                         if (robot.intakeState == 3) goToWarehouseSteps++;
                         break;
                     case 4:
-                        robot.setTargetPoint(new Target(3, robot.startIntakingAutoY, PI/2));
+                        robot.setTargetPoint(new Target(3, robot.startIntakingAutoY, PI/2).thetaKp((Math.abs(robot.theta-PI/2)<PI / 6 )? Drivetrain.thetaKp : 10));
                         if (robot.x < 7 && Math.abs(PI / 2 - robot.theta) < PI / 10) goToWarehouseSteps++;
                         break;
                     case 5:

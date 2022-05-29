@@ -86,6 +86,7 @@ public class Teleop1P extends LinearOpMode {
         }
 
 //        imu = new IMU(robot.theta, this);
+        robot.intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS;
         waitForStart();
 
         ElapsedTime cycleTimer = new ElapsedTime();
