@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
-
 import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -82,7 +80,6 @@ public class Intake {
     }
 
     public boolean checkIfStalling() {
-        addPacket("intake current", getCurrent());
         return getCurrent() > Constants.STALL_THRESHOLD;
     }
 
