@@ -73,6 +73,7 @@ public class Robot {
     public boolean releaseApproval = false;
     public boolean transferVerify = false;
     public boolean intakeApproval = false;
+    public boolean midGoal = false;
     public boolean intakeTransfer = false;
     public boolean slidesInCommand = false;
     public boolean depositingFreight = false;
@@ -107,7 +108,8 @@ public class Robot {
     public static double armFlipThreshold = 1000;
     public static double armReturnThreshold = 1000;
     public String element;
-    public static double intakeExtendDist = (Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
+    public static double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
+    public boolean rumble = false;
 
     // Cycle Tracker
     public ArrayList<Double> cycles = new ArrayList<>();
@@ -350,6 +352,7 @@ public class Robot {
         }
 
         boolean waitForIntakeFlip = false;
+        rumble = false;
         switch (intakeState) {
             case 1: //intake home
                 intake.flipDown();
@@ -363,10 +366,10 @@ public class Robot {
                 if (intakeFull || (!isAuto && !intakeApproval)) {
                     intakeState++;
                     intakeRetractStart = System.currentTimeMillis();
-                }
-                if (intakeState == 3) {
-                    if (element == "ball") cycleHub = DepositTarget.mid;
+                    if (element == "ball" || midGoal) cycleHub = DepositTarget.mid;
                     else cycleHub = DepositTarget.high;
+                } else if (intakeFull && !isAuto && intakeApproval) {
+                    rumble = true;
                 }
 
                 //anti-stall
@@ -404,7 +407,7 @@ public class Robot {
                 break;
             case 5: //transfer
                 intake.reverse();
-                if (System.currentTimeMillis() - transferStart > (cycleHub == DepositTarget.mid ? ballTransferThreshold : cubeTransferThreshold)) {
+                if ((!isAuto && depositApproval) || (System.currentTimeMillis() - transferStart > (cycleHub == DepositTarget.mid ? ballTransferThreshold : cubeTransferThreshold))) {
                     intakeState = 1;
                     depositState = 2;
                     sharedState = 2;

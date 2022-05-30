@@ -51,6 +51,7 @@ public class Teleop2P extends LinearOpMode {
     private boolean cappingDown = true;
 
     private boolean capToggle = false;
+    private boolean midGoalToggle = false;
 
     /*
     Controller Button Mappings: *updated 3/13/22 12:30 PM*
@@ -97,6 +98,14 @@ public class Teleop2P extends LinearOpMode {
             robot.intakeApproval = gamepad1.right_trigger > .1;
             robot.depositApproval = gamepad2.a;
             robot.releaseApproval = gamepad1.left_trigger > .1;
+            if (robot.rumble) gamepad1.rumble(500);
+
+            if (!midGoalToggle && gamepad2.left_bumper) {
+                midGoalToggle = true;
+                robot.midGoal = !robot.midGoal;
+            } else if (midGoalToggle && !gamepad2.left_bumper) {
+                midGoalToggle = false;
+            }
 
             if (gamepad2.right_bumper) robot.carousel.turnon();
             else  robot.carousel.turnoff();

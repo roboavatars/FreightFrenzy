@@ -95,6 +95,7 @@ public class Teleop1P extends LinearOpMode {
         while (opModeIsActive()) {
             robot.intakeApproval = gamepad1.right_trigger > .1;
             robot.depositApproval = gamepad1.left_trigger > .1;
+            if (robot.rumble) gamepad1.rumble(500);
 
             robot.intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS;
             if (robot.depositState != 1) wGain = .5;
