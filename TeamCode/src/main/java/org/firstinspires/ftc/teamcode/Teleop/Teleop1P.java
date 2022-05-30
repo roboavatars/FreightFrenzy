@@ -51,28 +51,13 @@ public class Teleop1P extends LinearOpMode {
     private boolean cappingDown = true;
 
     /*
-    Controller Button Mappings: *updated 3/13/22 12:30 PM*
-    gamepad 1:
-    y - carousel on
-    left bumper - cancel automation
-    b - defense mode
-    x - duck cycle
-    dpad up - high goal
-    dpad left - mid goal
-    dpad down - low goal
-    dpad right - neutral
+    Controller Button Mappings: *updated 5/30/22 2:55 PM*
 
-    gamepad 2:
-    left trigger - deposit
+    gamepad 1:
     right trigger - intake
-    right bumper - enable deposit reset mode
-    left bumper - disable deposit reset mode
-    left stick x - turret offset
-    left stick y - slides offset
-    right stick y - arm offset
-    a = reset deposit offsets
-    x - reset odo/imu
-    y - retract odo
+    left trigger - deposit
+    left stick - move
+    right stick - turn
     */
 
     @Override
