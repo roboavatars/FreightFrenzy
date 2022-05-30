@@ -16,7 +16,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
@@ -30,19 +29,17 @@ import java.util.List;
 public class Robot {
 
     public static boolean turretEnabled = false;
-    public double capUpOffset = 0;
-    public double capDownOffset = 0;
+    public double capOffset = 0;
 
     // Robot Classes
     public Drivetrain drivetrain;
     public Intake intake;
-    public Arm arm;
     public Carousel carousel;
     // public TapeDetector tapeDetector;
     public Logger logger;
-    public Turret turret;
+    public Deposit deposit;
 
-    private final ElapsedTime profiler;
+    //    private final ElapsedTime profiler;
     private final List<LynxModule> allHubs;
     private final VoltageSensor battery;
     private double voltage;
@@ -50,8 +47,8 @@ public class Robot {
 
     // Class Constants
     private final int loggerUpdatePeriod = 2;
-    private final int sensorUpdatePeriod = 15;
-    private final int stallUpdatePeriod = 15;
+    private final int sensorUpdatePeriod = 10;
+    private final int stallUpdatePeriod = 5;
     private final int voltageUpdatePeriod = 1000;
     private final double xyTolerance = 1;
     private final double thetaTolerance = PI / 35;
@@ -73,22 +70,47 @@ public class Robot {
 
     // Automation Variables
     public boolean depositApproval = false;
+    public boolean releaseApproval = false;
     public boolean transferVerify = false;
     public boolean intakeApproval = false;
+    public boolean midGoal = false;
+    public boolean highGoal = false;
     public boolean intakeTransfer = false;
     public boolean slidesInCommand = false;
     public boolean depositingFreight = false;
     public boolean armExtendCommands = false;
     public boolean intakeRev = false;
-    private double intakeFlipTime = -1;
+    private final double intakeFlipTime = -1;
     private final double armOpenTime = -1;
     private final double slidesAtPosTime = -1;
     private final double extendTime = -1;
-    public boolean noExtend = false;
     public boolean autoNoTurret = false;
-    public boolean carouselAuto = false;
-    public int depositState = 1;
+    //    public boolean carouselAuto = false;
     public boolean depositEnabled = true;
+
+    public int depositState = 0;
+    public int sharedState = 0;
+    public boolean capping = false;
+    public int capState = 0;
+    private double transferStart;
+    private double startExtendTime;
+    private double sharedDepositStart;
+    private double sharedRetractStart;
+    private double depositStart;
+    private double depositStartRetract;
+    private double intakeRetractStart;
+    public int intakeState = 1;
+    public static double cubeTransferThreshold = 750;
+    public static double ballTransferThreshold = 1000;
+    public static double turretDepositThreshold = 1000;
+    public static double turretHomeThreshold = 1000;
+    public static double releaseThreshold = 500;
+    public static double intakeFlipThreshold = 500;
+    public static double armFlipThreshold = 1000;
+    public static double armReturnThreshold = 1000;
+//    public String element;
+    public static double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
+    public boolean rumble = false;
 
     // Cycle Tracker
     public ArrayList<Double> cycles = new ArrayList<>();
@@ -96,25 +118,23 @@ public class Robot {
     public double lastCycleTime;
     public double longestCycle = 0;
     public boolean autoFirstCycle = false;
+    public static boolean shared = false;
 
     // Time and Delay Variables
     public double curTime;
     public static int flipUpThreshold = 700;
-    public static int transferThreshold = flipUpThreshold + 600;
-    public static int releaseThreshold = 500;
 //    public static int hubTipThreshold = 300;
 
-    //Auto Time Delays
-    public static int autoFlipUpThreshold = 800;
-    public static int autoTransferThreshold = autoFlipUpThreshold + 400;
-    public static int autoReleaseThreshold = 500;
+
 
     public static int convergeThreshold = 1500;
 
     public double stallStartTime = -1;
-    public static int stallThreshold = 750;
+    public static int stallThreshold = 500;
     public double automationStepTime;
     public double depositTime = 0;
+    public static double startIntakingAutoY = 106;
+    public static double extendDepositAutoY = 95;
 
     // Motion Variables
     public double x, y, theta, vx, vy, w;
@@ -127,17 +147,25 @@ public class Robot {
     public enum DepositTarget {
         high,
         mid,
-        capping,
-        neutral
+        low,
+        cap
     }
+
     public DepositTarget cycleHub;
 
     // Constructor
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed) {
-        this(op, x, y, theta, isAuto, isRed, false, 0, 0, 0);
+        this(op, x, y, theta, isAuto, isRed, 0,0, false);
+    }
+    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean startLogger) {
+        this(op, x, y, theta, isAuto, isRed, 0,0, startLogger);
     }
 
-    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean useAutoLoggedarmPos, double turretTheta, int armPos, int slidesPos) {
+    public Robot(LinearOpMode op, boolean startLogger) {
+        this(op, Logger.readPos()[1], Logger.readPos()[2], Logger.readPos()[3], false, Logger.readPos()[0] == 1, (int) Logger.readPos()[6], (int) Logger.readPos()[7], startLogger);
+    }
+
+    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, int depositSlidesPos, int intakeSlidesPos, boolean startLogger) {
         this.x = x;
         this.y = y;
         this.theta = theta;
@@ -147,15 +175,15 @@ public class Robot {
 
         // init subsystems
         drivetrain = new Drivetrain(op, x, y, theta, isAuto);
-        intake = new Intake(op, isAuto);
         carousel = new Carousel(op, isRed);
         logger = new Logger();
-        if (useAutoLoggedarmPos) {
-            arm = new Arm(op, isAuto, armPos, slidesPos);
-        } else {
-            arm = new Arm(op, isAuto);
-        }
-        turret = new Turret(op, isAuto);
+
+        deposit = new Deposit(op, isAuto, depositSlidesPos);
+        intake = new Intake(op, isAuto, intakeSlidesPos);
+
+        addPacket("depositSlides", depositSlidesPos);
+        addPacket("intakeSlides", intakeSlidesPos);
+
 
         //        tapeDetector = new TapeDetector(op);
 
@@ -170,20 +198,23 @@ public class Robot {
         voltage = round(battery.getVoltage());
         log("Battery Voltage: " + voltage + "v");
         startVoltage = voltage;
-        profiler = new ElapsedTime();
+//        profiler = new ElapsedTime();
 
         // Initial Dashboard Drawings
-        if (intake.getDistance() > 1000) {
-            addPacket("0 DISTANCE SENSOR", "> 1000!!!");
-            op.telemetry.addData("0 DISTANCE SENSOR", "> 1000!!!");
-            op.telemetry.update();
-        }
+//        if (intake.getDistance() > 1000) {
+//            addPacket("0 DISTANCE SENSOR", "> 1000!!!");
+//            op.telemetry.addData("0 DISTANCE SENSOR", "> 1000!!!");
+//            op.telemetry.update();
+//        }
 
         drawField();
         drawRobot(this);
         sendPacket();
 
         cycleHub = DepositTarget.high;
+
+        if(startLogger) logger.startLogging(isAuto, isRed);
+
     }
 
     // Stop logger
@@ -202,23 +233,27 @@ public class Robot {
     }
 
     public void update() {
-        loopCounter++;
-        profiler.reset();
+//        profiler.reset();
         curTime = System.currentTimeMillis();
 
         // Don't check states every loop
-        if (loopCounter % sensorUpdatePeriod == 0 && intakeTransfer) {
-            intakeFull = intake.intakeFull();
+        if (loopCounter % sensorUpdatePeriod == 0 && intakeState != 1) {
+            intakeFull = intake.isFull();
+//            element = intake.getElement();
         }
-        profile(1);
-        if (loopCounter % stallUpdatePeriod == 0 && intakeTransfer) {
-            intakeStalling = intake.checkIfStalling();
+        addPacket("intake current", intake.getCurrent());
+//        profile(1);
+        if (loopCounter % stallUpdatePeriod == 0 && intakeState != 1) {
+            intakeStalling = intake.checkIfStalling();;
         }
-        profile(2);
+//        profile(2);
         if (loopCounter % voltageUpdatePeriod == 0) {
             voltage = round(battery.getVoltage());
         }
-        profile(3);
+
+        loopCounter++;
+
+//        profile(3);
 
         // Track time after start
         if (firstLoop) {
@@ -226,219 +261,12 @@ public class Robot {
             lastCycleTime = curTime;
         }
 
-        // Auto-Intaking
-        if (isAuto) {
-            if (!intakeTransfer && !depositingFreight && intake.slidesIsHome() && (y > 90 || intakeApproval)) {
-//                if (!noExtend) {
-//                    intake.extend(Constants.INTAKE_EXTEND_POS);
-//                } else {
-//                    intake.extend(Constants.INTAKE_HOME_POS);
-//                }
-                intake.on();
-
-                intakeTransfer = true;
-                intakeApproval = false;
-                slidesInCommand = false;
-                automationStep("Intake Extend/On");
-                automationStepTime = curTime;
-            } else if (intakeTransfer) {
-                if (intakeFull && !intake.slidesIsHome() && intakeFlipTime == -1 && (!autoFirstCycle || arm.armSlidesHome())) {
-                    intake.setPower(0.2);
-                    intake.home();
-                    intake.flipUp();
-                    intakeFlipTime = curTime;
-                    automationStep("Intake Home/Flip");
-                } else if (intakeFull && intake.slidesIsHome() && !intakeRev && curTime - intakeFlipTime > autoFlipUpThreshold && arm.armSlidesHome()) {
-                    intake.setPower(Constants.INTAKE_TRANSFER_POWER);
-                    intakeRev = true;
-                    automationStep("Transfer Freight");
-                } else if (intake.slidesIsHome() && intakeRev && curTime - intakeFlipTime > autoTransferThreshold) {
-                    arm.hold();
-                    intake.off();
-                    intake.flipDown();
-
-                    automationStep("Intake/Transfer Done");
-                    log("Intake done after: " + (curTime - automationStepTime) + "ms");
-                    automationStepTime = curTime;
-
-                    intakeTransfer = false;
-                    intakeFlipTime = -1;
-                    intakeRev = false;
-                    depositingFreight = true;
-                }
-                // Robot.log(transferVerify + " " + (curTime - intakeFlipTime > transferThreshold));
-            }
-        } else {
-            // Auto-Intaking
-            if (!intakeTransfer && intake.slidesIsHome() && intakeApproval) {
-                intake.extend();
-                intake.on();
-
-                intakeTransfer = true;
-                slidesInCommand = false;
-                automationStep("Intake Extend/On");
-                automationStepTime = curTime;
-                intakeFlipTime = -1;
-                intakeRev = false;
-            } else if (intakeTransfer) {
-                if (!intakeApproval && !intake.slidesIsHome() && intakeFlipTime == -1) {
-                    intake.setPower(0.2);
-                    intake.home();
-                    intake.flipUp();
-                    intakeFlipTime = curTime;
-                    automationStep("Intake Home/Flip");
-                } else if (!intakeApproval && intake.slidesIsHome() && arm.armSlidesHome() && turret.isHome() && !intakeRev && curTime - intakeFlipTime > flipUpThreshold) {
-                    intake.setPower(Constants.INTAKE_TRANSFER_POWER);
-                    intakeRev = true;
-                    automationStep("Transfer Freight");
-                } else if (intake.slidesIsHome() && intakeRev &&
-                        curTime - intakeFlipTime > transferThreshold) {
-                    arm.hold();
-                    intake.off();
-                    intake.flipDown();
-
-                    automationStep("Intake/Transfer Done");
-                    log("Intake done after: " + (curTime - automationStepTime) + "ms");
-                    automationStepTime = curTime;
-
-                    intakeTransfer = false;
-                    intakeFlipTime = -1;
-                    intakeRev = false;
-                    depositingFreight = true;
-                }
-                // Robot.log(transferVerify + " " + (curTime - intakeFlipTime > transferThreshold));
-            }
-        }
-
-        //Arm Servo Limit
-        arm.limitArm(cycleHub == DepositTarget.high);
-
-        // Auto-depositing
-        if (depositingFreight && depositEnabled) {
-            if (cycleHub == DepositTarget.neutral) {
-                switch (depositState) {
-                    case 1:
-                        turret.setNeutral();
-                        depositState++;
-                    case 2:
-                        if (turret.isAtNeutral()) {
-//                            arm.setNeutral();
-                            depositState++;
-                        }
-                        break;
-                    case 3:
-                        if (depositApproval) {
-                            depositTime = curTime;
-                            arm.open();
-                            markCycle();
-                            depositState++;
-                        }
-                        break;
-                    case 4:
-                        if (curTime - depositTime > releaseThreshold) {
-                            arm.setHome();
-                            depositState++;
-                        }
-                        break;
-                    case 5:
-                        if (arm.clearNeutralPipe()) {
-                            turret.setHome();
-                            depositingFreight = false;
-                            depositState = 1;
-                        }
-                        break;
-                }
-            } else if (cycleHub == DepositTarget.high || cycleHub == DepositTarget.mid) {
-                switch (depositState) {
-                    case 1:
-                        if (cycleHub == DepositTarget.high) arm.setHigh();
-                        else arm.setMid();
-                        depositState++;
-                        break;
-                    case 2:
-                        if (!isAuto || arm.armAtDeposit()) {
-                            depositState++;
-                        }
-                        break;
-                    case 3:
-                        if (depositApproval) {
-                            depositTime = curTime;
-                            arm.release();
-                            markCycle();
-                            depositState++;
-                        }
-                        break;
-                    case 4:
-                        if (curTime - depositTime > (isAuto ? autoReleaseThreshold : releaseThreshold)) {
-                            arm.setHome();
-                            arm.open();
-                            depositState++;
-                        }
-                        break;
-                    case 5:
-                        depositingFreight = false;
-                        depositState = 1;
-                        break;
-
-                }
-                turret.setHome();
-            }
-        } else {
-            arm.setHome();
-            turret.setHome();
-        }
-
-        if (cycleHub == DepositTarget.capping) {
-//            arm.servoCapPos();
-//            if (depositState == 1) {
-//                arm.setCapping(Constants.ARM_CAP_DOWN_POS + (int) Math.round(capDownOffset));
-//            } else {
-//                if (capUpOffset == 0) arm.setCapping(Constants.ARM_CAP_UP_POS, 0.003, 0.04, 0.1);
-//                else arm.setCapping(Constants.ARM_CAP_UP_POS + (int) Math.round(capUpOffset));
-//            }
-        }
-
-        arm.update();
-        if (turretEnabled) turret.update();
-
-
-        profile(4);
-
-        // Intake Anti-Stall
-        if (isAuto && intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
-            if (!intakeStalling) {
-                stallStartTime = -1;
-                intake.on();
-                //antiStallStep = "Intake On";
-                //automationStep(antiStallStep);
-            } else if (stallStartTime == -1) {
-                stallStartTime = curTime;
-                antiStallStep = "Jam Detected";
-                automationStep(antiStallStep);
-            } else if (curTime - stallStartTime > stallThreshold) {
-                if (curTime % 400 > 200) intake.reverse();
-                else intake.on();
-                // antiStallStep = "Reverse Intake";
-                automationStep(antiStallStep);
-            }
-        }
-
-        if (!isAuto && intakeTransfer && !intakeFull && !intake.slidesIsHome()) {
-            if (reverseIntake) intake.reverse();
-            else intake.on();
-        }
-
-            profile(5);
-
-        // Update Intake Slides
-//        intake.update();
-
-        profile(8);
+//        profile(8);
 
         // Update Position
         drivetrain.updatePose();
 
-        profile(9);
+//        profile(9);
 
         // Calculate Motion Info
         double timeDiff = curTime / 1000 - prevTime;
@@ -470,11 +298,11 @@ public class Robot {
         // Log Data
         if (loopCounter % loggerUpdatePeriod == 0) {
             logger.logData(curTime - startTime, x, y, theta, vx, vy, w, ax, ay, a,
-                    turretGlobalTheta, 0, cycleHub, intake.slidesIsHome(), intakeTransfer, depositingFreight,
-                    cycles.size(), cycleAvg, arm.getArmPosition(), arm.getArmPosition());
+                    deposit.getSlidesPos(), cycleHub, intake.getSlidesPos(), intakeState, depositState,
+                    cycles.size(), cycleAvg);
         }
 
-        profile(10);
+//        profile(10);
 
         // Dashboard Telemetry
         addPacket("1 Voltage", startVoltage + " -> " + voltage);
@@ -485,12 +313,14 @@ public class Robot {
         addPacket("7 Automation Step", automationStep + "; " + antiStallStep);
         addPacket("7 Automation", intakeTransfer + "; " + depositingFreight);
         addPacket("8 Intake Full", intakeFull);
+        addPacket("81 Intake Sensor Distance", intake.getDistance());
         addPacket("9 Intake Stalling", intakeStalling);
-        addPacket("Carousel Velocity", carousel.getVelocity());
+//        addPacket("Carousel Velocity", carousel.getVelocity());
         addPacket("91 Run Time", (curTime - startTime) / 1000);
         addPacket("92 Update Frequency (Hz)", round(1 / timeDiff));
         addPacket("pod zeroes", drivetrain.zero1 + " " + drivetrain.zero2 + " " + drivetrain.zero3);
-        addPacket("arm", arm.getArmPosition());
+        addPacket("intake slides", intake.getSlidesPos());
+        addPacket("deposit slides", deposit.getSlidesPos());
 
         if (!isAuto) {
             addPacket("Cycle Time", (curTime - lastCycleTime) / 1000);
@@ -503,24 +333,176 @@ public class Robot {
         drawRobot(this);
         sendPacket();
 
-        profile(11);
+//        profile(11);
 
-        // Clear bulk cache
+        // Clear bulk cache/ print current
+//        List<Double> hubCurrents = new ArrayList<>();
         for (LynxModule hub : allHubs) {
+//            hubCurrents.add(hub.getCurrent(CurrentUnit.AMPS));
             hub.clearBulkCache();
         }
-        profile(12);
+//        Log.w("hub current draw", "1: " + hubCurrents.get(1) + "; 2: " + hubCurrents.get(hubCurrents.size() - 1));
+//        addPacket("hub current draw", "1: " + hubCurrents.get(1) + "; 2: " + hubCurrents.get(hubCurrents.size() - 1));
+
+//        profile(12);
 
         firstLoop = false;
+        if (intakeApproval && !isAuto) {
+            intakeState = 2;
+            depositState = 1;
+        }
+
+        boolean waitForIntakeFlip = false;
+        rumble = false;
+        switch (intakeState) {
+            case 1: //intake home
+                intake.flipDown();
+                intake.off();
+                if (isAuto && intakeApproval && y >= startIntakingAutoY) intakeState++;
+                break;
+            case 2: //intake freight
+                if (isAuto) intake.extend();
+                else intake.setSlidesPosition((int) Math.round(intakeExtendDist));
+                intake.flipDown();
+                if (intakeFull || (!isAuto && !intakeApproval)) {
+                    intakeState++;
+                    intakeRetractStart = System.currentTimeMillis();
+                    if (midGoal) cycleHub = DepositTarget.mid;
+                    else cycleHub = DepositTarget.high;
+                } else if (intakeFull && !isAuto && intakeApproval) {
+                    rumble = true;
+                }
+
+                //anti-stall
+                if (isAuto) {
+                    if (!intakeStalling) {
+                        stallStartTime = -1;
+                        intake.on();
+                        antiStallStep = "Intake On";
+                        automationStep(antiStallStep);
+                    } else if (stallStartTime == -1) {
+                        stallStartTime = curTime;
+                        antiStallStep = "Jam Detected";
+                        automationStep(antiStallStep);
+                    } else if (curTime - stallStartTime > stallThreshold) {
+                        intake.reverse();
+                        antiStallStep = "Reverse Intake";
+                        automationStep(antiStallStep);
+                    }
+                } else {
+                    intake.on();
+                }
+                break;
+            case 3: //wait for flip servo and intake slides
+                intake.home();
+                intake.setPower(.5);
+                intake.flipUp();
+                if (intake.slidesIsHome() && System.currentTimeMillis() - intakeRetractStart > intakeFlipThreshold)
+                    intakeState++;
+                break;
+            case 4: //wait for deposit to retract
+                if (depositState == 1) {
+                    intakeState++;
+                    transferStart = System.currentTimeMillis();
+                }
+                break;
+            case 5: //transfer
+                intake.reverse();
+                if ((!isAuto && depositApproval) || (System.currentTimeMillis() - transferStart > (cycleHub == DepositTarget.mid ? ballTransferThreshold : cubeTransferThreshold))) {
+                    intakeState = 1;
+                    depositState = 2;
+                    sharedState = 2;
+                }
+                break;
+        }
+        intake.updateSlides(ay);
+
+        //deposit states
+//        deposit.turretHome();
+        if (capping) {
+            switch (capState) {
+                case 1:
+                    deposit.retractSlides();
+                    deposit.setArmControls(Constants.ARM_CAP_DOWN_POS - capOffset);
+                    deposit.setServoPos(Constants.DEPOSIT_CAP_POS);
+                    break;
+                case 2:
+                    deposit.extendSlides(cycleHub);
+                    deposit.setArmControls(Constants.ARM_CAP_UP_POS - capOffset);
+                    deposit.setServoPos(Constants.DEPOSIT_CAP_POS);
+                    break;
+            }
+        } else {
+            switch (depositState) {
+                case 1: //deposit home
+                    deposit.retractSlides();
+                    deposit.armHome();
+                    deposit.open();
+                    break;
+                case 2: //once transfer done, hold freight
+                    deposit.hold();
+                    if ((isAuto && y <= extendDepositAutoY) || depositApproval) depositState++;
+                    break;
+                case 3: //extend deposit
+                    deposit.extendSlides(cycleHub);
+                    deposit.armOut();
+                    deposit.hold();
+                    startExtendTime = curTime;
+                    if (isAuto || !depositApproval) depositState++;
+                    break;
+                case 4: //wait for driver approval for release
+                    if ((!isAuto || (deposit.slidesAtPos() && curTime - startExtendTime > armFlipThreshold)) && (depositApproval || releaseApproval)) {
+                        depositState++;
+                        depositStart = System.currentTimeMillis();
+                    }
+                    break;
+                case 5: //release & wait for freight to drop
+                    deposit.release();
+                    if (System.currentTimeMillis() - depositStart > releaseThreshold) {
+                        depositState++;
+                    }
+                    break;
+                case 6:
+                    markCycle();
+                    depositStartRetract = curTime;
+                    depositState++;
+                    break;
+                case 7:
+                    deposit.retractSlides();
+                    deposit.armHome();
+                    if (curTime - depositStartRetract > armReturnThreshold) {
+                        depositState = 1;
+                    }
+                    break;
+            }
+        }
+        deposit.updateSlides();
+        addPacket("deposit state", depositState);
+        addPacket("intake state", intakeState);
+//        addPacket("element", element == "ball" ? 0 : 1);
+
     }
 
-    public void setCycleHub(DepositTarget cycleHub) {
-        this.cycleHub = cycleHub;
-        depositState = 1;
+//    public void setCycleHub(DepositTarget cycleHub) {
+//        this.cycleHub = cycleHub;
+//        depositState = 1;
+//
+//        if (cycleHub == DepositTarget.high || cycleHub == DepositTarget.neutral) {
+//            turret.setHome();
+//            arm.setHome();
+//        }
+//    }
 
-        if (cycleHub == DepositTarget.high || cycleHub == DepositTarget.neutral) {
-            turret.setHome();
-            arm.setHome();
+
+    public void advanceCapState() {
+        capping = true;
+        capOffset = 0;
+        if (capState < 2)
+            capState++;
+        else {
+            capState = 0;
+            depositState = 1;
+            capping = false;
         }
     }
 

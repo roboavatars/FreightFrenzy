@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Carousel {
     private DcMotorEx carouselMotor;
+    private CRServoImplEx crServoImplEx1;
+    private CRServoImplEx crServoImplEx2;
     private double lastPower = 0;
     private double lastPosition = 0;
     public boolean home;
@@ -16,8 +19,19 @@ public class Carousel {
     public Carousel(LinearOpMode op, boolean isRed) {
         this.isRed = isRed;
 
-        carouselMotor = op.hardwareMap.get(DcMotorEx.class, "carouselMotor");
-        carouselMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        crServoImplEx1 = op.hardwareMap.get(CRServoImplEx.class, "carousel1");
+        if (isRed) {
+            crServoImplEx1.setDirection(DcMotorSimple.Direction.FORWARD);
+        } else {
+            crServoImplEx1.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
+
+        crServoImplEx2 = op.hardwareMap.get(CRServoImplEx.class, "carousel2");
+        if (isRed) {
+            crServoImplEx2.setDirection(DcMotorSimple.Direction.FORWARD);
+        } else {
+            crServoImplEx2.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
 
         op.telemetry.addData("Status", "Carousel Initialized");
     }
@@ -32,16 +46,20 @@ public class Carousel {
     public double getVelocity() {
         return carouselMotor.getVelocity();
     }
+
+    public void turnon() {
+        crServoImplEx1.setPower(1);
+        crServoImplEx2.setPower(1);
+    }
+
+    public void turnoff() {
+        crServoImplEx1.setPower(0);
+        crServoImplEx2.setPower(0);
+    }
+
 //
 //    public void on() {
 //        on(Constants.CAROUSEL_VELOCITY);
 //    }
 
-    public void on(double velocity) {
-        setVelocity(velocity);
-    }
-
-    public void stop() {
-        setVelocity(0);
-    }
 }

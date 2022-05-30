@@ -21,7 +21,8 @@ public class Drivetrain {
     private DcMotorEx motorFrontLeft;
     private DcMotorEx motorBackRight;
     private DcMotorEx motorBackLeft;
-    private Servo odoRetractServo;
+    private Servo vertOdoRetractServo;
+    private Servo latOdoRetractServo;
 
     // private IMU imu;
 
@@ -53,21 +54,21 @@ public class Drivetrain {
     private final double motorUpdateTolerance = 0.05;
 
     // Odometry constants
-    public static double ticksToInch1 = 0.0005174365331;
-    public static double ticksToInch2 = 0.0005129081894;
-    public static double ticksToInch3 = 0.0005260994656;
-    public static double ODOMETRY_TRACK_WIDTH = 9.4274010132881;
-    public static double ODOMETRY_HORIZONTAL_OFFSET = 0.15;
+    public static double ticksToInch1 = 0.00051422264;
+    public static double ticksToInch2 = 0.00052548981396;
+    public static double ticksToInch3 = 0.00051870587;
+    public static double ODOMETRY_TRACK_WIDTH = 9.32090892786918918;
+    public static double ODOMETRY_HORIZONTAL_OFFSET = 8;
 
     private final double ODOMETRY_HEADING_THRESHOLD = PI / 8;
 
     // PD controller constants
     public static double xKp = 0.41;
-    public static double yKp = 0.3;
-    public static double thetaKp = 2.5;
-    public static double xKd = 0.035;
-    public static double yKd = 0.032;
-    public static double thetaKd = 0.12;
+    public static double yKp = 0.2;
+    public static double thetaKp = 2;
+    public static double xKd = 0.04;
+    public static double yKd = 0.03;
+    public static double thetaKd = 0.155;
 
     // Odometry delta 0 counters
     public int zero1, zero2, zero3;
@@ -115,8 +116,15 @@ public class Drivetrain {
             motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
 
-        odoRetractServo = hardwareMap.get(Servo.class, "odoRetractServo");
-        odoRetractServo.setPosition(Constants.ODO_NORMAL_POS);
+        vertOdoRetractServo = hardwareMap.get(Servo.class, "vertOdo");
+        latOdoRetractServo = hardwareMap.get(Servo.class, "latOdo");
+        if(isAuto) {
+            vertOdoRetractServo.setPosition(Constants.VERT_ODO_NORMAL_POS);
+            latOdoRetractServo.setPosition(Constants.LAT_ODO_NORMAL_POS);
+        } else {
+            vertOdoRetractServo.setPosition(Constants.VERT_ODO_RETRACT_POS);
+            latOdoRetractServo.setPosition(Constants.LAT_ODO_RETRACT_POS);
+        }
 
         x = initialX;
         y = initialY;
@@ -127,9 +135,10 @@ public class Drivetrain {
         op.telemetry.addData("Status", "Drivetrain Initialized");
     }
 
-    // retract horizontal odometry pod
+    // retract odometry
     public void retractOdo() {
-        odoRetractServo.setPosition(Constants.ODO_RETRACT_POS);
+        vertOdoRetractServo.setPosition(Constants.VERT_ODO_RETRACT_POS);
+        latOdoRetractServo.setPosition(Constants.LAT_ODO_RETRACT_POS);
     }
 
     // reset odometry
@@ -232,8 +241,8 @@ public class Drivetrain {
     public void updatePose() {
         try {
             pod1 = motorBackRight.getCurrentPosition() * ticksToInch1;
-            pod2 = motorFrontLeft.getCurrentPosition() * -ticksToInch2;
-            pod3 = motorFrontRight.getCurrentPosition() * ticksToInch3;
+            pod2 = motorBackLeft.getCurrentPosition() * -ticksToInch2;
+            pod3 = motorFrontRight.getCurrentPosition() * -ticksToInch3;
 
             deltaPod1 = pod1 - lastPod1;
             deltaPod2 = pod2 - lastPod2;

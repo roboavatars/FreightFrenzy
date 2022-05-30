@@ -1,30 +1,31 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import android.graphics.Color;
 
+import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+@Config
 @SuppressWarnings("FieldCanBeLocal")
 public class Intake {
     private DcMotorEx intakeMotor;
     private DcMotorEx slidesMotor;
     private Servo flipServo;
-    private DistanceSensor intakeSensor;
+    private Rev2mDistanceSensor intakeSensor;
 
     private double lastIntakePow = 0;
+    public static int slidesErrorThreshold = 3;
 
-    private boolean slidesHome = true;
-    public double intakeOffset = 0;
-    private double lastSlidesPos = 0;
-    private double slidesTargetPos = 0;
+    public int initialSlidesPos;
 
     public double INTAKE_SLIDES_SERVO_SPEED = 0.1;
     public double HOME_THRESHOLD = 20;
@@ -33,12 +34,17 @@ public class Intake {
     public int slidesError = 0;
     public int slidesTarget = 0;
 
-    public double slidesKp = 0.2;
-    public double slidesKd = 0;
+    public static double slidesKp = 0.05;
+    public static double slidesKd = 0.0;
+    public static double accelFF =  0;
 
     private LinearOpMode op;
 
     public Intake(LinearOpMode op, boolean isAuto) {
+        this(op, isAuto, 0);
+    }
+
+    public Intake(LinearOpMode op, boolean isAuto, int initialSlidesPos) {
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -48,6 +54,10 @@ public class Intake {
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slidesMotor.setTargetPosition(0);
         slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        this.initialSlidesPos = initialSlidesPos;
+
+        intakeSensor = op.hardwareMap.get(Rev2mDistanceSensor.class, "intakeSensor");
     }
 
     // Intake Motor
@@ -71,7 +81,7 @@ public class Intake {
     }
 
     public boolean checkIfStalling() {
-        return intakeMotor.getCurrent(CurrentUnit.AMPS) > Constants.STALL_THRESHOLD;
+        return getCurrent() > Constants.STALL_THRESHOLD;
     }
 
     public double getCurrent() {
@@ -93,16 +103,17 @@ public class Intake {
         slidesTarget = position;
     }
 
-    public void updateSlides(){
+    public void updateSlides(double ay){
         int currentTicks = getSlidesPos();
         slidesErrorChange = slidesTarget - currentTicks - slidesError;
         slidesError = slidesTarget - currentTicks;
 
-        slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange);
+        if (Math.abs(slidesError) > slidesErrorThreshold) slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + accelFF * ay);
+        else slidesMotor.setPower(0);
     }
 
     public int getSlidesPos() {
-        return slidesMotor.getCurrentPosition();
+        return slidesMotor.getCurrentPosition() + initialSlidesPos;
     }
 
     public boolean slidesIsHome() {
@@ -120,12 +131,21 @@ public class Intake {
 
     // Distance Sensor
     public double getDistance() {
-        addPacket("0 DISTANCE SENSOR", "> 1000!!!");
-        op.telemetry.addData("0 DISTANCE SENSOR", "> 1000!!!");
         return intakeSensor.getDistance(DistanceUnit.MM);
     }
 
-    public boolean intakeFull() {
+    public boolean isFull() {
         return getDistance() < Constants.INTAKE_DISTANCE_THRESHOLD;
     }
+
+//    public String getElement() {
+//        String element;
+//        float [] hsv = {0F, 0F, 0F};
+//        Color.RGBToHSV(intakeSensor.red(), intakeSensor.green(),  intakeSensor.blue(), hsv);
+//        if (hsv[0] < Constants.COLOR_SENSOR_THRESHOLD)
+//            element = "cube";
+//        else
+//            element =  "ball";
+//        return element;
+//    }
 }

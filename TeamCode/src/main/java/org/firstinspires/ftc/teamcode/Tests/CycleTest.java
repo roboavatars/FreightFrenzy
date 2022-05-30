@@ -34,7 +34,7 @@ public class CycleTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Deposit deposit = new Deposit(this,false, 0, 0);
+        Deposit deposit = new Deposit(this,false, 0);
         Intake intake = new Intake(this,false);
         Drivetrain dt = new Drivetrain(this, 0,0,0);
 
@@ -55,7 +55,7 @@ public class CycleTest extends LinearOpMode {
 
             dt.setControls(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
 
-            intake.updateSlides();
+            intake.updateSlides(0);
             //intake states
             if (gamepad1.right_trigger > .1) {
                 intakeCase = 2;
@@ -103,25 +103,25 @@ public class CycleTest extends LinearOpMode {
                         if (System.currentTimeMillis() - sharedDepositStart > turretDepositThreshold) sharedCase ++;
                         break;
                     case 3:
-                        deposit.turretRight();
+//                        deposit.turretRight();
                         sharedRetractStart = System.currentTimeMillis();
                         if (gamepad1.a) {
                             depositCase++;
                         }
                         break;
                     case 4:
-                        deposit.turretHome();
+//                        deposit.turretHome();
                         if (System.currentTimeMillis() - sharedRetractStart > turretHomeThreshold) {
                             depositCase = 1;
                         }
                 }
             } else {
-                deposit.turretHome();
+//                deposit.turretHome();
                 switch (depositCase) {
                     case 1:
                         deposit.retractSlides();
                         deposit.armHome();
-                        deposit.open();
+                        deposit.release();
                         break;
                     case 2:
                         deposit.extendSlides();

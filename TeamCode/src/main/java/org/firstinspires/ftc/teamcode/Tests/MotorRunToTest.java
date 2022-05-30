@@ -35,7 +35,7 @@ public class MotorRunToTest extends LinearOpMode {
                 motor.setTargetPosition(ticks);
             } else {
                 motor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-//                motor.setPower(power);
+                motor.setPower(power);
             }
             motor.setPositionPIDFCoefficients(P);
 

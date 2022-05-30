@@ -27,14 +27,13 @@ public class Logger extends Thread {
     private double x, y, theta;
     private double vx, vy, w;
     private double ax, ay, alpha;
-    private double turretTheta, depositSlidesDist;
-    private Robot.DepositTarget depositTarget;
-    private boolean intakeSlidesExtend;
-    private boolean intakeTransfer, depositingFreight;
+    private double turretTheta, depositSlidesPos;
+    private Robot.DepositTarget depositHub;
+    private int intakeSlidesPos;
+    private int intakeState, depositState;
     private int numCycles;
     private double avgCycleTime;
     private int armPos;
-    private int slidesPos;
 
     /**
      * Creates a new file and writes initial rows
@@ -45,7 +44,7 @@ public class Logger extends Thread {
             fileWriter = new FileWriter(robotDataLog);
             fileWriter.write("# " + (isAuto ? "Auto" : "Teleop") + "\n# " + (isRed ? "Red" : "Blue") + "\n");
             fileWriter.write("Timestamp,SinceStart,X,Y,Theta,VelocityX,VelocityY,VelocityTheta,AccelX,AccelY,AccelTheta," +
-                    "TurretTheta,DepositSlidesDist,DepositTarget,IntakeSlidesExtend,IntakeTransfer,Depositing,Cycles,AvgCycle,ArmPos,SlidesPos\n");
+                    "depositSlidesPos,depositSlidesTarget,intakeSlidesPos,intakeState,depositingState,numCycles,avgCycleTime\n");
             logCounter = 0;
             writeCounter = 0;
             start();
@@ -91,8 +90,8 @@ public class Logger extends Thread {
             if (writeCounter < logCounter) {
                 try {
                     fileWriter.write(df.format(new Date()) + "," + timeSinceSt + "," + x + "," + y + "," + theta + "," + vx + "," + vy + "," + w + "," + ax + "," + ay + "," + alpha + ","
-                            + turretTheta + "," + depositSlidesDist + "," + depositTarget + "," + intakeSlidesExtend + "," + intakeTransfer + "," + depositingFreight + "," +
-                            numCycles + "," + avgCycleTime + "," + armPos + "," + slidesPos + "\n");
+                            + depositSlidesPos + "," + depositHub + "," + intakeSlidesPos + "," + intakeState + "," + depositState + "," +
+                            numCycles + "," + avgCycleTime + "\n");
                     writeCounter++;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -106,8 +105,7 @@ public class Logger extends Thread {
      */
     @SuppressLint("SimpleDateFormat")
     public void logData(double timeSinceSt, double x, double y, double theta, double vx, double vy, double w, double ax, double ay, double alpha,
-                        double turretTheta, double depositSlidesDist, Robot.DepositTarget depositTarget, boolean intakeSlidesExtend, boolean intakeTransfer, boolean depositingFreight,
-                        int numCycles, double avgCycleTime, int armPos, int slidesPos) {
+                        int depositSlidesPos, Robot.DepositTarget depositHub, int intakeSlidesPos, int intakeState, int depositState, int numCycles, double avgCycleTime) {
         df = new SimpleDateFormat("HH:mm:ss.SSS");
         this.timeSinceSt = timeSinceSt;
         this.x = x;
@@ -119,16 +117,13 @@ public class Logger extends Thread {
         this.ax = ax;
         this.ay = ay;
         this.alpha = alpha;
-        this.turretTheta = turretTheta;
-        this.depositSlidesDist = depositSlidesDist;
-        this.depositTarget = depositTarget;
-        this.intakeSlidesExtend = intakeSlidesExtend;
-        this.intakeTransfer = intakeTransfer;
-        this.depositingFreight = depositingFreight;
+        this.depositSlidesPos = depositSlidesPos;
+        this.depositHub = depositHub;
+        this.intakeSlidesPos = intakeSlidesPos;
+        this.intakeState = intakeState;
+        this.depositState = depositState;
         this.numCycles = numCycles;
         this.avgCycleTime = avgCycleTime;
-        this.armPos = armPos;
-        this.slidesPos = slidesPos;
 
         logCounter++;
     }
@@ -149,14 +144,17 @@ public class Logger extends Thread {
      * Reads position from last written file
      */
     public static double[] readPos() {
-        double[] robotPos = new double[]{1, 0, 0, 0, Math.PI / 2, 0, 0};
+        double[] robotPos = new double[]{1, 0, 0, 0, Math.PI / 2, 0, 0, 0};
 
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(getLogName(false)));
             List<String> lines = bufferedReader.lines().collect(Collectors.toList());
             int isRed = lines.get(1).contains("Red") ? 1 : 0;
             String[] data = lines.get(lines.size() - 3).split(",");
-            robotPos = new double[]{isRed, Double.parseDouble(data[2]), Double.parseDouble(data[3]), Double.parseDouble(data[4]), Double.parseDouble(data[5]), Double.parseDouble(data[11]), Double.parseDouble(data[19]), Double.parseDouble(data[20])};
+                                    //side  x                           y                            vx                          vy                            w
+            robotPos = new double[]{isRed, Double.parseDouble(data[2]), Double.parseDouble(data[3]), Double.parseDouble(data[4]), Double.parseDouble(data[5]), Double.parseDouble(data[6]),
+                    //depositSlidesPos            intakeSlidesPos
+                    Double.parseDouble(data[11]), Double.parseDouble(data[13])};
 
             bufferedReader.close();
             Robot.log("Starting At " + Arrays.toString(robotPos));
