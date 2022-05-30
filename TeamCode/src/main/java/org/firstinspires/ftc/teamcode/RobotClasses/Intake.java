@@ -1,17 +1,14 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
-import android.graphics.Color;
-
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Config
 @SuppressWarnings("FieldCanBeLocal")
@@ -19,7 +16,7 @@ public class Intake {
     private DcMotorEx intakeMotor;
     private DcMotorEx slidesMotor;
     private Servo flipServo;
-    private RevColorSensorV3 intakeSensor;
+    private OpticalDistanceSensor intakeSensor;
 
     private double lastIntakePow = 0;
     public static int slidesErrorThreshold = 3;
@@ -38,6 +35,7 @@ public class Intake {
     public static double accelFF =  0;
 
     private LinearOpMode op;
+    private boolean isAuto;
 
     public Intake(LinearOpMode op, boolean isAuto) {
         this(op, isAuto, 0);
@@ -55,8 +53,9 @@ public class Intake {
         slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         this.initialSlidesPos = initialSlidesPos;
+        this.isAuto = isAuto;
 
-        intakeSensor = op.hardwareMap.get(RevColorSensorV3.class, "intakeSensor");
+        intakeSensor = op.hardwareMap.get(OpticalDistanceSensor.class, "intakeSensor");
     }
 
     // Intake Motor
@@ -130,21 +129,21 @@ public class Intake {
 
     // Distance Sensor
     public double getDistance() {
-        return intakeSensor.getDistance(DistanceUnit.MM);
+        return intakeSensor.getLightDetected();
     }
 
     public boolean isFull() {
-        return getDistance() < Constants.INTAKE_DISTANCE_THRESHOLD;
+        return getDistance() > (isAuto? Constants.INTAKE_DISTANCE_THRESHOLD_AUTO : Constants.INTAKE_DISTANCE_THRESHOLD_TELE);
     }
 
-    public String getElement() {
-        String element;
-        float [] hsv = {0F, 0F, 0F};
-        Color.RGBToHSV(intakeSensor.red(), intakeSensor.green(),  intakeSensor.blue(), hsv);
-        if (hsv[0] < Constants.COLOR_SENSOR_THRESHOLD)
-            element = "cube";
-        else
-            element =  "ball";
-        return element;
-    }
+//    public String getElement() {
+//        String element;
+//        float [] hsv = {0F, 0F, 0F};
+//        Color.RGBToHSV(intakeSensor.red(), intakeSensor.green(),  intakeSensor.blue(), hsv);
+//        if (hsv[0] < Constants.COLOR_SENSOR_THRESHOLD)
+//            element = "cube";
+//        else
+//            element =  "ball";
+//        return element;
+//    }
 }

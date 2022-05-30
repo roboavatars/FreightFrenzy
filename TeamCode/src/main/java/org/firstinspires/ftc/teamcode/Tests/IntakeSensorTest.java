@@ -25,8 +25,8 @@ public class IntakeSensorTest extends LinearOpMode {
             float [] hsv = {0F, 0F, 0F};
             Color.RGBToHSV(intakeSensor.red(), intakeSensor.green(),  intakeSensor.blue(), hsv);
             addPacket("Measured Distance", intakeSensor.getDistance(DistanceUnit.MM));
-            addPacket("Threshold Distance", Constants.INTAKE_DISTANCE_THRESHOLD);
-            addPacket("intakeFull", intakeSensor.getDistance(DistanceUnit.MM) < Constants.INTAKE_DISTANCE_THRESHOLD);
+            addPacket("Threshold Distance", Constants.INTAKE_DISTANCE_THRESHOLD_AUTO);
+            addPacket("intakeFull", intakeSensor.getDistance(DistanceUnit.MM) < Constants.INTAKE_DISTANCE_THRESHOLD_AUTO);
             addPacket("red", intakeSensor.red());
             addPacket("green", intakeSensor.green());
             addPacket("blue", intakeSensor.blue());
@@ -38,8 +38,8 @@ public class IntakeSensorTest extends LinearOpMode {
             sendPacket();
 
             telemetry.addData("Measured Distance", intakeSensor.getDistance(DistanceUnit.MM));
-            telemetry.addData("Threshold Distance", Constants.INTAKE_DISTANCE_THRESHOLD);
-            telemetry.addData("intakeFull", intakeSensor.getDistance(DistanceUnit.MM) < Constants.INTAKE_DISTANCE_THRESHOLD);
+            telemetry.addData("Threshold Distance", Constants.INTAKE_DISTANCE_THRESHOLD_AUTO);
+            telemetry.addData("intakeFull", intakeSensor.getDistance(DistanceUnit.MM) < Constants.INTAKE_DISTANCE_THRESHOLD_AUTO);
             telemetry.addData("red", intakeSensor.red());
             telemetry.addData("green", intakeSensor.green());
             telemetry.addData("blue", intakeSensor.blue());

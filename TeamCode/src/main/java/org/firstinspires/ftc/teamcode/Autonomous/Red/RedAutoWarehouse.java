@@ -108,7 +108,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 }
             } else if (!goToWarehouse) {
                 robot.depositApproval = false;
-                if (robot.depositState != 1) robot.intakeApproval = false;
+                if (robot.depositState != 1 && robot.depositState != 7) robot.intakeApproval = false;
 
                 switch (goToWarehouseSteps) {
                     case 1:
@@ -130,12 +130,12 @@ public class RedAutoWarehouse extends LinearOpMode {
                         if (timeLeft > parkThreshold) {
                             robot.drivetrain.constantStrafeConstant = 0;
                             if (cycleCounter < 3) {
-                                double y = Math.min(Robot.startIntakingAutoY + 0.75 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
+                                double y = Math.min(Robot.startIntakingAutoY + 0.75 * cycleCounter + 3 * (time.seconds() - passLineTime), 120);
                                 double theta = PI/2 - (PI/15)*(Math.cos(4*(time.seconds() - passLineTime))-1);
                                 robot.setTargetPoint(new Target(138, y, theta));
                             } else {
                                 double x = Math.max(138 - 1 * (time.seconds() - passLineTime), 130);
-                                double y = Math.min(Robot.startIntakingAutoY + 0.75 * (cycleCounter - 3) + 1 * (time.seconds() - passLineTime), 125);
+                                double y = Math.min(Robot.startIntakingAutoY + 0.75 * (cycleCounter - 3) + 1 * (time.seconds() - passLineTime), 120);
                                 double theta = Math.min(PI / 2 + PI / 11 * (time.seconds() - passLineTime), 2 * PI / 3);
                                 robot.setTargetPoint(new Target(x, y, theta));
                             }

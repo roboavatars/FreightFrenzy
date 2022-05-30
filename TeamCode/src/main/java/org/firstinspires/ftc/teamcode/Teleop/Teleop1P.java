@@ -37,7 +37,7 @@ public class Teleop1P extends LinearOpMode {
 
     // Control Gains
     private double xyGain = 1;
-    private double wGain = 1;
+    private double wGain = 0.8;
 
     // Rumbles
     private boolean teleRumble1 = false;
@@ -49,6 +49,8 @@ public class Teleop1P extends LinearOpMode {
     private double capUpOffset = 0;
     private double capDownOffset = 0;
     private boolean cappingDown = true;
+
+    private boolean intakeApprovalToggle = false;
 
     /*
     Controller Button Mappings: *updated 3/13/22 12:30 PM*
@@ -93,9 +95,19 @@ public class Teleop1P extends LinearOpMode {
         cycleTimer.reset();
 
         while (opModeIsActive()) {
-            robot.intakeApproval = gamepad1.right_trigger > .1;
             robot.depositApproval = gamepad1.left_trigger > .1;
-            if (robot.rumble) gamepad1.rumble(500);
+
+            if (robot.intakeApproval && gamepad1.right_trigger <= .1) robot.intakeApproval = false;
+            else if (gamepad1.right_trigger > .1 && !intakeApprovalToggle) {
+                intakeApprovalToggle = true;
+                robot.intakeApproval = true;
+            } else if (gamepad1.right_trigger <= .1 && intakeApprovalToggle) {
+                intakeApprovalToggle = false;
+            }
+            robot.outtake = gamepad1.left_bumper;
+
+            if (gamepad1.dpad_up) robot.deposit.initialSlidesPos -= .4;
+            if (gamepad1.dpad_down) robot.deposit.initialSlidesPos += .4;
 
             robot.intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS;
             if (robot.depositState != 1) wGain = .5;

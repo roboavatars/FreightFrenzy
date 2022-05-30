@@ -6,13 +6,14 @@ import com.acmerobotics.dashboard.config.Config;
 public class Constants {
 
     // Drivetrain
-    public static double VERT_ODO_NORMAL_POS = 0.65;
+    public static double VERT_ODO_NORMAL_POS = 0.7;
     public static double VERT_ODO_RETRACT_POS = 0;
     public static double LAT_ODO_NORMAL_POS = 0.75;
     public static double LAT_ODO_RETRACT_POS = 0.48;
 
     // Intake
-    public static double INTAKE_DISTANCE_THRESHOLD = 10;
+    public static double INTAKE_DISTANCE_THRESHOLD_AUTO = 0.5;
+    public static double INTAKE_DISTANCE_THRESHOLD_TELE = 0.45;
     public static double STALL_THRESHOLD = 6;
     public static double COLOR_SENSOR_THRESHOLD = 110;
 

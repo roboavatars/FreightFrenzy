@@ -47,7 +47,7 @@ public class Robot {
 
     // Class Constants
     private final int loggerUpdatePeriod = 2;
-    private final int sensorUpdatePeriod = 10;
+    private final int sensorUpdatePeriod = 5;
     private final int stallUpdatePeriod = 5;
     private final int voltageUpdatePeriod = 1000;
     private final double xyTolerance = 1;
@@ -73,6 +73,7 @@ public class Robot {
     public boolean releaseApproval = false;
     public boolean transferVerify = false;
     public boolean intakeApproval = false;
+    public boolean outtake = false;
     public boolean midGoal = false;
     public boolean intakeTransfer = false;
     public boolean slidesInCommand = false;
@@ -99,15 +100,15 @@ public class Robot {
     private double depositStartRetract;
     private double intakeRetractStart;
     public int intakeState = 1;
-    public static double cubeTransferThreshold = 750;
-    public static double ballTransferThreshold = 1000;
+    public static double teleTransferThreshold = 750;
+    public static double autoTransferThreshold = 1000;
     public static double turretDepositThreshold = 1000;
     public static double turretHomeThreshold = 1000;
     public static double releaseThreshold = 500;
     public static double intakeFlipThreshold = 500;
     public static double armFlipThreshold = 1000;
     public static double armReturnThreshold = 1000;
-    public String element;
+//    public String element;
     public static double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
     public boolean rumble = false;
 
@@ -238,7 +239,7 @@ public class Robot {
         // Don't check states every loop
         if (loopCounter % sensorUpdatePeriod == 0 && intakeState != 1) {
             intakeFull = intake.isFull();
-            element = intake.getElement();
+//            element = intake.getElement();
         }
         addPacket("intake current", intake.getCurrent());
 //        profile(1);
@@ -312,7 +313,7 @@ public class Robot {
         addPacket("7 Automation Step", automationStep + "; " + antiStallStep);
         addPacket("7 Automation", intakeTransfer + "; " + depositingFreight);
         addPacket("8 Intake Full", intakeFull);
-        addPacket("81 Intake Sensor Distance", intake.getDistance());
+//        addPacket("81 Intake Sensor Distance", intake.getDistance());
         addPacket("9 Intake Stalling", intakeStalling);
 //        addPacket("Carousel Velocity", carousel.getVelocity());
         addPacket("91 Run Time", (curTime - startTime) / 1000);
@@ -346,7 +347,7 @@ public class Robot {
 //        profile(12);
 
         firstLoop = false;
-        if (intakeApproval && !isAuto) {
+        if ((intakeApproval || outtake) && !isAuto) {
             intakeState = 2;
             depositState = 1;
         }
@@ -366,10 +367,12 @@ public class Robot {
                 if (intakeFull || (!isAuto && !intakeApproval)) {
                     intakeState++;
                     intakeRetractStart = System.currentTimeMillis();
-                    if (element == "ball" || midGoal) cycleHub = DepositTarget.mid;
-                    else cycleHub = DepositTarget.high;
-                } else if (intakeFull && !isAuto && intakeApproval) {
-                    rumble = true;
+//                    if (element == "ball" || midGoal) cycleHub = DepositTarget.mid;
+//                    else cycleHub = DepositTarget.high;
+                    if (isAuto) cycleHub = DepositTarget.high;
+                }
+                if (intakeFull && !isAuto && intakeApproval) {
+                    intakeApproval = false;
                 }
 
                 //anti-stall
@@ -389,7 +392,8 @@ public class Robot {
                         automationStep(antiStallStep);
                     }
                 } else {
-                    intake.on();
+                    if(!outtake) intake.on();
+                    else intake.reverse();
                 }
                 break;
             case 3: //wait for flip servo and intake slides
@@ -407,7 +411,7 @@ public class Robot {
                 break;
             case 5: //transfer
                 intake.reverse();
-                if ((!isAuto && depositApproval) || (System.currentTimeMillis() - transferStart > (cycleHub == DepositTarget.mid ? ballTransferThreshold : cubeTransferThreshold))) {
+                if ((!isAuto && depositApproval) || (System.currentTimeMillis() - transferStart > (isAuto ? autoTransferThreshold : teleTransferThreshold))) {
                     intakeState = 1;
                     depositState = 2;
                     sharedState = 2;
@@ -478,7 +482,7 @@ public class Robot {
         deposit.updateSlides();
         addPacket("deposit state", depositState);
         addPacket("intake state", intakeState);
-        addPacket("element", element == "ball" ? 0 : 1);
+//        addPacket("element", element == "ball" ? 0 : 1);
 
     }
 

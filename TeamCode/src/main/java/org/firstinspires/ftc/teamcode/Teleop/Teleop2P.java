@@ -36,8 +36,8 @@ public class Teleop2P extends LinearOpMode {
     private boolean defenseModeToggle = false;
 
     // Control Gains
-    private double xyGain = 1;
-    private double wGain = 1;
+    private static double xyGain = 1;
+    private static double wGain = 0.8;
 
     // Rumbles
     private boolean teleRumble1 = false;
@@ -52,6 +52,7 @@ public class Teleop2P extends LinearOpMode {
 
     private boolean capToggle = false;
     private boolean midGoalToggle = false;
+    private boolean intakeApprovalToggle = false;
 
     /*
     Controller Button Mappings: *updated 3/13/22 12:30 PM*
@@ -95,16 +96,24 @@ public class Teleop2P extends LinearOpMode {
         cycleTimer.reset();
 
         while (opModeIsActive()) {
-            robot.intakeApproval = gamepad1.right_trigger > .1;
             robot.depositApproval = gamepad2.a;
             robot.releaseApproval = gamepad1.left_trigger > .1;
-            if (robot.rumble) gamepad1.rumble(500);
+            if (robot.intakeApproval && gamepad1.right_trigger <= .1) robot.intakeApproval = false;
+            else if (gamepad1.right_trigger > .1 && !intakeApprovalToggle) {
+                intakeApprovalToggle = true;
+                robot.intakeApproval = true;
+            } else if (gamepad1.right_trigger <= .1 && intakeApprovalToggle) {
+                intakeApprovalToggle = false;
+            }
+            robot.outtake = gamepad1.left_bumper;
 
-            if (!midGoalToggle && gamepad2.left_bumper) {
-                midGoalToggle = true;
-                robot.midGoal = !robot.midGoal;
-            } else if (midGoalToggle && !gamepad2.left_bumper) {
-                midGoalToggle = false;
+
+            if (gamepad2.dpad_right) {
+                robot.cycleHub = Robot.DepositTarget.mid;
+            } else if (gamepad2.dpad_left) {
+                robot.cycleHub = Robot.DepositTarget.low;
+            } else if (gamepad2.left_bumper) {
+                robot.cycleHub = Robot.DepositTarget.high;
             }
 
             if (gamepad2.right_bumper) robot.carousel.turnon();
