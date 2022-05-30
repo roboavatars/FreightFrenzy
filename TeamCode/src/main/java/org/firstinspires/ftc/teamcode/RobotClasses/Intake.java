@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -19,7 +20,7 @@ public class Intake {
     private DcMotorEx intakeMotor;
     private DcMotorEx slidesMotor;
     private Servo flipServo;
-    private RevColorSensorV3 intakeSensor;
+    private Rev2mDistanceSensor intakeSensor;
 
     private double lastIntakePow = 0;
     public static int slidesErrorThreshold = 3;
@@ -56,7 +57,7 @@ public class Intake {
 
         this.initialSlidesPos = initialSlidesPos;
 
-        intakeSensor = op.hardwareMap.get(RevColorSensorV3.class, "intakeSensor");
+        intakeSensor = op.hardwareMap.get(Rev2mDistanceSensor.class, "intakeSensor");
     }
 
     // Intake Motor
@@ -137,14 +138,14 @@ public class Intake {
         return getDistance() < Constants.INTAKE_DISTANCE_THRESHOLD;
     }
 
-    public String getElement() {
-        String element;
-        float [] hsv = {0F, 0F, 0F};
-        Color.RGBToHSV(intakeSensor.red(), intakeSensor.green(),  intakeSensor.blue(), hsv);
-        if (hsv[0] < Constants.COLOR_SENSOR_THRESHOLD)
-            element = "cube";
-        else
-            element =  "ball";
-        return element;
-    }
+//    public String getElement() {
+//        String element;
+//        float [] hsv = {0F, 0F, 0F};
+//        Color.RGBToHSV(intakeSensor.red(), intakeSensor.green(),  intakeSensor.blue(), hsv);
+//        if (hsv[0] < Constants.COLOR_SENSOR_THRESHOLD)
+//            element = "cube";
+//        else
+//            element =  "ball";
+//        return element;
+//    }
 }

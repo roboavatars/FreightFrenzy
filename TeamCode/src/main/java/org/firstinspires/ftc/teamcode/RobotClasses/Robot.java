@@ -74,6 +74,7 @@ public class Robot {
     public boolean transferVerify = false;
     public boolean intakeApproval = false;
     public boolean midGoal = false;
+    public boolean highGoal = false;
     public boolean intakeTransfer = false;
     public boolean slidesInCommand = false;
     public boolean depositingFreight = false;
@@ -107,7 +108,7 @@ public class Robot {
     public static double intakeFlipThreshold = 500;
     public static double armFlipThreshold = 1000;
     public static double armReturnThreshold = 1000;
-    public String element;
+//    public String element;
     public static double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
     public boolean rumble = false;
 
@@ -238,7 +239,7 @@ public class Robot {
         // Don't check states every loop
         if (loopCounter % sensorUpdatePeriod == 0 && intakeState != 1) {
             intakeFull = intake.isFull();
-            element = intake.getElement();
+//            element = intake.getElement();
         }
         addPacket("intake current", intake.getCurrent());
 //        profile(1);
@@ -366,7 +367,7 @@ public class Robot {
                 if (intakeFull || (!isAuto && !intakeApproval)) {
                     intakeState++;
                     intakeRetractStart = System.currentTimeMillis();
-                    if (element == "ball" || midGoal) cycleHub = DepositTarget.mid;
+                    if (midGoal) cycleHub = DepositTarget.mid;
                     else cycleHub = DepositTarget.high;
                 } else if (intakeFull && !isAuto && intakeApproval) {
                     rumble = true;
@@ -478,7 +479,7 @@ public class Robot {
         deposit.updateSlides();
         addPacket("deposit state", depositState);
         addPacket("intake state", intakeState);
-        addPacket("element", element == "ball" ? 0 : 1);
+//        addPacket("element", element == "ball" ? 0 : 1);
 
     }
 
