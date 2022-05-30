@@ -55,28 +55,24 @@ public class Teleop2P extends LinearOpMode {
     private boolean intakeApprovalToggle = false;
 
     /*
-    Controller Button Mappings: *updated 3/13/22 12:30 PM*
+    Controller Button Mappings: *updated 5/30/22 2:48 PM*
     gamepad 1:
-    y - carousel on
-    left bumper - cancel automation
-    b - defense mode
-    x - duck cycle
-    dpad up - high goal
-    dpad left - mid goal
-    dpad down - low goal
-    dpad right - neutral
+
+    right trigger - intake
+    left trigger - release
+    left stick - xy movement
+    right stick - turn
 
     gamepad 2:
-    left trigger - deposit
-    right trigger - intake
-    right bumper - enable deposit reset mode
-    left bumper - disable deposit reset mode
-    left stick x - turret offset
-    left stick y - slides offset
-    right stick y - arm offset
-    a = reset deposit offsets
-    x - reset odo/imu
-    y - retract odo
+
+    a - deposit
+    y - capping mode
+    left bumper - mid goal
+    right bumper - carousel
+    dpad up - decrease slide offset
+    dpad down - increase slide offset
+    right trigger - increase intake offset
+    left trigger - decrease intake offset
     */
 
     @Override
