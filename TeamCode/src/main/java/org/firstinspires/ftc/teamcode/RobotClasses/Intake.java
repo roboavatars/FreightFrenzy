@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -32,7 +34,7 @@ public class Intake {
 
     public static double slidesKp = 0.05;
     public static double slidesKd = 0.0;
-    public static double accelFF =  0;
+    public static double accelFF =  0.5;
 
     private LinearOpMode op;
     private boolean isAuto;
@@ -106,8 +108,12 @@ public class Intake {
         slidesErrorChange = slidesTarget - currentTicks - slidesError;
         slidesError = slidesTarget - currentTicks;
 
-        if (Math.abs(slidesError) > slidesErrorThreshold) slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + accelFF * ay);
+        if (Math.abs(slidesError) > slidesErrorThreshold &&
+                slidesMotor.getCurrent(CurrentUnit.AMPS) < Constants.INTAKE_SLIDES_STALL_THRESHOLD)
+            slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + accelFF * ay);
         else slidesMotor.setPower(0);
+        addPacket("intake slides current", slidesMotor.getCurrent(CurrentUnit.AMPS));
+
     }
 
     public int getSlidesPos() {

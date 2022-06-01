@@ -50,6 +50,7 @@ public class Robot {
     private final int sensorUpdatePeriod = 5;
     private final int stallUpdatePeriod = 5;
     private final int voltageUpdatePeriod = 1000;
+    private final int imuUpdatePeriod = 10;
     private final double xyTolerance = 1;
     private final double thetaTolerance = PI / 35;
     public final static double[] cameraRelativeToRobot = new double[]{1, 3};
@@ -57,6 +58,7 @@ public class Robot {
     // State Variables
     private final boolean isAuto;
     public final boolean isRed;
+    public boolean carouselAuto = false;
     private boolean firstLoop = true;
     private int loopCounter = 0;
     public String automationStep = "n/a";
@@ -64,8 +66,6 @@ public class Robot {
 
     public boolean intakeFull;
     public boolean intakeStalling;
-    public double turretGlobalTheta;
-    public boolean reverseIntake = false;
 
 
     // Automation Variables
@@ -74,6 +74,8 @@ public class Robot {
     public boolean transferVerify = false;
     public boolean intakeApproval = false;
     public boolean outtake = false;
+    public boolean intakeNoExtend = false;
+    public boolean intakeUp = false;
     public boolean midGoal = false;
     public boolean intakeTransfer = false;
     public boolean slidesInCommand = false;
@@ -100,6 +102,7 @@ public class Robot {
     private double depositStartRetract;
     private double intakeRetractStart;
     public int intakeState = 1;
+    public boolean intakeOff = false;
     public static double teleTransferThreshold = 750;
     public static double autoTransferThreshold = 1000;
     public static double turretDepositThreshold = 1000;
@@ -141,6 +144,8 @@ public class Robot {
     private double prevX, prevY, prevTheta, prevVx, prevVy, prevW, prevTime, ax, ay, a;
     public double startTime;
 
+    public double IMUay;
+
     // OpMode Stuff
     private final LinearOpMode op;
 
@@ -175,7 +180,7 @@ public class Robot {
 
         // init subsystems
         drivetrain = new Drivetrain(op, x, y, theta, isAuto);
-        carousel = new Carousel(op, isRed);
+        carousel = new Carousel(op, isAuto, isRed);
         logger = new Logger();
 
         deposit = new Deposit(op, isAuto, depositSlidesPos);
@@ -251,6 +256,10 @@ public class Robot {
             voltage = round(battery.getVoltage());
         }
 
+        if (loopCounter % imuUpdatePeriod == 0) {
+            IMUay = -drivetrain.getAccel().yAccel;
+        }
+
         loopCounter++;
 
 //        profile(3);
@@ -309,7 +318,6 @@ public class Robot {
         addPacket("2 X", round(x));
         addPacket("3 Y", round(y));
         addPacket("4 Theta", round(theta));
-        addPacket("5 Turret Theta", round(turretGlobalTheta));
         addPacket("7 Automation Step", automationStep + "; " + antiStallStep);
         addPacket("7 Automation", intakeTransfer + "; " + depositingFreight);
         addPacket("8 Intake Full", intakeFull);
@@ -347,7 +355,7 @@ public class Robot {
 //        profile(12);
 
         firstLoop = false;
-        if ((intakeApproval || outtake) && !isAuto) {
+        if ((intakeApproval || outtake || intakeNoExtend) && !isAuto) {
             intakeState = 2;
             depositState = 1;
         }
@@ -356,13 +364,15 @@ public class Robot {
         rumble = false;
         switch (intakeState) {
             case 1: //intake home
-                intake.flipDown();
+                if (!intakeUp) intake.flipDown();
+                else intake.flipUp();
                 intake.off();
-                if (isAuto && intakeApproval && y >= startIntakingAutoY) intakeState++;
+                if (isAuto && intakeApproval && (y >= startIntakingAutoY||carouselAuto)) intakeState++;
                 break;
             case 2: //intake freight
                 if (isAuto) intake.extend();
-                else intake.setSlidesPosition((int) Math.round(intakeExtendDist));
+                else if (!intakeNoExtend) intake.setSlidesPosition((int) Math.round(intakeExtendDist));
+                else intake.home();
                 intake.flipDown();
                 if (intakeFull || (!isAuto && !intakeApproval)) {
                     intakeState++;
@@ -395,6 +405,8 @@ public class Robot {
                     if(!outtake) intake.on();
                     else intake.reverse();
                 }
+
+                if (intakeOff) intakeState = 6;
                 break;
             case 3: //wait for flip servo and intake slides
                 intake.home();
@@ -417,8 +429,12 @@ public class Robot {
                     sharedState = 2;
                 }
                 break;
+            case 6:
+                intake.off();
+                intake.home();
+                break;
         }
-        intake.updateSlides(ay);
+        intake.updateSlides(IMUay);
 
         //deposit states
 //        deposit.turretHome();

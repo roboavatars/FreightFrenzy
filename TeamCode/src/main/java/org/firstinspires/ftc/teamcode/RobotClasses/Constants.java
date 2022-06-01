@@ -20,6 +20,7 @@ public class Constants {
     // Intake Slides
     public static int INTAKE_SLIDES_EXTEND_TICKS = 100;
     public static int INTAKE_SLIDES_HOME_TICKS = 10;
+    public static int INTAKE_SLIDES_STALL_THRESHOLD = 8;
 
 
     // Intake Servo
@@ -50,6 +51,9 @@ public class Constants {
     public static double CAROUSEL_VELOCITY_SLOW = 300;
     public static double CAROUSEL_VELOCITY_FAST = 1270;
     public static double CAROUSEL_SPEED_UP_THRESHOLD = 1100;
+
+    public static double CAROUSEL_SPEED = 1;
+    public static double CAROUSEL_AUTO_SPEED = 0.7;
 
     // Anti-Tip
     public static double TIP_THRESHOLD = 0.1;

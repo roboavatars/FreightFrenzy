@@ -15,8 +15,9 @@ public class Carousel {
     public boolean home;
 
     private boolean isRed;
+    private boolean isAuto;
 
-    public Carousel(LinearOpMode op, boolean isRed) {
+    public Carousel(LinearOpMode op, boolean isAuto, boolean isRed) {
         this.isRed = isRed;
 
         crServoImplEx1 = op.hardwareMap.get(CRServoImplEx.class, "carousel1");
@@ -33,6 +34,8 @@ public class Carousel {
             crServoImplEx2.setDirection(DcMotorSimple.Direction.REVERSE);
         }
 
+        this.isAuto = isAuto;
+
         op.telemetry.addData("Status", "Carousel Initialized");
     }
 
@@ -48,8 +51,8 @@ public class Carousel {
     }
 
     public void turnon() {
-        crServoImplEx1.setPower(1);
-        crServoImplEx2.setPower(1);
+        crServoImplEx1.setPower(isAuto ? Constants.CAROUSEL_AUTO_SPEED : Constants.CAROUSEL_SPEED);
+        crServoImplEx2.setPower(isAuto ? Constants.CAROUSEL_AUTO_SPEED : Constants.CAROUSEL_SPEED);
     }
 
     public void turnoff() {

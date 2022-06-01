@@ -12,6 +12,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.teamcode.Localization.IMU;
+
 @SuppressWarnings("FieldCanBeLocal")
 @Config
 public class Drivetrain {
@@ -23,6 +26,7 @@ public class Drivetrain {
     private DcMotorEx motorBackLeft;
     private Servo vertOdoRetractServo;
     private Servo latOdoRetractServo;
+    private IMU imu;
 
     // private IMU imu;
 
@@ -133,6 +137,8 @@ public class Drivetrain {
         lastHeading = theta;
 
         op.telemetry.addData("Status", "Drivetrain Initialized");
+
+        imu = new IMU(PI / 2, op);
     }
 
     // retract odometry
@@ -294,5 +300,9 @@ public class Drivetrain {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public Acceleration getAccel(){
+        return imu.getAccel();
     }
 }

@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -20,11 +21,18 @@ public class IMU {
     public static double IMU_DRIFT_COMPENSATION = 1;
 
     public IMU(double startTheta, LinearOpMode op) {
+        this(startTheta, op, BNO055IMU.SensorMode.IMU);
+    }
+    public IMU(double startTheta, LinearOpMode op, BNO055IMU.SensorMode mode) {
         imu = op.hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(new BNO055IMU.Parameters());
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.mode = mode;
+        imu.initialize(parameters);
 
-        while (!op.isStopRequested() && !imu.isGyroCalibrated()) {
-            op.idle();
+        if (mode == BNO055IMU.SensorMode.IMU) {
+            while (!op.isStopRequested() && !imu.isGyroCalibrated()) {
+                op.idle();
+            }
         }
 
         theta = startTheta;
@@ -76,4 +84,6 @@ public class IMU {
     public double getDeltaHeading() {
         return deltaHeading;
     }
+
+    public Acceleration getAccel () {return imu.getLinearAcceleration();}
 }
