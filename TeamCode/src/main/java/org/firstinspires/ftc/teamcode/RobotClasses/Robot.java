@@ -73,6 +73,7 @@ public class Robot {
     public boolean releaseApproval = false;
     public boolean transferVerify = false;
     public boolean intakeApproval = false;
+    public boolean transferOverride = false;
     public boolean outtake = false;
     public boolean intakeNoExtend = false;
     public boolean intakeUp = false;
@@ -374,7 +375,7 @@ public class Robot {
                 else if (!intakeNoExtend) intake.setSlidesPosition((int) Math.round(intakeExtendDist));
                 else intake.home();
                 intake.flipDown();
-                if (intakeFull || (!isAuto && !intakeApproval)) {
+                if (intakeFull || (!isAuto && !intakeApproval) || transferOverride) {
                     intakeState++;
                     intakeRetractStart = System.currentTimeMillis();
 //                    if (element == "ball" || midGoal) cycleHub = DepositTarget.mid;

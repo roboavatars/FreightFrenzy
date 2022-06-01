@@ -85,6 +85,7 @@ public class RedAutoCarousel extends LinearOpMode {
                             && robot.notMoving();
 
                     if (robot.depositState == 6) {
+                        time.reset();
                         Waypoint[] pathToCarousel = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, robot.theta, 10, 10, 0, 0),
                                 new Waypoint(spinPose[0], spinPose[1], spinPose[2], 10, 10, 0, 1)
@@ -106,19 +107,14 @@ public class RedAutoCarousel extends LinearOpMode {
                         if (time.seconds() - reachedSpinPos < 3.5) {
                             robot.carousel.turnon();
                             startSweepTime = time.seconds();
-                        } else if (timeLeft < 5) {
-                            robot.setTargetPoint(parkCoords[0], parkCoords[1], parkCoords[2]);
-                            robot.intakeOff = true;
-                            if (robot.isAtPose(parkCoords[0], parkCoords[1], parkCoords[2])
-                                    && robot.notMoving()) {
-                                autoSteps = 5;
-                            }
                         } else {
                             robot.carousel.turnoff();
                             robot.intakeApproval = true;
 
                             //sweep
                             robot.setTargetPoint(121, 35 - 5 * Math.sin(2*(time.seconds() - startSweepTime)), 7.5 * PI / 4);
+
+                            if (timeLeft < 5) robot.transferOverride = true;
 
                             if (robot.intakeState == 3) {
                                 robot.intakeApproval = false;
@@ -127,6 +123,8 @@ public class RedAutoCarousel extends LinearOpMode {
                                         new Waypoint(depositCoords[0], depositCoords[1], depositCoords[2] + PI, 10, 10, 0, 1),
                                 };
                                 depoDuck = new Path(depositDuck);
+
+                                time.reset();
                                 autoSteps++;
                             }
                         }
@@ -141,13 +139,14 @@ public class RedAutoCarousel extends LinearOpMode {
                             && robot.notMoving();
 
                     if (robot.depositState == 6) {
-                        time.reset();
-                        autoSteps++;
                         Waypoint[] goToThePark = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, robot.theta, 10, 10, 0, 0),
                                 new Waypoint(parkCoords[0], parkCoords[1], parkCoords[2], 10, 10, 0, 1)
                         };
                         gotoP = new Path(goToThePark);
+
+                        time.reset();
+                        autoSteps++;
                     }
                     break;
                 case 4:
@@ -156,16 +155,17 @@ public class RedAutoCarousel extends LinearOpMode {
 
                     if (robot.isAtPose(parkCoords[0], parkCoords[1], parkCoords[2])
                             && robot.notMoving()) {
-                        autoSteps = 5;
+                        autoSteps++;
                     }
                     break;
                 case 5:
-                    robot.drivetrain.setControls(0,0,0);
+                    robot.drivetrain.stop();
                     addPacket("auto done", 0);
                     break;
             }
             robot.update();
         }
+        robot.stop();
     }
 }
 
