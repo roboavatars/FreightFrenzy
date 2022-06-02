@@ -69,10 +69,10 @@ public class Drivetrain {
     // PD controller constants
     public static double xKp = 0.41;
     public static double yKp = 0.2;
-    public static double thetaKp = 2;
+    public static double thetaKp = 2.5;
     public static double xKd = 0.04;
     public static double yKd = 0.03;
-    public static double thetaKd = 0.155;
+    public static double thetaKd = 0.2;
 
     // Odometry delta 0 counters
     public int zero1, zero2, zero3;

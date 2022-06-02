@@ -38,12 +38,13 @@ public class Intake {
 
     private LinearOpMode op;
     private boolean isAuto;
+    private boolean carouselAuto;
 
     public Intake(LinearOpMode op, boolean isAuto) {
-        this(op, isAuto, 0);
+        this(op, isAuto, false, 0);
     }
 
-    public Intake(LinearOpMode op, boolean isAuto, int initialSlidesPos) {
+    public Intake(LinearOpMode op, boolean isAuto, boolean carouselAuto, int initialSlidesPos) {
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -56,6 +57,7 @@ public class Intake {
 
         this.initialSlidesPos = initialSlidesPos;
         this.isAuto = isAuto;
+        this.carouselAuto = carouselAuto;
 
         intakeSensor = op.hardwareMap.get(OpticalDistanceSensor.class, "intakeSensor");
     }
@@ -94,7 +96,8 @@ public class Intake {
     }
 
     public void home() {
-        setSlidesPosition(Constants.INTAKE_SLIDES_HOME_TICKS);
+        if (carouselAuto) setSlidesPosition(Constants.INTAKE_SLIDES_DUCK_HOME_TICKS);
+        else setSlidesPosition(Constants.INTAKE_SLIDES_HOME_TICKS);
     }
 
     public void setSlidesPosition(int position) {

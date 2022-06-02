@@ -25,7 +25,7 @@ public class PDTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Robot robot = new Robot(this, 0, 0, PI / 2, false, true);
+        Robot robot = new Robot(this, 0, 0, PI / 2, true, true);
 
         waitForStart();
 

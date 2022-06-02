@@ -185,7 +185,7 @@ public class Robot {
         logger = new Logger();
 
         deposit = new Deposit(op, isAuto, depositSlidesPos);
-        intake = new Intake(op, isAuto, intakeSlidesPos);
+        intake = new Intake(op, isAuto, carouselAuto, intakeSlidesPos);
 
         addPacket("depositSlides", depositSlidesPos);
         addPacket("intakeSlides", intakeSlidesPos);
@@ -387,7 +387,7 @@ public class Robot {
                 }
 
                 //anti-stall
-                if (isAuto) {
+                if (isAuto && !carouselAuto) {
                     if (!intakeStalling) {
                         stallStartTime = -1;
                         intake.on();
