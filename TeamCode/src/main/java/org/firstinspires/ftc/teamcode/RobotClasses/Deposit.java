@@ -30,6 +30,7 @@ public class Deposit {
     public double initialSlidesPos;
 
     private boolean isAuto;
+    private boolean isExtended = false;
 
     public boolean reset = false;
 
@@ -90,11 +91,16 @@ public class Deposit {
 
     public void armOut() {
         setArmControls(Constants.ARM_DEPOSIT_POS);
-
+        isExtended = true;
     }
 
     public void armHome() {
         setArmControls(Constants.ARM_HOME_POS);
+        isExtended = false;
+    }
+
+    public boolean isArmOut() {
+        return isExtended;
     }
 
     public void setArmControls(double pos) {
