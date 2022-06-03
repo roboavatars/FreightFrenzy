@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawDrivetrain;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawField;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawIntakeSlides;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawRobot;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 import static java.lang.Math.PI;
@@ -110,7 +109,7 @@ public class Robot {
     public static double turretDepositThreshold = 1000;
     public static double turretHomeThreshold = 1000;
     public static double releaseThreshold = 500;
-    public static double intakeFlipThreshold = 500;
+    public static double intakeFlipThreshold = 300;
     public static double armFlipThreshold = 1000;
     public static double armReturnThreshold = 1000;
 //    public String element;
@@ -366,7 +365,7 @@ public class Robot {
         rumble = false;
         switch (intakeState) {
             case 1: //intake home
-                if (!intakeUp) intake.flipDown();
+                if (!intakeUp && !(isAuto && !carouselAuto && y < 80)) intake.flipDown();
                 else intake.flipUp();
                 intake.off();
                 if (isAuto && intakeApproval && (y >= startIntakingAutoY||carouselAuto)) intakeState++;

@@ -126,4 +126,16 @@ public class Dashboard {
         dashboard.sendTelemetryPacket(packet);
         packet = new TelemetryPacket();
     }
+
+    public double[] rotatePoint(double x, double y, double theta) {
+        return new double[]{cos(x)-sin(y), sin(x)+cos(y)};
+    }
+
+    //rotate a rectangle about origin
+    public double[][] rotateRect(double x1, double y1, double x2, double y2, double theta){
+        double[][] rotatedPoints = new double[2][2];
+        rotatedPoints[0] = rotatePoint(x1, y1, theta);
+        rotatedPoints[1] = rotatePoint(x2, y2, theta);
+        return rotatedPoints;
+    }
 }

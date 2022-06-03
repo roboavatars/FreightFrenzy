@@ -45,7 +45,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
         // Segment Times
         double cycleScoreTime = 1.5;
-        double parkThreshold = 6;
+        double parkThreshold = 4;
         double preloadScoreTime = 1;
 
         double[] highCyclePos = new double[]{19, 73, PI - 0.3};
@@ -144,7 +144,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             addPacket("path", "creeping right rn");
                         } else {
                             robot.depositEnabled = false;
-                            robot.setTargetPoint(new Target(4, 112, PI / 2));
+                            robot.setTargetPoint(new Target(6.5, 112, PI / 2));
                             addPacket("path", "going to park right rn");
                         }
 

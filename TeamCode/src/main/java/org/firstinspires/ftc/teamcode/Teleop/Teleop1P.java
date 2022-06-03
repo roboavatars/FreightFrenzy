@@ -94,8 +94,19 @@ public class Teleop1P extends LinearOpMode {
             if (gamepad1.dpad_up) robot.deposit.initialSlidesPos -= .4;
             if (gamepad1.dpad_down) robot.deposit.initialSlidesPos += .4;
 
-            robot.intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS;
-            if (robot.depositState != 1) wGain = .5;
+            robot.outtake = gamepad1.left_bumper;
+            robot.intakeNoExtend = gamepad1.right_bumper;
+            robot.intakeUp = gamepad1.x;
+
+
+            if (gamepad1.b) {
+                robot.cycleHub = Robot.DepositTarget.mid;
+            } else if (gamepad1.a) {
+                robot.cycleHub = Robot.DepositTarget.low;
+            } else if (gamepad1.y) {
+                robot.cycleHub = Robot.DepositTarget.high;
+            }
+
 
             // Drivetrain Controls
             // Field Centric Driving
