@@ -22,9 +22,13 @@ public class Deposit {
     public int slidesError = 0;
     public int slidesTarget = 0;
 
-    public double slidesKp = 0.03;
-    public double slidesKd = 0;
-    public double gravityFF = .3;
+    public static double slidesKp = 0.03;
+    public static double slidesKd = 0;
+
+    public static double slidesCapKp = 0.02;
+    public static double slidesCapKd = 0;
+
+    public static double gravityFF = .3;
 
 
     public double initialSlidesPos;
@@ -82,6 +86,13 @@ public class Deposit {
     }
 
     public void updateSlides(){
+        updateSlides(false);
+    }
+
+    public void updateSlides(boolean capping){
+        double slidesKp = !capping ? this.slidesKp : this.slidesCapKp;
+        double slidesKd = !capping ? this.slidesKd : this.slidesCapKd;
+
         int currentTicks = getSlidesPos();
         slidesErrorChange = slidesTarget - currentTicks - slidesError;
         slidesError = slidesTarget - currentTicks;

@@ -39,6 +39,9 @@ public class Teleop1P extends LinearOpMode {
     private double xyGain = 1;
     private double wGain = 0.8;
 
+    private double xySlowGain = 0.3;
+    private double wSlowGain = 0.4;
+
     // Rumbles
     private boolean teleRumble1 = false;
     private boolean midTeleRumble = false;
@@ -107,6 +110,16 @@ public class Teleop1P extends LinearOpMode {
                 robot.cycleHub = Robot.DepositTarget.high;
             }
 
+            double xyGain;
+            double wGain;
+
+            if (robot.capping || robot.depositState == 4) {
+                xyGain = this.xySlowGain;
+                wGain = this.wSlowGain;
+            } else {
+                xyGain = this.xyGain;
+                wGain = this.wGain;
+            }
 
             // Drivetrain Controls
             // Field Centric Driving

@@ -39,6 +39,9 @@ public class Teleop2P extends LinearOpMode {
     private static double xyGain = 1;
     private static double wGain = 0.8;
 
+    private static double xySlowGain = 0.4;
+    private static double wSlowGain = 0.3;
+
     // Rumbles
     private boolean teleRumble1 = false;
     private boolean midTeleRumble = false;
@@ -140,8 +143,18 @@ public class Teleop2P extends LinearOpMode {
                 if (gamepad2.dpad_down) robot.deposit.initialSlidesPos += .4;
             }
 
+            double xyGain;
+            double wGain;
+
+            if (robot.capping || robot.depositState == 4) {
+                xyGain = this.xySlowGain;
+                wGain = this.wSlowGain;
+            } else {
+                xyGain = this.xyGain;
+                wGain = this.wGain;
+            }
+
             robot.intakeExtendDist = Math.max(Constants.INTAKE_SLIDES_HOME_TICKS,Math.min(robot.intakeExtendDist + gamepad2.right_trigger - gamepad2.left_trigger, Constants.INTAKE_SLIDES_EXTEND_TICKS));
-            if (robot.depositState != 1) wGain = .5;
 
             // Drivetrain Controls
             // Field Centric Driving

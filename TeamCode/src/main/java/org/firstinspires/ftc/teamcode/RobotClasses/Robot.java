@@ -496,7 +496,7 @@ public class Robot {
                     break;
             }
         }
-        deposit.updateSlides();
+        deposit.updateSlides(capping);
         addPacket("deposit state", depositState);
         addPacket("intake state", intakeState);
 //        addPacket("element", element == "ball" ? 0 : 1);
