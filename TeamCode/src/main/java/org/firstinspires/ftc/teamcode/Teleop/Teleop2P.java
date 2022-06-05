@@ -58,7 +58,7 @@ public class Teleop2P extends LinearOpMode {
     private boolean intakeApprovalToggle = false;
 
     /*
-    Controller Button Mappings: *updated 5/30/22 2:48 PM*
+    Controller Buttons : *updated 5/30/22 2:48 PM*
     gamepad 1:
 
     right trigger - intake
