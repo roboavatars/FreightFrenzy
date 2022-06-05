@@ -21,7 +21,7 @@ public class Intake {
     private OpticalDistanceSensor intakeSensor;
 
     private double lastIntakePow = 0;
-    public static int slidesErrorThreshold = 3;
+    public static int slidesErrorThreshold = 5;
 
     public int initialSlidesPos;
 
@@ -32,9 +32,9 @@ public class Intake {
     public int slidesError = 0;
     public int slidesTarget = 0;
 
-    public static double slidesKp = 0.05;
+    public static double slidesKp = 0.07;
     public static double slidesKd = 0.0;
-    public static double accelFF = 0.7;
+    public static double accelFF = 0;
 
     private LinearOpMode op;
     private boolean isAuto;
@@ -103,7 +103,7 @@ public class Intake {
     public void setSlidesPosition(int position) {
 //        slidesMotor.setTargetPosition(position);
 //        slidesMotor.setPower(Constants.INTAKE_SLIDES_POWER);
-        slidesTarget = position;
+        slidesTarget = Math.min(Constants.INTAKE_SLIDES_EXTEND_TICKS, Math.max(position, 0));
     }
 
     public void updateSlides(double ay){

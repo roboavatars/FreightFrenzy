@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
+import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
@@ -87,6 +88,7 @@ public class RedAutoWarehouse extends LinearOpMode {
         robot.depositState = 2;
 
         while (opModeIsActive()) {
+            robot.intakeExtendDist = (int) Math.round(Constants.INTAKE_SLIDES_EXTEND_TICKS/3 + cycleCounter * Constants.INTAKE_SLIDES_EXTEND_TICKS/4);
             addPacket("w", robot.w);
             double timeLeft = 30 - (System.currentTimeMillis() - robot.startTime) / 1000;
             addPacket("time left", timeLeft);

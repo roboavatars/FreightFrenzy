@@ -365,14 +365,14 @@ public class Robot {
         rumble = false;
         switch (intakeState) {
             case 1: //intake home
-                if (!intakeUp && !(isAuto && !carouselAuto && y < 80)) intake.flipDown();
+                if (!intakeUp && !(isAuto && !carouselAuto && y < 80) && !(!isAuto && cycleHub == DepositTarget.low)) intake.flipDown();
                 else intake.flipUp();
                 intake.off();
                 if (isAuto && intakeApproval && (y >= startIntakingAutoY||carouselAuto)) intakeState++;
                 break;
             case 2: //intake freight
-                if (isAuto) intake.extend();
-                else if (!intakeNoExtend) intake.setSlidesPosition((int) Math.round(intakeExtendDist));
+//                if (isAuto) intake.extend();
+                if (!intakeNoExtend) intake.setSlidesPosition((int) Math.round(intakeExtendDist));
                 else intake.home();
                 intake.flipDown();
                 if (intakeFull || (!isAuto && !intakeApproval) || transferOverride) {

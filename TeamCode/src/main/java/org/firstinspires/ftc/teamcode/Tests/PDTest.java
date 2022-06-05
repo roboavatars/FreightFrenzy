@@ -6,17 +6,18 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @TeleOp
 @Config
 public class PDTest extends LinearOpMode {
-    public static double xKp = 0.41;
-    public static double yKp = 0.3;
-    public static double thetaKp = 2.5;
-    public static double xKd = 0.035;
-    public static double yKd = 0.032;
-    public static double thetaKd = 0.12;
+    public static double xKp = Drivetrain.xKp;
+    public static double yKp = Drivetrain.yKp;
+    public static double thetaKp = Drivetrain.thetaKp;
+    public static double xKd = Drivetrain.xKd;
+    public static double yKd = Drivetrain.yKd;
+    public static double thetaKd = Drivetrain.thetaKd;
 
     public static double targetX = 0;
     public static double targetY = 0;

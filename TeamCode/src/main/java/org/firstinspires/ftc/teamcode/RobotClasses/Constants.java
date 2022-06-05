@@ -18,10 +18,10 @@ public class Constants {
     public static double COLOR_SENSOR_THRESHOLD = 110;
 
     // Intake Slides
-    public static int INTAKE_SLIDES_EXTEND_TICKS = 100;
-    public static int INTAKE_SLIDES_HOME_TICKS = 20;
-    public static int INTAKE_SLIDES_DUCK_HOME_TICKS = 15;
-    public static int INTAKE_SLIDES_STALL_THRESHOLD = 8;
+    public static int INTAKE_SLIDES_EXTEND_TICKS = 330;
+    public static int INTAKE_SLIDES_HOME_TICKS = 55;
+    public static int INTAKE_SLIDES_DUCK_HOME_TICKS = 30;
+    public static double INTAKE_SLIDES_STALL_THRESHOLD = 1000; //TODO: tune
 
 
     // Intake Servo
@@ -29,7 +29,7 @@ public class Constants {
     public static double INTAKE_DOWN_POS = 0.08;
 
     // Deposit Servo
-    public static double DEPOSIT_OPEN_POS = 0.65;
+    public static double DEPOSIT_OPEN_POS = 0.7;
     public static double DEPOSIT_HOLD_POS = 0;
     public static double DEPOSIT_RELEASE_POS = 1;
     public static double DEPOSIT_CAP_POS = 0.5;
