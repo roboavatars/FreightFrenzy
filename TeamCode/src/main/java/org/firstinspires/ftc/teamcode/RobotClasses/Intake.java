@@ -33,7 +33,7 @@ public class Intake {
     public int slidesTarget = 0;
 
     public static double slidesKp = 0.07;
-    public static double slidesKd = 0.0;
+    public static double slidesKd = 0.01;
     public static double accelFF = 0;
 
     private LinearOpMode op;

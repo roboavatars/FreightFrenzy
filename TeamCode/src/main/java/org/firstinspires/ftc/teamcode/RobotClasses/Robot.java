@@ -108,9 +108,10 @@ public class Robot {
     public static double autoTransferThreshold = 1000;
     public static double turretDepositThreshold = 1000;
     public static double turretHomeThreshold = 1000;
-    public static double releaseThreshold = 500;
-    public static double intakeFlipThreshold = 300;
-    public static double armFlipThreshold = 1000;
+    public static double teleReleaseThreshold = 400;
+    public static double autoReleaseThreshold = 250;
+    public static double intakeFlipThreshold = 500;
+    public static double armFlipThreshold = 750;
     public static double armReturnThreshold = 1000;
 //    public String element;
     public static double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
@@ -134,7 +135,7 @@ public class Robot {
     public static int convergeThreshold = 1500;
 
     public double stallStartTime = -1;
-    public static int stallThreshold = 500;
+    public static int stallThreshold = 750;
     public double automationStepTime;
     public double depositTime = 0;
     public static double startIntakingAutoY = 106;
@@ -365,7 +366,7 @@ public class Robot {
         rumble = false;
         switch (intakeState) {
             case 1: //intake home
-                if (!intakeUp && !(isAuto && !carouselAuto && y < 80) && !(!isAuto && cycleHub == DepositTarget.low)) intake.flipDown();
+                if (!intakeUp && !(isAuto && !carouselAuto && y < 75 && Math.abs(theta - PI/2) > PI/10) && !(!isAuto && cycleHub == DepositTarget.low)) intake.flipDown();
                 else intake.flipUp();
                 intake.off();
                 if (isAuto && intakeApproval && (y >= startIntakingAutoY||carouselAuto)) intakeState++;
@@ -478,7 +479,7 @@ public class Robot {
                     break;
                 case 5: //release & wait for freight to drop
                     deposit.release();
-                    if (System.currentTimeMillis() - depositStart > releaseThreshold) {
+                    if (System.currentTimeMillis() - depositStart > (isAuto ? autoReleaseThreshold : teleReleaseThreshold)) {
                         depositState++;
                     }
                     break;
