@@ -33,7 +33,7 @@ public class Intake {
     public int slidesTarget = 0;
 
     public static double slidesKp = 0.07;
-    public static double slidesKd = 0.01;
+    public static double slidesKd = 0.1;
     public static double accelFF = 0;
 
     private LinearOpMode op;
@@ -49,6 +49,9 @@ public class Intake {
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         flipServo = op.hardwareMap.get(Servo.class, "intakeServo");
+
+        if (isAuto) flipUp();
+        else flipDown();
 
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "intakeSlides");
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

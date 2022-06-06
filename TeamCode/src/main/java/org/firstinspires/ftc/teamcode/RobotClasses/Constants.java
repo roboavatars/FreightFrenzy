@@ -13,7 +13,8 @@ public class Constants {
 
     // Intake
     public static double INTAKE_DISTANCE_THRESHOLD_AUTO = 0.55;
-    public static double INTAKE_DISTANCE_THRESHOLD_TELE = 0.25;
+    public static double INTAKE_DISTANCE_THRESHOLD_TELE = 0.35;
+    public static double INTAKE_RETRACT_POWER = 1;
     public static double STALL_THRESHOLD = 6;
     public static double COLOR_SENSOR_THRESHOLD = 110;
 

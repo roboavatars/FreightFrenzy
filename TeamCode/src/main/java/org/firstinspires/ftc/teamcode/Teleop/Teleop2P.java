@@ -106,7 +106,7 @@ public class Teleop2P extends LinearOpMode {
             }
             robot.outtake = gamepad1.left_bumper;
             robot.intakeNoExtend = gamepad1.right_bumper;
-            robot.intakeUp = gamepad2.b;
+            robot.intakeUp = gamepad1.back;
 
 
             if (gamepad2.dpad_right) {

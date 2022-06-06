@@ -102,6 +102,7 @@ public class Robot {
     private double depositStart;
     private double depositStartRetract;
     private double intakeRetractStart;
+    private double freightDetectedTime;
     public int intakeState = 1;
     public boolean intakeOff = false;
     public static double teleTransferThreshold = 750;
@@ -110,7 +111,8 @@ public class Robot {
     public static double turretHomeThreshold = 1000;
     public static double teleReleaseThreshold = 400;
     public static double autoReleaseThreshold = 250;
-    public static double intakeFlipThreshold = 500;
+    public static double intakeFlipThreshold = 200;
+    public static double freightDetectedThreshold = 200;
     public static double armFlipThreshold = 750;
     public static double armReturnThreshold = 1000;
 //    public String element;
@@ -376,6 +378,16 @@ public class Robot {
                 if (!intakeNoExtend) intake.setSlidesPosition((int) Math.round(intakeExtendDist));
                 else intake.home();
                 intake.flipDown();
+                boolean intakeFull;
+                if (!this.intakeFull) {
+                    freightDetectedTime = System.currentTimeMillis();
+                    intakeFull = false;
+                } else if (System.currentTimeMillis() - freightDetectedTime > freightDetectedThreshold){
+                    intakeFull = true;
+                } else {
+                    intakeFull = false;
+                }
+
                 if (intakeFull || (!isAuto && !intakeApproval) || transferOverride) {
                     intakeState++;
                     intakeRetractStart = System.currentTimeMillis();
@@ -412,7 +424,7 @@ public class Robot {
                 break;
             case 3: //wait for flip servo and intake slides
                 intake.home();
-                intake.setPower(.5);
+                intake.setPower(Constants.INTAKE_RETRACT_POWER);
                 intake.flipUp();
                 if (intake.slidesIsHome() && System.currentTimeMillis() - intakeRetractStart > intakeFlipThreshold)
                     intakeState++;
