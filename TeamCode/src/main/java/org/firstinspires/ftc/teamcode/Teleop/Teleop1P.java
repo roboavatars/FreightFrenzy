@@ -83,7 +83,7 @@ public class Teleop1P extends LinearOpMode {
         cycleTimer.reset();
 
         while (opModeIsActive()) {
-            robot.depositApproval = gamepad1.a || gamepad1.b || gamepad1.y;
+            robot.depositApproval = gamepad1.left_trigger > .1 || gamepad1.b || gamepad1.y;
 
             if (robot.intakeApproval && gamepad1.right_trigger <= .1) robot.intakeApproval = false;
             else if (gamepad1.right_trigger > .1 && !intakeApprovalToggle) {
@@ -102,11 +102,11 @@ public class Teleop1P extends LinearOpMode {
             robot.intakeUp = gamepad1.x;
 
 
-            if (gamepad1.b) {
+            if (gamepad1.y) {
                 robot.cycleHub = Robot.DepositTarget.mid;
-            } else if (gamepad1.a) {
+            } else if (gamepad1.b) {
                 robot.cycleHub = Robot.DepositTarget.low;
-            } else if (gamepad1.y) {
+            } else if (gamepad1.left_trigger > .1) {
                 robot.cycleHub = Robot.DepositTarget.high;
             }
 

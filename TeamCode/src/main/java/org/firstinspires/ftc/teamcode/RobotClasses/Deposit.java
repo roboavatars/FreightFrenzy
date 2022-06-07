@@ -115,8 +115,8 @@ public class Deposit {
     }
 
     public void setArmControls(double pos) {
-        armServo1.setPosition(pos);
-        armServo2.setPosition(1 - pos);
+        armServo1.setPosition((Math.max(0, Math.min(1, pos))));
+        armServo2.setPosition(Math.max(0, Math.min(1, 1 - pos + Constants.ARM_OFFSET)));
     }
 
     public int getSlidesPos() {

@@ -466,6 +466,7 @@ public class Robot {
                     break;
             }
         } else {
+            if  (!depositEnabled) depositState = 8;
             switch (depositState) {
                 case 1: //deposit home
                     deposit.retractSlides();
@@ -507,6 +508,9 @@ public class Robot {
                         depositState = 1;
                     }
                     break;
+                case 8:
+                    deposit.retractSlides();
+                    deposit.armHome();
             }
         }
         deposit.updateSlides(capping);

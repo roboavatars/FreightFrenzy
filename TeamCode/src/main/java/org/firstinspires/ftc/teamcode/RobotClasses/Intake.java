@@ -26,14 +26,14 @@ public class Intake {
     public int initialSlidesPos;
 
     public double INTAKE_SLIDES_SERVO_SPEED = 0.1;
-    public static double HOME_THRESHOLD = 10;
+    public static double HOME_THRESHOLD = 15;
 
     public int slidesErrorChange = 0;
     public int slidesError = 0;
     public int slidesTarget = 0;
 
-    public static double slidesKp = 0.07;
-    public static double slidesKd = 0.1;
+    public static double slidesKp = 0.025;
+    public static double slidesKd = 0.03;
     public static double accelFF = 0;
 
     private LinearOpMode op;
@@ -54,6 +54,7 @@ public class Intake {
         else flipDown();
 
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "intakeSlides");
+        slidesMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slidesMotor.setTargetPosition(0);
         slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

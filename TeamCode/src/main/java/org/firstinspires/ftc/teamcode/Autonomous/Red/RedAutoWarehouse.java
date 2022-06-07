@@ -140,7 +140,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                                 double theta = PI/2 + (PI/8 * Math.sin(4*(time.seconds() - passLineTime)));
                                 robot.setTargetPoint(new Target(x, y, theta));
                             }
-
+                            if (robot.intakeState == 3) goToWarehouseSteps++;
 
                             addPacket("path", "creeping right rn");
                         } else {
@@ -148,8 +148,6 @@ public class RedAutoWarehouse extends LinearOpMode {
                             robot.setTargetPoint(new Target(137.5, 109, PI/2));
                             addPacket("path", "going to park right rn");
                         }
-
-                        if (robot.intakeState == 3) goToWarehouseSteps++;
                         break;
                     case 4:
                         robot.setTargetPoint(new Target(141, robot.startIntakingAutoY, PI/2).thetaKp((Math.abs(robot.theta-PI/2) < PI/6) ? Drivetrain.thetaKp : 10));
@@ -220,12 +218,9 @@ public class RedAutoWarehouse extends LinearOpMode {
                     robot.intakeApproval = true;
                 }
             } else {
-                if (robot.depositState == 2) robot.intakeApproval = false;
                 robot.depositEnabled = false;
-                if (timeLeft < 2) {
-                    robot.intakeOff = true;
-                    robot.intakeApproval = false;
-                }
+                robot.intakeOff = true;
+                robot.intakeApproval = false;
                 robot.drivetrain.stop();
                 addPacket("path", "stopped rn");
             }

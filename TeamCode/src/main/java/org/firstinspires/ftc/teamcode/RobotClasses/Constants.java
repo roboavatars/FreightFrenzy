@@ -19,7 +19,7 @@ public class Constants {
     public static double COLOR_SENSOR_THRESHOLD = 110;
 
     // Intake Slides
-    public static int INTAKE_SLIDES_EXTEND_TICKS = 310;
+    public static int INTAKE_SLIDES_EXTEND_TICKS = 290;
     public static int INTAKE_SLIDES_HOME_TICKS = 55;
     public static int INTAKE_SLIDES_DUCK_HOME_TICKS = 30;
     public static double INTAKE_SLIDES_STALL_THRESHOLD = 1000; //TODO: tune
@@ -41,6 +41,7 @@ public class Constants {
     public static double ARM_CAP_DOWN_POS = 0.15;
     public static double ARM_CAP_UP_POS = 0.15;
     public static double ARM_INIT_POS = 0.75;
+    public static double ARM_OFFSET = -0.0125;
 
     public static int DEPOSIT_SLIDES_HOME_TICKS = 0;
     public static int DEPOSIT_SLIDES_HIGH_TICKS = 500;
