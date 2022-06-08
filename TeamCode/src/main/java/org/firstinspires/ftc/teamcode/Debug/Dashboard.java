@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Debug;
 
+import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
@@ -24,7 +25,7 @@ public class Dashboard {
     public static void drawRobot(double robotX, double robotY, double robotTheta, double intakeSlidePos, double depositSlidesDist, boolean isArmExtended, String drivetrainColor) {
         drawDrivetrain(robotX, robotY, robotTheta, drivetrainColor);
 //        drawIntakeSlides(robotX, robotY, robotTheta, intakeSlidesExtend);
-        drawDepositTurretSlidesArm(robotX, robotY, robotTheta, 0, depositSlidesDist, 0);
+        drawDepositSlides(robotX, robotY, robotTheta, depositSlidesDist);
         drawIntakeSlides(robotX, robotY, robotTheta, intakeSlidePos);
     }
 
@@ -37,43 +38,51 @@ public class Dashboard {
         double[] ycoords = {-6.5 * sin(theta) + 9 * cos(theta) + y, 6.5 * sin(theta) + 9 * cos(theta) + y, 6.5 * sin(theta) - 9 * cos(theta) + y, -6.5 * sin(theta) - 9 * cos(theta) + y};
 
         packet.fieldOverlay().setFill(color).fillPolygon(xcoords, ycoords);
-        packet.fieldOverlay().setFill("green").fillCircle(-4.5 * cos(theta) + 6.5 * sin(theta) + x, -4.5 * sin(theta) - 6.5 * cos(theta) + y, 2.25);
+        packet.fieldOverlay().setFill("black").fillCircle(6.5 * sin(theta) + x,  -6.5 * cos(theta) + y, 2.25);
     }
 
     public static void drawIntakeSlides(double x, double y, double theta, double slidesPos) {
-        double extendedPos =  slidesPos * 0.1;
-        double[] leftX = {-2.5 * sin(theta) - 9 * cos(theta) + x, -2.5 * sin(theta) - (9 + extendedPos) * cos(theta) + x, -3 * sin(theta) - (9 + extendedPos) * sin(theta) + x, -3 * sin(theta) - 9 * cos(theta) + x};
-        double[] leftY = {-2.5 * cos(theta) + 9 * sin(theta) + y, -2.5 * cos(theta) + (9 + extendedPos) * sin(theta) + y, -3 * cos(theta) + (9 + extendedPos) * cos(theta) + y, -3 * cos(theta) + 9 * sin(theta) + y};
+        double extendedPos =  slidesPos * 0.052;
+        theta -= PI / 2;
 
-        double[] rightX = {2.5 * sin(theta) - 9 * cos(theta) + x, 2.5 * sin(theta) - (9 + extendedPos) * cos(theta) + x, 3 * sin(theta) - (9 + extendedPos) * sin(theta) + x, 3 * sin(theta) - 9 * cos(theta) + x};
-        double[] rightY = {2.5 * cos(theta) + 9 * sin(theta) + y, 2.5 * cos(theta) + (9 + extendedPos) * sin(theta) + y, 3 * cos(theta) + (9 + extendedPos) * cos(theta) + y, 3 * cos(theta) + 9 * sin(theta) + y};
+        double[] leftX = {-3.5 * cos(theta) - (9 + extendedPos) * sin(theta) + x, -3 * cos(theta) - (9 + extendedPos) * sin(theta) + x, -3 * cos(theta) + 8.5 * sin(theta) + x, -3.5 * cos(theta) + 8.5 * sin(theta) + x};
+        double[] leftY = {-3.5 * sin(theta) + (9 + extendedPos) * cos(theta) + y, -3 * sin(theta) + (9 + extendedPos) * cos(theta) + y, -3 * sin(theta) - 8.5 * cos(theta) + y, -3.5 * sin(theta) - 8.5 * sin(theta) + y};
 
-        drawPolygon(leftX, leftY, "orange");
-        drawPolygon(rightX, rightY, "orange");
+        double[] rightX = {3 * cos(theta) - (9 + extendedPos) * sin(theta) + x, 3.5 * cos(theta) - (9 + extendedPos) * sin(theta) + x, 3.5 * cos(theta) + 8.5 * sin(theta) + x, 3 * cos(theta) + 8.5 * sin(theta) + x};
+        double[] rightY = {3 * sin(theta) + (9 + extendedPos) * cos(theta) + y, 3.5 * sin(theta) + (9 + extendedPos) * cos(theta) + y, 3.5 * sin(theta) - 8.5 * cos(theta) + y, 3 * sin(theta) - 8.5 * cos(theta) + y};
+
+        if (slidesPos <= 70) {
+            drawPolygon(leftX, leftY, "green");
+            drawPolygon(rightX, rightY, "green");
+        } else if (slidesPos >= 285) {
+            drawPolygon(leftX, leftY, "red");
+            drawPolygon(rightX, rightY, "red");
+        } else {
+            drawPolygon(leftX, leftY, "yellow");
+            drawPolygon(rightX, rightY, "yellow");
+        }
     }
 
-    public static void drawDepositTurretSlidesArm(double x, double y, double robotTheta, double turretTheta, double slidesDist, double armTheta) {
-        double extendedPos = 11.5 + slidesDist;
-        double theta = robotTheta + turretTheta;
+    public static void drawDepositSlides(double x, double y, double theta, double slidesPos) {
+        double extendedPos = slidesPos * 0.045;
+        theta -= PI / 2;
 
-        double[] leftSlidesX = {-2 * cos(theta) - -4.5 * sin(theta) + x, -2 * cos(theta) - extendedPos * sin(theta) + x, -3.5 * cos(theta) - extendedPos * sin(theta) + x, -3.5 * cos(theta) - -4.5 * sin(theta) + x};
-        double[] leftSlidesY = {-2 * sin(theta) + -4.5 * cos(theta) + y, -2 * sin(theta) + extendedPos * cos(theta) + x, -3.5 * sin(theta) + extendedPos * cos(theta) + y, -3.5 * sin(theta) + -4.5 * cos(theta) + y};
+        double[] leftX = {-3 * cos(theta) + x, -4.5 * cos(theta) + x, -4.5 * cos(theta) + (9 + extendedPos) * sin(theta) + x, -3 * cos(theta) + (9 + extendedPos) * sin(theta) + x};
+        double[] leftY = {-3 * sin(theta) + y, -4.5 * sin(theta) + y, -4.5 * sin(theta) - (9 + extendedPos) * cos(theta) + y, -3 * sin(theta) - (9 + extendedPos) * cos(theta) + y};
 
-        double[] rightSlidesX = {2 * cos(theta) - -4.5 * sin(theta) + x, 2 * cos(theta) - extendedPos * sin(theta) + x, 3.5 * cos(theta) - extendedPos * sin(theta) + x, 3.5 * cos(theta) - -4.5 * sin(theta) + x};
-        double[] rightSlidesY = {2 * sin(theta) + -4.5 * cos(theta) + y, 2 * sin(theta) + extendedPos * cos(theta) + y, 3.5 * sin(theta) + extendedPos * cos(theta) + y, 3.5 * sin(theta) + -4.5 * cos(theta) + y};
+        double[] rightX = {3 * cos(theta) + x, 4.5 * cos(theta) + x, 4.5 * cos(theta) + (9 + extendedPos) * sin(theta) + x, 3 * cos(theta) + (9 + extendedPos) * sin(theta) + x};
+        double[] rightY = {3 * sin(theta) + y, 4.5 * sin(theta) + y, 4.5 * sin(theta) - (9 + extendedPos) * cos(theta) + y, 3 * sin(theta) - (9 + extendedPos) * cos(theta) + y};
 
-        double[] armX = {0.5 * cos(theta) - extendedPos * sin(theta) + x,
-                0.5 * cos(theta) - (extendedPos + (-cos(armTheta)))  * sin(theta) + x,
-                -0.5 * cos(theta) - (extendedPos + (-cos(armTheta))) * sin(theta) + x,
-                -0.5 * cos(theta) - extendedPos * sin(theta) + x};
-        double[] armY = {0.5 * sin(theta) + extendedPos * cos(theta) + y,
-                0.5 * sin(theta) + (extendedPos + (-cos(armTheta))) * cos(theta) + y,
-                -0.5 * sin(theta) + (extendedPos + (-cos(armTheta))) * cos(theta) + y,
-                -0.5 * sin(theta) + extendedPos * cos(theta) + y};
-
-        drawPolygon(leftSlidesX, leftSlidesY, "red");
-        drawPolygon(rightSlidesX, rightSlidesY, "red");
-        drawPolygon(armX, armY, "black");
+        if (slidesPos <= 20) {
+            drawPolygon(leftX, leftY, "green");
+            drawPolygon(rightX, rightY, "green");
+        } else if (slidesPos >= 495) {
+            drawPolygon(leftX, leftY, "red");
+            drawPolygon(rightX, rightY, "red");
+        } else {
+            drawPolygon(leftX, leftY, "yellow");
+            drawPolygon(rightX, rightY, "yellow");
+        }
     }
 
     public static void drawFreight(Freight freight, String color) {
