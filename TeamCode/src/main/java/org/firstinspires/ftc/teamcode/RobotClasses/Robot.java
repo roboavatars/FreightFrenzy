@@ -108,7 +108,7 @@ public class Robot {
     public static double autoTransferThreshold = 1000;
     public static double turretDepositThreshold = 1000;
     public static double turretHomeThreshold = 1000;
-    public static double teleReleaseThreshold = 400;
+    public static double teleReleaseThreshold = 250;
     public static double autoReleaseThreshold = 250;
     public static double intakeFlipThreshold = 400;
     public static double armFlipThreshold = 750;

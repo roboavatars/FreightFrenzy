@@ -12,7 +12,7 @@ public class Constants {
     public static double LAT_ODO_RETRACT_POS = 0.48;
 
     // Intake
-    public static double INTAKE_DISTANCE_THRESHOLD_AUTO = 0.35;
+    public static double INTAKE_DISTANCE_THRESHOLD_AUTO = 0.32;
     public static double INTAKE_TIME_THRESHOLD_AUTO = 400;
     public static double INTAKE_DISTANCE_THRESHOLD_TELE = 0.35;
     public static double INTAKE_TIME_THRESHOLD_TELE = 200;
@@ -28,7 +28,7 @@ public class Constants {
 
 
     // Intake Servo
-    public static double INTAKE_UP_POS = 0.75;
+    public static double INTAKE_UP_POS = 0.7;
     public static double INTAKE_DOWN_POS = 0.08;
 
     // Deposit Servo

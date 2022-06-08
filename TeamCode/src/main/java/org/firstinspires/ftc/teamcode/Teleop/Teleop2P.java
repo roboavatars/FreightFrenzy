@@ -40,7 +40,7 @@ public class Teleop2P extends LinearOpMode {
     public static double wGain = 0.8;
 
     public static double xySlowGain = 0.3;
-    public static double wSlowGain = 0.3;
+    public static double wSlowGain = 0.4;
 
     // Rumbles
     private boolean teleRumble1 = false;
@@ -129,7 +129,7 @@ public class Teleop2P extends LinearOpMode {
                 capToggle = false;
             }
 
-            if (robot.capState == 4) {
+            if (robot.capState == 4 || robot.capState == 5) {
                 if (gamepad2.dpad_up) robot.capArm.upOffset += .007;
                 if (gamepad2.dpad_down) robot.capArm.upOffset -= .007;
             } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.high) {
@@ -141,6 +141,10 @@ public class Teleop2P extends LinearOpMode {
             } else {
                 if (gamepad2.dpad_up) robot.deposit.initialSlidesPos -= .4;
                 if (gamepad2.dpad_down) robot.deposit.initialSlidesPos += .4;
+            }
+
+            if (Math.abs(gamepad2.right_stick_y) > .1) {
+                robot.intake.initialSlidesPos -= .6 * gamepad2.right_stick_y;
             }
 
             double xyGain;
