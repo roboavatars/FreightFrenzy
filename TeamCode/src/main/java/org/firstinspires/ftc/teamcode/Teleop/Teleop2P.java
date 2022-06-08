@@ -97,11 +97,13 @@ public class Teleop2P extends LinearOpMode {
         while (opModeIsActive()) {
             robot.depositApproval = gamepad2.dpad_left || gamepad2.dpad_right || gamepad2.a;
             robot.releaseApproval = gamepad1.left_trigger > .1;
-            if (robot.intakeApproval && gamepad1.right_trigger <= .1) robot.intakeApproval = false;
-            else if (gamepad1.right_trigger > .1 && !intakeApprovalToggle) {
+
+            boolean intakeApproval = gamepad1.right_trigger > .1 || gamepad1.right_bumper;
+            if (robot.intakeApproval && !intakeApproval) robot.intakeApproval = false;
+            else if (intakeApproval && !intakeApprovalToggle) {
                 intakeApprovalToggle = true;
                 robot.intakeApproval = true;
-            } else if (gamepad1.right_trigger <= .1 && intakeApprovalToggle) {
+            } else if (!intakeApproval && intakeApprovalToggle) {
                 intakeApprovalToggle = false;
             }
             robot.outtake = gamepad1.left_bumper;
@@ -127,17 +129,15 @@ public class Teleop2P extends LinearOpMode {
                 capToggle = false;
             }
 
-            if (robot.capping) {
-                if (robot.capState == 1) {
-                    if (gamepad2.dpad_up)
-                        robot.capOffset -= .01;
-                    if (gamepad2.dpad_down)
-                        robot.capOffset += .01;
-                } else if (robot.capState == 2)
-                    if (gamepad2.dpad_up)
-                        robot.capOffset -= .01;
-                    if (gamepad2.dpad_down)
-                        robot.capOffset += .01;
+            if (robot.capState == 4) {
+                if (gamepad2.dpad_up) robot.capArm.upOffset += .007;
+                if (gamepad2.dpad_down) robot.capArm.upOffset -= .007;
+            } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.high) {
+                if (gamepad2.dpad_up) robot.deposit.highOffset += 1;
+                if (gamepad2.dpad_down) robot.deposit.highOffset -= 1;
+            } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.mid) {
+                if (gamepad2.dpad_up) robot.deposit.midOffset += 1;
+                if (gamepad2.dpad_down) robot.deposit.midOffset -= 1;
             } else {
                 if (gamepad2.dpad_up) robot.deposit.initialSlidesPos -= .4;
                 if (gamepad2.dpad_down) robot.deposit.initialSlidesPos += .4;
@@ -146,7 +146,7 @@ public class Teleop2P extends LinearOpMode {
             double xyGain;
             double wGain;
 
-            if (robot.capping || robot.depositState == 4) {
+            if (robot.capState != 1 || robot.depositState == 4) {
                 xyGain = this.xySlowGain;
                 wGain = this.wSlowGain;
             } else {

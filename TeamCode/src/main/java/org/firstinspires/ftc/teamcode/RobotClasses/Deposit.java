@@ -30,6 +30,8 @@ public class Deposit {
 
     public static double gravityFF = .3;
 
+    public double midOffset = 0;
+    public double highOffset = 0;
 
     public double initialSlidesPos;
 
@@ -72,8 +74,8 @@ public class Deposit {
     public void extendSlides () {extendSlides(Robot.DepositTarget.high);}
 
     public void extendSlides(Robot.DepositTarget hub){
-        if (hub == Robot.DepositTarget.high) slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS;
-        else if (hub == Robot.DepositTarget.mid) slidesTarget = Constants.DEPOSIT_SLIDES_MID_TICKS;
+        if (hub == Robot.DepositTarget.high) slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS + (int) Math.round(highOffset);
+        else if (hub == Robot.DepositTarget.mid) slidesTarget = Constants.DEPOSIT_SLIDES_MID_TICKS + (int) Math.round(midOffset);
         else if (hub == Robot.DepositTarget.low) slidesTarget = Constants.DEPOSIT_SLIDES_LOW_TICKS;
         else if (hub == Robot.DepositTarget.cap) slidesTarget = Constants.DEPOSIT_SLIDES_CAP_TICKS;
 
