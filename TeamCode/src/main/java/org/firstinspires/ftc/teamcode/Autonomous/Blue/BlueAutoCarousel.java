@@ -71,7 +71,7 @@ public class BlueAutoCarousel extends LinearOpMode {
                     Pose curPose = preloadP.getRobotPose(Math.min(goToPreload, time.seconds()));
                     robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
 
-                    robot.depositApproval = robot.isAtPose(26, 48, -PI / 6, 2, 2, PI / 10)
+                    robot.depositApproval = robot.isAtPose(26, 48, 13 * PI / 6, 2, 2, PI / 10)
                             && robot.notMoving();
 
                     if (robot.depositState == 6) {
