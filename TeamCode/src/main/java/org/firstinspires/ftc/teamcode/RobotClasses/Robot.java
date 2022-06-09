@@ -425,7 +425,7 @@ public class Robot {
                 break;
             case 3: //wait for flip servo and intake slides
                 intake.home();
-                intake.setPower(Constants.INTAKE_RETRACT_POWER);
+                intake.setPower(intakeStalling ? 0.25 : Constants.INTAKE_RETRACT_POWER);
                 intake.flipUp();
                 if (intake.slidesIsHome() && System.currentTimeMillis() - intakeRetractStart > intakeFlipThreshold)
                     intakeState++;

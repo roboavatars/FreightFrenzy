@@ -35,6 +35,7 @@ public class Intake {
     public static double slidesKp = 0.025;
     public static double slidesKd = 0.03;
     public static double accelFF = 0;
+    public static double springFF = -0.001;
 
     private LinearOpMode op;
     private boolean isAuto;
@@ -117,7 +118,7 @@ public class Intake {
 
         if (Math.abs(slidesError) > slidesErrorThreshold &&
                 slidesMotor.getCurrent(CurrentUnit.AMPS) < Constants.INTAKE_SLIDES_STALL_THRESHOLD)
-            slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + accelFF * ay);
+            slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + accelFF * ay + springFF * (Constants.INTAKE_SLIDES_EXTEND_TICKS - getSlidesPos()));
         else slidesMotor.setPower(0);
         addPacket("intake slides current", slidesMotor.getCurrent(CurrentUnit.AMPS));
 

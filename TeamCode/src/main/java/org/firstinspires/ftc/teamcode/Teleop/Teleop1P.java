@@ -36,11 +36,11 @@ public class Teleop1P extends LinearOpMode {
     private boolean defenseModeToggle = false;
 
     // Control Gains
-    private double xyGain = 1;
-    private double wGain = 0.8;
+    public static double xyGain = 1;
+    public static double wGain = 0.8;
 
-    private double xySlowGain = 0.3;
-    private double wSlowGain = 0.4;
+    public static double xySlowGain = 0.3;
+    public static double wSlowGain = 0.4;
 
     // Rumbles
     private boolean teleRumble1 = false;
@@ -97,6 +97,9 @@ public class Teleop1P extends LinearOpMode {
 
             if (gamepad1.dpad_up) robot.deposit.initialSlidesPos -= .4;
             if (gamepad1.dpad_down) robot.deposit.initialSlidesPos += .4;
+
+            if (gamepad1.dpad_left) robot.intake.initialSlidesPos -= .4;
+            if (gamepad1.dpad_right) robot.intake.initialSlidesPos += .4;
 
             robot.outtake = gamepad1.left_bumper;
             robot.intakeNoExtend = gamepad1.right_bumper;
