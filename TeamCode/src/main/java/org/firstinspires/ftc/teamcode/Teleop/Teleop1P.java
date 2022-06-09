@@ -98,8 +98,8 @@ public class Teleop1P extends LinearOpMode {
             if (gamepad1.dpad_up) robot.deposit.initialSlidesPos -= .4;
             if (gamepad1.dpad_down) robot.deposit.initialSlidesPos += .4;
 
-            if (gamepad1.dpad_left) robot.intake.initialSlidesPos -= .4;
-            if (gamepad1.dpad_right) robot.intake.initialSlidesPos += .4;
+            if (gamepad1.dpad_left) robot.intake.initialSlidesPos += .4;
+            if (gamepad1.dpad_right) robot.intake.initialSlidesPos -= .4;
 
             robot.outtake = gamepad1.left_bumper;
             robot.intakeNoExtend = gamepad1.right_bumper;
