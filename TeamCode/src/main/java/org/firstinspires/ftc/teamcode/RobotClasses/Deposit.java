@@ -22,6 +22,7 @@ public class Deposit {
     public int slidesError = 0;
     public int slidesTarget = 0;
 
+    //PID constants
     public static double slidesKp = 0.03;
     public static double slidesKd = 0;
 
@@ -43,6 +44,8 @@ public class Deposit {
     public Deposit(LinearOpMode op, boolean isAuto) {
         this(op, isAuto, 0);
     }
+
+    //general mappings, init positions/modes
     public Deposit(LinearOpMode op, boolean isAuto, int initialSlidesPos) {
         this.isAuto = isAuto;
 
@@ -73,6 +76,8 @@ public class Deposit {
 
     public void extendSlides () {extendSlides(Robot.DepositTarget.high);}
 
+
+    //sets the slide height/position based on deposit level
     public void extendSlides(Robot.DepositTarget hub){
         if (hub == Robot.DepositTarget.high) slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS + (int) Math.round(highOffset);
         else if (hub == Robot.DepositTarget.mid) slidesTarget = Constants.DEPOSIT_SLIDES_MID_TICKS + (int) Math.round(midOffset);
@@ -91,6 +96,7 @@ public class Deposit {
         updateSlides(false);
     }
 
+    //Slide PD
     public void updateSlides(boolean capping){
         double slidesKp = !capping ? this.slidesKp : this.slidesCapKp;
         double slidesKd = !capping ? this.slidesKd : this.slidesCapKd;

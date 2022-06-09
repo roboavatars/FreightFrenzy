@@ -66,6 +66,8 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
         ElapsedTime time = new ElapsedTime();
 
+        //loading path based on barcode position
+
         if (barcodeCase == BarcodePipeline.Case.Left) {
             robot.cycleHub = Robot.DepositTarget.low;
             preloadDepositPos = new double[]{22, 69, 13 * PI / 15};
@@ -95,6 +97,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
             addPacket("time left", timeLeft);
 
             if (!preloadScore) {
+                //preload depositing
                 addPacket("path", "initial deposit imo");
 
                 Pose curPose = preloadScorePath.getRobotPose(Math.min(preloadScoreTime, time.seconds()));
@@ -108,6 +111,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     robot.intakeApproval = true;
                 }
             } else if (!goToWarehouse) {
+                //starting warehouse traveling
                 robot.depositApproval = false;
                 if (robot.depositState != 1 && robot.depositState != 7) robot.intakeApproval = false;
 
@@ -117,6 +121,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     cycleScore = true;
                 } else {
                     switch (goToWarehouseSteps) {
+                        //cycling between warehouse and depositing
                         case 1:
                             robot.drivetrain.constantStrafeConstant = 0; //0.4
                             robot.setTargetPoint(new Target(3, 78, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
