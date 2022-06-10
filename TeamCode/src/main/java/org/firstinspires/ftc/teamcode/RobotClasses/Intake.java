@@ -35,7 +35,7 @@ public class Intake {
     public static double slidesKp = 0.025;
     public static double slidesKd = 0.03;
     public static double accelFF = 0;
-    public static double springFF = -0.001;
+    public static double springFF = 0;
 
     private LinearOpMode op;
     private boolean isAuto;
@@ -55,7 +55,7 @@ public class Intake {
         else flipDown();
 
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "intakeSlides");
-        slidesMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        slidesMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slidesMotor.setTargetPosition(0);
         slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -148,6 +148,10 @@ public class Intake {
 
     public boolean isFull() {
         return getDistance() > (isAuto? Constants.INTAKE_DISTANCE_THRESHOLD_AUTO : Constants.INTAKE_DISTANCE_THRESHOLD_TELE);
+    }
+
+    public boolean transferred() {
+        return getDistance() < Constants.INTAKE_SENSOR_TRANSFER_THRESHOLD;
     }
 
 //    public String getElement() {

@@ -32,6 +32,7 @@ public class Deposit {
 
     public double midOffset = 0;
     public double highOffset = 0;
+    public double sharedOffset = 0;
 
     public double initialSlidesPos;
 
@@ -76,7 +77,7 @@ public class Deposit {
     public void extendSlides(Robot.DepositTarget hub){
         if (hub == Robot.DepositTarget.high) slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS + (int) Math.round(highOffset);
         else if (hub == Robot.DepositTarget.mid) slidesTarget = Constants.DEPOSIT_SLIDES_MID_TICKS + (int) Math.round(midOffset);
-        else if (hub == Robot.DepositTarget.low) slidesTarget = Constants.DEPOSIT_SLIDES_LOW_TICKS;
+        else if (hub == Robot.DepositTarget.low || hub == Robot.DepositTarget.shared) slidesTarget = Constants.DEPOSIT_SLIDES_LOW_TICKS;
         else if (hub == Robot.DepositTarget.cap) slidesTarget = Constants.DEPOSIT_SLIDES_CAP_TICKS;
 
 //        slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS;
@@ -103,7 +104,12 @@ public class Deposit {
     }
 
     public void armOut() {
-        setArmControls(Constants.ARM_DEPOSIT_POS);
+        armOut(Robot.DepositTarget.high);
+    }
+
+    public void armOut(Robot.DepositTarget hub) {
+        if (hub == Robot.DepositTarget.shared) setArmControls(Constants.ARM_SHARED_POS + sharedOffset);
+        else setArmControls(Constants.ARM_ALLIANCE_POS);
         isExtended = true;
     }
 

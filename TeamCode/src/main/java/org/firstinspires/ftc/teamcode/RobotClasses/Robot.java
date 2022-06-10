@@ -65,6 +65,7 @@ public class Robot {
     public String antiStallStep = "n/a";
 
     public boolean intakeFull;
+    public boolean intakeTransferred;
     public boolean intakeStalling;
 
 
@@ -156,6 +157,7 @@ public class Robot {
         high,
         mid,
         low,
+        shared,
         cap
     }
 
@@ -246,13 +248,13 @@ public class Robot {
         curTime = System.currentTimeMillis();
 
         // Don't check states every loop
-        if (loopCounter % sensorUpdatePeriod == 0 && intakeState != 1) {
+        if (loopCounter % sensorUpdatePeriod == 0) {
             intakeFull = intake.isFull();
-//            element = intake.getElement();
+                intakeTransferred = intake.transferred();
         }
         addPacket("intake current", intake.getCurrent());
 //        profile(1);
-        if (loopCounter % stallUpdatePeriod == 0 && intakeState != 1) {
+        if (loopCounter % stallUpdatePeriod == 0 && intakeState == 2 || intakeState == 3) {
             intakeStalling = intake.checkIfStalling();
         }
 //        profile(2);
@@ -373,12 +375,15 @@ public class Robot {
         if (!intakeEnabled) intakeState = 6;
         switch (intakeState) {
             case 1: //intake home
-                if (!intakeUp && !(isAuto && !carouselAuto && y < 75 && Math.abs(theta - PI / 2) > PI / 10) && !(!isAuto && cycleHub == DepositTarget.low))
+                if (!intakeUp && !(isAuto && !carouselAuto && y < 75 && Math.abs(theta - PI / 2) > PI / 10) && !(!isAuto && cycleHub == DepositTarget.shared))
                     intake.flipDown();
                 else intake.flipUp();
                 intake.off();
-                if (isAuto && intakeApproval && (y >= startIntakingAutoY || carouselAuto))
+                if (isAuto && intakeApproval && (y >= startIntakingAutoY || carouselAuto)) {
                     intakeState++;
+                    intakeFull = intake.isFull();
+                    intakeStalling = intake.checkIfStalling();
+                }
                 break;
             case 2: //intake freight
 //                if (isAuto) intake.extend();
@@ -391,7 +396,7 @@ public class Robot {
                     intakeFull = false;
                 } else intakeFull = System.currentTimeMillis() - freightDetectedTime > (isAuto ? Constants.INTAKE_TIME_THRESHOLD_AUTO : Constants.INTAKE_TIME_THRESHOLD_TELE);
 
-                if (intakeFull || (!isAuto && !intakeApproval) || transferOverride) {
+                if ((isAuto && intakeFull) || (!isAuto && !intakeApproval) || transferOverride) {
                     intakeState++;
                     intakeRetractStart = System.currentTimeMillis();
 //                    if (element == "ball" || midGoal) cycleHub = DepositTarget.mid;
@@ -399,7 +404,8 @@ public class Robot {
                     if (isAuto) cycleHub = DepositTarget.high;
                 }
                 if (intakeFull && !isAuto && intakeApproval) {
-                    intakeApproval = false;
+//                    intakeApproval = false;
+                    rumble = true;
                 }
 
                 //anti-stall
@@ -433,12 +439,13 @@ public class Robot {
             case 4: //wait for deposit to retract
                 if (depositState == 1) {
                     intakeState++;
+                    intakeTransferred = intake.transferred();
                     transferStart = System.currentTimeMillis();
                 }
                 break;
             case 5: //transfer
                 intake.reverse();
-                if ((!isAuto && depositApproval) || (System.currentTimeMillis() - transferStart > (isAuto ? autoTransferThreshold : teleTransferThreshold))) {
+                if ((!isAuto && depositApproval) || intakeTransferred) {//(System.currentTimeMillis() - transferStart > (isAuto ? autoTransferThreshold : teleTransferThreshold))) {
                     intakeState = 1;
                     depositState = 2;
                     sharedState = 2;
@@ -466,13 +473,14 @@ public class Robot {
                 break;
             case 3: //extend deposit
                 deposit.extendSlides(cycleHub);
-                deposit.armOut();
+                deposit.armOut(cycleHub);
                 deposit.hold();
                 startExtendTime = curTime;
                 if (isAuto || !depositApproval) depositState++;
                 break;
             case 4: //wait for driver approval for release
                 deposit.extendSlides(cycleHub);
+                deposit.armOut(cycleHub);
                 if ((!isAuto || (deposit.slidesAtPos() && curTime - startExtendTime > armFlipThreshold)) && (depositApproval || releaseApproval)) {
                     depositState++;
                     depositStart = System.currentTimeMillis();

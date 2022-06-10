@@ -95,8 +95,24 @@ public class Teleop1P extends LinearOpMode {
             }
             robot.outtake = gamepad1.left_bumper;
 
-            if (gamepad1.dpad_up) robot.deposit.initialSlidesPos -= .4;
-            if (gamepad1.dpad_down) robot.deposit.initialSlidesPos += .4;
+            if (robot.rumble) gamepad1.rumble(500);
+
+            if (robot.capState == 4 || robot.capState == 5) {
+                if (gamepad1.dpad_up) robot.capArm.upOffset += .007;
+                if (gamepad1.dpad_down) robot.capArm.upOffset -= .007;
+            } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.high) {
+                if (gamepad1.dpad_up) robot.deposit.highOffset += 1;
+                if (gamepad1.dpad_down) robot.deposit.highOffset -= 1;
+            } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.mid) {
+                if (gamepad1.dpad_up) robot.deposit.midOffset += 1;
+                if (gamepad1.dpad_down) robot.deposit.midOffset -= 1;
+            } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.shared) {
+                if (gamepad1.dpad_up) robot.deposit.sharedOffset -= 0.003;
+                if (gamepad1.dpad_down) robot.deposit.sharedOffset += 0.003;
+            } else {
+                if (gamepad1.dpad_up) robot.deposit.initialSlidesPos -= .4;
+                if (gamepad1.dpad_down) robot.deposit.initialSlidesPos += .4;
+            }
 
             if (gamepad1.dpad_left) robot.intake.initialSlidesPos += .4;
             if (gamepad1.dpad_right) robot.intake.initialSlidesPos -= .4;
@@ -109,7 +125,7 @@ public class Teleop1P extends LinearOpMode {
             if (gamepad1.y) {
                 robot.cycleHub = Robot.DepositTarget.mid;
             } else if (gamepad1.b) {
-                robot.cycleHub = Robot.DepositTarget.low;
+                robot.cycleHub = Robot.DepositTarget.shared;
             } else if (gamepad1.left_trigger > .1) {
                 robot.cycleHub = Robot.DepositTarget.high;
             }
