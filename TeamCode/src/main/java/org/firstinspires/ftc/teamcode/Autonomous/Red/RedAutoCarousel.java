@@ -22,6 +22,8 @@ public class RedAutoCarousel extends LinearOpMode {
     public void runOpMode() {
         Robot robot = new Robot(this, 135.0, 41, PI / 2, true, true);
 
+        //segment times
+
         double goToPreload = 1;
         double timeToCarousel = 1;
         double timeToPark = 0.75;
@@ -50,6 +52,8 @@ public class RedAutoCarousel extends LinearOpMode {
 
         ElapsedTime time = new ElapsedTime();
 
+        //setting the target deposit position dependent on barcode case:
+
         if (barcodeCase == BarcodePipeline.Case.Left) {
             robot.cycleHub = Robot.DepositTarget.low;
         } else if (barcodeCase == BarcodePipeline.Case.Middle) {
@@ -68,6 +72,7 @@ public class RedAutoCarousel extends LinearOpMode {
 
             switch (autoSteps) {
                 case 1:
+                    //robot goes to deposit preload
                     Pose curPose = preloadP.getRobotPose(Math.min(goToPreload, time.seconds()));
                     robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
 
@@ -86,6 +91,7 @@ public class RedAutoCarousel extends LinearOpMode {
                     }
                     break;
                 case 2:
+                    //spins carousel and intakes duck
                     Pose curDuck = preloadDuck.getRobotPose(Math.min(timeToCarousel, time.seconds()));
                     robot.setTargetPoint(new Target(curDuck));
 
@@ -105,6 +111,7 @@ public class RedAutoCarousel extends LinearOpMode {
 
                                 if (robot.intakeState == 3) {
                                     robot.intakeApproval = false;
+                                    //once the duck is swept, load waypoint to deposit the duck
                                     Waypoint[] depositDuck = new Waypoint[]{
                                             new Waypoint(robot.x, robot.y, 11 * PI / 4, 10, 10, 0, 0),
                                             new Waypoint(118, 48, -7 * PI / 6, 10, 10, 0, 1),
@@ -117,6 +124,7 @@ public class RedAutoCarousel extends LinearOpMode {
                     break;
 
                 case 3:
+                    //deposits the duck
                     Pose curDepo = depoDuck.getRobotPose(Math.min(time.seconds(), timeToCarousel));
                     robot.setTargetPoint(new Target(curDepo).theta(curDepo.theta + PI));
 
@@ -129,6 +137,7 @@ public class RedAutoCarousel extends LinearOpMode {
                     }
                     break;
                 case 4:
+                    //parks in the storage deposit
                     Pose curPark = gotoP.getRobotPose(Math.min(time.seconds(), timeToPark));
                     robot.setTargetPoint(new Target(curPark).theta(curPark.theta + PI));
 

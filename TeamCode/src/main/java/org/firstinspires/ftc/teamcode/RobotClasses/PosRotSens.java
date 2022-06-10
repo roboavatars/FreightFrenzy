@@ -11,6 +11,7 @@ public class PosRotSens {
     private DistanceSensor dsens;
     private DistanceSensor X;
     private DistanceSensor Y;
+    //setting up distance sensors
     public PosRotSens (LinearOpMode op, boolean isRed) {
         if(isRed){
             X = op.hardwareMap.get(DistanceSensor.class, "DistanceSensorRedX");
@@ -24,6 +25,7 @@ public class PosRotSens {
         //double distX = X.getDistance(DistanceUnit.INCH) + 6;
         //double distY = Y.getDistance(DistanceUnit.INCH) + 9;
     }
+    //update general values
     public double[] update (){
         double notx = X.getDistance(DistanceUnit.INCH) + 6;
         double noty = Y.getDistance(DistanceUnit.INCH) + 9;

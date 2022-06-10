@@ -32,6 +32,8 @@ public class Intake {
     public int slidesError = 0;
     public int slidesTarget = 0;
 
+    //PID constantly
+
     public static double slidesKp = 0.025;
     public static double slidesKd = 0.03;
     public static double accelFF = 0;
@@ -45,6 +47,7 @@ public class Intake {
         this(op, isAuto, false, 0);
     }
 
+    //mapping, general intake/slide modes
     public Intake(LinearOpMode op, boolean isAuto, boolean carouselAuto, int initialSlidesPos) {
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -111,6 +114,7 @@ public class Intake {
         slidesTarget = Math.min(Constants.INTAKE_SLIDES_EXTEND_TICKS, Math.max(position, 0));
     }
 
+    //runs pid for slides
     public void updateSlides(double ay){
         int currentTicks = getSlidesPos();
         slidesErrorChange = slidesTarget - currentTicks - slidesError;
@@ -146,6 +150,7 @@ public class Intake {
         return intakeSensor.getLightDetected();
     }
 
+    //checks if block/ball is in intake
     public boolean isFull() {
         return getDistance() > (isAuto? Constants.INTAKE_DISTANCE_THRESHOLD_AUTO : Constants.INTAKE_DISTANCE_THRESHOLD_TELE);
     }

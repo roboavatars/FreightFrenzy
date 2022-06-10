@@ -14,6 +14,7 @@ public class CapMech {
     public double upOffset = 0;
     public double downOffset = 0;
 
+    //mapping, set init position
     public CapMech(LinearOpMode op, boolean isAuto) {
         this.isAuto = isAuto;
 
@@ -26,6 +27,8 @@ public class CapMech {
 
         op.telemetry.addData("Status", "Cap Mech Initialized");
     }
+
+    //general methods for setting the claw position
 
     public void open () {
         clawServo.setPosition(Constants.CAP_HOME);
