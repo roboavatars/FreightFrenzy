@@ -191,7 +191,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 robot.drivetrain.constantStrafeConstant = robot.y > Robot.startIntakingAutoY ? -0.7 : 0;
 
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
-                robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
+                robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI).thetaKp(1.5).thetaKd(0.1));
 
                 addPacket("path", "going to deposit right rn");
 
@@ -207,7 +207,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                 if (robot.depositState == 6) {
                     cycleCounter++;
                     highCyclePos[0] -= 0.5;
-                    highCyclePos[2] += 0.05;
+                    highCyclePos[2] += 0.04;
 //                    if (cycleCounter == 2) robot.noExtend = false;
 
                     resetOdo = false;
@@ -216,7 +216,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                     robot.intakeApproval = true;
                 }
             } else { //parking
-                robot.setTargetPoint(new Target(137.5, 109, PI/2));
+                robot.setTargetPoint(new Target(137.5, 111, PI/2));
                 robot.depositEnabled = false;
                 if (timeLeft < 1) {
                     robot.intakeEnabled = false;

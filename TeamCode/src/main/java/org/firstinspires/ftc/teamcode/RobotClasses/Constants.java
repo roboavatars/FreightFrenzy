@@ -12,11 +12,11 @@ public class Constants {
     public static double LAT_ODO_RETRACT_POS = 0.48;
 
     // Intake
-    public static double INTAKE_DISTANCE_THRESHOLD_AUTO = 0.32;
+    public static double INTAKE_DISTANCE_THRESHOLD_AUTO = 0.25;
     public static double INTAKE_TIME_THRESHOLD_AUTO = 400;
     public static double INTAKE_DISTANCE_THRESHOLD_TELE = 0.45;
     public static double INTAKE_TIME_THRESHOLD_TELE = 0;
-    public static double INTAKE_SENSOR_TRANSFER_THRESHOLD = 0.08;
+    public static double INTAKE_SENSOR_TRANSFER_THRESHOLD = 0.09;
     public static double INTAKE_RETRACT_POWER = 1;
     public static double STALL_THRESHOLD = 6;
     public static double COLOR_SENSOR_THRESHOLD = 110;

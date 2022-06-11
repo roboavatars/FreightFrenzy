@@ -112,7 +112,7 @@ public class Robot {
     public static double teleReleaseThreshold = 250;
     public static double autoReleaseThreshold = 250;
     public static double intakeFlipThreshold = 400;
-    public static double armFlipThreshold = 750;
+    public static double armFlipThreshold = 1250;
     public static double armReturnThreshold = 1000;
     //    public String element;
     public double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
