@@ -95,8 +95,7 @@ public class Teleop2P extends LinearOpMode {
         cycleTimer.reset();
 
         while (opModeIsActive()) {
-            robot.depositApproval = gamepad2.dpad_left || gamepad2.dpad_right || gamepad2.a;
-            robot.releaseApproval = gamepad1.left_trigger > .1;
+            robot.depositApproval = gamepad1.left_trigger > .1 || gamepad1.b || gamepad1.left_bumper;
 
             boolean intakeApproval = gamepad1.right_trigger > .1 || gamepad1.right_bumper;
             if (robot.intakeApproval && !intakeApproval) robot.intakeApproval = false;
@@ -106,18 +105,19 @@ public class Teleop2P extends LinearOpMode {
             } else if (!intakeApproval && intakeApprovalToggle) {
                 intakeApprovalToggle = false;
             }
-            robot.outtake = gamepad1.left_bumper;
+
+            robot.outtake = gamepad1.y;
             robot.intakeNoExtend = gamepad1.right_bumper;
             robot.intakeUp = gamepad1.back;
 
             if (robot.rumble) gamepad1.rumble(500);
 
 
-            if (gamepad2.dpad_right) {
+            if (gamepad1.left_bumper) {
                 robot.cycleHub = Robot.DepositTarget.mid;
-            } else if (gamepad2.dpad_left) {
+            } else if (gamepad1.b) {
                 robot.cycleHub = Robot.DepositTarget.shared;
-            } else if (gamepad2.a) {
+            } else if (gamepad1.left_trigger > .1) {
                 robot.cycleHub = Robot.DepositTarget.high;
             }
 

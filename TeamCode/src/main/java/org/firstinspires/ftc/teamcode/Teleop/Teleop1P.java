@@ -83,7 +83,7 @@ public class Teleop1P extends LinearOpMode {
         cycleTimer.reset();
 
         while (opModeIsActive()) {
-            robot.depositApproval = gamepad1.left_trigger > .1 || gamepad1.b || gamepad1.y;
+            robot.depositApproval = gamepad1.left_trigger > .1 || gamepad1.b || gamepad1.left_bumper;
 
             boolean intakeApproval = gamepad1.right_trigger > .1 || gamepad1.right_bumper;
             if (robot.intakeApproval && !intakeApproval) robot.intakeApproval = false;
@@ -93,7 +93,7 @@ public class Teleop1P extends LinearOpMode {
             } else if (!intakeApproval && intakeApprovalToggle) {
                 intakeApprovalToggle = false;
             }
-            robot.outtake = gamepad1.left_bumper;
+            robot.outtake = gamepad1.y;
 
             if (robot.rumble) gamepad1.rumble(500);
 
@@ -117,12 +117,12 @@ public class Teleop1P extends LinearOpMode {
             if (gamepad1.dpad_left) robot.intake.initialSlidesPos += .4;
             if (gamepad1.dpad_right) robot.intake.initialSlidesPos -= .4;
 
-            robot.outtake = gamepad1.left_bumper;
+            robot.outtake = gamepad1.y;
             robot.intakeNoExtend = gamepad1.right_bumper;
             robot.intakeUp = gamepad1.x;
 
 
-            if (gamepad1.y) {
+            if (gamepad1.left_bumper) {
                 robot.cycleHub = Robot.DepositTarget.mid;
             } else if (gamepad1.b) {
                 robot.cycleHub = Robot.DepositTarget.shared;

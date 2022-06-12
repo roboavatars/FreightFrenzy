@@ -67,6 +67,7 @@ public class Robot {
     public boolean intakeFull;
     public boolean intakeTransferred;
     public boolean intakeStalling;
+    public double intakeSensorDist;
 
 
     // Automation Variables
@@ -112,7 +113,7 @@ public class Robot {
     public static double teleReleaseThreshold = 250;
     public static double autoReleaseThreshold = 250;
     public static double intakeFlipThreshold = 400;
-    public static double armFlipThreshold = 1250;
+    public static double armFlipThreshold = 750;
     public static double armReturnThreshold = 1000;
     //    public String element;
     public double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
@@ -140,7 +141,8 @@ public class Robot {
     public static int stallThreshold = 750;
     public double automationStepTime;
     public double depositTime = 0;
-    public static double startIntakingAutoY = 106;
+    public static double startIntakingRedAutoY = 106;
+    public static double startIntakingBlueAutoY = 110;
     public static double extendDepositAutoY = 95;
 
     // Motion Variables
@@ -250,7 +252,8 @@ public class Robot {
         // Don't check states every loop
         if (loopCounter % sensorUpdatePeriod == 0) {
             intakeFull = intake.isFull();
-                intakeTransferred = intake.transferred();
+            intakeTransferred = intake.transferred();
+            intakeSensorDist = intake.getDistance();
         }
         addPacket("intake current", intake.getCurrent());
 //        profile(1);
@@ -335,6 +338,7 @@ public class Robot {
         addPacket("pod zeroes", drivetrain.zero1 + " " + drivetrain.zero2 + " " + drivetrain.zero3);
         addPacket("intake slides", intake.getSlidesPos());
         addPacket("deposit slides", deposit.getSlidesPos());
+        addPacket("Intake Sensor", intakeSensorDist);
 
         if (!isAuto) {
             addPacket("z0 Current Time", (curTime - lastCycleTime) / 1000);
@@ -379,7 +383,7 @@ public class Robot {
                     intake.flipDown();
                 else intake.flipUp();
                 intake.off();
-                if (isAuto && intakeApproval && (y >= startIntakingAutoY || carouselAuto)) {
+                if (isAuto && intakeApproval && (y >= (isRed ? startIntakingRedAutoY : startIntakingBlueAutoY) || carouselAuto)) {
                     intakeState++;
                     intakeFull = intake.isFull();
                     intakeStalling = intake.checkIfStalling();

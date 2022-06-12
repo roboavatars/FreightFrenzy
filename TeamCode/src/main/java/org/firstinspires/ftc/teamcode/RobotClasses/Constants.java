@@ -29,7 +29,7 @@ public class Constants {
 
 
     // Intake Servo
-    public static double INTAKE_UP_POS = 0.85;
+    public static double INTAKE_UP_POS = 0.8;
     public static double INTAKE_DOWN_POS = 0.1;
 
     // Deposit Servo

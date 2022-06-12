@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Config
 @Autonomous(name = "0 Blue Auto Warehouse", preselectTeleOp = "2 Teleop 2P", group = "Red")
 public class BlueAutoWarehouse extends LinearOpMode {
-    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Middle;
+    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Left;
 
     @Override
     public void runOpMode() {
@@ -101,9 +101,12 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 addPacket("path", "initial deposit imo");
 
                 Pose curPose = preloadScorePath.getRobotPose(Math.min(preloadScoreTime, time.seconds()));
-                robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
+                boolean thetaAtTarget = Math.abs(robot.theta - preloadDepositPos[2]) < PI/20;
+                robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI)
+                        .thetaKp(thetaAtTarget ? 1 : Drivetrain.thetaKp)
+                        .thetaKd(thetaAtTarget ? 0 : Drivetrain.thetaKd));
 
-                robot.depositApproval = robot.isAtPose(preloadDepositPos[0], preloadDepositPos[1], preloadDepositPos[2], 2, 2, PI / 10) && robot.notMoving();
+                robot.depositApproval = robot.isAtPose(preloadDepositPos[0], preloadDepositPos[1], preloadDepositPos[2], 2, 2, PI/20) && robot.notMoving();
 
                 if (robot.depositState == 6) {
                     time.reset();
@@ -111,9 +114,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     robot.intakeApproval = true;
                 }
             } else if (!goToWarehouse) {
-                //starting warehouse traveling
                 robot.depositApproval = false;
-                if (robot.depositState != 1 && robot.depositState != 7) robot.intakeApproval = false;
 
                 if (timeLeft < parkThreshold && goToWarehouseSteps != 1) {
                     time.reset();
@@ -126,36 +127,40 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             robot.drivetrain.constantStrafeConstant = 0; //0.4
                             robot.setTargetPoint(new Target(3, 78, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
                             addPacket("path", "going to the wall right rn");
-                            if (robot.x < 9 && Math.abs(PI / 2 - robot.theta) < PI / 10)
+                            if (robot.x < (7 /*+ 1.5*cycleCounter*/) && Math.abs(PI / 2 - robot.theta) < PI / 10)
                                 goToWarehouseSteps++;
                             break;
                         case 2:
                             robot.intake.setSlidesPosition((int) Math.round(robot.intakeExtendDist));
-                            robot.drivetrain.constantStrafeConstant = 0;
-                            robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 < -PI / 10 ? 0.5 : 0);
+                            robot.drivetrain.constantStrafeConstant = -0.7;
+//                            robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 > PI / 10 ? -0.5 : 0);
+                            robot.setTargetPoint(new Target(4, Robot.startIntakingBlueAutoY, PI/2).thetaKp(3));
                             passLineTime = time.seconds();
                             addPacket("path", "going to warehouse right rn");
-                            if (robot.y > Robot.startIntakingAutoY - 1) goToWarehouseSteps++;
+                            if (robot.y > Robot.startIntakingBlueAutoY - 1) goToWarehouseSteps++;
                             break;
                         case 3:
                             robot.drivetrain.constantStrafeConstant = 0;
                             if (cycleCounter < 3) {
-                                double y = Math.min(Robot.startIntakingAutoY + 0.75 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
+                                double y = Math.min(Robot.startIntakingBlueAutoY + 0.75 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
                                 double theta = PI / 2 + (PI / 15) * (Math.cos(4 * (time.seconds() - passLineTime)) - 1);
                                 robot.setTargetPoint(new Target(6, y, theta));
                             } else {
                                 double x = Math.min(6 + 1 * (time.seconds() - passLineTime), 14);
-                                double y = Robot.startIntakingAutoY + 0.75 * (cycleCounter - 3) + (5 * Math.sin(4 * (time.seconds() - passLineTime)));
+                                double y = Robot.startIntakingBlueAutoY + 0.75 * (cycleCounter - 3) + (5 * Math.sin(4 * (time.seconds() - passLineTime)));
                                 double theta = PI / 2 - (PI / 8 * Math.sin(4 * (time.seconds() - passLineTime)));
                                 robot.setTargetPoint(new Target(x, y, theta));
                             }
-                            if (robot.intakeState == 3) goToWarehouseSteps++;
+                            if (robot.intakeState == 3) {
+                                robot.intakeApproval = false;
+                                goToWarehouseSteps++;
+                            }
 
                             addPacket("path", "creeping right rn");
                             break;
                         case 4:
-                            robot.setTargetPoint(new Target(3, Robot.startIntakingAutoY, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
-                            if (robot.x < 7 && Math.abs(PI / 2 - robot.theta) < PI / 10)
+                            robot.setTargetPoint(new Target(3, Robot.startIntakingBlueAutoY, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
+                            if (robot.x < (7 /*+ 1.5*cycleCounter*/) && Math.abs(PI / 2 - robot.theta) < PI / 10)
                                 goToWarehouseSteps++;
                             break;
                         case 5:
@@ -185,25 +190,27 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     }
                 }
 
-                if (Math.abs(robot.y - 97) < 0.5 && !resetOdo) {
+                if (Math.abs(robot.y - 90) < 0.5 && !resetOdo) {
                     robot.resetOdo(6, robot.y, PI / 2);
                     resetOdo = true;
                 }
             } else if (!cycleScore) {
-                robot.drivetrain.constantStrafeConstant = robot.y > Robot.startIntakingAutoY ? 0.7 : 0;
+                robot.drivetrain.constantStrafeConstant = robot.y > Robot.startIntakingBlueAutoY ? 0.7 : 0;
 
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
-                robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
-
+                boolean thetaAtTarget = Math.abs(robot.theta - preloadDepositPos[2]) < PI/20;
+                robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI)
+                        .thetaKp(thetaAtTarget ? 1 : Drivetrain.thetaKp)
+                        .thetaKd(thetaAtTarget ? 0 : Drivetrain.thetaKd));
                 addPacket("path", "going to deposit right rn");
 
-                if (Math.abs(robot.y - 97) < 0.5 && !resetOdo) {
+                if (Math.abs(robot.y - 90) < 0.5 && !resetOdo) {
                     robot.resetOdo(6, robot.y, PI / 2);
                     resetOdo = true;
                 }
 
-                robot.depositApproval = (robot.cycleHub == Robot.DepositTarget.high && robot.isAtPose(highCyclePos[0], highCyclePos[1], highCyclePos[2], 2, 2, PI / 10))
-                        || (robot.cycleHub == Robot.DepositTarget.mid && robot.isAtPose(midCyclePos[0], midCyclePos[1], midCyclePos[2], 2, 2, PI / 10))
+                robot.depositApproval = (robot.cycleHub == Robot.DepositTarget.high && robot.isAtPose(highCyclePos[0], highCyclePos[1], highCyclePos[2], 2, 2, PI/20))
+//                        || (robot.cycleHub == Robot.DepositTarget.mid && robot.isAtPose(midCyclePos[0], midCyclePos[1], midCyclePos[2], 2, 2, PI/20))
                         && robot.notMoving();
 
                 if (robot.depositState == 6) {
