@@ -37,7 +37,7 @@ public class Teleop1P extends LinearOpMode {
 
     // Control Gains
     public static double xyGain = 1;
-    public static double wGain = 0.8;
+    public static double wGain = 1;
 
     public static double xySlowGain = 0.3;
     public static double wSlowGain = 0.4;

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -16,11 +18,13 @@ public class Deposit {
 
     public static int SLIDES_HOME_THRESHOLD = 20;
     public static int SLIDES_ERROR_THRESHOLD = 20;
+    public static double SLIDES_DRIFT_MULTIPLIER = 0.00021;
 
     // Slides PD
     public int slidesErrorChange = 0;
     public int slidesError = 0;
     public int slidesTarget = 0;
+    public int slidesLastTicks = 0;
 
     //PID constants
     public static double slidesKp = 0.03;
@@ -103,10 +107,15 @@ public class Deposit {
         double slidesKd = !capping ? this.slidesKd : this.slidesCapKd;
 
         int currentTicks = getSlidesPos();
+        initialSlidesPos += Math.abs(currentTicks - slidesLastTicks) * SLIDES_DRIFT_MULTIPLIER;
+        slidesLastTicks = currentTicks;
+
         slidesErrorChange = slidesTarget - currentTicks - slidesError;
         slidesError = slidesTarget - currentTicks;
 
         slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + gravityFF);
+
+        addPacket("initialSlidesPos", initialSlidesPos);
     }
 
     public void armOut() {

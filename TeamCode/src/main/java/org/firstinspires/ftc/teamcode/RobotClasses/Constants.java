@@ -16,14 +16,14 @@ public class Constants {
     public static double INTAKE_TIME_THRESHOLD_AUTO = 400;
     public static double INTAKE_DISTANCE_THRESHOLD_TELE = 0.45;
     public static double INTAKE_TIME_THRESHOLD_TELE = 0;
-    public static double INTAKE_SENSOR_TRANSFER_THRESHOLD = 0.09;
+    public static double INTAKE_SENSOR_TRANSFER_THRESHOLD = 0.15;
     public static double INTAKE_RETRACT_POWER = 1;
     public static double STALL_THRESHOLD = 6;
     public static double COLOR_SENSOR_THRESHOLD = 110;
 
     // Intake Slides
     public static int INTAKE_SLIDES_EXTEND_TICKS = 290;
-    public static int INTAKE_SLIDES_HOME_TICKS = 55;
+    public static int INTAKE_SLIDES_HOME_TICKS = 40;
     public static int INTAKE_SLIDES_DUCK_HOME_TICKS = 30;
     public static double INTAKE_SLIDES_STALL_THRESHOLD = 1000; //TODO: tune
 
@@ -35,7 +35,7 @@ public class Constants {
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.7;
     public static double DEPOSIT_HOLD_POS = 0;
-    public static double DEPOSIT_RELEASE_POS = 1;
+    public static double DEPOSIT_RELEASE_POS = 0.83;
     public static double DEPOSIT_CAP_POS = 0.5;
 
     // Deposit Arm

@@ -225,8 +225,9 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     robot.intakeApproval = true;
                 }
             } else { //parking
+                robot.drivetrain.constantStrafeConstant = 0;
                 robot.setTargetPoint(new Target(6.5, 112, PI / 2));
-                robot.depositEnabled = false;
+//                robot.depositEnabled = false;
                 if (timeLeft < 1) {
                     robot.intakeEnabled = false;
                     robot.drivetrain.stop();
