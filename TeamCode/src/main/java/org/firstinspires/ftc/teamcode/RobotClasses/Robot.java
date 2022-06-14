@@ -116,7 +116,9 @@ public class Robot {
     public static double intakeFlipThreshold = 400;
     public static double armFlipThreshold = 750;
     public static double armReturnThreshold = 1000;
-    public static double clampThresold = 500;
+    public static double clampThreshold = 500;
+    public static double waitClampThreshold = 150;
+
     //    public String element;
     public double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
     public boolean rumble = false;
@@ -403,6 +405,7 @@ public class Robot {
                 } else intakeFull = System.currentTimeMillis() - freightDetectedTime > (isAuto ? Constants.INTAKE_TIME_THRESHOLD_AUTO : Constants.INTAKE_TIME_THRESHOLD_TELE);
 
                 if ((isAuto && intakeFull) || (!isAuto && !intakeApproval) || transferOverride) {
+                    intake.off();
                     intakeState++;
                     intakeRetractStart = System.currentTimeMillis();
 //                    if (element == "ball" || midGoal) cycleHub = DepositTarget.mid;
@@ -410,7 +413,7 @@ public class Robot {
                     if (isAuto) cycleHub = DepositTarget.high;
                 }
                 if (intakeFull && !isAuto && intakeApproval) {
-//                    intakeApproval = false;
+                    intakeApproval = false;
                     rumble = true;
                 }
 
@@ -460,7 +463,7 @@ public class Robot {
                 break;
             case 6: //wait for deposit to clamp down on freight
 //                intake.off();
-                if (System.currentTimeMillis() - clampStart > clampThresold) intakeState = 1;
+                if (System.currentTimeMillis() - clampStart > clampThreshold) intakeState = 1;
                 break;
             case 7: //intake off toggle
                 intake.off();
@@ -479,7 +482,7 @@ public class Robot {
                 deposit.open();
                 break;
             case 2: //once transfer done, hold freight
-                deposit.hold();
+                if (System.currentTimeMillis() - clampStart > waitClampThreshold) deposit.hold();
                 if ((isAuto && y <= extendDepositAutoY) || depositApproval) depositState++;
                 break;
             case 3: //extend deposit

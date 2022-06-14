@@ -17,21 +17,22 @@ public class Constants {
     public static double INTAKE_DISTANCE_THRESHOLD_TELE = 0.45;
     public static double INTAKE_TIME_THRESHOLD_TELE = 0;
     public static double INTAKE_SENSOR_TRANSFER_THRESHOLD = 0.2;
-    public static double INTAKE_RETRACT_POWER = 1;
-    public static double INTAKE_TRANSFER_POWER = -1;
+    public static double INTAKE_RETRACT_POWER = 0.1;
+    public static double INTAKE_POWER = 0.8;
+    public static double INTAKE_TRANSFER_POWER = -0.8;
     public static double INTAKE_STALL_THRESHOLD = 6;
     public static double COLOR_SENSOR_THRESHOLD = 110;
 
     // Intake Slides
     public static int INTAKE_SLIDES_EXTEND_TICKS = 290;
-    public static int INTAKE_SLIDES_HOME_TICKS = 30;
+    public static int INTAKE_SLIDES_HOME_TICKS = 55;
     public static int INTAKE_SLIDES_DUCK_HOME_TICKS = 30;
     public static double INTAKE_SLIDES_STALL_THRESHOLD = 1000; //TODO: tune
 
 
     // Intake Servo
     public static double INTAKE_UP_POS = 0.8;
-    public static double INTAKE_DOWN_POS = 0.05;
+    public static double INTAKE_DOWN_POS = 0.1;
 
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.7;

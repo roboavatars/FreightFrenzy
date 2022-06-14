@@ -11,10 +11,12 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
 @TeleOp
 @Config
 public class HardwareTest extends LinearOpMode {
-//    public static String motorName1 = "carouselMotor";
+//    public static String motorName1 = "intake";
 //    public static String motorName2 = "depositSlides";
     public static String servoName1 = "intakeServo";
 //    public static String servoName2 = "depositServo";
@@ -49,7 +51,7 @@ public class HardwareTest extends LinearOpMode {
 //            motor1.setPower(motor1Power);
 //            motor1.setVelocity(motor1Power);
 //            motor2.setPower(motor2Power);
-//            addPacket("Motor Velocity", motor1.getVelocity());
+//            addPacket("Motor current", motor1.getCurrent(CurrentUnit.AMPS));
 //            sendPacket();
         }
     }
