@@ -18,7 +18,7 @@ public class Deposit {
 
     public static int SLIDES_HOME_THRESHOLD = 20;
     public static int SLIDES_ERROR_THRESHOLD = 50;
-    public static double SLIDES_DRIFT_MULTIPLIER = 0.00021;
+    public static double SLIDES_DRIFT_MULTIPLIER = 0.002;
 
     // Slides PD
     public int slidesErrorChange = 0;
@@ -27,13 +27,13 @@ public class Deposit {
     public int slidesLastTicks = 0;
 
     //PID constants
-    public static double slidesKp = 0.03;
+    public static double slidesKp = 0.01;
     public static double slidesKd = 0;
 
-    public static double slidesCapKp = 0.02;
+    public static double slidesCapKp = 0.002;
     public static double slidesCapKd = 0;
 
-    public static double gravityFF = .3;
+    public static double gravityFF = .1;
 
     public double midOffset = 0;
     public double highOffset = 0;

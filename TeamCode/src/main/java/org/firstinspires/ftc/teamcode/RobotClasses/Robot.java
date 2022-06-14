@@ -104,7 +104,7 @@ public class Robot {
     private double depositStartRetract;
     private double intakeRetractStart;
     private double freightDetectedTime;
-    private double clampStart;
+    private double clampStart = -Double.MAX_VALUE;
     public int intakeState = 1;
     public boolean intakeEnabled = true;
     public static double teleTransferThreshold = 750;
@@ -483,7 +483,8 @@ public class Robot {
                 break;
             case 2: //once transfer done, hold freight
                 if (System.currentTimeMillis() - clampStart > waitClampThreshold) deposit.hold();
-                if ((isAuto && y <= extendDepositAutoY) || depositApproval) depositState++;
+                if (((isAuto && y <= extendDepositAutoY) || depositApproval) && (System.currentTimeMillis() - clampStart > waitClampThreshold))
+                    depositState++;
                 break;
             case 3: //extend deposit
                 deposit.extendSlides(cycleHub);

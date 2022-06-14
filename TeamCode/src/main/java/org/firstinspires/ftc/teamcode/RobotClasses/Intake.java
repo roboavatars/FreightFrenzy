@@ -3,14 +3,15 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Config
 @SuppressWarnings("FieldCanBeLocal")
@@ -18,7 +19,7 @@ public class Intake {
     private DcMotorEx intakeMotor;
     private DcMotorEx slidesMotor;
     private Servo flipServo;
-    private OpticalDistanceSensor intakeSensor;
+    Rev2mDistanceSensor intakeSensor;
 
     private double lastIntakePow = 0;
     public static int slidesErrorThreshold = 5;
@@ -34,8 +35,8 @@ public class Intake {
 
     //PID constantly
 
-    public static double slidesKp = 0.025;
-    public static double slidesKd = 0.03;
+    public static double slidesKp = 0.01;
+    public static double slidesKd = 0.01;
     public static double accelFF = 0;
     public static double springFF = 0;
 
@@ -67,7 +68,7 @@ public class Intake {
         this.isAuto = isAuto;
         this.carouselAuto = carouselAuto;
 
-        intakeSensor = op.hardwareMap.get(OpticalDistanceSensor.class, "intakeSensor");
+        intakeSensor = op.hardwareMap.get(Rev2mDistanceSensor.class, "intakeSensor");
     }
 
     // Intake Motor
@@ -147,16 +148,16 @@ public class Intake {
 
     // Distance Sensor
     public double getDistance() {
-        return intakeSensor.getLightDetected();
+        return intakeSensor.getDistance(DistanceUnit.MM);
     }
 
     //checks if block/ball is in intake
     public boolean isFull() {
-        return getDistance() > (isAuto? Constants.INTAKE_DISTANCE_THRESHOLD_AUTO : Constants.INTAKE_DISTANCE_THRESHOLD_TELE);
+        return getDistance() < (isAuto? Constants.INTAKE_DISTANCE_THRESHOLD_AUTO : Constants.INTAKE_DISTANCE_THRESHOLD_TELE);
     }
 
     public boolean transferred() {
-        return getDistance() < Constants.INTAKE_SENSOR_TRANSFER_THRESHOLD;
+        return getDistance() > Constants.INTAKE_SENSOR_TRANSFER_THRESHOLD;
     }
 
 //    public String getElement() {

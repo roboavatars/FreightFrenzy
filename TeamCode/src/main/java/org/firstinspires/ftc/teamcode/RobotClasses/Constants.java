@@ -12,11 +12,11 @@ public class Constants {
     public static double LAT_ODO_RETRACT_POS = 0.48;
 
     // Intake
-    public static double INTAKE_DISTANCE_THRESHOLD_AUTO = 0.25;
-    public static double INTAKE_TIME_THRESHOLD_AUTO = 400;
-    public static double INTAKE_DISTANCE_THRESHOLD_TELE = 0.45;
+    public static double INTAKE_DISTANCE_THRESHOLD_AUTO = 30;
+    public static double INTAKE_TIME_THRESHOLD_AUTO = 0;
+    public static double INTAKE_DISTANCE_THRESHOLD_TELE = 30;
     public static double INTAKE_TIME_THRESHOLD_TELE = 0;
-    public static double INTAKE_SENSOR_TRANSFER_THRESHOLD = 0.2;
+    public static double INTAKE_SENSOR_TRANSFER_THRESHOLD = 30;
     public static double INTAKE_RETRACT_POWER = 0.1;
     public static double INTAKE_POWER = 0.8;
     public static double INTAKE_TRANSFER_POWER = -0.8;
@@ -25,7 +25,7 @@ public class Constants {
 
     // Intake Slides
     public static int INTAKE_SLIDES_EXTEND_TICKS = 290;
-    public static int INTAKE_SLIDES_HOME_TICKS = 55;
+    public static int INTAKE_SLIDES_HOME_TICKS = 50;
     public static int INTAKE_SLIDES_DUCK_HOME_TICKS = 30;
     public static double INTAKE_SLIDES_STALL_THRESHOLD = 1000; //TODO: tune
 
