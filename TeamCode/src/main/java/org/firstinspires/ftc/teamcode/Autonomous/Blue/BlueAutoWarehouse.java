@@ -49,7 +49,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
         double parkThreshold = 6;
         double preloadScoreTime = 1;
 
-        double[] highCyclePos = new double[]{19, 73, PI - 0.3};
+        double[] highCyclePos = new double[]{19, 73, PI - 0.45};
         double[] midCyclePos = new double[]{25, 72, PI - 0.3};
         double[] preloadDepositPos;
 
@@ -127,7 +127,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             robot.drivetrain.constantStrafeConstant = 0; //0.4
                             robot.setTargetPoint(new Target(3, 78, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
                             addPacket("path", "going to the wall right rn");
-                            if (robot.x < (7 /*+ 1.5*cycleCounter*/) && Math.abs(PI / 2 - robot.theta) < PI / 10)
+                            if (robot.x < (7 + 1.5*cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10)
                                 goToWarehouseSteps++;
                             break;
                         case 2:
@@ -144,7 +144,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             if (cycleCounter < 3) {
                                 double y = Math.min(Robot.startIntakingBlueAutoY + 0.75 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
                                 double theta = PI / 2 + (PI / 15) * (Math.cos(4 * (time.seconds() - passLineTime)) - 1);
-                                robot.setTargetPoint(new Target(6, y, theta));
+                                robot.setTargetPoint(new Target(6 + 1*cycleCounter, y, theta));
                             } else {
                                 double x = Math.min(6 + 1 * (time.seconds() - passLineTime), 14);
                                 double y = Robot.startIntakingBlueAutoY + 0.75 * (cycleCounter - 3) + (5 * Math.sin(4 * (time.seconds() - passLineTime)));
@@ -160,7 +160,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             break;
                         case 4:
                             robot.setTargetPoint(new Target(3, Robot.startIntakingBlueAutoY, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
-                            if (robot.x < (7 /*+ 1.5*cycleCounter*/) && Math.abs(PI / 2 - robot.theta) < PI / 10)
+                            if (robot.x < (7 + 1.5  *cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10)
                                 goToWarehouseSteps++;
                             break;
                         case 5:

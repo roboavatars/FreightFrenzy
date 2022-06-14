@@ -76,7 +76,7 @@ public class Intake {
     }
 
     public void reverse() {
-        setPower(-1);
+        setPower(Constants.INTAKE_TRANSFER_POWER);
     }
 
     public void off() {
@@ -91,7 +91,7 @@ public class Intake {
     }
 
     public boolean checkIfStalling() {
-        return getCurrent() > Constants.STALL_THRESHOLD;
+        return getCurrent() > Constants.INTAKE_STALL_THRESHOLD;
     }
 
     public double getCurrent() {

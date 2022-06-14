@@ -104,6 +104,7 @@ public class Robot {
     private double depositStartRetract;
     private double intakeRetractStart;
     private double freightDetectedTime;
+    private double clampStart;
     public int intakeState = 1;
     public boolean intakeEnabled = true;
     public static double teleTransferThreshold = 750;
@@ -115,6 +116,7 @@ public class Robot {
     public static double intakeFlipThreshold = 400;
     public static double armFlipThreshold = 750;
     public static double armReturnThreshold = 1000;
+    public static double clampThresold = 250;
     //    public String element;
     public double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
     public boolean rumble = false;
@@ -376,7 +378,7 @@ public class Robot {
 
         boolean waitForIntakeFlip = false;
         rumble = false;
-        if (!intakeEnabled) intakeState = 6;
+        if (!intakeEnabled) intakeState = 7;
         switch (intakeState) {
             case 1: //intake home
                 if (!intakeUp && !(isAuto && !carouselAuto && y < 75 && Math.abs(theta - PI / 2) > PI / 10) && !(!isAuto && cycleHub == DepositTarget.shared))
@@ -448,14 +450,19 @@ public class Robot {
                 }
                 break;
             case 5: //transfer
-                intake.reverse();
-                if ((!isAuto && depositApproval) || intakeTransferred) {//(System.currentTimeMillis() - transferStart > (isAuto ? autoTransferThreshold : teleTransferThreshold))) {
-                    intakeState = 1;
+                intake.setPower(Constants.INTAKE_TRANSFER_POWER);
+                if (/*(!isAuto && depositApproval) || */intakeTransferred) {//(System.currentTimeMillis() - transferStart > (isAuto ? autoTransferThreshold : teleTransferThreshold))) {
+                    intakeState++;
+                    clampStart = System.currentTimeMillis();
                     depositState = 2;
                     sharedState = 2;
                 }
                 break;
-            case 6:
+            case 6: //wait for deposit to clamp down on freight
+                intake.off();
+                if (System.currentTimeMillis() - clampStart > clampThresold) intakeState = 1;
+                break;
+            case 7: //intake off toggle
                 intake.off();
                 intake.home();
                 break;

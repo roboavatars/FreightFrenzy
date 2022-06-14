@@ -17,7 +17,7 @@ public class Deposit {
     private Servo depositServo;
 
     public static int SLIDES_HOME_THRESHOLD = 20;
-    public static int SLIDES_ERROR_THRESHOLD = 20;
+    public static int SLIDES_ERROR_THRESHOLD = 50;
     public static double SLIDES_DRIFT_MULTIPLIER = 0.00021;
 
     // Slides PD
