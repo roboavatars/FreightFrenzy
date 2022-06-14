@@ -37,6 +37,7 @@ public class Constants {
     public static double DEPOSIT_OPEN_POS = 0.7;
     public static double DEPOSIT_HOLD_POS = 0;
     public static double DEPOSIT_RELEASE_POS = 0.9;
+    public static double DEPOSIT_SHARED_RELEASE_POS = 1;
     public static double DEPOSIT_CAP_POS = 0.5;
 
     // Deposit Arm

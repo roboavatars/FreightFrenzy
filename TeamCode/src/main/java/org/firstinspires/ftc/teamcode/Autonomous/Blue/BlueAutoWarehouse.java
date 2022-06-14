@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Autonomous(name = "0 Blue Auto Warehouse", preselectTeleOp = "2 Teleop 2P", group = "Red")
 public class BlueAutoWarehouse extends LinearOpMode {
     public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Left;
+    public static double xDrift = 0;
 
     @Override
     public void runOpMode() {
@@ -127,12 +128,12 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             robot.drivetrain.constantStrafeConstant = 0; //0.4
                             robot.setTargetPoint(new Target(3, 78, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
                             addPacket("path", "going to the wall right rn");
-                            if (robot.x < (7 + 1.5*cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10)
+                            if (robot.x < (7 + xDrift*cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10)
                                 goToWarehouseSteps++;
                             break;
                         case 2:
                             robot.intake.setSlidesPosition((int) Math.round(robot.intakeExtendDist));
-                            robot.drivetrain.constantStrafeConstant = -0.7;
+                            robot.drivetrain.constantStrafeConstant = 0.7;
 //                            robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 > PI / 10 ? -0.5 : 0);
                             robot.setTargetPoint(new Target(4, Robot.startIntakingBlueAutoY, PI/2).thetaKp(3));
                             passLineTime = time.seconds();
@@ -141,26 +142,29 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             break;
                         case 3:
                             robot.drivetrain.constantStrafeConstant = 0;
-                            if (cycleCounter < 3) {
-                                double y = Math.min(Robot.startIntakingBlueAutoY + 0.75 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
-                                double theta = PI / 2 + (PI / 15) * (Math.cos(4 * (time.seconds() - passLineTime)) - 1);
-                                robot.setTargetPoint(new Target(6 + 1*cycleCounter, y, theta));
+                            if (robot.antiStallStep == "Reverse Intake") {
+                                robot.setTargetPoint(6.5, Robot.startIntakingBlueAutoY, PI/2);
                             } else {
-                                double x = Math.min(6 + 1 * (time.seconds() - passLineTime), 14);
-                                double y = Robot.startIntakingBlueAutoY + 0.75 * (cycleCounter - 3) + (5 * Math.sin(4 * (time.seconds() - passLineTime)));
-                                double theta = PI / 2 - (PI / 8 * Math.sin(4 * (time.seconds() - passLineTime)));
-                                robot.setTargetPoint(new Target(x, y, theta));
+                                if (cycleCounter < 3) {
+                                    double y = Math.min(Robot.startIntakingBlueAutoY + 0.75 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
+                                    double theta = PI / 2 + (PI / 15) * (Math.cos(4 * (time.seconds() - passLineTime)) - 1);
+                                    robot.setTargetPoint(new Target(6 + 1 * cycleCounter, y, theta));
+                                } else {
+                                    double x = Math.min(6 + 1 * (time.seconds() - passLineTime), 14);
+                                    double y = Robot.startIntakingBlueAutoY + 0.75 * (cycleCounter - 3) + (5 * Math.sin(4 * (time.seconds() - passLineTime)));
+                                    double theta = PI / 2 - (PI / 8 * Math.sin(4 * (time.seconds() - passLineTime)));
+                                    robot.setTargetPoint(new Target(x, y, theta));
+                                }
+                                if (robot.intakeState == 3) {
+                                    robot.intakeApproval = false;
+                                    goToWarehouseSteps++;
+                                }
                             }
-                            if (robot.intakeState == 3) {
-                                robot.intakeApproval = false;
-                                goToWarehouseSteps++;
-                            }
-
                             addPacket("path", "creeping right rn");
                             break;
                         case 4:
                             robot.setTargetPoint(new Target(3, Robot.startIntakingBlueAutoY, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
-                            if (robot.x < (7 + 1.5  *cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10)
+                            if (robot.x < (7 + xDrift*cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10)
                                 goToWarehouseSteps++;
                             break;
                         case 5:
@@ -195,7 +199,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     resetOdo = true;
                 }
             } else if (!cycleScore) {
-                robot.drivetrain.constantStrafeConstant = robot.y > Robot.startIntakingBlueAutoY ? 0.7 : 0;
+                robot.drivetrain.constantStrafeConstant = robot.y > Robot.startIntakingBlueAutoY ? 1 : 0;
 
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
                 boolean thetaAtTarget = Math.abs(robot.theta - preloadDepositPos[2]) < PI/20;
@@ -227,7 +231,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
             } else { //parking
                 robot.drivetrain.constantStrafeConstant = 0;
                 robot.setTargetPoint(new Target(6.5, 112, PI / 2));
-//                robot.depositEnabled = false;
+                if (robot.intakeState == 6) robot.intakeEnabled = false;
                 if (timeLeft < 1) {
                     robot.intakeEnabled = false;
                     robot.drivetrain.stop();

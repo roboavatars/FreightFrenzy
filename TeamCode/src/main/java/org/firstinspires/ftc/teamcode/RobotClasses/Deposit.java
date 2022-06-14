@@ -171,7 +171,11 @@ public class Deposit {
         setServoPos(Constants.DEPOSIT_HOLD_POS);
     }
     public void release() {
-        setServoPos(Constants.DEPOSIT_RELEASE_POS);
+        release(Robot.DepositTarget.high);
+    }
+    public void release(Robot.DepositTarget hub) {
+        if (hub == Robot.DepositTarget.shared) setServoPos(Constants.DEPOSIT_SHARED_RELEASE_POS);
+        else setServoPos(Constants.DEPOSIT_RELEASE_POS);
     }
     public void open() {
         setServoPos(Constants.DEPOSIT_OPEN_POS);

@@ -116,7 +116,7 @@ public class Robot {
     public static double intakeFlipThreshold = 400;
     public static double armFlipThreshold = 750;
     public static double armReturnThreshold = 1000;
-    public static double clampThresold = 250;
+    public static double clampThresold = 500;
     //    public String element;
     public double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
     public boolean rumble = false;
@@ -144,7 +144,7 @@ public class Robot {
     public double automationStepTime;
     public double depositTime = 0;
     public static double startIntakingRedAutoY = 106;
-    public static double startIntakingBlueAutoY = 110;
+    public static double startIntakingBlueAutoY = 106;
     public static double extendDepositAutoY = 95;
 
     // Motion Variables
@@ -459,7 +459,7 @@ public class Robot {
                 }
                 break;
             case 6: //wait for deposit to clamp down on freight
-                intake.off();
+//                intake.off();
                 if (System.currentTimeMillis() - clampStart > clampThresold) intakeState = 1;
                 break;
             case 7: //intake off toggle
@@ -498,7 +498,7 @@ public class Robot {
                 }
                 break;
             case 5: //release & wait for freight to drop
-                deposit.release();
+                deposit.release(cycleHub);
                 if (System.currentTimeMillis() - depositStart > (isAuto ? autoReleaseThreshold : teleReleaseThreshold)) {
                     depositState++;
                 }

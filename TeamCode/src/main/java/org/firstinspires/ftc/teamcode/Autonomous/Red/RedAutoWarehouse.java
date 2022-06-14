@@ -131,7 +131,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                             break;
                         case 2:
                             robot.intake.setSlidesPosition((int) Math.round(robot.intakeExtendDist));
-                            robot.drivetrain.constantStrafeConstant = 0.7;
+                            robot.drivetrain.constantStrafeConstant = -0.7;
 //                            robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 > PI / 10 ? -0.5 : 0);
                             robot.setTargetPoint(new Target(141, Robot.startIntakingRedAutoY, PI/2).thetaKp(3));
                             passLineTime = time.seconds();
@@ -194,7 +194,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                     resetOdo = true;
                 }
             } else if (!cycleScore) {
-                robot.drivetrain.constantStrafeConstant = robot.y > Robot.startIntakingRedAutoY ? 0.7 : 0;
+                robot.drivetrain.constantStrafeConstant = robot.y > Robot.startIntakingRedAutoY ? -0.7 : 0;
 
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
                 boolean thetaAtTarget = Math.abs(robot.theta - preloadDepositPos[2]) < PI/10;
@@ -226,7 +226,7 @@ public class RedAutoWarehouse extends LinearOpMode {
             } else { //parking
                 robot.drivetrain.constantStrafeConstant = 0;
                 robot.setTargetPoint(new Target(137.5, 111, PI/2));
-//                robot.depositEnabled = false;
+                if (robot.intakeState == 6) robot.intakeEnabled = false;
                 if (timeLeft < 1) {
                     robot.intakeEnabled = false;
                     robot.drivetrain.stop();

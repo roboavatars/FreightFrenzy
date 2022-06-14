@@ -23,7 +23,7 @@ public class Intake {
     private double lastIntakePow = 0;
     public static int slidesErrorThreshold = 5;
 
-    public int initialSlidesPos;
+    public double initialSlidesPos;
 
     public double INTAKE_SLIDES_SERVO_SPEED = 0.1;
     public static double HOME_THRESHOLD = 15;
@@ -129,7 +129,7 @@ public class Intake {
     }
 
     public int getSlidesPos() {
-        return slidesMotor.getCurrentPosition() + initialSlidesPos;
+        return slidesMotor.getCurrentPosition() + (int) Math.round(initialSlidesPos);
     }
 
     public boolean slidesIsHome() {

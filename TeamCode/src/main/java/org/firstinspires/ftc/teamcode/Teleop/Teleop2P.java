@@ -149,8 +149,10 @@ public class Teleop2P extends LinearOpMode {
             }
 
             if (Math.abs(gamepad2.right_stick_y) > .1) {
-                robot.intake.initialSlidesPos -= .6 * gamepad2.right_stick_y;
+                robot.intake.initialSlidesPos += .6 * gamepad2.right_stick_y;
             }
+
+            addPacket("initial slidesPos", robot.intake.initialSlidesPos);
 
             double xyGain;
             double wGain;
