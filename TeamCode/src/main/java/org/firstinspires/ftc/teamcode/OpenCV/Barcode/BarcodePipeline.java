@@ -24,8 +24,6 @@ public class BarcodePipeline extends OpenCvPipeline {
     public enum Case {None, Left, Middle, Right}
 
     // Image Cropping
-    public static int RECT_X = 0;
-    public static int RECT_Y = 0;
     public static int RECT_WIDTH = 320;
     public static int RECT_HEIGHT = 240;
     public static int BLUE_LEFT_DIVIDER = 80;
@@ -33,38 +31,51 @@ public class BarcodePipeline extends OpenCvPipeline {
     public static int RED_LEFT_DIVIDER = 140;
     public static int RED_RIGHT_DIVIDER = 230;
     public static int RETURN_IMAGE = 1;
-    public static int leftDivider;
-    public static int rightDivider;
 
-    // Debug
-    public static boolean debug = true;
-
-    // Results
-    private Case outputCase = Case.None;
-    private Case[] results = new Case[]{Case.None, Case.None, Case.None, Case.None, Case.None};
-    private int cycles = 0;
+    public int leftDivider;
+    public int rightDivider;
 
     // CV Thresholds
-    public static int MIN_H = 40;
-    public static int MIN_S = 35;
-    public static int MIN_V = 10;
-    public static int MAX_H = 80;
-    public static int MAX_S = 200;
-    public static int MAX_V = 255;
-    public static int AREA_MIN = 750;
+    public static int BLUE_MIN_H = 140;
+    public static int BLUE_MIN_S = 100;
+    public static int BLUE_MIN_V = 70;
+    public static int BLUE_MAX_H = 190;
+    public static int BLUE_MAX_S = 255;
+    public static int BLUE_MAX_V = 255;
+    public static int RED_MIN_H = 0;
+    public static int RED_MIN_S = 120;
+    public static int RED_MIN_V = 60;
+    public static int RED_MAX_H = 15;
+    public static int RED_MAX_S = 255;
+    public static int RED_MAX_V = 255;
+    public static int RED_MIN_H_2 = 225;
+    public static int RED_MAX_H_2 = 255;
+
+    public static int AREA_MAX = 200;
 
     // Image Processing Mats
     private Mat hsv = new Mat();
     private Mat processed = new Mat();
+    private Mat processed2 = new Mat();
     private Mat save;
     private Mat left = new Mat();
     private Mat middle = new Mat();
     private Mat right = new Mat();
     private Mat blank = new Mat();
 
-    private String path = "/sdcard/OpenCV/barcode/";
+    // Debug
+    private static String path = "/sdcard/OpenCV/barcode/";
+    public boolean debug = true;
+    public boolean isRed;
+
+    // Results
+    private Case outputCase = Case.None;
+    private Case[] results = new Case[] {Case.None, Case.None, Case.None, Case.None, Case.None};
+    private int cycles = 0;
 
     public BarcodePipeline(boolean isRed) {
+        this.isRed = isRed;
+
         if (isRed) {
             leftDivider = RED_LEFT_DIVIDER;
             rightDivider = RED_RIGHT_DIVIDER;
@@ -85,12 +96,17 @@ public class BarcodePipeline extends OpenCvPipeline {
             Imgproc.rectangle(input, new Point(0, 0), new Point(leftDivider, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
             Imgproc.rectangle(input, new Point(leftDivider, 0), new Point(rightDivider, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
             Imgproc.rectangle(input, new Point(rightDivider, 0), new Point(RECT_WIDTH, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
-//            saveMatToDisk("redRect", input);
         }
 
         // Convert to HSV Color Space
         Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2HSV);
-        Core.inRange(hsv, new Scalar(MIN_H, MIN_S, MIN_V), new Scalar(MAX_H, MAX_S, MAX_V), processed);
+        if (isRed) {
+            Core.inRange(hsv, new Scalar(RED_MIN_H, RED_MIN_S, RED_MIN_V), new Scalar(RED_MAX_H, RED_MAX_S, RED_MAX_V), processed);
+            Core.inRange(hsv, new Scalar(RED_MIN_H_2, RED_MIN_S, RED_MIN_V), new Scalar(RED_MAX_H_2, RED_MAX_S, RED_MAX_V), processed2);
+            Core.bitwise_and(processed, processed2, processed);
+        } else {
+            Core.inRange(hsv, new Scalar(BLUE_MIN_H, BLUE_MIN_S, BLUE_MIN_V), new Scalar(BLUE_MAX_H, BLUE_MAX_S, BLUE_MAX_V), processed);
+        }
 
         // Remove Noise
         Imgproc.morphologyEx(processed, processed, Imgproc.MORPH_OPEN, blank);
@@ -107,22 +123,22 @@ public class BarcodePipeline extends OpenCvPipeline {
         int middleArea = Core.countNonZero(middle);
         int rightArea = Core.countNonZero(right);
 
-        // Find Area with Maximum Area
-        int maxArea = leftArea;
+        // Find Area with Minimum Area
+        int minArea = leftArea;
         outputCase = Case.Left;
 
-        if (middleArea > maxArea) {
-            maxArea = middleArea;
+        if (middleArea < minArea) {
+            minArea = middleArea;
             outputCase = Case.Middle;
         }
 
-        if (rightArea > maxArea) {
-            maxArea = rightArea;
+        if (rightArea < minArea) {
+            minArea = rightArea;
             outputCase = Case.Right;
         }
 
-        // Reject Area if too Small
-        if (maxArea < AREA_MIN) {
+        // Reject Area if Too Large
+        if (minArea < AREA_MAX) {
             outputCase = Case.None;
         }
 
