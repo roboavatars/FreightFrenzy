@@ -79,6 +79,7 @@ public class Robot {
     public boolean outtake = false;
     public boolean intakeNoExtend = false;
     public boolean intakeUp = false;
+    public boolean capDown = false;
     public boolean midGoal = false;
     public boolean intakeTransfer = false;
     public boolean slidesInCommand = false;
@@ -482,6 +483,10 @@ public class Robot {
 //        deposit.turretHome();
         if (!depositEnabled) depositState = 8;
         switch (depositState) {
+            case 0: //auto delay
+                deposit.retractSlides();
+                deposit.setArmControls(Constants.ARM_INIT_POS);
+                deposit.hold();
             case 1: //deposit home
                 deposit.retractSlides();
                 deposit.armHome();
@@ -489,7 +494,7 @@ public class Robot {
                 break;
             case 2: //once transfer done, hold freight
                 if (System.currentTimeMillis() - clampStart > waitClampThreshold) deposit.hold();
-                if (((isAuto && y <= extendDepositAutoY) || depositApproval) && (System.currentTimeMillis() - clampStart > waitClampThreshold))
+                if (((isAuto && !carouselAuto && y <= extendDepositAutoY) || depositApproval) && (System.currentTimeMillis() - clampStart > waitClampThreshold))
                     depositState++;
                 break;
             case 3: //extend deposit
@@ -502,7 +507,7 @@ public class Robot {
             case 4: //wait for driver approval for release
                 deposit.extendSlides(cycleHub);
                 deposit.armOut(cycleHub);
-                if ((!isAuto || (deposit.slidesAtPos() && curTime - startExtendTime > armFlipThreshold)) && (depositApproval || releaseApproval)) {
+                if ((!isAuto || (deposit.slidesAtPos() && curTime - startExtendTime > armFlipThreshold)) && ((!carouselAuto && depositApproval) || releaseApproval)) {
                     depositState++;
                     depositStart = System.currentTimeMillis();
                 }
@@ -535,7 +540,8 @@ public class Robot {
 
         switch (capState) {
             case 1: //arm up
-                capArm.home();
+                if (capDown) capArm.init();
+                else capArm.home();
                 capArm.close();
                 break;
             case 2: //picking up tse

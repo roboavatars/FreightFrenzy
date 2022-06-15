@@ -128,6 +128,10 @@ public class BlueAutoWarehouse extends LinearOpMode {
                                 goToWarehouseSteps++;
                             break;
                         case 2:
+                            robot.drivetrain.setControls(0, -4, 0);
+                            if (time.seconds() > 0.5) goToWarehouseSteps++;
+                            break;
+                        case 3:
                             robot.intake.setSlidesPosition((int) Math.round(robot.intakeExtendDist));
                             robot.drivetrain.constantStrafeConstant = 0.5;
 //                            robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 > PI / 10 ? -0.5 : 0);
@@ -136,7 +140,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             addPacket("path", "going to warehouse right rn");
                             if (robot.y > Robot.startIntakingBlueAutoY - 1) goToWarehouseSteps++;
                             break;
-                        case 3:
+                        case 4:
                             robot.drivetrain.constantStrafeConstant = 0;
                             if (robot.antiStallStep == "Reverse Intake") {
                                 robot.setTargetPoint(6.5, Robot.startIntakingBlueAutoY, PI/2);
@@ -158,12 +162,12 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             }
                             addPacket("path", "creeping right rn");
                             break;
-                        case 4:
+                        case 5:
                             robot.setTargetPoint(new Target(3, Robot.startIntakingBlueAutoY, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
                             if (robot.x < (7 + xDrift*cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10)
                                 goToWarehouseSteps++;
                             break;
-                        case 5:
+                        case 6:
                             goToWarehouseSteps = 1;
 
                             resetOdo = false;

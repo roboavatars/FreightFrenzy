@@ -52,6 +52,10 @@ public class Deposit {
     }
 
     //general mappings, init positions/modes
+    public Deposit(LinearOpMode op, boolean isAuto, int initialSlidesPos) {
+        this (op, isAuto, initialSlidesPos, false);
+    }
+
     public Deposit(LinearOpMode op, boolean isAuto, int initialSlidesPos, boolean carouselAuto) {
         this.isAuto = isAuto;
         this.carouselAuto = carouselAuto;
@@ -170,7 +174,8 @@ public class Deposit {
 
     //Deposit Servo
     public void hold() {
-        setServoPos(Constants.DEPOSIT_HOLD_POS);
+        if (carouselAuto) setServoPos(Constants.DEPOSIT_DUCK_HOLD_POS);
+        else setServoPos(Constants.DEPOSIT_HOLD_POS);
     }
     public void release() {
         release(Robot.DepositTarget.high);

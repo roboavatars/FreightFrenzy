@@ -20,7 +20,7 @@ public class CapMech {
         armServo = op.hardwareMap.get(Servo.class, "capArm");
         clawServo = op.hardwareMap.get(Servo.class, "capClaw");
 
-        if (isAuto) armServo.setPosition(Constants.CAP_INIT);
+        if (isAuto) init();
         else home();
         close();
 
@@ -38,6 +38,8 @@ public class CapMech {
     public void home () {
         armServo.setPosition(Constants.CAP_HOME);
     }
+    public void init () {
+        armServo.setPosition(Constants.CAP_INIT);    }
 
     public void down () {
         armServo.setPosition(Constants.CAP_DOWN + downOffset);

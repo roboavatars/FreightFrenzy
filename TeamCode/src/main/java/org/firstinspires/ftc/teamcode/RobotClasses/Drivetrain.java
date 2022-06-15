@@ -67,12 +67,12 @@ public class Drivetrain {
     private final double ODOMETRY_HEADING_THRESHOLD = PI / 8;
 
     // PD controller constants
-    public static double xKp = 0.275;
-    public static double yKp = 0.18;
-    public static double thetaKp = 2.5;
-    public static double xKd = 0.02;
-    public static double yKd = 0.025;
-    public static double thetaKd = 0.2;
+    public static double xKp = 0.15;
+    public static double yKp = 0.06;
+    public static double thetaKp = 0.8;
+    public static double xKd = 0.006;
+    public static double yKd = 0.002;
+    public static double thetaKd = 0.05;
 
     // Odometry delta 0 counters
     public int zero1, zero2, zero3;
