@@ -17,11 +17,9 @@ public class Carousel {
     private boolean isRed;
     private boolean isAuto;
 
-    //mappings
     public Carousel(LinearOpMode op, boolean isAuto, boolean isRed) {
         this.isRed = isRed;
 
-        //sets direction of servo based on red or blue
         crServoImplEx1 = op.hardwareMap.get(CRServoImplEx.class, "carousel1");
         if (isRed) {
             crServoImplEx1.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -52,7 +50,6 @@ public class Carousel {
         return carouselMotor.getVelocity();
     }
 
-    //turns on and off carousel servos
     public void turnon() {
         crServoImplEx1.setPower(isAuto ? Constants.CAROUSEL_AUTO_SPEED : Constants.CAROUSEL_SPEED);
         crServoImplEx2.setPower(isAuto ? Constants.CAROUSEL_AUTO_SPEED : Constants.CAROUSEL_SPEED);

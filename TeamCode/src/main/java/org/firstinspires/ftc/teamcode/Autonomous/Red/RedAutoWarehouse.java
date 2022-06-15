@@ -66,8 +66,6 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         ElapsedTime time = new ElapsedTime();
 
-        //loading path based on barcode position
-
         if (barcodeCase == BarcodePipeline.Case.Left) {
             robot.cycleHub = Robot.DepositTarget.low;
             preloadDepositPos = new double[] {122, 69, 2*PI/15};

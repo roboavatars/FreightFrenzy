@@ -32,7 +32,6 @@ public class ServoPosEstimation {
         return currentPos;
     }
 
-    //update the current servo position to the target position
     public void update() {
         if (targetPos > currentPos) currentPos += Math.min(speed * (System.currentTimeMillis() - lastTime), targetPos);
         if (targetPos < currentPos) currentPos -= Math.max(speed * (System.currentTimeMillis() - lastTime), targetPos);

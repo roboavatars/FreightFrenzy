@@ -3,15 +3,14 @@ package org.firstinspires.ftc.teamcode.RobotClasses;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Config
 @SuppressWarnings("FieldCanBeLocal")
@@ -19,12 +18,12 @@ public class Intake {
     private DcMotorEx intakeMotor;
     private DcMotorEx slidesMotor;
     private Servo flipServo;
-    Rev2mDistanceSensor intakeSensor;
+    private OpticalDistanceSensor intakeSensor;
 
     private double lastIntakePow = 0;
     public static int slidesErrorThreshold = 5;
 
-    public double initialSlidesPos;
+    public int initialSlidesPos;
 
     public double INTAKE_SLIDES_SERVO_SPEED = 0.1;
     public static double HOME_THRESHOLD = 15;
@@ -33,12 +32,10 @@ public class Intake {
     public int slidesError = 0;
     public int slidesTarget = 0;
 
-    //PID constantly
-
-    public static double slidesKp = 0.01;
-    public static double slidesKd = 0.01;
+    public static double slidesKp = 0.025;
+    public static double slidesKd = 0.03;
     public static double accelFF = 0;
-    public static double springFF = 0;
+    public static double springFF = -0.001;
 
     private LinearOpMode op;
     private boolean isAuto;
@@ -48,7 +45,6 @@ public class Intake {
         this(op, isAuto, false, 0);
     }
 
-    //mapping, general intake/slide modes
     public Intake(LinearOpMode op, boolean isAuto, boolean carouselAuto, int initialSlidesPos) {
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -59,7 +55,7 @@ public class Intake {
         else flipDown();
 
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "intakeSlides");
-//        slidesMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        slidesMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slidesMotor.setTargetPosition(0);
         slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -68,16 +64,16 @@ public class Intake {
         this.isAuto = isAuto;
         this.carouselAuto = carouselAuto;
 
-        intakeSensor = op.hardwareMap.get(Rev2mDistanceSensor.class, "intakeSensor");
+        intakeSensor = op.hardwareMap.get(OpticalDistanceSensor.class, "intakeSensor");
     }
 
     // Intake Motor
     public void on() {
-        setPower(Constants.INTAKE_POWER);
+        setPower(1);
     }
 
     public void reverse() {
-        setPower(-Constants.INTAKE_POWER);
+        setPower(-1);
     }
 
     public void off() {
@@ -92,7 +88,7 @@ public class Intake {
     }
 
     public boolean checkIfStalling() {
-        return getCurrent() > Constants.INTAKE_STALL_THRESHOLD;
+        return getCurrent() > Constants.STALL_THRESHOLD;
     }
 
     public double getCurrent() {
@@ -115,7 +111,6 @@ public class Intake {
         slidesTarget = Math.min(Constants.INTAKE_SLIDES_EXTEND_TICKS, Math.max(position, 0));
     }
 
-    //runs pid for slides
     public void updateSlides(double ay){
         int currentTicks = getSlidesPos();
         slidesErrorChange = slidesTarget - currentTicks - slidesError;
@@ -130,7 +125,7 @@ public class Intake {
     }
 
     public int getSlidesPos() {
-        return slidesMotor.getCurrentPosition() + (int) Math.round(initialSlidesPos);
+        return slidesMotor.getCurrentPosition() + initialSlidesPos;
     }
 
     public boolean slidesIsHome() {
@@ -148,16 +143,11 @@ public class Intake {
 
     // Distance Sensor
     public double getDistance() {
-        return intakeSensor.getDistance(DistanceUnit.MM);
+        return intakeSensor.getLightDetected();
     }
 
-    //checks if block/ball is in intake
     public boolean isFull() {
-        return getDistance() < (isAuto? Constants.INTAKE_DISTANCE_THRESHOLD_AUTO : Constants.INTAKE_DISTANCE_THRESHOLD_TELE);
-    }
-
-    public boolean transferred() {
-        return getDistance() > Constants.INTAKE_SENSOR_TRANSFER_THRESHOLD;
+        return getDistance() > (isAuto? Constants.INTAKE_DISTANCE_THRESHOLD_AUTO : Constants.INTAKE_DISTANCE_THRESHOLD_TELE);
     }
 
 //    public String getElement() {

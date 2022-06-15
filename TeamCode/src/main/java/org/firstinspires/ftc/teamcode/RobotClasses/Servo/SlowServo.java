@@ -12,7 +12,6 @@ public class SlowServo {
 
     private double lastUpdateTime;
 
-    //servo mapping
     public SlowServo (LinearOpMode op, String servoName, double servoSpeed, double initPos){
         servo = op.hardwareMap.get(Servo.class, servoName);
         servo.setPosition(initPos);
@@ -20,7 +19,6 @@ public class SlowServo {
         this.servoSpeed = servoSpeed;
     }
 
-    //update servo position
     public void update (){
         double curTime = System.currentTimeMillis();
 

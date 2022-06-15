@@ -89,7 +89,6 @@ public class Drivetrain {
         this(op, initialX, initialY, initialTheta, true);
     }
 
-    //general mapping/assignment, sets some init velocities/positions
     public Drivetrain(LinearOpMode op, double initialX, double initialY, double initialTheta, boolean isAuto) {
         this.op = op;
         HardwareMap hardwareMap = op.hardwareMap;
