@@ -94,7 +94,7 @@ public class Robot {
     //    public boolean carouselAuto = false;
     public boolean depositEnabled = true;
 
-    public int depositState = 0;
+    public int depositState = -1;
     public int sharedState = 0;
     public int capState = 1;
     private double transferStart;
@@ -115,7 +115,8 @@ public class Robot {
     public static double teleReleaseThreshold = 250;
     public static double autoReleaseThreshold = 250;
     public static double duckReleaseThreshold = 500;
-    public static double intakeFlipThreshold = 400;
+    public static double teleIntakeFlipThreshold = 400;
+    public static double autoIntakeFlipThreshold = 800;
     public static double armFlipThreshold = 750;
     public static double armReturnThreshold = 1000;
     public static double clampThreshold = 500;
@@ -405,24 +406,6 @@ public class Robot {
                 if (!intakeNoExtend) intake.setSlidesPosition((int) Math.round(intakeExtendDist));
                 else intake.home();
                 intake.flipDown();
-                boolean intakeFull;
-                if (!this.intakeFull) {
-                    freightDetectedTime = System.currentTimeMillis();
-                    intakeFull = false;
-                } else intakeFull = System.currentTimeMillis() - freightDetectedTime > (isAuto ? Constants.INTAKE_TIME_THRESHOLD_AUTO : Constants.INTAKE_TIME_THRESHOLD_TELE);
-
-                if ((isAuto && intakeFull) || (!isAuto && !intakeApproval) || transferOverride) {
-                    intake.off();
-                    intakeState++;
-                    intakeRetractStart = System.currentTimeMillis();
-//                    if (element == "ball" || midGoal) cycleHub = DepositTarget.mid;
-//                    else cycleHub = DepositTarget.high;
-                    if (isAuto) cycleHub = DepositTarget.high;
-                }
-                if (intakeFull && !isAuto && intakeApproval) {
-//                    intakeApproval = false;
-                    rumble = true;
-                }
 
                 //anti-stall
                 if (isAuto && !carouselAuto) {
@@ -444,12 +427,31 @@ public class Robot {
                     if (!outtake) intake.on();
                     else intake.reverse();
                 }
+
+                boolean intakeFull;
+                if (!this.intakeFull) {
+                    freightDetectedTime = System.currentTimeMillis();
+                    intakeFull = false;
+                } else intakeFull = System.currentTimeMillis() - freightDetectedTime > (isAuto ? Constants.INTAKE_TIME_THRESHOLD_AUTO : Constants.INTAKE_TIME_THRESHOLD_TELE);
+
+                if ((isAuto && intakeFull) || (!isAuto && !intakeApproval) || transferOverride) {
+                    intake.off();
+                    intakeState++;
+                    intakeRetractStart = System.currentTimeMillis();
+//                    if (element == "ball" || midGoal) cycleHub = DepositTarget.mid;
+//                    else cycleHub = DepositTarget.high;
+                    if (isAuto) cycleHub = DepositTarget.high;
+                }
+                if (intakeFull && !isAuto && intakeApproval) {
+//                    intakeApproval = false;
+                    rumble = true;
+                }
                 break;
             case 3: //wait for flip servo and intake slides
                 intake.home();
-                intake.setPower(intakeStalling ? 0.25 : Constants.INTAKE_RETRACT_POWER);
+                intake.setPower(Constants.INTAKE_RETRACT_POWER);
                 intake.flipUp();
-                if (intake.slidesIsHome() && System.currentTimeMillis() - intakeRetractStart > intakeFlipThreshold)
+                if (intake.slidesIsHome() && ((System.currentTimeMillis() - intakeRetractStart) > ((isAuto && !carouselAuto) ? autoIntakeFlipThreshold : teleIntakeFlipThreshold)))
                     intakeState++;
                 break;
             case 4: //wait for deposit to retract
@@ -487,6 +489,7 @@ public class Robot {
                 deposit.retractSlides();
                 deposit.setArmControls(Constants.ARM_INIT_POS);
                 deposit.hold();
+                break;
             case 1: //deposit home
                 deposit.retractSlides();
                 deposit.armHome();

@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Config
 @Autonomous(name = "0 Blue Auto Warehouse", preselectTeleOp = "2 Teleop 2P", group = "Red")
 public class BlueAutoWarehouse extends LinearOpMode {
-    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Left;
+    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Middle;
     public static double xDrift = 0;
 
     @Override
@@ -47,10 +47,10 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
         // Segment Times
         double cycleScoreTime = 1.5;
-        double parkThreshold = 6;
+        double parkThreshold = 8;
         double preloadScoreTime = 1;
 
-        double[] highCyclePos = new double[]{19, 73, PI - 0.45};
+        double[] highCyclePos = new double[]{11, 68, PI - 0.45};
         double[] midCyclePos = new double[]{25, 72, PI - 0.3};
         double[] preloadDepositPos;
 
@@ -122,14 +122,20 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     switch (goToWarehouseSteps) {
                         case 1:
                             robot.drivetrain.constantStrafeConstant = 0; //0.4
-                            robot.setTargetPoint(new Target(3, 78, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
+                            robot.setTargetPoint(new Target(3, 73, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
                             addPacket("path", "going to the wall right rn");
-                            if (robot.x < (7 + xDrift*cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10)
+                            if (robot.x < (7 + xDrift*cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10) {
                                 goToWarehouseSteps++;
+                                time.reset();
+                            }
                             break;
                         case 2:
-                            robot.drivetrain.setControls(0, -4, 0);
-                            if (time.seconds() > 0.5) goToWarehouseSteps++;
+                            robot.drivetrain.setControls(0, 4, 0);
+                            if (time.seconds() > 0.2) {
+                                goToWarehouseSteps++;
+                                robot.resetOdo(6, robot.y, PI/2);
+                                time.reset();
+                            }
                             break;
                         case 3:
                             robot.intake.setSlidesPosition((int) Math.round(robot.intakeExtendDist));
@@ -164,10 +170,20 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             break;
                         case 5:
                             robot.setTargetPoint(new Target(3, Robot.startIntakingBlueAutoY, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
-                            if (robot.x < (7 + xDrift*cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10)
+                            if (robot.x < (7 + xDrift*cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10) {
                                 goToWarehouseSteps++;
+                                time.reset();
+                            }
                             break;
                         case 6:
+                            robot.drivetrain.setControls(0, 4, 0);
+                            if (time.seconds() > 0.2) {
+                                goToWarehouseSteps++;
+                                robot.resetOdo(6, robot.y, PI/2);
+                                time.reset();
+                            }
+                            break;
+                        case 7:
                             goToWarehouseSteps = 1;
 
                             resetOdo = false;
@@ -176,7 +192,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             if (robot.cycleHub == Robot.DepositTarget.high) {
                                 cycleScoreWaypoints = new Waypoint[]{
                                         new Waypoint(4, robot.y, 3 * PI / 2, 10, 10, 0, 0),
-                                        new Waypoint(4, 79, 3 * PI / 2, 5, 1, 0, 0.75),
+                                        new Waypoint(4, 73, 3 * PI / 2, 5, 1, 0, 0.75),
                                         new Waypoint(highCyclePos[0], highCyclePos[1], highCyclePos[2] + PI, 2, -10, 0, cycleScoreTime),
                                 };
                             } else {
@@ -220,7 +236,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 if (robot.depositState == 6) {
                     cycleCounter++;
                     highCyclePos[0] += 0.5;
-                    highCyclePos[2] -= 0.025;
+//                    highCyclePos[2] -= 0.025;
 //                    if (cycleCounter == 2) robot.noExtend = false;
 
                     resetOdo = false;
@@ -232,6 +248,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 robot.drivetrain.constantStrafeConstant = 0;
                 robot.setTargetPoint(new Target(6.5, 112, PI / 2));
                 if (robot.intakeState == 6) robot.intakeEnabled = false;
+                robot.capDown = true;
                 if (timeLeft < 1) {
                     robot.intakeEnabled = false;
                     robot.drivetrain.stop();

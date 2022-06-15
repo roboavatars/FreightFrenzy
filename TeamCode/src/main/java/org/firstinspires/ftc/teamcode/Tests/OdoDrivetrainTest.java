@@ -17,7 +17,7 @@ public class OdoDrivetrainTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Drivetrain dt = new Drivetrain(this, 90, 9, PI / 2);
+        Drivetrain dt = new Drivetrain (this, 9, 41, PI);
 
         waitForStart();
 
