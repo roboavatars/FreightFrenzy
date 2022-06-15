@@ -133,9 +133,9 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             break;
                         case 2:
                             robot.intake.setSlidesPosition((int) Math.round(robot.intakeExtendDist));
-                            robot.drivetrain.constantStrafeConstant = 0.7;
+                            robot.drivetrain.constantStrafeConstant = 0.5;
 //                            robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 > PI / 10 ? -0.5 : 0);
-                            robot.setTargetPoint(new Target(4, Robot.startIntakingBlueAutoY, PI/2).thetaKp(3));
+                            robot.setTargetPoint(new Target(robot.x, Robot.startIntakingBlueAutoY + 5, PI/2).thetaKp(3));
                             passLineTime = time.seconds();
                             addPacket("path", "going to warehouse right rn");
                             if (robot.y > Robot.startIntakingBlueAutoY - 1) goToWarehouseSteps++;

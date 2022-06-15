@@ -20,9 +20,9 @@ public class BlueAutoCarousel extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Robot robot = new Robot(this, 9.0, 41, PI / 2, true, false);
+        Robot robot = new Robot(this, 9, 41, PI / 2, true, false, true, true);
 
-        //times (in seconds) for each step
+        //segment times
 
         double goToPreload = 1;
         double timeToCarousel = 1;
@@ -32,23 +32,15 @@ public class BlueAutoCarousel extends LinearOpMode {
         double reachedSpinPos = -1;
         double startSweepTime = -1;
 
-        //pre loads paths:
-
         Waypoint[] preload = new Waypoint[]{
-                new Waypoint(robot.x, robot.y, 0, 5, 10, 0, 0),
-                new Waypoint(26, 48, 13 * PI / 6, 10, 10, 0, 1)
+                new Waypoint(robot.x, robot.y, PI, 5, 10, 0, 0),
+                new Waypoint(26, 48, PI / 6, 10, 10, 0, 1)
         };
         Path preloadP = new Path(preload);
 
         Path preloadDuck = null;
         Path depoDuck = null;
-
-        Waypoint[] goToThePark = new Waypoint[]{
-                new Waypoint(26, 48, 13 * PI / 6, 10, 10, 0, 0),
-                new Waypoint(36, 10,  -PI / 2, 10, 10, 0, 1)
-        };
-
-        Path gotoP = new Path(goToThePark);
+        Path gotoP = null;
 
         waitForStart();
 
@@ -78,14 +70,13 @@ public class BlueAutoCarousel extends LinearOpMode {
                     Pose curPose = preloadP.getRobotPose(Math.min(goToPreload, time.seconds()));
                     robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
 
-                    robot.depositApproval = robot.isAtPose(26, 48, 13 * PI / 6, 2, 2, PI / 10)
+                    robot.depositApproval = robot.isAtPose(26, 48, -7 * PI / 6, 2, 2, PI / 10)
                             && robot.notMoving();
 
                     if (robot.depositState == 6) {
-                        //loads path to carousel after deposit is done
                         Waypoint[] pathToCarousel = new Waypoint[]{
-                                new Waypoint(26, 48, 7 * PI / 6, 10, 10, 0, 0),
-                                new Waypoint(15, 18, -3 * PI / 4, 10, 10, 0, 1)
+                                new Waypoint(118, 48, -PI / 6, 10, 10, 0, 0),
+                                new Waypoint(129, 18, 7 * PI / 4, 10, 10, 0, 1)
                         };
                         preloadDuck = new Path(pathToCarousel);
 
@@ -98,7 +89,7 @@ public class BlueAutoCarousel extends LinearOpMode {
                     Pose curDuck = preloadDuck.getRobotPose(Math.min(timeToCarousel, time.seconds()));
                     robot.setTargetPoint(new Target(curDuck));
 
-                    if (reachedSpinPos == -1 && robot.isAtPose(15, 18, -3 * PI / 4, 2, 2, PI / 10))
+                    if (reachedSpinPos == -1 && robot.isAtPose(129, 18, 7 * PI / 4, 2, 2, PI / 10))
                         reachedSpinPos = time.seconds();
 
                     if (reachedSpinPos != -1) {
@@ -110,14 +101,14 @@ public class BlueAutoCarousel extends LinearOpMode {
                             robot.intakeApproval = true;
 
                             //sweep
-                            robot.setTargetPoint(29, 20 - 5 * Math.sin(time.seconds() - startSweepTime), -3 * PI / 4);
+                            robot.setTargetPoint(115, 20 - 5 * Math.sin(time.seconds() - startSweepTime), 7 * PI / 4);
 
                             if (robot.intakeState == 3) {
                                 robot.intakeApproval = false;
                                 //once the duck is swept, load waypoint to deposit the duck
                                 Waypoint[] depositDuck = new Waypoint[]{
-                                        new Waypoint(robot.x, robot.y, -7 * PI / 4, 10, 10, 0, 0),
-                                        new Waypoint(26, 48, 13 * PI / 6, 10, 10, 0, 1),
+                                        new Waypoint(robot.x, robot.y, 11 * PI / 4, 10, 10, 0, 0),
+                                        new Waypoint(118, 48, -7 * PI / 6, 10, 10, 0, 1),
                                 };
                                 depoDuck = new Path(depositDuck);
                                 autoSteps++;
@@ -131,12 +122,18 @@ public class BlueAutoCarousel extends LinearOpMode {
                     Pose curDepo = depoDuck.getRobotPose(Math.min(time.seconds(), timeToCarousel));
                     robot.setTargetPoint(new Target(curDepo).theta(curDepo.theta + PI));
 
-                    robot.depositApproval = robot.isAtPose(26, 48, 13 * PI / 6, 2, 2, PI / 10)
+                    robot.depositApproval = robot.isAtPose(118, 48, -7 * PI / 6, 2, 2, PI / 10)
                             && robot.notMoving();
 
                     if (robot.depositState == 6) {
                         time.reset();
                         autoSteps++;
+                        Waypoint[] goToThePark = new Waypoint[]{
+                                new Waypoint(118, 48, -7 * PI / 6, 10, 10, 0, 0),
+                                new Waypoint(108, 10, 3 * PI / 2, 10, 10, 0, 1)
+                        };
+
+                        gotoP = new Path(goToThePark);
                     }
                     break;
                 case 4:
@@ -144,7 +141,7 @@ public class BlueAutoCarousel extends LinearOpMode {
                     Pose curPark = gotoP.getRobotPose(Math.min(time.seconds(), timeToPark));
                     robot.setTargetPoint(new Target(curPark).theta(curPark.theta + PI));
 
-                    if (robot.isAtPose(36, 10, -PI / 2, 2, 2, PI / 10)
+                    if (robot.isAtPose(108, 10, 3 * PI / 2, 2, 2, PI / 10)
                             && robot.notMoving()) {
                         robot.stop();
                     }

@@ -13,7 +13,7 @@ public class Constants {
 
     // Intake
     public static double INTAKE_DISTANCE_THRESHOLD_AUTO = 30;
-    public static double INTAKE_TIME_THRESHOLD_AUTO = 0;
+    public static double INTAKE_TIME_THRESHOLD_AUTO = 250;
     public static double INTAKE_DISTANCE_THRESHOLD_TELE = 30;
     public static double INTAKE_TIME_THRESHOLD_TELE = 0;
     public static double INTAKE_SENSOR_TRANSFER_THRESHOLD = 30;
@@ -38,6 +38,7 @@ public class Constants {
     public static double DEPOSIT_OPEN_POS = 0.7;
     public static double DEPOSIT_HOLD_POS = 0;
     public static double DEPOSIT_RELEASE_POS = 0.9;
+    public static double DEPOSIT_DUCK_RELEASE_POS = 1;
     public static double DEPOSIT_SHARED_RELEASE_POS = 1;
     public static double DEPOSIT_CAP_POS = 0.5;
 

@@ -24,8 +24,7 @@ public class Dashboard {
 
     public static void drawRobot(double robotX, double robotY, double robotTheta, double intakeSlidePos, double depositSlidesDist, boolean isArmExtended, String drivetrainColor) {
         drawDrivetrain(robotX, robotY, robotTheta, drivetrainColor);
-//        drawIntakeSlides(robotX, robotY, robotTheta, intakeSlidesExtend);
-        drawDepositSlides(robotX, robotY, robotTheta, depositSlidesDist);
+//        drawDepositSlides(robotX, robotY, robotTheta, depositSlidesDist);
         drawIntakeSlides(robotX, robotY, robotTheta, intakeSlidePos);
     }
 
@@ -46,7 +45,7 @@ public class Dashboard {
         theta -= PI / 2;
 
         double[] leftX = {-3.5 * cos(theta) - (9 + extendedPos) * sin(theta) + x, -3 * cos(theta) - (9 + extendedPos) * sin(theta) + x, -3 * cos(theta) + 8.5 * sin(theta) + x, -3.5 * cos(theta) + 8.5 * sin(theta) + x};
-        double[] leftY = {-3.5 * sin(theta) + (9 + extendedPos) * cos(theta) + y, -3 * sin(theta) + (9 + extendedPos) * cos(theta) + y, -3 * sin(theta) - 8.5 * cos(theta) + y, -3.5 * sin(theta) - 8.5 * sin(theta) + y};
+        double[] leftY = {-3.5 * sin(theta) + (9 + extendedPos) * cos(theta) + y, -3 * sin(theta) + (9 + extendedPos) * cos(theta) + y, -3 * sin(theta) - 8.5 * cos(theta) + y, -3.5 * sin(theta) - 8.5 * cos(theta) + y};
 
         double[] rightX = {3 * cos(theta) - (9 + extendedPos) * sin(theta) + x, 3.5 * cos(theta) - (9 + extendedPos) * sin(theta) + x, 3.5 * cos(theta) + 8.5 * sin(theta) + x, 3 * cos(theta) + 8.5 * sin(theta) + x};
         double[] rightY = {3 * sin(theta) + (9 + extendedPos) * cos(theta) + y, 3.5 * sin(theta) + (9 + extendedPos) * cos(theta) + y, 3.5 * sin(theta) - 8.5 * cos(theta) + y, 3 * sin(theta) - 8.5 * cos(theta) + y};

@@ -113,6 +113,7 @@ public class Robot {
     public static double turretHomeThreshold = 1000;
     public static double teleReleaseThreshold = 250;
     public static double autoReleaseThreshold = 250;
+    public static double duckReleaseThreshold = 500;
     public static double intakeFlipThreshold = 400;
     public static double armFlipThreshold = 750;
     public static double armReturnThreshold = 1000;
@@ -171,30 +172,35 @@ public class Robot {
 
     // Constructor
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed) {
-        this(op, x, y, theta, isAuto, isRed, 0, 0, false);
+        this(op, x, y, theta, isAuto, isRed, 0, 0, false, false);
+    }
+
+    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean startLogger, boolean carouselAuto) {
+        this(op, x, y, theta, isAuto, isRed, 0, 0, startLogger, carouselAuto);
     }
 
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean startLogger) {
-        this(op, x, y, theta, isAuto, isRed, 0, 0, startLogger);
+        this(op, x, y, theta, isAuto, isRed, 0, 0, startLogger, false);
     }
 
     public Robot(LinearOpMode op, boolean startLogger) {
-        this(op, Logger.readPos()[1], Logger.readPos()[2], Logger.readPos()[3], false, Logger.readPos()[0] == 1, (int) Logger.readPos()[6], (int) Logger.readPos()[7], startLogger);
+        this(op, Logger.readPos()[1], Logger.readPos()[2], Logger.readPos()[3], false, Logger.readPos()[0] == 1, (int) Logger.readPos()[6], (int) Logger.readPos()[7], startLogger, false);
     }
 
-    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, int depositSlidesPos, int intakeSlidesPos, boolean startLogger) {
+    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, int depositSlidesPos, int intakeSlidesPos, boolean startLogger, boolean carouselAuto) {
         this.x = x;
         this.y = y;
         this.theta = theta;
         this.op = op;
         this.isAuto = isAuto;
         this.isRed = isRed;
+        this.carouselAuto = carouselAuto;
 
         // init subsystems
         drivetrain = new Drivetrain(op, x, y, theta, isAuto);
         carousel = new Carousel(op, isAuto, isRed);
         logger = new Logger();
-        deposit = new Deposit(op, isAuto, depositSlidesPos);
+        deposit = new Deposit(op, isAuto, depositSlidesPos, carouselAuto);
         intake = new Intake(op, isAuto, carouselAuto, intakeSlidesPos);
         capArm = new CapMech(op, isAuto);
 
@@ -413,7 +419,7 @@ public class Robot {
                     if (isAuto) cycleHub = DepositTarget.high;
                 }
                 if (intakeFull && !isAuto && intakeApproval) {
-                    intakeApproval = false;
+//                    intakeApproval = false;
                     rumble = true;
                 }
 
@@ -503,7 +509,7 @@ public class Robot {
                 break;
             case 5: //release & wait for freight to drop
                 deposit.release(cycleHub);
-                if (System.currentTimeMillis() - depositStart > (isAuto ? autoReleaseThreshold : teleReleaseThreshold)) {
+                if (System.currentTimeMillis() - depositStart > (isAuto ? (carouselAuto ? duckReleaseThreshold : autoReleaseThreshold) : teleReleaseThreshold)) {
                     depositState++;
                 }
                 break;

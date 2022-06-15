@@ -42,17 +42,19 @@ public class Deposit {
     public double initialSlidesPos;
 
     private boolean isAuto;
+    private boolean carouselAuto;
     private boolean isExtended = false;
 
     public boolean reset = false;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
-        this(op, isAuto, 0);
+        this(op, isAuto, 0, false);
     }
 
     //general mappings, init positions/modes
-    public Deposit(LinearOpMode op, boolean isAuto, int initialSlidesPos) {
+    public Deposit(LinearOpMode op, boolean isAuto, int initialSlidesPos, boolean carouselAuto) {
         this.isAuto = isAuto;
+        this.carouselAuto = carouselAuto;
 
         // Deposit Servo
 
@@ -175,6 +177,7 @@ public class Deposit {
     }
     public void release(Robot.DepositTarget hub) {
         if (hub == Robot.DepositTarget.shared) setServoPos(Constants.DEPOSIT_SHARED_RELEASE_POS);
+        else if (carouselAuto) setServoPos(Constants.DEPOSIT_DUCK_RELEASE_POS);
         else setServoPos(Constants.DEPOSIT_RELEASE_POS);
     }
     public void open() {
