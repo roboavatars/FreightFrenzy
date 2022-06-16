@@ -72,7 +72,8 @@ public class Intake {
 
     // Intake Motor
     public void on() {
-        setPower(Constants.INTAKE_POWER);
+        if (!carouselAuto) setPower(Constants.INTAKE_POWER);
+        else setPower(Constants.INTAKE_DUCK_POWER);
     }
 
     public void reverse() {

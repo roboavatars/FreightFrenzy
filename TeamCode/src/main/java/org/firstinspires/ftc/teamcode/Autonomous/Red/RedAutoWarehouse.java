@@ -124,14 +124,18 @@ public class RedAutoWarehouse extends LinearOpMode {
                             robot.drivetrain.constantStrafeConstant = 0; //-0.4
                             robot.setTargetPoint(new Target(141, 78, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
                             addPacket("path", "going to the wall right rn");
-                            if (robot.x > 137 && Math.abs(PI / 2 - robot.theta) < PI / 10) {
+                            if (robot.x > 135.5 && Math.abs(PI / 2 - robot.theta) < PI / 10) {
                                 goToWarehouseSteps++;
                                 time.reset();
                             }
                             break;
                         case 2:
                             robot.drivetrain.setControls(0, -4, 0);
-                            if (time.seconds() > 0.5) goToWarehouseSteps++;
+                            if (time.seconds() > 0.2) {
+                                goToWarehouseSteps++;
+//                                robot.resetOdo(138, robot.y, PI/2);
+                                time.reset();
+                            }
                             break;
                         case 3:
                             robot.intake.setSlidesPosition((int) Math.round(robot.intakeExtendDist));
@@ -163,10 +167,20 @@ public class RedAutoWarehouse extends LinearOpMode {
                             break;
                         case 5:
                             robot.setTargetPoint(new Target(138, robot.startIntakingRedAutoY, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
-                            if (robot.x > 137 && Math.abs(PI / 2 - robot.theta) < PI / 10)
+                            if (robot.x > 135.5 && Math.abs(PI / 2 - robot.theta) < PI / 10) {
                                 goToWarehouseSteps++;
+                                time.reset();
+                            }
                             break;
                         case 6:
+                            robot.drivetrain.setControls(0, -4, 0);
+                            if (time.seconds() > 0.2) {
+                                goToWarehouseSteps++;
+//                                robot.resetOdo(138, robot.y, PI/2);
+                                time.reset();
+                            }
+                            break;
+                        case 7:
                             goToWarehouseSteps = 1;
 
                             resetOdo = false;
@@ -193,7 +207,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                     }
                 }
 
-                if (Math.abs(robot.y - 97) < 0.5 && !resetOdo) {
+                if (Math.abs(robot.y - 97) < 0.2 && !resetOdo) {
                      robot.resetOdo(138, robot.y, PI/2);
                     resetOdo = true;
                 }

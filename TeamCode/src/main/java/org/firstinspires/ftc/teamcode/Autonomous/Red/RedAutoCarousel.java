@@ -13,34 +13,35 @@ import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
 import org.firstinspires.ftc.teamcode.Pathing.Waypoint;
+import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Config
 @Autonomous
 public class RedAutoCarousel extends LinearOpMode {
-    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Middle;
+    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Right;
+    public static double delay = 0;
 
     @Override
     public void runOpMode() {
-        Robot robot = new Robot(this, 135.0, 41, 0, true, true, true);
+        Robot robot = new Robot(this, 135, 41, 0, true, true, true);
 
-        double goToPreloadTime = 1;
-        double timeToCarousel = 1;
-        double timeToDeposit = 1;
-        double timeToPark = 0.75;
-        int autoSteps = 1;
+        double goToPreloadTime = 1.5;
+        double timeToCarousel = 2;
+        double timeToDeposit = 2;
+        double timeToPark = 2;
+        int autoSteps = 0;
+        boolean intookSomthing = false;
 
         double reachedSpinPos = -1;
         double startSweepTime = -1;
 
         double[] preloadScoreCoords;
-        double[] spinPose = new double[]{130, 15, 7.2 * PI / 4};
-        double[] depositCoords = new double[]{128, 44, 11 * PI/6};
-        double[] parkCoords = new double[]{112, 16, 3 * PI / 2};
+        double[] spinPose = new double[]{130.5, 14.5, 7.2 * PI / 4};
+        double[] depositCoords = new double[]{79, 34, -3 * PI/4};
+        double[] parkCoords = new double[]{109, 10, 0};
 
         robot.carouselAuto = true;
-
-
 
         Path spinPath = null;
         Path depoDuck = null;
@@ -54,10 +55,10 @@ public class RedAutoCarousel extends LinearOpMode {
             preloadScoreCoords = new double[]{118, 48, 11 * PI/6};
             robot.cycleHub = Robot.DepositTarget.low;
         } else if (barcodeCase == BarcodePipeline.Case.Middle) {
-            preloadScoreCoords = new double[]{118, 48, 11 * PI/6};
+            preloadScoreCoords = new double[]{120, 48, 11 * PI/6};
             robot.cycleHub = Robot.DepositTarget.mid;
         } else {
-            preloadScoreCoords = new double[]{126, 44, 11 * PI/6};
+            preloadScoreCoords = new double[]{128, 44, 11 * PI/6};
             robot.cycleHub = Robot.DepositTarget.high;
         }
 
@@ -69,7 +70,8 @@ public class RedAutoCarousel extends LinearOpMode {
 
         robot.depositingFreight = true;
         robot.depositApproval = false;
-        robot.depositState = 2;
+        robot.depositState = 0;
+        robot.intakeExtendDist = Constants.INTAKE_SLIDES_HOME_TICKS;
 
         while (opModeIsActive()) {
             double timeLeft = 30 - (System.currentTimeMillis() - robot.startTime) / 1000;
@@ -78,20 +80,28 @@ public class RedAutoCarousel extends LinearOpMode {
             addPacket("step", autoSteps);
 
             switch (autoSteps) {
+                case 0: //delay
+                    if (time.seconds() > delay) {
+                        time.reset();
+                        autoSteps++;
+                        robot.depositState = 3;
+                    }
+                    break;
                 case 1:
                     Pose curPose = preloadP.getRobotPose(Math.min(goToPreloadTime, time.seconds()));
                     robot.setTargetPoint(new Target(curPose).theta(curPose.theta + PI));
 
                     addPacket("robit at deposit pos", robot.isAtPose(preloadScoreCoords[0], preloadScoreCoords[1], preloadScoreCoords[2]));
 
-                    robot.depositApproval = robot.isAtPose(preloadScoreCoords[0], preloadScoreCoords[1], preloadScoreCoords[2])
-                            && robot.notMoving();
+                    robot.releaseApproval = time.seconds() > goToPreloadTime;//robot.isAtPose(preloadScoreCoords[0], preloadScoreCoords[1], preloadScoreCoords[2]);
+//                            && robot.notMoving();
 
                     if (robot.depositState == 6) {
                         time.reset();
                         Waypoint[] pathToCarousel = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, robot.theta, 10, 10, 0, 0),
-                                new Waypoint(spinPose[0], spinPose[1], spinPose[2], 1, -5, 0.01, timeToCarousel)
+                                new Waypoint(spinPose[0], spinPose[1] + 4, spinPose[2], 1, -5, 1, timeToCarousel-0.2),
+                                new Waypoint(spinPose[0], spinPose[1], spinPose[2], 1, -5, 0, timeToCarousel)
                         };
                         spinPath = new Path(pathToCarousel);
 
@@ -103,43 +113,65 @@ public class RedAutoCarousel extends LinearOpMode {
                     Pose curDuck = spinPath.getRobotPose(Math.min(timeToCarousel, time.seconds()));
                     robot.setTargetPoint(new Target(curDuck));
 
-                    if (reachedSpinPos == -1 && robot.isAtPose(spinPose[0], spinPose[1], spinPose[2]))
+                    if (reachedSpinPos == -1 && time.seconds() > timeToCarousel)//robot.isAtPose(spinPose[0], spinPose[1], spinPose[2], 4, 4, PI/10))
                         reachedSpinPos = time.seconds();
+                    addPacket("reachedSpinPos", reachedSpinPos);
+                    addPacket("at pos", robot.isAtPose(spinPose[0], spinPose[1], spinPose[2]));
+
+                    robot.carousel.turnon();
 
                     if (reachedSpinPos != -1) {
-                        if (time.seconds() - reachedSpinPos < 10) {
+                        if (time.seconds() - reachedSpinPos < 6) {
                             robot.carousel.turnon();
-                            startSweepTime = time.seconds();
                         } else {
+                            autoSteps++;
+                            time.reset();
                             robot.carousel.turnoff();
                             robot.intakeApproval = true;
-
-                            //sweep
-                            robot.setTargetPoint(121, 30 - 5 * Math.sin(3*(time.seconds() - startSweepTime)), 7.5 * PI / 4);
-
-                            if (timeLeft < 5) robot.transferOverride = true;
-
-                            if (robot.intakeState == 3) {
-                                robot.intakeApproval = false;
-                                Waypoint[] depositDuck = new Waypoint[]{
-                                        new Waypoint(robot.x, robot.y, robot.theta + PI, 10, 10, 0, 0),
-                                        new Waypoint(depositCoords[0], depositCoords[1], depositCoords[2] + PI, 10, 10, 0, timeToDeposit),
-                                };
-                                depoDuck = new Path(depositDuck);
-
-                                time.reset();
-                                autoSteps++;
-                            }
                         }
                     }
                     break;
+                case 3 :
+                    //sweep
+                    if (time.seconds() < 1) {
+                        robot.setTargetPoint(114, 15, 0);
+                    } else if (time.seconds() < 4.14) {
+                        robot.setTargetPoint(114 + 10 * Math.sin(1 * (time.seconds() - 1)), 15,  PI/3 * Math.sin(3 * (time.seconds() - 1)));
+                        startSweepTime = time.seconds();
+                    } else {
+                        robot.setTargetPoint(127 - 4 * Math.sin(5*(time.seconds() - startSweepTime)), 30 - 10 * Math.sin(0.5*(time.seconds() - startSweepTime)), -0.5 * PI / 4);
+                    }
 
-                case 3:
+                    if (timeLeft < 8) {
+                        robot.transferOverride = true;
+                    }
+
+                    if (robot.intakeState == 3) {
+                        robot.intakeApproval = false;
+                        autoSteps++;
+                    }
+                    break;
+                case 4 :
+                    robot.setTargetPoint(124, 6, 0);
+                    if (robot.y < 10) {
+                        Waypoint[] depositDuck = new Waypoint[]{
+                                new Waypoint(robot.x, robot.y, robot.theta + PI, 10, 10, 0, 0),
+                                new Waypoint(104 , 10, 1.5 * PI/2, 5, 5, 0, 1),
+                                new Waypoint(depositCoords[0], depositCoords[1], depositCoords[2] + PI, 10, 10, 0.1, timeToDeposit),
+                        };
+                        depoDuck = new Path(depositDuck);
+                        time.reset();
+                        autoSteps++;
+                    }
+                    break;
+                case 5:
                     Pose curDepo = depoDuck.getRobotPose(Math.min(time.seconds(), timeToDeposit));
                     robot.setTargetPoint(new Target(curDepo).theta(curDepo.theta + PI));
 
-                    robot.depositApproval = robot.isAtPose(depositCoords[0], depositCoords[1], depositCoords[2])
-                            && robot.notMoving();
+                    robot.depositApproval = time.seconds() > 1.5;
+
+                    robot.releaseApproval = time.seconds() > timeToDeposit + 0.5;//robot.isAtPose(depositCoords[0], depositCoords[1], depositCoords[2], 4, 4, PI/10);
+//                            && robot.notMoving();
 
                     if (robot.depositState == 6) {
                         Waypoint[] goToThePark = new Waypoint[]{
@@ -152,15 +184,26 @@ public class RedAutoCarousel extends LinearOpMode {
                         autoSteps++;
                     }
                     break;
-                case 4:
+                case 6:
                     robot.setTargetPoint(new Target(gotoP.getRobotPose(Math.min(time.seconds(), timeToPark))));
 
-                    if (robot.isAtPose(parkCoords[0], parkCoords[1], parkCoords[2])
+                    robot.intakeUp = true;
+                    if (time.seconds() > 1) robot.capDown = true;
+
+                    if (time.seconds() > timeToPark) {
+                        autoSteps++;
+                    }
+                    break;
+                case 7 :
+                    robot.intakeUp = true;
+                    robot.capDown = true;
+                    robot.setTargetPoint(parkCoords[0], 6, PI/2);
+                    if (robot.isAtPose(parkCoords[0], 6, PI/2)
                             && robot.notMoving()) {
                         autoSteps++;
                     }
                     break;
-                case 5:
+                case 8:
                     robot.drivetrain.stop();
                     addPacket("auto done", 0);
                     break;

@@ -31,12 +31,13 @@ public class BlueAutoCarousel extends LinearOpMode {
         double timeToDeposit = 2;
         double timeToPark = 2;
         int autoSteps = 0;
+        boolean intookSomthing = false;
 
         double reachedSpinPos = -1;
         double startSweepTime = -1;
 
         double[] preloadScoreCoords;
-        double[] spinPose = new double[]{14, 14.5, 4.5 * PI / 4};
+        double[] spinPose = new double[]{13.5, 14.5, 4.5 * PI / 4};
         double[] depositCoords = new double[]{65, 34, 3.5 * PI/2};
         double[] parkCoords = new double[]{36.5, 10, PI};
 
@@ -142,9 +143,7 @@ public class BlueAutoCarousel extends LinearOpMode {
                     }
 
                     if (timeLeft < 8) {
-                        //robot.transferOverride = true;\
-                        autoSteps = 7;
-                        robot.intakeEnabled = false;
+                        robot.transferOverride = true;
                     }
 
                     if (robot.intakeState == 3) {
@@ -197,6 +196,8 @@ public class BlueAutoCarousel extends LinearOpMode {
                     }
                     break;
                 case 7 :
+                    robot.intakeUp = true;
+                    robot.capDown = true;
                     robot.setTargetPoint(36, 6, PI/2);
                     if (robot.isAtPose(36, 6, PI/2)
                             && robot.notMoving()) {

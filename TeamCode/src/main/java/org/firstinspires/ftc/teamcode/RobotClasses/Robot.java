@@ -443,7 +443,7 @@ public class Robot {
                     if (isAuto) cycleHub = DepositTarget.high;
                 }
                 if (intakeFull && !isAuto && intakeApproval) {
-//                    intakeApproval = false;
+                    intakeApproval = false;
                     rumble = true;
                 }
                 break;
@@ -477,6 +477,8 @@ public class Robot {
             case 7: //intake off toggle
                 intake.off();
                 intake.home();
+                if (intakeUp) intake.flipUp();
+                else intake.flipDown();
                 break;
         }
         intake.updateSlides(IMUay);
