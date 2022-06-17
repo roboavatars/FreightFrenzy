@@ -443,7 +443,7 @@ public class Robot {
                     if (isAuto) cycleHub = DepositTarget.high;
                 }
                 if (intakeFull && !isAuto && intakeApproval) {
-//                    intakeApproval = false;
+                    intakeApproval = false;
                     rumble = true;
                 }
                 break;

@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.OpenCV.Barcode;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
-import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -41,10 +39,10 @@ public class BarcodePipeline extends OpenCvPipeline {
     public int rightDivider;
 
     // CV Thresholds
-    public static int BLUE_MIN_H = 140;
-    public static int BLUE_MIN_S = 100;
-    public static int BLUE_MIN_V = 70;
-    public static int BLUE_MAX_H = 190;
+    public static int BLUE_MIN_H = 10;
+    public static int BLUE_MIN_S = 70;
+    public static int BLUE_MIN_V = 150;
+    public static int BLUE_MAX_H = 25;
     public static int BLUE_MAX_S = 255;
     public static int BLUE_MAX_V = 255;
     public static int RED_MIN_H = 120;
@@ -53,11 +51,9 @@ public class BarcodePipeline extends OpenCvPipeline {
     public static int RED_MAX_H = 140;
     public static int RED_MAX_S = 255;
     public static int RED_MAX_V = 255;
-//    public static int RED_MIN_H_2 = 225;
-//    public static int RED_MAX_H_2 = 255;
 
     public static int AREA_MAX = 200;
-    public static int SQUARE_AREA = 600;
+    public static int SQUARE_AREA = 120;
 
     public int leftArea = -1;
     public int middleArea = -1;
@@ -71,7 +67,7 @@ public class BarcodePipeline extends OpenCvPipeline {
     private Mat blank = new Mat();
 
     // Debug
-    private static String path = "/sdcard/OpenCV/barcode/";
+    private static String path = "/sdcard/EasyOpenCV/";
     public boolean debug = true;
     public boolean isRed;
 
@@ -98,13 +94,6 @@ public class BarcodePipeline extends OpenCvPipeline {
         input = new Mat(input, new Rect(x, y, RECT_WIDTH, RECT_HEIGHT));
         saveMatToDisk("input", input);
 
-        // Draw Three Red Rectangles
-        if (debug) {
-            Imgproc.rectangle(input, new Point(0, 0), new Point(leftDivider, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
-            Imgproc.rectangle(input, new Point(leftDivider, 0), new Point(rightDivider, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
-            Imgproc.rectangle(input, new Point(rightDivider, 0), new Point(RECT_WIDTH, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
-        }
-
         // Convert to HSV Color Space
         Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2HSV);
         if (isRed) {
@@ -125,14 +114,6 @@ public class BarcodePipeline extends OpenCvPipeline {
         // Compute White Area for each Region
         leftArea = Core.countNonZero(left);
         middleArea = Core.countNonZero(middle);
-//        try {
-            addPacket("leftSize", leftArea);
-            addPacket("middleSize", middleArea);
-//        } catch (Exception e) {
-//            addPacket("error", e);
-//        }
-
-        sendPacket();
 
         // Find Area with Minimum Area
         int minArea = leftArea;
@@ -149,6 +130,13 @@ public class BarcodePipeline extends OpenCvPipeline {
         // Reject Area if Too Large
         else if (minArea > AREA_MAX) {
             outputCase = Case.None;
+        }
+
+        // Draw Three Red Rectangles
+        if (debug) {
+            Imgproc.rectangle(input, new Point(0, 0), new Point(leftDivider, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
+            Imgproc.rectangle(input, new Point(leftDivider, 0), new Point(rightDivider, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
+            Imgproc.rectangle(input, new Point(rightDivider, 0), new Point(RECT_WIDTH, RECT_HEIGHT), new Scalar(255, 0, 0), 4);
         }
 
         // Draw Green Rectangle Depending on Region
@@ -174,9 +162,6 @@ public class BarcodePipeline extends OpenCvPipeline {
     }
 
     public Case getResult() {
-        addPacket("left", leftArea);
-        addPacket("right", middleArea);
-
         List<Case> list = Arrays.asList(results);
 
         int none = Collections.frequency(list, Case.None);
