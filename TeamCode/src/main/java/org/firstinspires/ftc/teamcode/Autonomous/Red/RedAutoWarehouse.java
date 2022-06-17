@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodeDetector;
 import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodePipeline;
-import org.firstinspires.ftc.teamcode.OpenCV.Vision;
 import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
@@ -51,7 +50,7 @@ public class RedAutoWarehouse extends LinearOpMode {
         double parkThreshold = 6;
         double preloadScoreTime = 1;
 
-        double[] highCyclePos = new double[] {129, 69, 0.325};
+        double[] highCyclePos = new double[] {130.5, 69, 0.325};
         double[] midCyclePos = new double[] {127, 64, 0.3};
         double[] preloadDepositPos;
 

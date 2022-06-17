@@ -18,7 +18,7 @@ public class Deposit {
 
     public static int SLIDES_HOME_THRESHOLD = 20;
     public static int SLIDES_ERROR_THRESHOLD = 50;
-    public static double SLIDES_DRIFT_MULTIPLIER = 0.002;
+    public static double SLIDES_DRIFT_MULTIPLIER = 0; //0.002;
 
     // Slides PD
     public int slidesErrorChange = 0;
@@ -181,8 +181,9 @@ public class Deposit {
         release(Robot.DepositTarget.high);
     }
     public void release(Robot.DepositTarget hub) {
-        if (hub == Robot.DepositTarget.high && !carouselAuto) setServoPos(Constants.DEPOSIT_RELEASE_POS);
-        else setServoPos(Constants.DEPOSIT_FLICK_POS);
+//        if (hub == Robot.DepositTarget.high && !carouselAuto) setServoPos(Constants.DEPOSIT_RELEASE_POS);
+//        else
+        setServoPos(Constants.DEPOSIT_FLICK_POS);
     }
     public void open() {
         setServoPos(Constants.DEPOSIT_OPEN_POS);

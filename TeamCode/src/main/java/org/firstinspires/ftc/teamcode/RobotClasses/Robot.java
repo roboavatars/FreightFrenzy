@@ -455,7 +455,7 @@ public class Robot {
                     intakeState++;
                 break;
             case 4: //wait for deposit to retract
-                if (depositState == 1) {
+                if (depositState == 1 && deposit.slidesisHome()) {
                     intakeState++;
                     intakeTransferred = intake.transferred();
                     transferStart = System.currentTimeMillis();
