@@ -108,7 +108,7 @@ public class Teleop2P extends LinearOpMode {
 
             robot.outtake = gamepad1.y;
             robot.intakeNoExtend = gamepad1.right_bumper;
-            robot.intakeUp = gamepad1.back;
+            robot.intakeUp = gamepad1.x;
 
             if (robot.rumble) gamepad1.rumble(500);
 
@@ -143,8 +143,8 @@ public class Teleop2P extends LinearOpMode {
                 if (gamepad2.dpad_up) robot.deposit.midOffset += 1;
                 if (gamepad2.dpad_down) robot.deposit.midOffset -= 1;
             } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.shared) {
-                if (gamepad2.dpad_up) robot.deposit.sharedOffset -= 0.003;
-                if (gamepad2.dpad_down) robot.deposit.sharedOffset += 0.003;
+                if (gamepad2.dpad_up) robot.deposit.sharedOffset += 0.003;
+                if (gamepad2.dpad_down) robot.deposit.sharedOffset -= 0.003;
             } else {
                 if (gamepad2.dpad_up) robot.deposit.initialSlidesPos -= .4;
                 if (gamepad2.dpad_down) robot.deposit.initialSlidesPos += .4;

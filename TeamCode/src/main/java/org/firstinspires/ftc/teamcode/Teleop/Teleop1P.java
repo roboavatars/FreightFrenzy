@@ -22,7 +22,7 @@ public class Teleop1P extends LinearOpMode {
     public static double startY = 81;
     public static double startTheta = PI / 2;
 
-    public static boolean useAutoPos = false;
+    public static boolean useAutoPos = true;
     public static boolean isRed = true;
     public static boolean fieldCentric = false;
 
@@ -107,8 +107,8 @@ public class Teleop1P extends LinearOpMode {
                 if (gamepad1.dpad_up) robot.deposit.midOffset += 1;
                 if (gamepad1.dpad_down) robot.deposit.midOffset -= 1;
             } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.shared) {
-                if (gamepad1.dpad_up) robot.deposit.sharedOffset -= 0.003;
-                if (gamepad1.dpad_down) robot.deposit.sharedOffset += 0.003;
+                if (gamepad1.dpad_up) robot.deposit.sharedOffset += 0.003;
+                if (gamepad1.dpad_down) robot.deposit.sharedOffset -= 0.003;
             } else {
                 if (gamepad1.dpad_up) robot.deposit.initialSlidesPos -= .4;
                 if (gamepad1.dpad_down) robot.deposit.initialSlidesPos += .4;

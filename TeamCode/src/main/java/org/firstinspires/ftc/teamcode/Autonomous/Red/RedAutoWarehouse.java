@@ -78,7 +78,7 @@ public class RedAutoWarehouse extends LinearOpMode {
             preloadDepositPos = new double[] {124, 71, 2*PI/15};
         } else {
             robot.cycleHub = Robot.DepositTarget.high;
-            preloadDepositPos = new double[] {126, 73, 2*PI/15};
+            preloadDepositPos = new double[] {130, 73, 2*PI/15};
         }
 
         Waypoint[] preloadScoreWaypoints = new Waypoint[]{
