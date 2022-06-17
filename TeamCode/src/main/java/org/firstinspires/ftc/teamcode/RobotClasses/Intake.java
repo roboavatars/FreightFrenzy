@@ -51,6 +51,7 @@ public class Intake {
     public Intake(LinearOpMode op, boolean isAuto, boolean carouselAuto, int initialSlidesPos) {
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         flipServo = op.hardwareMap.get(Servo.class, "intakeServo");
 

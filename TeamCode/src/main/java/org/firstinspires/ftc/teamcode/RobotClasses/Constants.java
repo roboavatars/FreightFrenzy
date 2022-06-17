@@ -17,10 +17,10 @@ public class Constants {
     public static double INTAKE_DISTANCE_THRESHOLD_TELE = 0.6;
     public static double INTAKE_TIME_THRESHOLD_TELE = 0;
     public static double INTAKE_SENSOR_TRANSFER_THRESHOLD = 0.6;
-    public static double INTAKE_RETRACT_POWER = 0.1;
-    public static double INTAKE_POWER = 0.8;
+    public static double INTAKE_RETRACT_POWER = -0.15;
+    public static double INTAKE_POWER = 1;
     public static double INTAKE_DUCK_POWER = 0.2;
-    public static double INTAKE_TRANSFER_POWER = -0.8;
+    public static double INTAKE_TRANSFER_POWER = -1;
     public static double INTAKE_STALL_THRESHOLD = 6;
     public static double COLOR_SENSOR_THRESHOLD = 110;
 

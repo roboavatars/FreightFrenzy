@@ -23,7 +23,11 @@ public class BarcodeTest extends LinearOpMode {
 
         while (opModeIsActive()) {
             addPacket("FPS", detector.getFPS());
-            addPacket("Result", detector.getResult().name());
+            try {
+                addPacket("Result", detector.getResult().name());
+            } catch (Exception e) {
+                addPacket("error", e);
+            }
             sendPacket();
         }
 

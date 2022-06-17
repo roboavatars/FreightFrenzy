@@ -29,7 +29,7 @@ public class BaseDetector {
         cam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                cam.startStreaming(320, 240, pipeline == Vision.Pipeline.Freight ? OpenCvCameraRotation.SIDEWAYS_RIGHT : OpenCvCameraRotation.UPRIGHT);
+                cam.startStreaming(320, 240, pipeline == Vision.Pipeline.Freight ? OpenCvCameraRotation.SIDEWAYS_RIGHT : OpenCvCameraRotation.UPSIDE_DOWN);
             }
 
             @Override
