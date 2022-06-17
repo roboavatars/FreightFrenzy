@@ -434,7 +434,7 @@ public class Robot {
                     intakeFull = false;
                 } else intakeFull = System.currentTimeMillis() - freightDetectedTime > (isAuto ? Constants.INTAKE_TIME_THRESHOLD_AUTO : Constants.INTAKE_TIME_THRESHOLD_TELE);
 
-                if ((isAuto && intakeFull) || (!isAuto && !intakeApproval) || transferOverride) {
+                if ((isAuto && intakeFull) || (!isAuto && !intakeApproval && !outtake) || transferOverride) {
                     intake.off();
                     intakeState++;
                     intakeRetractStart = System.currentTimeMillis();
@@ -443,7 +443,7 @@ public class Robot {
                     if (isAuto) cycleHub = DepositTarget.high;
                 }
                 if (intakeFull && !isAuto && intakeApproval) {
-                    intakeApproval = false;
+//                    intakeApproval = false;
                     rumble = true;
                 }
                 break;
@@ -581,7 +581,7 @@ public class Robot {
 
 
     public void advanceCapState() {
-        if (capState != 4) capArm.upOffset = capArm.downOffset = 0;
+        if (capState != 4 && capState != 2) capArm.upOffset = capArm.downOffset = 0;
         if (capState < 5)
             capState++;
         else {

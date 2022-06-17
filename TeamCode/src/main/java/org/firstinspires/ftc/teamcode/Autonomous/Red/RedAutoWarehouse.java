@@ -8,7 +8,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodeDetector;
 import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodePipeline;
+import org.firstinspires.ftc.teamcode.OpenCV.Vision;
 import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
 import org.firstinspires.ftc.teamcode.Pathing.Target;
@@ -34,8 +36,8 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         Robot robot = new Robot(this, 135, 78.5, 0, true, true, true);
 
-//        Vision detector = new Vision(this, true, Vision.Pipeline.Barcode);
-//        detector.start();
+        BarcodeDetector barcodeDetector = new BarcodeDetector(this, true);
+        barcodeDetector.start();
 
         // Segments
         boolean preloadScore = false;
@@ -63,6 +65,9 @@ public class RedAutoWarehouse extends LinearOpMode {
         double passLineTime = 0;
 
         waitForStart();
+        barcodeCase = barcodeDetector.getResult();
+
+        addPacket("barcode", barcodeCase);
 
         ElapsedTime time = new ElapsedTime();
 
@@ -88,6 +93,8 @@ public class RedAutoWarehouse extends LinearOpMode {
         robot.depositState = 2;
 
         while (opModeIsActive()) {
+            addPacket("case", barcodeCase);
+
             addPacket("cycleCounter", cycleCounter);
             robot.intakeExtendDist = (int) Math.round(Constants.INTAKE_SLIDES_EXTEND_TICKS/3 + cycleCounter * Constants.INTAKE_SLIDES_EXTEND_TICKS/4);
             addPacket("w", robot.w);

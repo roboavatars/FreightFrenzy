@@ -29,10 +29,10 @@ public class BarcodePipeline extends OpenCvPipeline {
     public static int BLUE_LEFT_DIVIDER = 80;
     public static int BLUE_RIGHT_DIVIDER = 180;
     public static int RED_LEFT_DIVIDER = 100;
-    public static int RED_RIGHT_DIVIDER = 200;
+    public static int RED_RIGHT_DIVIDER = 180;
     public static int RETURN_IMAGE = 0;
 
-    public static int x = 20;
+    public static int x = 30;
     public static int y = 130;
 
     public int leftDivider;
