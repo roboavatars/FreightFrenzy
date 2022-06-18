@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
 @SuppressWarnings("FieldCanBeLocal")
 @Config
 public class Deposit {
@@ -17,8 +19,9 @@ public class Deposit {
     private Servo depositServo;
 
     public static int SLIDES_HOME_THRESHOLD = 20;
-    public static int SLIDES_ERROR_THRESHOLD = 50;
+    public static int SLIDES_ERROR_THRESHOLD = 100;
     public static double SLIDES_DRIFT_MULTIPLIER = 0; //0.002;
+    public static double SLIDES_STALL_THRESHOLD = 8; //0.002;
 
     // Slides PD
     public int slidesErrorChange = 0;
@@ -44,6 +47,7 @@ public class Deposit {
     private boolean isAuto;
     private boolean carouselAuto;
     private boolean isExtended = false;
+    private boolean slidesReset = false;
 
     public boolean reset = false;
 
@@ -109,19 +113,32 @@ public class Deposit {
 
     //Slide PD
     public void updateSlides(boolean capping){
-        double slidesKp = !capping ? this.slidesKp : this.slidesCapKp;
-        double slidesKd = !capping ? this.slidesKd : this.slidesCapKd;
+        if (slidesTarget != Constants.DEPOSIT_SLIDES_HOME_TICKS) slidesReset = false;
+        if (slidesTarget == Constants.DEPOSIT_SLIDES_HOME_TICKS && !slidesReset && getSlidesPos() < 5) {
+            slidesMotor.setPower(-1);
+            if (getSlidesCurrent() > SLIDES_STALL_THRESHOLD) {
+                slidesReset = true;
+                initialSlidesPos -= getSlidesPos();
+            }
+        } else {
+            double slidesKp = !capping ? this.slidesKp : this.slidesCapKp;
+            double slidesKd = !capping ? this.slidesKd : this.slidesCapKd;
 
-        int currentTicks = getSlidesPos();
-        initialSlidesPos += Math.abs(currentTicks - slidesLastTicks) * SLIDES_DRIFT_MULTIPLIER;
-        slidesLastTicks = currentTicks;
+            int currentTicks = getSlidesPos();
+            initialSlidesPos += Math.abs(currentTicks - slidesLastTicks) * SLIDES_DRIFT_MULTIPLIER;
+            slidesLastTicks = currentTicks;
 
-        slidesErrorChange = slidesTarget - currentTicks - slidesError;
-        slidesError = slidesTarget - currentTicks;
+            slidesErrorChange = slidesTarget - currentTicks - slidesError;
+            slidesError = slidesTarget - currentTicks;
 
-        slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + gravityFF);
+            slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + gravityFF);
+        }
 
         addPacket("initialSlidesPos", initialSlidesPos);
+    }
+
+    public double getSlidesCurrent() {
+        return slidesMotor.getCurrent(CurrentUnit.AMPS);
     }
 
     public void armOut() {
@@ -181,9 +198,8 @@ public class Deposit {
         release(Robot.DepositTarget.high);
     }
     public void release(Robot.DepositTarget hub) {
-//        if (hub == Robot.DepositTarget.high && !carouselAuto) setServoPos(Constants.DEPOSIT_RELEASE_POS);
-//        else
-        setServoPos(Constants.DEPOSIT_FLICK_POS);
+        if (hub == Robot.DepositTarget.shared) setServoPos(Constants.DEPOSIT_RELEASE_POS);
+        else setServoPos(Constants.DEPOSIT_FLICK_POS);
     }
     public void open() {
         setServoPos(Constants.DEPOSIT_OPEN_POS);

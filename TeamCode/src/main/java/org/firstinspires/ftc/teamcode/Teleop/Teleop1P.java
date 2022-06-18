@@ -22,7 +22,7 @@ public class Teleop1P extends LinearOpMode {
     public static double startY = 81;
     public static double startTheta = PI / 2;
 
-    public static boolean useAutoPos = true;
+    public static boolean useAutoPos = false;
     public static boolean isRed = true;
     public static boolean fieldCentric = false;
 

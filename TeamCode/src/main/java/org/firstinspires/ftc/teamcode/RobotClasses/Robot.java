@@ -120,7 +120,7 @@ public class Robot {
     public static double armFlipThreshold = 750;
     public static double armReturnThreshold = 1000;
     public static double clampThreshold = 500;
-    public static double waitClampThreshold = 150;
+    public static double waitClampThreshold = 300;
 
     //    public String element;
     public double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
@@ -395,7 +395,7 @@ public class Robot {
                     intake.flipDown();
                 else intake.flipUp();
                 intake.off();
-                if (isAuto && intakeApproval && (y >= (isRed ? startIntakingRedAutoY : startIntakingBlueAutoY) || carouselAuto)) {
+                if (isAuto && intakeApproval && (y >= 90 || carouselAuto)) {
                     intakeState++;
                     intakeFull = intake.isFull();
                     intakeStalling = intake.checkIfStalling();

@@ -14,7 +14,7 @@ public class Constants {
     // Intake
     public static double INTAKE_DISTANCE_THRESHOLD_AUTO = 0.43;
     public static double INTAKE_TIME_THRESHOLD_AUTO = 500;
-    public static double INTAKE_DISTANCE_THRESHOLD_TELE = 0.6;
+    public static double INTAKE_DISTANCE_THRESHOLD_TELE = 0.43;
     public static double INTAKE_TIME_THRESHOLD_TELE = 0;
     public static double INTAKE_SENSOR_TRANSFER_THRESHOLD = 0.6;
     public static double INTAKE_RETRACT_POWER = 0;
@@ -39,13 +39,13 @@ public class Constants {
     public static double DEPOSIT_OPEN_POS = 0.7;
     public static double DEPOSIT_HOLD_POS = 0;
     public static double DEPOSIT_DUCK_HOLD_POS = 0.2;
-    public static double DEPOSIT_RELEASE_POS = 0.9;
+    public static double DEPOSIT_RELEASE_POS = 0.8;
     public static double DEPOSIT_FLICK_POS = 1;
     public static double DEPOSIT_CAP_POS = 0.5;
 
     // Deposit Arm
     public static double ARM_ALLIANCE_POS = 0.2;
-    public static double ARM_SHARED_POS = 0.3;
+    public static double ARM_SHARED_POS = 0.25;
     public static double ARM_HOME_POS = 0.85;
     public static double ARM_INIT_POS = 0.75;
     public static double ARM_OFFSET = -0.0125;
@@ -54,8 +54,8 @@ public class Constants {
     public static double CAP_OPEN = 1;
     public static double CAP_CLOSE = 0;
     public static double CAP_INIT = 1;
-    public static double CAP_HOME = 0.7;
-    public static double CAP_UP = 0.5;
+    public static double CAP_HOME = 0.75;
+    public static double CAP_UP = 0.6;
     public static double CAP_DOWN = 0.22;
 
     public static int DEPOSIT_SLIDES_HOME_TICKS = 0;

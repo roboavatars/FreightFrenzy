@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
 @TeleOp
 @Config
 public class MotorRunToTest extends LinearOpMode {
@@ -41,6 +43,7 @@ public class MotorRunToTest extends LinearOpMode {
 
             addPacket("ticks", motor.getCurrentPosition());
             addPacket("velocity", motor.getVelocity());
+            addPacket("current", motor.getCurrent(CurrentUnit.AMPS));
             sendPacket();
         }
     }
