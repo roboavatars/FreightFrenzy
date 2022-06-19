@@ -25,7 +25,7 @@ public class MotorRunToTest extends LinearOpMode {
     public void runOpMode() {
         motor = hardwareMap.get(DcMotorEx.class, motorName);
 //        motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        motor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+//        motor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         motor.setTargetPosition(0);
 
         waitForStart();

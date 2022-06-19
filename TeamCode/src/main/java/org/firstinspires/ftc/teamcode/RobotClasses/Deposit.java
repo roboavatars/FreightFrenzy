@@ -42,7 +42,7 @@ public class Deposit {
     public double highOffset = 0;
     public double sharedOffset = 0;
 
-    public double initialSlidesPos;
+    public double initialSlidesPos = 0;
 
     private boolean isAuto;
     private boolean carouselAuto;
@@ -52,15 +52,10 @@ public class Deposit {
     public boolean reset = false;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
-        this(op, isAuto, 0, false);
+        this(op, isAuto, false, true);
     }
 
-    //general mappings, init positions/modes
-    public Deposit(LinearOpMode op, boolean isAuto, int initialSlidesPos) {
-        this (op, isAuto, initialSlidesPos, false);
-    }
-
-    public Deposit(LinearOpMode op, boolean isAuto, int initialSlidesPos, boolean carouselAuto) {
+    public Deposit(LinearOpMode op, boolean isAuto, boolean carouselAuto, boolean resetEncoder) {
         this.isAuto = isAuto;
         this.carouselAuto = carouselAuto;
 
@@ -80,11 +75,11 @@ public class Deposit {
 
         // Arm Motor
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
-        slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slidesMotor.setTargetPosition(0);
-        slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        if (resetEncoder) slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        slidesMotor.setTargetPosition(0);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        this.initialSlidesPos = initialSlidesPos;
+//        this.initialSlidesPos = initialSlidesPos;
 
         op.telemetry.addData("Status", "Deposit Initialized");
     }

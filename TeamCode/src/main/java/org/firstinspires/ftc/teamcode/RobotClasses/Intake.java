@@ -23,7 +23,7 @@ public class Intake {
     private double lastIntakePow = 0;
     public static int slidesErrorThreshold = 5;
 
-    public double initialSlidesPos;
+    public double initialSlidesPos = 0;
 
     public double INTAKE_SLIDES_SERVO_SPEED = 0.1;
     public static double HOME_THRESHOLD = 15;
@@ -44,14 +44,15 @@ public class Intake {
     private boolean carouselAuto;
 
     public Intake(LinearOpMode op, boolean isAuto) {
-        this(op, isAuto, false, 0);
+        this(op, isAuto, false, true);
     }
 
     //mapping, general intake/slide modes
-    public Intake(LinearOpMode op, boolean isAuto, boolean carouselAuto, int initialSlidesPos) {
+    public Intake(LinearOpMode op, boolean isAuto, boolean carouselAuto, boolean resetEncoder) {
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         flipServo = op.hardwareMap.get(Servo.class, "intakeServo");
 
@@ -60,11 +61,11 @@ public class Intake {
 
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "intakeSlides");
 //        slidesMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slidesMotor.setTargetPosition(0);
+        if (resetEncoder) slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        slidesMotor.setTargetPosition(0);
         slidesMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        this.initialSlidesPos = initialSlidesPos;
+//        this.initialSlidesPos = initialSlidesPos;
         this.isAuto = isAuto;
         this.carouselAuto = carouselAuto;
 

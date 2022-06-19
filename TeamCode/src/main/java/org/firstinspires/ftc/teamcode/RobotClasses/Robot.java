@@ -174,22 +174,22 @@ public class Robot {
 
     // Constructor
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed) {
-        this(op, x, y, theta, isAuto, isRed, 0, 0, false, false);
+        this(op, x, y, theta, isAuto, isRed, false, false, true);
     }
 
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean startLogger, boolean carouselAuto) {
-        this(op, x, y, theta, isAuto, isRed, 0, 0, startLogger, carouselAuto);
+        this(op, x, y, theta, isAuto, isRed, startLogger, carouselAuto, true);
     }
 
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean startLogger) {
-        this(op, x, y, theta, isAuto, isRed, 0, 0, startLogger, false);
+        this(op, x, y, theta, isAuto, isRed, startLogger, false, true);
     }
 
     public Robot(LinearOpMode op, boolean startLogger) {
-        this(op, Logger.readPos()[1], Logger.readPos()[2], Logger.readPos()[3], false, Logger.readPos()[0] == 1, (int) Logger.readPos()[6], (int) Logger.readPos()[7], startLogger, false);
+        this(op, Logger.readPos()[1], Logger.readPos()[2], Logger.readPos()[3], false, Logger.readPos()[0] == 1, startLogger, false, false);
     }
 
-    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, int depositSlidesPos, int intakeSlidesPos, boolean startLogger, boolean carouselAuto) {
+    public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean startLogger, boolean carouselAuto, boolean resetEncoders) {
         this.x = x;
         this.y = y;
         this.theta = theta;
@@ -202,14 +202,9 @@ public class Robot {
         drivetrain = new Drivetrain(op, x, y, theta, isAuto);
         carousel = new Carousel(op, isAuto, isRed);
         logger = new Logger();
-        deposit = new Deposit(op, isAuto, depositSlidesPos, carouselAuto);
-        intake = new Intake(op, isAuto, carouselAuto, intakeSlidesPos);
+        deposit = new Deposit(op, isAuto, carouselAuto, (isAuto || resetEncoders));
+        intake = new Intake(op, isAuto, carouselAuto, (isAuto || resetEncoders));
         capArm = new CapMech(op, isAuto);
-
-        addPacket("depositSlides", depositSlidesPos);
-        addPacket("intakeSlides", intakeSlidesPos);
-
-
         //        tapeDetector = new TapeDetector(op);
 
         // set up bulk read
@@ -391,7 +386,7 @@ public class Robot {
         if (!intakeEnabled) intakeState = 7;
         switch (intakeState) {
             case 1: //intake home
-                if (!intakeUp && !(isAuto && !carouselAuto && y < 75 && Math.abs(theta - PI / 2) > PI / 10) && !(!isAuto && cycleHub == DepositTarget.shared))
+                if (!intakeUp && !(!isAuto && cycleHub == DepositTarget.shared))
                     intake.flipDown();
                 else intake.flipUp();
                 intake.off();
