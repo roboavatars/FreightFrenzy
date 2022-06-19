@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @Config
-@Autonomous
+@Autonomous (name = "Blue Auto Carousel" , preselectTeleOp = "2 Teleop 2P", group = "Blue")
 public class BlueAutoCarousel extends LinearOpMode {
     public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Right;
     public static double delay = 0;
@@ -37,8 +37,8 @@ public class BlueAutoCarousel extends LinearOpMode {
         double startSweepTime = -1;
 
         double[] preloadScoreCoords;
-        double[] spinPose = new double[]{13.5, 14.5, 4.5 * PI / 4};
-        double[] depositCoords = new double[]{65, 34, 3.5 * PI/2};
+        double[] spinPose = new double[]{16, 14, 4.5 * PI / 4};
+        double[] depositCoords = new double[]{65, 31, 3.5 * PI/2};
         double[] parkCoords = new double[]{36.5, 10, PI};
 
         robot.carouselAuto = true;
@@ -123,6 +123,9 @@ public class BlueAutoCarousel extends LinearOpMode {
                     if (reachedSpinPos != -1) {
                         if (time.seconds() - reachedSpinPos < 6) {
                             robot.carousel.turnon();
+                            if (time.seconds() - reachedSpinPos < 1 || !robot.notMoving()) {
+                                robot.drivetrain.setControls(0.3, 0, 0);
+                            }
                         } else {
                             autoSteps++;
                             time.reset();
@@ -168,10 +171,10 @@ public class BlueAutoCarousel extends LinearOpMode {
                     Pose curDepo = depoDuck.getRobotPose(Math.min(time.seconds(), timeToDeposit));
                     robot.setTargetPoint(new Target(curDepo).theta(curDepo.theta + PI));
 
-                    robot.depositApproval = time.seconds() > 1.5;
+                    robot.depositApproval = time.seconds() > 1;
 
-                    robot.releaseApproval = time.seconds() > timeToDeposit + 0.5;//robot.isAtPose(depositCoords[0], depositCoords[1], depositCoords[2], 4, 4, PI/10);
-//                            && robot.notMoving();
+                    robot.releaseApproval = time.seconds() > timeToDeposit//robot.isAtPose(depositCoords[0], depositCoords[1], depositCoords[2], 4, 4, PI/10);
+                            && robot.notMoving();
 
                     if (robot.depositState == 6) {
                         Waypoint[] goToThePark = new Waypoint[]{

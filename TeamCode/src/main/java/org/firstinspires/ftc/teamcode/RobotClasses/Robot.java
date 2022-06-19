@@ -491,6 +491,7 @@ public class Robot {
                 deposit.retractSlides();
                 deposit.armHome();
                 deposit.open();
+                deposit.sharedOffset = 0;
                 break;
             case 2: //once transfer done, hold freight
                 if (System.currentTimeMillis() - clampStart > waitClampThreshold) deposit.hold();

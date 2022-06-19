@@ -63,7 +63,7 @@ public class Intake {
 //        slidesMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         if (resetEncoder) slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        slidesMotor.setTargetPosition(0);
-        slidesMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 //        this.initialSlidesPos = initialSlidesPos;
         this.isAuto = isAuto;

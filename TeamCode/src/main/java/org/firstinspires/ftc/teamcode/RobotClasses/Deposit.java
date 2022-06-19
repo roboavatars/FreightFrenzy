@@ -77,7 +77,7 @@ public class Deposit {
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
         if (resetEncoder) slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        slidesMotor.setTargetPosition(0);
-        slidesMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 //        this.initialSlidesPos = initialSlidesPos;
 
@@ -109,7 +109,7 @@ public class Deposit {
     //Slide PD
     public void updateSlides(boolean capping){
         if (slidesTarget != Constants.DEPOSIT_SLIDES_HOME_TICKS) slidesReset = false;
-        if (slidesTarget == Constants.DEPOSIT_SLIDES_HOME_TICKS && !slidesReset && getSlidesPos() < 5) {
+        if (slidesTarget == Constants.DEPOSIT_SLIDES_HOME_TICKS && !slidesReset && getSlidesPos() < 15) {
             slidesMotor.setPower(-1);
             if (getSlidesCurrent() > SLIDES_STALL_THRESHOLD) {
                 slidesReset = true;
