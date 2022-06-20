@@ -167,7 +167,8 @@ public class Robot {
         mid,
         low,
         shared,
-        cap
+        cap,
+        duck
     }
 
     public DepositTarget cycleHub;
@@ -202,8 +203,8 @@ public class Robot {
         drivetrain = new Drivetrain(op, x, y, theta, isAuto);
         carousel = new Carousel(op, isAuto, isRed);
         logger = new Logger();
-        deposit = new Deposit(op, isAuto, carouselAuto, (isAuto || resetEncoders));
-        intake = new Intake(op, isAuto, carouselAuto, (isAuto || resetEncoders));
+        deposit = new Deposit(op, isAuto, (isAuto || resetEncoders));
+        intake = new Intake(op, isAuto, (isAuto || resetEncoders));
         capArm = new CapMech(op, isAuto);
         //        tapeDetector = new TapeDetector(op);
 
@@ -400,7 +401,8 @@ public class Robot {
 //                if (isAuto) intake.extend();
                 if (!intakeNoExtend) intake.setSlidesPosition((int) Math.round(intakeExtendDist));
                 else intake.home();
-                intake.flipDown();
+                if (carouselAuto) intake.flipDownDucks();
+                else intake.flipDown();
 
                 //anti-stall
                 if (isAuto && !carouselAuto) {

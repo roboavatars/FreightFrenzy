@@ -46,19 +46,17 @@ public class Deposit {
     public double initialSlidesPos = 0;
 
     private boolean isAuto;
-    private boolean carouselAuto;
     private boolean isExtended = false;
     private boolean slidesReset = false;
 
     public boolean reset = false;
 
     public Deposit(LinearOpMode op, boolean isAuto) {
-        this(op, isAuto, false, true);
+        this(op, isAuto, true);
     }
 
-    public Deposit(LinearOpMode op, boolean isAuto, boolean carouselAuto, boolean resetEncoder) {
+    public Deposit(LinearOpMode op, boolean isAuto, boolean resetEncoder) {
         this.isAuto = isAuto;
-        this.carouselAuto = carouselAuto;
 
         // Deposit Servo
 
@@ -188,7 +186,11 @@ public class Deposit {
 
     //Deposit Servo
     public void hold() {
-        if (carouselAuto) setServoPos(Constants.DEPOSIT_DUCK_HOLD_POS);
+        hold(Robot.DepositTarget.high);
+    }
+
+    public void hold(Robot.DepositTarget hub) {
+        if (hub == Robot.DepositTarget.duck) setServoPos(Constants.DEPOSIT_DUCK_HOLD_POS);
         else setServoPos(Constants.DEPOSIT_HOLD_POS);
     }
     public void release() {

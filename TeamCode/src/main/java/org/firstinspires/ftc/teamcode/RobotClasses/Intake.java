@@ -41,14 +41,13 @@ public class Intake {
 
     private LinearOpMode op;
     private boolean isAuto;
-    private boolean carouselAuto;
 
     public Intake(LinearOpMode op, boolean isAuto) {
-        this(op, isAuto, false, true);
+        this(op, isAuto, true);
     }
 
     //mapping, general intake/slide modes
-    public Intake(LinearOpMode op, boolean isAuto, boolean carouselAuto, boolean resetEncoder) {
+    public Intake(LinearOpMode op, boolean isAuto, boolean resetEncoder) {
         intakeMotor = op.hardwareMap.get(DcMotorEx.class, "intake");
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -67,14 +66,17 @@ public class Intake {
 
 //        this.initialSlidesPos = initialSlidesPos;
         this.isAuto = isAuto;
-        this.carouselAuto = carouselAuto;
 
         intakeSensor = op.hardwareMap.get(OpticalDistanceSensor.class, "intakeSensor");
     }
 
     // Intake Motor
     public void on() {
-        if (!carouselAuto) setPower(Constants.INTAKE_POWER);
+        on(Robot.DepositTarget.high);
+    }
+
+    public void on(Robot.DepositTarget hub) {
+        if (hub == Robot.DepositTarget.high) setPower(Constants.INTAKE_POWER);
         else setPower(Constants.INTAKE_DUCK_POWER);
     }
 
@@ -146,6 +148,10 @@ public class Intake {
 
     public void flipDown() {
         flipServo.setPosition(Constants.INTAKE_DOWN_POS);
+    }
+
+    public void flipDownDucks() {
+        flipServo.setPosition(Constants.INTAKE_DOWN_DUCKS_POS);
     }
 
     // Distance Sensor

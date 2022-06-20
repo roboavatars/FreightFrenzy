@@ -37,8 +37,8 @@ public class RedAutoCarousel extends LinearOpMode {
         double startSweepTime = -1;
 
         double[] preloadScoreCoords;
-        double[] spinPose = new double[]{130.5, 14.5, 7.2 * PI / 4};
-        double[] depositCoords = new double[]{79, 34, -3 * PI/4};
+        double[] spinPose = new double[]{130.5, 18, 7.2 * PI / 4};
+        double[] depositCoords = new double[]{79, 29, 4.6 * PI/4};
         double[] parkCoords = new double[]{109, 10, 0};
 
         robot.carouselAuto = true;
@@ -98,6 +98,7 @@ public class RedAutoCarousel extends LinearOpMode {
 
                     if (robot.depositState == 6) {
                         time.reset();
+                        robot.cycleHub = Robot.DepositTarget.duck;
                         Waypoint[] pathToCarousel = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, robot.theta, 10, 10, 0, 0),
                                 new Waypoint(spinPose[0], spinPose[1] + 4, spinPose[2], 1, -5, 1, timeToCarousel-0.2),
@@ -123,6 +124,9 @@ public class RedAutoCarousel extends LinearOpMode {
                     if (reachedSpinPos != -1) {
                         if (time.seconds() - reachedSpinPos < 6) {
                             robot.carousel.turnon();
+                            if (time.seconds() - reachedSpinPos < 1 || !robot.notMoving()) {
+                                robot.drivetrain.setControls(0.3, 0, 0);
+                            }
                         } else {
                             autoSteps++;
                             time.reset();
@@ -170,8 +174,8 @@ public class RedAutoCarousel extends LinearOpMode {
 
                     robot.depositApproval = time.seconds() > 1.5;
 
-                    robot.releaseApproval = time.seconds() > timeToDeposit + 0.5;//robot.isAtPose(depositCoords[0], depositCoords[1], depositCoords[2], 4, 4, PI/10);
-//                            && robot.notMoving();
+                    robot.releaseApproval = time.seconds() > timeToDeposit//robot.isAtPose(depositCoords[0], depositCoords[1], depositCoords[2], 4, 4, PI/10);
+                            && robot.notMoving();
 
                     if (robot.depositState == 6) {
                         Waypoint[] goToThePark = new Waypoint[]{
