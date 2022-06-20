@@ -21,7 +21,8 @@ public class Deposit {
     public static int SLIDES_HOME_THRESHOLD = 20;
     public static int SLIDES_ERROR_THRESHOLD = 100;
     public static double SLIDES_DRIFT_MULTIPLIER = 0; //0.002;
-    public static double SLIDES_STALL_THRESHOLD = 8; //0.002;
+    public static double SLIDES_STALL_THRESHOLD = 2.5; //0.002;
+    public static int SLIDES_RESET_THRESHOLD = 20; //0.002;
 
     // Slides PD
     public int slidesErrorChange = 0;
@@ -38,7 +39,7 @@ public class Deposit {
 
     public static double gravityFF = .1;
 
-    public double midOffset = 0;
+    public int midOffset = 0;
     public double highOffset = 0;
     public double sharedOffset = 0;
 
@@ -90,8 +91,9 @@ public class Deposit {
     //sets the slide height/position based on deposit level
     public void extendSlides(Robot.DepositTarget hub){
         if (hub == Robot.DepositTarget.high) slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS + (int) Math.round(highOffset);
-        else if (hub == Robot.DepositTarget.mid) slidesTarget = Constants.DEPOSIT_SLIDES_MID_TICKS + (int) Math.round(midOffset);
-        else if (hub == Robot.DepositTarget.low || hub == Robot.DepositTarget.shared) slidesTarget = Constants.DEPOSIT_SLIDES_LOW_TICKS;
+        else if (hub == Robot.DepositTarget.mid) slidesTarget = Constants.DEPOSIT_SLIDES_MID_TICKS + midOffset * Constants.DEPOSIT_SLIDES_MID_PRESET;
+        else if (hub == Robot.DepositTarget.low) slidesTarget = Constants.DEPOSIT_SLIDES_LOW_TICKS;
+        else if (hub == Robot.DepositTarget.shared) slidesTarget = Constants.DEPOSIT_SLIDES_SHARED_TICKS;
         else if (hub == Robot.DepositTarget.cap) slidesTarget = Constants.DEPOSIT_SLIDES_CAP_TICKS;
 
 //        slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS;
@@ -109,8 +111,8 @@ public class Deposit {
     //Slide PD
     public void updateSlides(boolean capping){
         if (slidesTarget != Constants.DEPOSIT_SLIDES_HOME_TICKS) slidesReset = false;
-        if (slidesTarget == Constants.DEPOSIT_SLIDES_HOME_TICKS && !slidesReset && getSlidesPos() < 15) {
-            slidesMotor.setPower(-1);
+        if (slidesTarget == Constants.DEPOSIT_SLIDES_HOME_TICKS && !slidesReset && getSlidesPos() < SLIDES_RESET_THRESHOLD) {
+            slidesMotor.setPower(-0.2);
             if (getSlidesCurrent() > SLIDES_STALL_THRESHOLD) {
                 slidesReset = true;
                 initialSlidesPos -= getSlidesPos();

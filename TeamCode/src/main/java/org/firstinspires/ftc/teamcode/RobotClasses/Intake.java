@@ -26,7 +26,7 @@ public class Intake {
     public double initialSlidesPos = 0;
 
     public double INTAKE_SLIDES_SERVO_SPEED = 0.1;
-    public static double HOME_THRESHOLD = 15;
+    public static double HOME_THRESHOLD = 30;
 
     public int slidesErrorChange = 0;
     public int slidesError = 0;

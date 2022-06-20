@@ -119,8 +119,8 @@ public class Robot {
     public static double autoIntakeFlipThreshold = 800;
     public static double armFlipThreshold = 750;
     public static double armReturnThreshold = 1000;
-    public static double clampThreshold = 500;
-    public static double waitClampThreshold = 300;
+    public static double clampThreshold = 200;
+    public static double waitClampThreshold = 150;
 
     //    public String element;
     public double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
@@ -386,7 +386,7 @@ public class Robot {
         if (!intakeEnabled) intakeState = 7;
         switch (intakeState) {
             case 1: //intake home
-                if (!intakeUp && !(!isAuto && cycleHub == DepositTarget.shared))
+                if (!intakeUp && !(!isAuto && cycleHub == DepositTarget.shared) && capState == 1)
                     intake.flipDown();
                 else intake.flipUp();
                 intake.off();

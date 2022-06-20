@@ -46,11 +46,11 @@ public class BlueAutoWarehouse extends LinearOpMode {
         boolean resetOdo = false;
 
         // Segment Times
-        double cycleScoreTime = 1.5;
-        double parkThreshold = 6;
+        double cycleScoreTime = 2;
+        double parkThreshold = 4.5;
         double preloadScoreTime = 1;
 
-        double[] highCyclePos = new double[]{10, 68, PI - 0.45};
+        double[] highCyclePos = new double[]{16, 74, PI - 0.5};
         double[] midCyclePos = new double[]{25, 72, PI - 0.3};
         double[] preloadDepositPos;
 
@@ -90,7 +90,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
         while (opModeIsActive()) {
             addPacket("cycleCounter", cycleCounter);
-            robot.intakeExtendDist = (int) Math.round(Constants.INTAKE_SLIDES_EXTEND_TICKS/3 + cycleCounter * Constants.INTAKE_SLIDES_EXTEND_TICKS/4);
+            robot.intakeExtendDist = (int) Math.round(Constants.INTAKE_SLIDES_EXTEND_TICKS/3 + (cycleCounter + 1) * Constants.INTAKE_SLIDES_EXTEND_TICKS/4);
             addPacket("w", robot.w);
             double timeLeft = 30 - (System.currentTimeMillis() - robot.startTime) / 1000;
             addPacket("time left", timeLeft);
@@ -131,7 +131,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             break;
                         case 2:
                             robot.drivetrain.setControls(0, 4, 0);
-                            if (time.seconds() > (0.2 + 0.2 * cycleCounter)) {
+                            if (time.seconds() > (0.3 + 0.05 * cycleCounter)) {
                                 goToWarehouseSteps++;
                                 robot.resetOdo(6, robot.y, PI/2);
                                 time.reset();
@@ -139,7 +139,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             break;
                         case 3:
                             robot.intake.setSlidesPosition((int) Math.round(robot.intakeExtendDist));
-                            robot.drivetrain.constantStrafeConstant = 0.3;
+                            robot.drivetrain.constantStrafeConstant = 0.5;
 //                            robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 > PI / 10 ? -0.5 : 0);
                             robot.setTargetPoint(new Target(robot.x, Robot.startIntakingBlueAutoY, PI/2).thetaKp(3));
                             passLineTime = time.seconds();
@@ -151,8 +151,8 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             if (robot.antiStallStep == "Reverse Intake" && robot.intakeState == 2) {
                                 robot.setTargetPoint(6.5, Robot.startIntakingBlueAutoY, PI/2);
                             } else {
-                                if (cycleCounter < 3) {
-                                    double y = Math.min(Robot.startIntakingBlueAutoY + 0.75 * cycleCounter + 3 * (time.seconds() - passLineTime), 121);
+                                if (cycleCounter < 5) {
+                                    double y = Math.min(Robot.startIntakingBlueAutoY/* + 0.75 * cycleCounter */+ 5 * (time.seconds() - passLineTime), 121);
                                     double theta = PI / 2 + (PI / 15) * (Math.cos(4 * (time.seconds() - passLineTime)) - 1);
                                     robot.setTargetPoint(new Target(6 + 1 * cycleCounter, y, theta));
                                 } else {
@@ -183,7 +183,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             robot.drivetrain.setControls(0, 4, 0);
                             if (time.seconds() > 0.3) {
                                 goToWarehouseSteps++;
-                                robot.resetOdo(6, robot.y, PI/2);
+//                                robot.resetOdo(6, robot.y, PI/2);
                                 time.reset();
                             }
                             break;
@@ -216,11 +216,11 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 }
 
                 if (Math.abs(robot.y - 90) < 0.5 && !resetOdo) {
-                    robot.resetOdo(6, robot.y, PI / 2);
+//                    robot.resetOdo(6, robot.y, PI / 2);
                     resetOdo = true;
                 }
             } else if (!cycleScore) {
-                robot.drivetrain.constantStrafeConstant = robot.y > Robot.startIntakingBlueAutoY ? 1 : 0;
+                robot.drivetrain.constantStrafeConstant = robot.y > Robot.startIntakingBlueAutoY ? 0.7 : 0;
 
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
                 boolean thetaAtTarget = Math.abs(robot.theta - preloadDepositPos[2]) < PI/20;
@@ -230,7 +230,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 addPacket("path", "going to deposit right rn");
 
                 if (Math.abs(robot.y - 90) < 0.5 && !resetOdo) {
-                    robot.resetOdo(6, robot.y, PI / 2);
+//                    robot.resetOdo(6, robot.y, PI / 2);
                     resetOdo = true;
                 }
 
