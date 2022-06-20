@@ -154,7 +154,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                                 if (cycleCounter < 5) {
                                     double y = Math.min(Robot.startIntakingBlueAutoY/* + 0.75 * cycleCounter */+ 5 * (time.seconds() - passLineTime), 121);
                                     double theta = PI / 2 + (PI / 15) * (Math.cos(4 * (time.seconds() - passLineTime)) - 1);
-                                    robot.setTargetPoint(new Target(6 + 1 * cycleCounter, y, theta));
+                                    robot.setTargetPoint(new Target(10, y, theta));
                                 } else {
                                     double x = Math.min(6 + 1 * (time.seconds() - passLineTime), 14);
                                     double y = Robot.startIntakingBlueAutoY + 0.75 * (cycleCounter - 3) + (5 * Math.sin(4 * (time.seconds() - passLineTime)));
@@ -197,8 +197,8 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             if (robot.cycleHub == Robot.DepositTarget.high) {
                                 cycleScoreWaypoints = new Waypoint[]{
                                         new Waypoint(4, robot.y, 3 * PI / 2, 10, 10, 0, 0),
-                                        new Waypoint(4.5, 75, 3 * PI / 2, 5, 1, 0, 0.75),
-                                        new Waypoint(highCyclePos[0], highCyclePos[1], highCyclePos[2] + PI, 2, -10, 0, cycleScoreTime),
+                                        new Waypoint(4.5, 78, 3 * PI / 2, 5, 1, 2, 1.25),
+                                        new Waypoint(highCyclePos[0], highCyclePos[1], highCyclePos[2] + PI, 1, -10, 0, cycleScoreTime),
                                 };
                             } else {
                                 cycleScoreWaypoints = new Waypoint[]{
@@ -251,6 +251,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     robot.intakeUp = false;
                 }
             } else { //parking
+                robot.intakeExtendDist = Constants.INTAKE_SLIDES_HOME_TICKS;
                 robot.drivetrain.constantStrafeConstant = 0;
                 robot.setTargetPoint(new Target(6.5, 112, PI / 2));
                 if (robot.intakeState == 6) robot.intakeEnabled = false;
