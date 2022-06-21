@@ -18,11 +18,11 @@ public class Deposit {
     private Servo armServo2;
     private Servo depositServo;
 
-    public static int SLIDES_HOME_THRESHOLD = 20;
+    public static int SLIDES_HOME_THRESHOLD = 100;
     public static int SLIDES_ERROR_THRESHOLD = 100;
     public static double SLIDES_DRIFT_MULTIPLIER = 0; //0.002;
-    public static double SLIDES_STALL_THRESHOLD = 2.5; //0.002;
-    public static int SLIDES_RESET_THRESHOLD = 20; //0.002;
+    public static double SLIDES_STALL_THRESHOLD = 8; //0.002;
+    public static int SLIDES_RESET_THRESHOLD = 100; //0.002;
 
     // Slides PD
     public int slidesErrorChange = 0;
@@ -93,6 +93,7 @@ public class Deposit {
         else if (hub == Robot.DepositTarget.low) slidesTarget = Constants.DEPOSIT_SLIDES_LOW_TICKS;
         else if (hub == Robot.DepositTarget.shared) slidesTarget = Constants.DEPOSIT_SLIDES_SHARED_TICKS;
         else if (hub == Robot.DepositTarget.cap) slidesTarget = Constants.DEPOSIT_SLIDES_CAP_TICKS;
+        else if (hub == Robot.DepositTarget.duck) slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS + (int) Math.round(highOffset);
 
 //        slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS;
     }
@@ -103,21 +104,21 @@ public class Deposit {
     }
 
     public void updateSlides(){
-        updateSlides(false);
+        updateSlides(Robot.DepositTarget.high);
     }
 
     //Slide PD
-    public void updateSlides(boolean capping){
+    public void updateSlides(Robot.DepositTarget hub){
         if (slidesTarget != Constants.DEPOSIT_SLIDES_HOME_TICKS) slidesReset = false;
         if (slidesTarget == Constants.DEPOSIT_SLIDES_HOME_TICKS && !slidesReset && getSlidesPos() < SLIDES_RESET_THRESHOLD) {
-            slidesMotor.setPower(-0.2);
+            slidesMotor.setPower(-1);
             if (getSlidesCurrent() > SLIDES_STALL_THRESHOLD) {
                 slidesReset = true;
                 initialSlidesPos -= getSlidesPos();
             }
         } else {
-            double slidesKp = !capping ? this.slidesKp : this.slidesCapKp;
-            double slidesKd = !capping ? this.slidesKd : this.slidesCapKd;
+            double slidesKp = hub != Robot.DepositTarget.duck ? this.slidesKp : this.slidesCapKp;
+            double slidesKd = hub != Robot.DepositTarget.duck ? this.slidesKd : this.slidesCapKd;
 
             int currentTicks = getSlidesPos();
             initialSlidesPos += Math.abs(currentTicks - slidesLastTicks) * SLIDES_DRIFT_MULTIPLIER;
@@ -142,6 +143,7 @@ public class Deposit {
 
     public void armOut(Robot.DepositTarget hub) {
         if (hub == Robot.DepositTarget.shared) setArmControls(Constants.ARM_SHARED_POS + sharedOffset);
+        else if (hub == Robot.DepositTarget.duck) setArmControls(Constants.ARM_DUCK_DEPOSIT_POS);
         else setArmControls(Constants.ARM_ALLIANCE_POS);
         isExtended = true;
     }

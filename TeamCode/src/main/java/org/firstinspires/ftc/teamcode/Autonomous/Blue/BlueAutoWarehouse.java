@@ -50,7 +50,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
         double parkThreshold = 4.5;
         double preloadScoreTime = 1;
 
-        double[] highCyclePos = new double[]{16, 74, PI - 0.5};
+        double[] highCyclePos = new double[]{16, 74, PI - 0.35};
         double[] midCyclePos = new double[]{25, 72, PI - 0.3};
         double[] preloadDepositPos;
 
@@ -119,6 +119,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     goToWarehouse = true;
                     cycleScore = true;
                 } else {
+                    addPacket("go to warehouse step", goToWarehouseSteps);
                     switch (goToWarehouseSteps) {
                         case 1:
                             robot.drivetrain.constantStrafeConstant = 0; //0.4
@@ -139,7 +140,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             break;
                         case 3:
                             robot.intake.setSlidesPosition((int) Math.round(robot.intakeExtendDist));
-                            robot.drivetrain.constantStrafeConstant = 0.5;
+                            robot.drivetrain.constantStrafeConstant = 0.3;
 //                            robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 > PI / 10 ? -0.5 : 0);
                             robot.setTargetPoint(new Target(robot.x, Robot.startIntakingBlueAutoY, PI/2).thetaKp(3));
                             passLineTime = time.seconds();
@@ -234,7 +235,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                     resetOdo = true;
                 }
 
-                robot.depositApproval = (robot.cycleHub == Robot.DepositTarget.high && robot.isAtPose(highCyclePos[0], highCyclePos[1], highCyclePos[2], 2, 2, PI/20))
+                robot.depositApproval = robot.isAtPose(highCyclePos[0], highCyclePos[1], highCyclePos[2], 2, 2, PI/20)
 //                        || (robot.cycleHub == Robot.DepositTarget.mid && robot.isAtPose(midCyclePos[0], midCyclePos[1], midCyclePos[2], 2, 2, PI/20))
                         && robot.notMoving();
 
@@ -253,7 +254,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
             } else { //parking
                 robot.intakeExtendDist = Constants.INTAKE_SLIDES_HOME_TICKS;
                 robot.drivetrain.constantStrafeConstant = 0;
-                robot.setTargetPoint(new Target(6.5, 112, PI / 2));
+                if (!robot.isAtPose(6.5, 112, PI/2)) robot.setTargetPoint(new Target(6.5, 108, PI / 2));
                 if (robot.intakeState == 6) robot.intakeEnabled = false;
                 if (timeLeft < 1) {
                     robot.intakeEnabled = false;

@@ -117,10 +117,14 @@ public class Robot {
     public static double duckReleaseThreshold = 500;
     public static double teleIntakeFlipThreshold = 400;
     public static double autoIntakeFlipThreshold = 800;
+    public static double duckIntakeFlipThreshold = 1500;
     public static double armFlipThreshold = 750;
     public static double armReturnThreshold = 1000;
+    public static double retractDepositThreshold = 300;
     public static double clampThreshold = 200;
     public static double waitClampThreshold = 150;
+    public static double duckTransferThreshold = 150;
+
 
     //    public String element;
     public double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
@@ -391,7 +395,7 @@ public class Robot {
                     intake.flipDown();
                 else intake.flipUp();
                 intake.off();
-                if (isAuto && intakeApproval && (y >= 90 || carouselAuto)) {
+                if (isAuto && intakeApproval && (y >= (isRed ?  startIntakingRedAutoY : startIntakingBlueAutoY) || carouselAuto)) {
                     intakeState++;
                     intakeFull = intake.isFull();
                     intakeStalling = intake.checkIfStalling();
@@ -401,12 +405,11 @@ public class Robot {
 //                if (isAuto) intake.extend();
                 if (!intakeNoExtend) intake.setSlidesPosition((int) Math.round(intakeExtendDist));
                 else intake.home();
-                if (carouselAuto) intake.flipDownDucks();
-                else intake.flipDown();
+                intake.flipDown(cycleHub);
 
                 //anti-stall
                 if (isAuto && !carouselAuto) {
-                    if (!intakeStalling) {
+                    if (!intakeStalling || intakeFull) {
                         stallStartTime = -1;
                         intake.on();
                         antiStallStep = "Intake On";
@@ -437,7 +440,7 @@ public class Robot {
                     intakeRetractStart = System.currentTimeMillis();
 //                    if (element == "ball" || midGoal) cycleHub = DepositTarget.mid;
 //                    else cycleHub = DepositTarget.high;
-                    if (isAuto) cycleHub = DepositTarget.high;
+                    if (isAuto && !carouselAuto) cycleHub = DepositTarget.high;
                 }
                 if (intakeFull && !isAuto && intakeApproval) {
 //                    intakeApproval = false;
@@ -445,10 +448,10 @@ public class Robot {
                 }
                 break;
             case 3: //wait for flip servo and intake slides
-                intake.home();
+                intake.home(cycleHub);
                 intake.setPower(Constants.INTAKE_RETRACT_POWER);
-                intake.flipUp();
-                if (intake.slidesIsHome() && ((System.currentTimeMillis() - intakeRetractStart) > ((isAuto && !carouselAuto) ? autoIntakeFlipThreshold : teleIntakeFlipThreshold)))
+                intake.flipUp(cycleHub);
+                if (intake.slidesIsHome() && ((System.currentTimeMillis() - intakeRetractStart) > ((isAuto) ? autoIntakeFlipThreshold : teleIntakeFlipThreshold)))
                     intakeState++;
                 break;
             case 4: //wait for deposit to retract
@@ -459,8 +462,8 @@ public class Robot {
                 }
                 break;
             case 5: //transfer
-                intake.setPower(Constants.INTAKE_TRANSFER_POWER);
-                if (/*(!isAuto && depositApproval) || */intakeTransferred) {//(System.currentTimeMillis() - transferStart > (isAuto ? autoTransferThreshold : teleTransferThreshold))) {
+                intake.setPower(carouselAuto ? Constants.INTAKE_DUCK_TRANSFER_POWER : Constants.INTAKE_TRANSFER_POWER);
+                if ((!isAuto && depositApproval) || (!carouselAuto && intakeTransferred) || (carouselAuto && curTime - transferStart > duckTransferThreshold)) {//(System.currentTimeMillis() - transferStart > (isAuto ? autoTransferThreshold : teleTransferThreshold))) {
                     intakeState++;
                     clampStart = System.currentTimeMillis();
                     depositState = 2;
@@ -496,14 +499,15 @@ public class Robot {
                 deposit.sharedOffset = 0;
                 break;
             case 2: //once transfer done, hold freight
-                if (System.currentTimeMillis() - clampStart > waitClampThreshold) deposit.hold();
+                if (System.currentTimeMillis() - clampStart > waitClampThreshold) deposit.hold(cycleHub);
+                if (cycleHub == DepositTarget.duck) deposit.setArmControls(Constants.ARM_DUCK_HOME_POS);
                 if (((isAuto && !carouselAuto && y <= extendDepositAutoY) || depositApproval) && (System.currentTimeMillis() - clampStart > waitClampThreshold))
                     depositState++;
                 break;
             case 3: //extend deposit
                 deposit.extendSlides(cycleHub);
                 deposit.armOut(cycleHub);
-                deposit.hold();
+                deposit.hold(cycleHub);
                 startExtendTime = curTime;
                 if (isAuto || !depositApproval) depositState++;
                 break;
@@ -517,6 +521,7 @@ public class Robot {
                 break;
             case 5: //release & wait for freight to drop
                 deposit.release(cycleHub);
+                if (cycleHub == DepositTarget.duck) deposit.armOut();
                 if (System.currentTimeMillis() - depositStart > (isAuto ? (carouselAuto ? duckReleaseThreshold : autoReleaseThreshold) : teleReleaseThreshold)) {
                     depositState++;
                 }
@@ -527,8 +532,8 @@ public class Robot {
                 depositState++;
                 break;
             case 7:
-                deposit.retractSlides();
                 deposit.armHome();
+                if (curTime - depositStartRetract > retractDepositThreshold) deposit.retractSlides();
                 if (curTime - depositStartRetract > armReturnThreshold) {
                     depositState = 1;
                 }
@@ -537,7 +542,7 @@ public class Robot {
                 deposit.retractSlides();
                 deposit.armHome();
         }
-        deposit.updateSlides();
+        deposit.updateSlides(cycleHub);
         addPacket("deposit state", depositState);
         addPacket("intake state", intakeState);
 

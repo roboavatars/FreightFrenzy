@@ -26,7 +26,7 @@ public class Intake {
     public double initialSlidesPos = 0;
 
     public double INTAKE_SLIDES_SERVO_SPEED = 0.1;
-    public static double HOME_THRESHOLD = 30;
+    public static double HOME_THRESHOLD = 60;
 
     public int slidesErrorChange = 0;
     public int slidesError = 0;
@@ -109,7 +109,11 @@ public class Intake {
     }
 
     public void home() {
-        if (carouselAuto) setSlidesPosition(Constants.INTAKE_SLIDES_DUCK_HOME_TICKS);
+        home(Robot.DepositTarget.high);
+    }
+
+    public void home(Robot.DepositTarget hub) {
+        if (hub == Robot.DepositTarget.duck) setSlidesPosition(Constants.INTAKE_SLIDES_DUCK_HOME_TICKS);
         else setSlidesPosition(Constants.INTAKE_SLIDES_HOME_TICKS);
     }
 
@@ -143,15 +147,21 @@ public class Intake {
 
     // Intake Servo
     public void flipUp() {
-        flipServo.setPosition(Constants.INTAKE_UP_POS);
+        flipUp(Robot.DepositTarget.high);
+    }
+
+    public void flipUp(Robot.DepositTarget hub) {
+        if (hub == Robot.DepositTarget.duck) flipServo.setPosition(Constants.INTAKE_UP_DUCK_POS);
+        else flipServo.setPosition(Constants.INTAKE_UP_POS);
     }
 
     public void flipDown() {
-        flipServo.setPosition(Constants.INTAKE_DOWN_POS);
+        flipDown(Robot.DepositTarget.high);
     }
 
-    public void flipDownDucks() {
-        flipServo.setPosition(Constants.INTAKE_DOWN_DUCKS_POS);
+    public void flipDown(Robot.DepositTarget hub) {
+        if (hub == Robot.DepositTarget.duck) flipServo.setPosition(Constants.INTAKE_DOWN_DUCKS_POS);
+        else flipServo.setPosition(Constants.INTAKE_DOWN_POS);
     }
 
     // Distance Sensor

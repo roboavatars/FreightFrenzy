@@ -54,6 +54,8 @@ public class Teleop1P extends LinearOpMode {
     private boolean cappingDown = true;
 
     private boolean intakeApprovalToggle = false;
+    private boolean midOffsetUpToggle = false;
+    private boolean midOffsetDownToggle = false;
 
     /*
     Controller Button Mappings: *updated 5/30/22 2:55 PM*
@@ -104,8 +106,18 @@ public class Teleop1P extends LinearOpMode {
                 if (gamepad1.dpad_up) robot.deposit.highOffset += 1;
                 if (gamepad1.dpad_down) robot.deposit.highOffset -= 1;
             } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.mid) {
-                if (gamepad1.dpad_up) robot.deposit.midOffset += 1;
-                if (gamepad1.dpad_down) robot.deposit.midOffset -= 1;
+                if (!midOffsetUpToggle && gamepad1.dpad_up) {
+                    if (robot.deposit.midOffset < 1) robot.deposit.midOffset++;
+                    midOffsetUpToggle = true;
+                } else if (midOffsetUpToggle && !gamepad1.dpad_up) {
+                    midOffsetUpToggle = false;
+                }
+                if (!midOffsetDownToggle && gamepad1.dpad_down) {
+                    if (robot.deposit.midOffset > -1) robot.deposit.midOffset--;
+                    midOffsetDownToggle = true;
+                } else if (midOffsetDownToggle && !gamepad1.dpad_down) {
+                    midOffsetDownToggle = false;
+                }
             } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.shared) {
                 if (gamepad1.dpad_up) robot.deposit.sharedOffset += 0.003;
                 if (gamepad1.dpad_down) robot.deposit.sharedOffset -= 0.003;

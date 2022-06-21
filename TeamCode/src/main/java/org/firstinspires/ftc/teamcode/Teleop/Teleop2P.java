@@ -145,14 +145,17 @@ public class Teleop2P extends LinearOpMode {
             } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.mid) {
                 if (!midOffsetUpToggle && gamepad2.dpad_up) {
                     if (robot.deposit.midOffset < 1) robot.deposit.midOffset++;
+                    midOffsetUpToggle = true;
                 } else if (midOffsetUpToggle && !gamepad2.dpad_up) {
                     midOffsetUpToggle = false;
                 }
                 if (!midOffsetDownToggle && gamepad2.dpad_down) {
                     if (robot.deposit.midOffset > -1) robot.deposit.midOffset--;
+                    midOffsetDownToggle = true;
                 } else if (midOffsetDownToggle && !gamepad2.dpad_down) {
                     midOffsetDownToggle = false;
                 }
+                addPacket("mid offset", robot.deposit.midOffset);
             } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.shared) {
                 if (gamepad2.dpad_up) robot.deposit.sharedOffset += 0.003;
                 if (gamepad2.dpad_down) robot.deposit.sharedOffset -= 0.003;
@@ -174,7 +177,7 @@ public class Teleop2P extends LinearOpMode {
             double xyGain;
             double wGain;
 
-            if (robot.capState == 2 || robot.capState == 3 || robot.depositState == 4) {
+            if (robot.capState != 1 || robot.depositState == 4) {
                 xyGain = this.xySlowGain;
                 wGain = this.wSlowGain;
             } else {
@@ -182,7 +185,7 @@ public class Teleop2P extends LinearOpMode {
                 wGain = this.wGain;
             }
 
-            squaredControl = robot.capState == 4 || robot.capState == 5;
+//            squaredControl = robot.capState == 4 || robot.capState == 5;
 
             robot.intakeExtendDist = Math.max(Constants.INTAKE_SLIDES_HOME_TICKS,Math.min(robot.intakeExtendDist + gamepad2.right_trigger - gamepad2.left_trigger, Constants.INTAKE_SLIDES_EXTEND_TICKS));
 

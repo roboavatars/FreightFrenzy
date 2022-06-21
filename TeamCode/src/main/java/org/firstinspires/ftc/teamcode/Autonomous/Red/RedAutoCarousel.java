@@ -37,8 +37,8 @@ public class RedAutoCarousel extends LinearOpMode {
         double startSweepTime = -1;
 
         double[] preloadScoreCoords;
-        double[] spinPose = new double[]{130.5, 18, 7.2 * PI / 4};
-        double[] depositCoords = new double[]{79, 29, 4.6 * PI/4};
+        double[] spinPose = new double[]{129, 16, 7.2 * PI / 4};
+        double[] depositCoords = new double[]{85, 31, 5.2 * PI/4};
         double[] parkCoords = new double[]{109, 10, 0};
 
         robot.carouselAuto = true;
@@ -124,8 +124,8 @@ public class RedAutoCarousel extends LinearOpMode {
                     if (reachedSpinPos != -1) {
                         if (time.seconds() - reachedSpinPos < 6) {
                             robot.carousel.turnon();
-                            if (time.seconds() - reachedSpinPos < 1 || !robot.notMoving()) {
-                                robot.drivetrain.setControls(0.3, 0, 0);
+                            if (time.seconds() - reachedSpinPos < 0.1 || !robot.notMoving()) {
+                                robot.drivetrain.setControls(0.23, 0, 0);
                             }
                         } else {
                             autoSteps++;
@@ -143,7 +143,7 @@ public class RedAutoCarousel extends LinearOpMode {
                         robot.setTargetPoint(114 + 10 * Math.sin(1 * (time.seconds() - 1)), 15,  PI/3 * Math.sin(3 * (time.seconds() - 1)));
                         startSweepTime = time.seconds();
                     } else {
-                        robot.setTargetPoint(127 - 4 * Math.sin(5*(time.seconds() - startSweepTime)), 30 - 10 * Math.sin(0.5*(time.seconds() - startSweepTime)), -0.5 * PI / 4);
+                        robot.setTargetPoint(127 - 4 * Math.sin(5*(time.seconds() - startSweepTime)), 30 - 12 * Math.cos(0.4*(time.seconds() - startSweepTime)), -0.5 * PI / 4);
                     }
 
                     if (timeLeft < 8) {
