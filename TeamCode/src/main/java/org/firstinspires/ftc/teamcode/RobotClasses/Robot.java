@@ -126,7 +126,8 @@ public class Robot {
 
     //    public String element;
     public double intakeExtendDist = Constants.INTAKE_SLIDES_EXTEND_TICKS; //(Constants.INTAKE_SLIDES_HOME_TICKS + Constants.INTAKE_SLIDES_EXTEND_TICKS)/2;
-    public boolean rumble = false;
+    public boolean intakeRumble = false;
+    public boolean transferRumble = false;
 
     // Cycle Tracker
     public ArrayList<Double> cycles = new ArrayList<>();
@@ -393,7 +394,8 @@ public class Robot {
         }
 
         boolean waitForIntakeFlip = false;
-        rumble = false;
+        intakeRumble = false;
+        transferRumble = false;
         if (!intakeEnabled) intakeState = 7;
         switch (intakeState) {
             case 1: //intake home
@@ -450,7 +452,7 @@ public class Robot {
                 }
                 if (intakeFull && !isAuto && intakeApproval) {
 //                    intakeApproval = false;
-                    rumble = true;
+                    intakeRumble = true;
                 }
                 break;
             case 3: //wait for flip servo and intake slides
@@ -469,7 +471,7 @@ public class Robot {
                 break;
             case 5: //transfer
                 intake.setPower(carouselAuto ? Constants.INTAKE_DUCK_TRANSFER_POWER : Constants.INTAKE_TRANSFER_POWER);
-                if ((!isAuto && depositApproval) || (!carouselAuto && intakeTransferred) || (carouselAuto && curTime - transferStart > duckTransferThreshold)) {//(System.currentTimeMillis() - transferStart > (isAuto ? autoTransferThreshold : teleTransferThreshold))) {
+                if (/*(!isAuto && depositApproval) || */(!carouselAuto && intakeTransferred) || (carouselAuto && curTime - transferStart > duckTransferThreshold)) {//(System.currentTimeMillis() - transferStart > (isAuto ? autoTransferThreshold : teleTransferThreshold))) {
                     intakeState++;
                     clampStart = System.currentTimeMillis();
                     depositState = 2;
@@ -478,7 +480,10 @@ public class Robot {
                 break;
             case 6: //wait for deposit to clamp down on freight
 //                intake.off();
-                if (System.currentTimeMillis() - clampStart > (carouselAuto ? duckClampThreshold : clampThreshold)) intakeState = 1;
+                if (System.currentTimeMillis() - clampStart > (carouselAuto ? duckClampThreshold : clampThreshold)) {
+                    transferRumble = true;
+                    intakeState = 1;
+                }
                 break;
             case 7: //intake off toggle
                 intake.off();

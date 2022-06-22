@@ -6,7 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 public class Constants {
 
     // Drivetrain
-    public static double VERT_ODO_NORMAL_POS = 0.7;
+    public static double VERT_ODO_NORMAL_POS = 0.65;
     public static double VERT_ODO_RETRACT_POS = 0;
     public static double LAT_ODO_NORMAL_POS = 0.75;
     public static double LAT_ODO_RETRACT_POS = 0.48;

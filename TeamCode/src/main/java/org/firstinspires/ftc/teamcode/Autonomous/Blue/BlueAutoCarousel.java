@@ -97,6 +97,7 @@ public class BlueAutoCarousel extends LinearOpMode {
 //                            && robot.notMoving();
 
                     if (robot.depositState == 6) {
+                        robot.cycleHub = Robot.DepositTarget.duck;
                         time.reset();
                         Waypoint[] pathToCarousel = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, robot.theta, 10, 10, 0, 0),

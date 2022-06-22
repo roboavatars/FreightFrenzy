@@ -117,7 +117,8 @@ public class Teleop2P extends LinearOpMode {
             robot.intakeNoExtend = gamepad1.right_bumper;
             robot.intakeUp = gamepad1.x || gamepad2.x;
 
-            if (robot.rumble) gamepad1.rumble(500);
+            if (robot.intakeRumble) gamepad1.rumble(500);
+            if (robot.transferRumble) gamepad1.rumble(500);
 
             if (!fastHighToggle && gamepad2.touchpad) {
                 fastHigh = !fastHigh;

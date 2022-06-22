@@ -142,7 +142,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             robot.intake.setSlidesPosition((int) Math.round(robot.intakeExtendDist));
                             robot.drivetrain.constantStrafeConstant = 0.3;
 //                            robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 > PI / 10 ? -0.5 : 0);
-                            robot.setTargetPoint(new Target(robot.x, Robot.startIntakingBlueAutoY, PI/2).thetaKp(3));
+                            robot.setTargetPoint(new Target(robot.x, Robot.startIntakingBlueAutoY, PI/2 + PI/20).thetaKp(3));
                             passLineTime = time.seconds();
                             addPacket("path", "going to warehouse right rn");
                             if (robot.y > Robot.startIntakingBlueAutoY - 1) goToWarehouseSteps++;
@@ -152,7 +152,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             if (robot.antiStallStep == "Reverse Intake" && robot.intakeState == 2) {
                                 robot.setTargetPoint(6.5, Robot.startIntakingBlueAutoY, PI/2);
                             } else {
-                                if (cycleCounter < 5) {
+                                if (cycleCounter < 3) {
                                     double y = Math.min(Robot.startIntakingBlueAutoY/* + 0.75 * cycleCounter */+ 5 * (time.seconds() - passLineTime), 121);
                                     double theta = PI / 2 + (PI / 15) * (Math.cos(4 * (time.seconds() - passLineTime)) - 1);
                                     robot.setTargetPoint(new Target(10, y, theta));
@@ -222,6 +222,9 @@ public class BlueAutoWarehouse extends LinearOpMode {
                 }
             } else if (!cycleScore) {
                 robot.drivetrain.constantStrafeConstant = robot.y > Robot.startIntakingBlueAutoY ? 0.7 : 0;
+
+                if (robot.deposit.getSlidesPos() < 250 && !robot.deposit.slidesisHome()) robot.intake.setSlidesPosition(150);
+                else robot.intake.setSlidesPosition(Constants.INTAKE_SLIDES_HOME_TICKS);
 
                 Pose curPose = cycleScorePath.getRobotPose(Math.min(cycleScoreTime, time.seconds()));
                 boolean thetaAtTarget = Math.abs(robot.theta - preloadDepositPos[2]) < PI/20;

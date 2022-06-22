@@ -18,7 +18,7 @@ public class Deposit {
     private DcMotorEx armMotor;
     private Servo depositServo;
 
-    public static int SLIDES_HOME_THRESHOLD = 100;
+    public static int SLIDES_HOME_THRESHOLD = 50;
     public static int SLIDES_ERROR_THRESHOLD = 100;
     public static double SLIDES_DRIFT_MULTIPLIER = 0; //0.002;
     public static double SLIDES_STALL_THRESHOLD = 8; //0.002;
@@ -77,8 +77,9 @@ public class Deposit {
 
     public Deposit(LinearOpMode op, boolean isAuto, boolean resetEncoder, double armInitialPos) {
         this.isAuto = isAuto;
-        if (isAuto) this.initialArmPos = armInitialPos;
-        else this.initialArmPos = 0;
+//        if (isAuto)
+        this.initialArmPos = armInitialPos;
+//        else this.initialArmPos = 0;
 
         // Deposit Servo
 
