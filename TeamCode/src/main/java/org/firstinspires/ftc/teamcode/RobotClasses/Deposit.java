@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -14,8 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 @Config
 public class Deposit {
     private DcMotorEx slidesMotor;
-    private Servo armServo1;
-    private Servo armServo2;
+    private DcMotorEx armMotor;
     private Servo depositServo;
 
     public static int SLIDES_HOME_THRESHOLD = 100;
@@ -24,26 +24,46 @@ public class Deposit {
     public static double SLIDES_STALL_THRESHOLD = 8; //0.002;
     public static int SLIDES_RESET_THRESHOLD = 100; //0.002;
 
+    public static double ARM_TICKS_TO_RAD = 0.00628;
+    public static double ARM_INITIAL_THETA = 0;
+    public static int ARM_HOME_THRESHOLD = 30;
+    public static int ARM_ERROR_THRESHOLD = 50;
+    public static double ARM_MAX_POWER = 0.7;
+
     // Slides PD
     public int slidesErrorChange = 0;
     public int slidesError = 0;
     public int slidesTarget = 0;
     public int slidesLastTicks = 0;
 
-    //PID constants
+    //SLides PID constants
     public static double slidesKp = 0.01;
     public static double slidesKd = 0;
 
     public static double slidesCapKp = 0.002;
     public static double slidesCapKd = 0;
 
-    public static double gravityFF = .1;
+    public static double slidesGravityFF = .1;
+
+    // Arm PD
+    public int armErrorChange = 0;
+    public int armError = 0;
+    public int armTarget = 0;
+    public int armLastTicks = 0;
+
+    //Arm PID constants
+    public static double armUpKp = 0.01;
+    public static double armDownKp = 0.008;
+    public static double armUpKd = 0.03;
+    public static double armDownKd = 0.02;
+    public static double armGravityFF = 0.1;
 
     public int midOffset = 0;
     public double highOffset = 0;
     public double sharedOffset = 0;
 
     public double initialSlidesPos = 0;
+    public double initialArmPos = 0;
 
     private boolean isAuto;
     private boolean isExtended = false;
@@ -61,11 +81,7 @@ public class Deposit {
         // Deposit Servo
 
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
-        armServo1 = op.hardwareMap.get(Servo.class, "arm1");
-        armServo2 = op.hardwareMap.get(Servo.class, "arm2");
-//        turretServo = op.hardwareMap.get(Servo.class, "turret");
 
-//        turretHome();
         if (isAuto) setArmControls(Constants.ARM_INIT_POS);
         else armHome();
 
@@ -73,9 +89,14 @@ public class Deposit {
         else open();
 
         // Arm Motor
+        armMotor = op.hardwareMap.get(DcMotorEx.class, "arm");
+        if (resetEncoder) armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // Slides Motor
         slidesMotor = op.hardwareMap.get(DcMotorEx.class, "depositSlides");
         if (resetEncoder) slidesMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        slidesMotor.setTargetPosition(0);
         slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 //        this.initialSlidesPos = initialSlidesPos;
@@ -83,8 +104,8 @@ public class Deposit {
         op.telemetry.addData("Status", "Deposit Initialized");
     }
 
-    public void update() {
-        updateSlides();
+    public void update(Robot.DepositTarget hub) {
+        updateSlides(hub);
         updateArm();
     }
 
@@ -133,7 +154,7 @@ public class Deposit {
             slidesErrorChange = slidesTarget - currentTicks - slidesError;
             slidesError = slidesTarget - currentTicks;
 
-            slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + gravityFF);
+            slidesMotor.setPower(slidesKp * slidesError + slidesKd * slidesErrorChange + slidesGravityFF);
         }
 
         addPacket("initialSlidesPos", initialSlidesPos);
@@ -141,34 +162,6 @@ public class Deposit {
 
     public double getSlidesCurrent() {
         return slidesMotor.getCurrent(CurrentUnit.AMPS);
-    }
-
-    public void armOut() {
-        armOut(Robot.DepositTarget.high);
-    }
-
-    public void armOut(Robot.DepositTarget hub) {
-        if (hub == Robot.DepositTarget.shared) setArmControls(Constants.ARM_SHARED_POS + sharedOffset);
-        else if (hub == Robot.DepositTarget.duck) setArmControls(Constants.ARM_DUCK_DEPOSIT_POS);
-        else if (hub == Robot.DepositTarget.high) setArmControls(Constants.ARM_HIGH_POS);
-        else if (hub == Robot.DepositTarget.fastHigh) setArmControls(Constants.ARM_FAST_HIGH_POS);
-        else setArmControls(Constants.ARM_ALLIANCE_POS);
-        isExtended = true;
-    }
-
-    public void armHome() {
-        setArmControls(Constants.ARM_HOME_POS);
-        isExtended = false;
-    }
-
-    public boolean isArmOut() {
-        return isExtended;
-    }
-
-    public void setArmControls(double pos) {
-        double offset = -.0168224 * pos + -.00285047;
-        armServo1.setPosition(Math.max(0, Math.min(1, pos)));
-        armServo2.setPosition(Math.max(0, Math.min(1, 1 - pos + offset)));
     }
 
     public int getSlidesPos() {
@@ -183,17 +176,59 @@ public class Deposit {
         return slidesError < SLIDES_ERROR_THRESHOLD;
     }
 
-//    public void turretHome() {
-//        turretServo.setPosition(Constants.TURRET_HOME);
-//    }
-//
-//    public void turretLeft() {
-//        turretServo.setPosition(Constants.TURRET_HOME - Constants.TURRET_TURN_DIST);
-//    }
-//
-//    public void turretRight() {
-//        turretServo.setPosition(Constants.TURRET_HOME + Constants.TURRET_TURN_DIST);
-//    }
+    public void updateArm() {
+        int currentTicks = getArmPos();
+
+        armErrorChange = armTarget - currentTicks - armError;
+        armError = armTarget - currentTicks;
+
+        double armKp = (armTarget == Constants.ARM_HOME_POS) ? armDownKp : armUpKp;
+        double armKd = (armTarget == Constants.ARM_HOME_POS) ? armDownKd : armUpKd;
+
+        armMotor.setPower(Math.max(-ARM_MAX_POWER, Math.min(ARM_MAX_POWER, armKp * armError + armKd * armErrorChange + armGravityFF * Math.cos(getArmTheta()))));
+    }
+
+    public void armOut() {
+        armOut(Robot.DepositTarget.high);
+    }
+
+    public void armOut(Robot.DepositTarget hub) {
+        if (hub == Robot.DepositTarget.shared) setArmControls(Constants.ARM_SHARED_POS + (int) Math.round(sharedOffset));
+        else if (hub == Robot.DepositTarget.duck) setArmControls(Constants.ARM_DUCK_DEPOSIT_POS);
+        else if (hub == Robot.DepositTarget.high) setArmControls(Constants.ARM_HIGH_POS);
+        else if (hub == Robot.DepositTarget.fastHigh) setArmControls(Constants.ARM_FAST_HIGH_POS);
+        else setArmControls(Constants.ARM_ALLIANCE_POS);
+        isExtended = true;
+    }
+
+    public void armHome() {
+        setArmControls(Constants.ARM_HOME_POS);
+        isExtended = false;
+    }
+
+    public int getArmPos() {
+        return armMotor.getCurrentPosition() + (int) Math.round(initialArmPos);
+    }
+
+    public double getArmTheta() {
+        return ARM_INITIAL_THETA + getArmPos() * ARM_TICKS_TO_RAD;
+    }
+
+    public boolean isArmAtPos() {
+        return armError < ARM_ERROR_THRESHOLD;
+    }
+
+    public boolean isArmHome() {
+        return getArmPos() < ARM_HOME_THRESHOLD;
+    }
+
+    public boolean isArmOut() {
+        return isExtended;
+    }
+
+    public void setArmControls(int pos) {
+        armTarget = pos;
+    }
 
     //Deposit Servo
     public void hold() {

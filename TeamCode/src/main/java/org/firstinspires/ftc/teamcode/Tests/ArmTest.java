@@ -1,35 +1,31 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
+import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
+
+import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 
 @TeleOp
 @Config
 public class ArmTest extends LinearOpMode {
-    public static double servo1pos = 0;
-    public static double offset = 0;
-
-    public static boolean arm1Enable = true;
-    public static boolean arm2Enable = true;
+    public static int pos = 0;
 
     @Override
     public void runOpMode() {
-        ServoImplEx arm1 = hardwareMap.get(ServoImplEx.class, "arm1");
-        ServoImplEx arm2 = hardwareMap.get(ServoImplEx.class, "arm2");
+        Deposit deposit = new Deposit(this, false);
 
         waitForStart();
 
         while (opModeIsActive()) {
-            double offset = -.0168224 * servo1pos + -.00285047;
-            arm1.setPosition(servo1pos);
-            arm2.setPosition(1-servo1pos+offset);
-
-            if(arm1Enable) arm1.setPwmEnable();
-            else arm1.setPwmDisable();
-            if(arm2Enable) arm2.setPwmEnable();
-            else arm2   .setPwmDisable();
+            deposit.setArmControls(pos);
+            deposit.updateArm();
+            addPacket("arm pos", deposit.getArmPos());
+            addPacket("arm theta", deposit.getArmTheta());
+            sendPacket();
         }
     }
 

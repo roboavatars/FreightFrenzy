@@ -85,10 +85,8 @@ public class Robot {
     public boolean intakeTransfer = false;
     public boolean slidesInCommand = false;
     public boolean depositingFreight = false;
-    public boolean armExtendCommands = false;
     public boolean intakeRev = false;
     private final double intakeFlipTime = -1;
-    private final double armOpenTime = -1;
     private final double slidesAtPosTime = -1;
     private final double extendTime = -1;
     public boolean autoNoTurret = false;
@@ -119,8 +117,6 @@ public class Robot {
     public static double teleIntakeFlipThreshold = 400;
     public static double autoIntakeFlipThreshold = 800;
     public static double duckIntakeFlipThreshold = 1500;
-    public static double armFlipThreshold = 750;
-    public static double armReturnThreshold = 1000;
     public static double retractDepositThreshold = 300;
     public static double clampThreshold = 200;
     public static double waitClampThreshold = 150;
@@ -523,7 +519,7 @@ public class Robot {
             case 4: //wait for driver approval for release
                 deposit.extendSlides(cycleHub);
                 deposit.armOut(cycleHub);
-                if ((!isAuto || (deposit.slidesAtPos() && curTime - startExtendTime > armFlipThreshold)) && ((!carouselAuto && depositApproval) || releaseApproval)) {
+                if ((!isAuto || (deposit.slidesAtPos() && deposit.isArmAtPos())) && ((!carouselAuto && depositApproval) || releaseApproval)) {
                     depositState++;
                     depositStart = System.currentTimeMillis();
                 }
@@ -543,7 +539,7 @@ public class Robot {
             case 7:
                 deposit.armHome();
                 if (curTime - depositStartRetract > retractDepositThreshold) deposit.retractSlides();
-                if (curTime - depositStartRetract > armReturnThreshold) {
+                if (deposit.isArmHome()) {
                     depositState = 1;
                 }
                 break;
@@ -551,7 +547,7 @@ public class Robot {
                 deposit.retractSlides();
                 deposit.armHome();
         }
-        deposit.updateSlides(cycleHub);
+        deposit.update(cycleHub);
         addPacket("deposit state", depositState);
         addPacket("intake state", intakeState);
 
@@ -577,20 +573,7 @@ public class Robot {
                 capMech.up();
                 capMech.open();
         }
-//        addPacket("element", element == "ball" ? 0 : 1);
-
     }
-
-//    public void setCycleHub(DepositTarget cycleHub) {
-//        this.cycleHub = cycleHub;
-//        depositState = 1;
-//
-//        if (cycleHub == DepositTarget.high || cycleHub == DepositTarget.neutral) {
-//            turret.setHome();
-//            arm.setHome();
-//        }
-//    }
-
 
     public void advanceCapState() {
         if (capState != 4 && capState != 2) capMech.upOffset = capMech.downOffset = 0;

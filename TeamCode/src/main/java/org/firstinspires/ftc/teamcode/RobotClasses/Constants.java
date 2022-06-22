@@ -47,14 +47,14 @@ public class Constants {
     public static double DEPOSIT_CAP_POS = 0.5;
 
     // Deposit Arm
-    public static double ARM_ALLIANCE_POS = 0.2;
-    public static double ARM_DUCK_DEPOSIT_POS = 0.5;
-    public static double ARM_DUCK_HOME_POS = 0.7;
-    public static double ARM_SHARED_POS = 0.15;
-    public static double ARM_HOME_POS = 0.85;
-    public static double ARM_INIT_POS = 0.75;
-    public static double ARM_HIGH_POS = 0.25;
-    public static double ARM_FAST_HIGH_POS = 0.35;
+    public static int ARM_ALLIANCE_POS = 475;
+    public static int ARM_DUCK_DEPOSIT_POS = 350;
+    public static int ARM_DUCK_HOME_POS = 200;
+    public static int ARM_SHARED_POS = 550;
+    public static int ARM_HOME_POS = 0;
+    public static int ARM_INIT_POS = 200;
+    public static int ARM_HIGH_POS = 450;
+    public static int ARM_FAST_HIGH_POS = 350;
 
 //    public static double ARM_OFFSET = -.22;
 
