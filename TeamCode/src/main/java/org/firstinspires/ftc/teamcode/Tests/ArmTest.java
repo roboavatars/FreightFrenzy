@@ -13,10 +13,11 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
 @Config
 public class ArmTest extends LinearOpMode {
     public static int pos = 0;
+    public static int initPos = 0;
 
     @Override
     public void runOpMode() {
-        Deposit deposit = new Deposit(this, false);
+        Deposit deposit = new Deposit(this, false, initPos);
 
         waitForStart();
 

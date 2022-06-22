@@ -27,12 +27,20 @@ public class BarcodePipeline extends OpenCvPipeline {
     public static int RECT_WIDTH = 280;
     public static int RECT_HEIGHT = 40;
     public static int BLUE_LEFT_DIVIDER = 80;
-    public static int BLUE_RIGHT_DIVIDER = 180;
+    public static int BLUE_RIGHT_DIVIDER = 135;
     public static int RED_LEFT_DIVIDER = 100;
     public static int RED_RIGHT_DIVIDER = 180;
+
+    // Carousel
+    public static int BLUE_LEFT_DIVIDER_C = 80;
+    public static int BLUE_RIGHT_DIVIDER_C = 180;
+    public static int RED_LEFT_DIVIDER_C = 90;
+    public static int RED_RIGHT_DIVIDER_C = 165;
+
     public static int RETURN_IMAGE = 0;
 
-    public static int x = 30;
+    public static int xw = 25;
+    public static int xc = 10;
     public static int y = 130;
 
     public int leftDivider;
@@ -57,6 +65,7 @@ public class BarcodePipeline extends OpenCvPipeline {
 
     public int leftArea = -1;
     public int middleArea = -1;
+    public int rightArea = -1;
 
     // Image Processing Mats
     private Mat hsv = new Mat();
@@ -64,34 +73,53 @@ public class BarcodePipeline extends OpenCvPipeline {
     private Mat save;
     private Mat left = new Mat();
     private Mat middle = new Mat();
+    private Mat right = new Mat();
     private Mat blank = new Mat();
 
     // Debug
     private static String path = "/sdcard/EasyOpenCV/";
     public boolean debug = true;
     public boolean isRed;
+    public boolean isWarehouse;
 
     // Results
     private Case outputCase = Case.None;
     private Case[] results = new Case[] {Case.None, Case.None, Case.None, Case.None, Case.None};
     private int cycles = 0;
 
-    public BarcodePipeline(boolean isRed) {
+    public BarcodePipeline(boolean isRed, boolean isWarehouse) {
         this.isRed = isRed;
+        this.isWarehouse = isWarehouse;
 
         if (isRed) {
-            leftDivider = RED_LEFT_DIVIDER;
-            rightDivider = RED_RIGHT_DIVIDER;
+            if (isWarehouse) {
+                leftDivider = RED_LEFT_DIVIDER;
+                rightDivider = RED_RIGHT_DIVIDER;
+            } else {
+                leftDivider = RED_LEFT_DIVIDER_C;
+                rightDivider = RED_RIGHT_DIVIDER_C;
+                RECT_WIDTH = 250;
+            }
         } else {
-            leftDivider = BLUE_LEFT_DIVIDER;
-            rightDivider = BLUE_RIGHT_DIVIDER;
+            if (isWarehouse) {
+                leftDivider = BLUE_LEFT_DIVIDER;
+                rightDivider = BLUE_RIGHT_DIVIDER;
+                RECT_WIDTH = 230;
+            } else {
+                leftDivider = BLUE_LEFT_DIVIDER_C;
+                rightDivider = BLUE_RIGHT_DIVIDER_C;
+            }
         }
     }
 
     @Override
     public Mat processFrame(Mat input) {
 //         Crop Input Image
-        input = new Mat(input, new Rect(x, y, RECT_WIDTH, RECT_HEIGHT));
+        if (isWarehouse) {
+            input = new Mat(input, new Rect(xw, y, RECT_WIDTH, RECT_HEIGHT));
+        } else {
+            input = new Mat(input, new Rect(xc, y, RECT_WIDTH, RECT_HEIGHT));
+        }
         saveMatToDisk("input", input);
 
         // Convert to HSV Color Space
@@ -107,29 +135,56 @@ public class BarcodePipeline extends OpenCvPipeline {
         Imgproc.morphologyEx(processed, processed, Imgproc.MORPH_CLOSE, blank);
         saveMatToDisk("processed", processed);
 
-        // Split Into Three Regions
-        left = new Mat(processed, new Rect(0, 0, leftDivider, RECT_HEIGHT));
-        middle = new Mat(processed, new Rect(rightDivider, 0, RECT_WIDTH - rightDivider, RECT_HEIGHT));
+        if (isRed && isWarehouse || !isRed && !isWarehouse) {
+            // Split Into Three Regions
+            left = new Mat(processed, new Rect(0, 0, leftDivider, RECT_HEIGHT));
+            middle = new Mat(processed, new Rect(rightDivider, 0, RECT_WIDTH - rightDivider, RECT_HEIGHT));
 
-        // Compute White Area for each Region
-        leftArea = Core.countNonZero(left);
-        middleArea = Core.countNonZero(middle);
+            // Compute White Area for each Region
+            leftArea = Core.countNonZero(left);
+            middleArea = Core.countNonZero(middle);
 
-        // Find Area with Minimum Area
-        int minArea = leftArea;
-        outputCase = Case.Left;
+            // Find Area with Minimum Area
+            int minArea = leftArea;
+            outputCase = Case.Left;
 
-        if (middleArea < minArea) {
-            minArea = middleArea;
+            if (middleArea < minArea) {
+                minArea = middleArea;
+                outputCase = Case.Middle;
+            }
+
+            if (leftArea > SQUARE_AREA && middleArea > SQUARE_AREA) {
+                outputCase = Case.Right;
+            }
+            // Reject Area if Too Large
+            else if (minArea > AREA_MAX) {
+                outputCase = Case.None;
+            }
+        } else {
+            // Split Into Three Regions
+            middle = new Mat(processed, new Rect(0, 0, leftDivider, RECT_HEIGHT));
+            right = new Mat(processed, new Rect(rightDivider, 0, RECT_WIDTH - rightDivider, RECT_HEIGHT));
+
+            // Compute White Area for each Region
+            middleArea = Core.countNonZero(middle);
+            rightArea = Core.countNonZero(right);
+
+            // Find Area with Minimum Area
+            int minArea = middleArea;
             outputCase = Case.Middle;
-        }
 
-        if (leftArea > SQUARE_AREA && middleArea > SQUARE_AREA) {
-            outputCase = Case.Right;
-        }
-        // Reject Area if Too Large
-        else if (minArea > AREA_MAX) {
-            outputCase = Case.None;
+            if (rightArea < minArea) {
+                minArea = rightArea;
+                outputCase = Case.Right;
+            }
+
+            if (middleArea > SQUARE_AREA && rightArea > SQUARE_AREA) {
+                outputCase = Case.Left;
+            }
+            // Reject Area if Too Large
+            else if (minArea > AREA_MAX) {
+                outputCase = Case.None;
+            }
         }
 
         // Draw Three Red Rectangles
@@ -140,10 +195,18 @@ public class BarcodePipeline extends OpenCvPipeline {
         }
 
         // Draw Green Rectangle Depending on Region
-        if (debug) {
-            if (outputCase == Case.Left) {
+        if (isWarehouse) {
+            if (debug) {
+                if (outputCase == Case.Left) {
+                    Imgproc.rectangle(input, new Point(0, 0), new Point(leftDivider, RECT_HEIGHT), new Scalar(0, 255, 0), 4);
+                } else if (outputCase == Case.Middle) {
+                    Imgproc.rectangle(input, new Point(rightDivider, 0), new Point(RECT_WIDTH, RECT_HEIGHT), new Scalar(0, 255, 0), 4);
+                }
+            }
+        } else {
+            if (outputCase == Case.Middle) {
                 Imgproc.rectangle(input, new Point(0, 0), new Point(leftDivider, RECT_HEIGHT), new Scalar(0, 255, 0), 4);
-            } else if (outputCase == Case.Middle) {
+            } else if (outputCase == Case.Right) {
                 Imgproc.rectangle(input, new Point(rightDivider, 0), new Point(RECT_WIDTH, RECT_HEIGHT), new Scalar(0, 255, 0), 4);
             }
         }

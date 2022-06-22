@@ -39,7 +39,7 @@ public class BlueAutoCarousel extends LinearOpMode {
         double[] preloadScoreCoords;
         double[] spinPose = new double[]{16, 14, 4.5 * PI / 4};
         double[] depositCoords = new double[]{65, 31, 3.5 * PI/2};
-        double[] parkCoords = new double[]{36.5, 10, PI};
+        double[] parkCoords = new double[]{34.5, 10, PI};
 
         robot.carouselAuto = true;
 
@@ -100,7 +100,7 @@ public class BlueAutoCarousel extends LinearOpMode {
                         time.reset();
                         Waypoint[] pathToCarousel = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, robot.theta, 10, 10, 0, 0),
-                                new Waypoint(spinPose[0], spinPose[1] + 4, spinPose[2], 1, -5, 1, timeToCarousel-0.2),
+                                new Waypoint(spinPose[0], spinPose[1] + 4, spinPose[2], 1, -5, 0.8, timeToCarousel-0.2),
                                 new Waypoint(spinPose[0], spinPose[1], spinPose[2], 1, -5, 0, timeToCarousel)
                         };
                         spinPath = new Path(pathToCarousel);
@@ -158,9 +158,9 @@ public class BlueAutoCarousel extends LinearOpMode {
                     robot.setTargetPoint(20, 6, PI);
                     if (robot.y < 10) {
                         Waypoint[] depositDuck = new Waypoint[]{
-                                new Waypoint(robot.x, robot.y, robot.theta + PI, 10, 10, 0, 0),
+                                new Waypoint(robot.x, robot.y, robot.theta + PI, 5, 5, 0, 0),
                                 new Waypoint(40 , 10, 0.5 * PI/2, 5, 5, 0, 1),
-                                new Waypoint(depositCoords[0], depositCoords[1], depositCoords[2] + PI, 10, 10, 0.1, timeToDeposit),
+                                new Waypoint(depositCoords[0], depositCoords[1], depositCoords[2] + PI, 5, 5, 0.1, timeToDeposit),
                         };
                         depoDuck = new Path(depositDuck);
                         time.reset();
@@ -201,8 +201,8 @@ public class BlueAutoCarousel extends LinearOpMode {
                 case 7 :
                     robot.intakeUp = true;
                     robot.capDown = true;
-                    robot.setTargetPoint(36, 6, PI/2);
-                    if (robot.isAtPose(36, 6, PI/2)
+                    robot.setTargetPoint(34, 6, PI/2);
+                    if (robot.isAtPose(34, 6, PI/2)
                             && robot.notMoving()) {
                         autoSteps++;
                     }

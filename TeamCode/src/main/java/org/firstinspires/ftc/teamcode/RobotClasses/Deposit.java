@@ -63,7 +63,7 @@ public class Deposit {
     public double sharedOffset = 0;
 
     public double initialSlidesPos = 0;
-    public double initialArmPos = 0;
+    public double initialArmPos;
 
     private boolean isAuto;
     private boolean isExtended = false;
@@ -71,18 +71,20 @@ public class Deposit {
 
     public boolean reset = false;
 
-    public Deposit(LinearOpMode op, boolean isAuto) {
-        this(op, isAuto, true);
+    public Deposit(LinearOpMode op, boolean isAuto, double armInitPos) {
+        this(op, isAuto, true, armInitPos);
     }
 
-    public Deposit(LinearOpMode op, boolean isAuto, boolean resetEncoder) {
+    public Deposit(LinearOpMode op, boolean isAuto, boolean resetEncoder, double armInitialPos) {
         this.isAuto = isAuto;
+        if (isAuto) this.initialArmPos = armInitialPos;
+        else this.initialArmPos = 0;
 
         // Deposit Servo
 
         depositServo = op.hardwareMap.get(Servo.class, "depositServo");
 
-        if (isAuto) setArmControls(Constants.ARM_INIT_POS);
+        if (isAuto) setArmControls((int) Math.round(initialArmPos));
         else armHome();
 
         if (isAuto) hold();

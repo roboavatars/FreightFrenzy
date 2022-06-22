@@ -15,11 +15,11 @@ public class Vision extends BaseDetector {
 
     public enum Pipeline {AprilTag, Barcode, Freight, Tape}
 
-    public Vision(LinearOpMode op, Pipeline pipeline, boolean isRed) {
+    public Vision(LinearOpMode op, Pipeline pipeline, boolean isRed, boolean isWarehouse) {
         super(op, pipeline);
 
         aprilTagPipeline = new AprilTagPipeline();
-        barcodePipeline = new BarcodePipeline(isRed);
+        barcodePipeline = new BarcodePipeline(isRed, isWarehouse);
         freightLocatorPipeline = new FreightLocatorPipeline();
         tapeDetectorPipeline = new TapeDetectorPipeline();
 

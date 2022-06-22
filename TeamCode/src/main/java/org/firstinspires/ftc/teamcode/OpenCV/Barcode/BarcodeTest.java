@@ -11,12 +11,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp(name = "Barcode Pipeline Test")
 public class BarcodeTest extends LinearOpMode {
     public static boolean isRed = true;
+    public static boolean isWarehouse = true;
 
     private BarcodeDetector detector;
 
     @Override
     public void runOpMode() {
-        detector = new BarcodeDetector(this, isRed);
+        detector = new BarcodeDetector(this, isRed, isWarehouse);
 
         waitForStart();
         detector.start();

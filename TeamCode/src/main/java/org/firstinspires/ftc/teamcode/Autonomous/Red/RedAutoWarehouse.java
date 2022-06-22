@@ -35,7 +35,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         Robot robot = new Robot(this, 135, 78.5, 0, true, true, true);
 
-        BarcodeDetector barcodeDetector = new BarcodeDetector(this, true);
+        BarcodeDetector barcodeDetector = new BarcodeDetector(this, true, true);
         barcodeDetector.start();
 
         // Segments
@@ -65,7 +65,6 @@ public class RedAutoWarehouse extends LinearOpMode {
 
         waitForStart();
         barcodeCase = barcodeDetector.getResult();
-
         addPacket("barcode", barcodeCase);
 
         ElapsedTime time = new ElapsedTime();
@@ -80,6 +79,11 @@ public class RedAutoWarehouse extends LinearOpMode {
             robot.cycleHub = Robot.DepositTarget.high;
             preloadDepositPos = new double[] {130, 73, 2*PI/15};
         }
+
+        Robot.log("Barcode Case: " + barcodeCase);
+        try {
+            barcodeDetector.stop();
+        } catch (Exception ignore) {}
 
         Waypoint[] preloadScoreWaypoints = new Waypoint[]{
                 new Waypoint(robot.x, robot.y, 3 * PI / 2, 10, 10, 0, 0),
@@ -145,7 +149,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                             break;
                         case 3:
                             robot.intake.setSlidesPosition((int) Math.round(robot.intakeExtendDist));
-                            robot.drivetrain.constantStrafeConstant = -0.5;
+                            robot.drivetrain.constantStrafeConstant = 0;
 //                            robot.drivetrain.setGlobalControls(0, 0.7, robot.theta - PI / 2 > PI / 10 ? -0.5 : 0);
                             robot.setTargetPoint(new Target(robot.x, Robot.startIntakingRedAutoY + 5, PI/2).thetaKp(3));
                             passLineTime = time.seconds();

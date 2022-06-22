@@ -119,8 +119,9 @@ public class Robot {
     public static double duckIntakeFlipThreshold = 1500;
     public static double retractDepositThreshold = 300;
     public static double clampThreshold = 200;
-    public static double waitClampThreshold = 150;
-    public static double duckTransferThreshold = 150;
+    public static double duckClampThreshold = 300;
+    public static double waitClampThreshold = 200;
+    public static double duckTransferThreshold = 300;
 
 
     //    public String element;
@@ -211,7 +212,7 @@ public class Robot {
         profile(2);
         logger = new Logger();
         profile(3);
-        deposit = new Deposit(op, isAuto, (isAuto || resetEncoders));
+        deposit = new Deposit(op, isAuto, (isAuto || resetEncoders), Constants.ARM_AUTO_INIT_POS);
         profile(4);
         intake = new Intake(op, isAuto, (isAuto || resetEncoders));
         profile(5);
@@ -477,7 +478,7 @@ public class Robot {
                 break;
             case 6: //wait for deposit to clamp down on freight
 //                intake.off();
-                if (System.currentTimeMillis() - clampStart > clampThreshold) intakeState = 1;
+                if (System.currentTimeMillis() - clampStart > (carouselAuto ? duckClampThreshold : clampThreshold)) intakeState = 1;
                 break;
             case 7: //intake off toggle
                 intake.off();
@@ -506,6 +507,7 @@ public class Robot {
             case 2: //once transfer done, hold freight
                 if (System.currentTimeMillis() - clampStart > waitClampThreshold) deposit.hold(cycleHub);
                 if (cycleHub == DepositTarget.duck) deposit.setArmControls(Constants.ARM_DUCK_HOME_POS);
+                if (carouselAuto) deposit.hold(DepositTarget.duck);
                 if (((isAuto && !carouselAuto && y <= extendDepositAutoY) || depositApproval) && (System.currentTimeMillis() - clampStart > waitClampThreshold))
                     depositState++;
                 break;

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodeDetector;
 import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodePipeline;
 import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
@@ -25,6 +26,9 @@ public class RedAutoCarousel extends LinearOpMode {
     @Override
     public void runOpMode() {
         Robot robot = new Robot(this, 135, 41, 0, true, true, true);
+
+        BarcodeDetector barcodeDetector = new BarcodeDetector(this, true, false);
+        barcodeDetector.start();
 
         double goToPreloadTime = 1.5;
         double timeToCarousel = 2;
@@ -48,6 +52,8 @@ public class RedAutoCarousel extends LinearOpMode {
         Path gotoP = null;
 
         waitForStart();
+        barcodeCase = barcodeDetector.getResult();
+        addPacket("barcode", barcodeCase);
 
         ElapsedTime time = new ElapsedTime();
 

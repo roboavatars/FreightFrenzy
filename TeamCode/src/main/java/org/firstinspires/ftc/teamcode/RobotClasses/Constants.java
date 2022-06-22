@@ -55,6 +55,7 @@ public class Constants {
     public static int ARM_INIT_POS = 200;
     public static int ARM_HIGH_POS = 450;
     public static int ARM_FAST_HIGH_POS = 350;
+    public static int ARM_AUTO_INIT_POS = 55;
 
 //    public static double ARM_OFFSET = -.22;
 
