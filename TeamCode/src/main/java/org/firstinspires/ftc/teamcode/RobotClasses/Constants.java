@@ -35,7 +35,7 @@ public class Constants {
     // Intake Servo
     public static double INTAKE_UP_POS = 0.83;
     public static double INTAKE_UP_DUCK_POS = 0.83;
-    public static double INTAKE_DOWN_POS = 0.15;
+    public static double INTAKE_DOWN_POS = 0;
     public static double INTAKE_DOWN_DUCKS_POS = 0.1;
 
     // Deposit Servo
@@ -53,7 +53,10 @@ public class Constants {
     public static double ARM_SHARED_POS = 0.15;
     public static double ARM_HOME_POS = 0.85;
     public static double ARM_INIT_POS = 0.75;
-    public static double ARM_OFFSET = -0.0125;
+    public static double ARM_HIGH_POS = 0.25;
+    public static double ARM_FAST_HIGH_POS = 0.35;
+
+//    public static double ARM_OFFSET = -.22;
 
     //Capping Arm
     public static double CAP_OPEN = 1;
@@ -61,10 +64,12 @@ public class Constants {
     public static double CAP_INIT = 1;
     public static double CAP_HOME = 0.75;
     public static double CAP_UP = 0.6;
-    public static double CAP_DOWN = 0.22;
+    public static double CAP_DOWN_1 = 0.22;
+    public static double CAP_DOWN_2 = 0.25;
 
     public static int DEPOSIT_SLIDES_HOME_TICKS = 0;
     public static int DEPOSIT_SLIDES_HIGH_TICKS = 500;
+    public static int DEPOSIT_SLIDES_FAST_HIGH_TICKS = 300;
     public static int DEPOSIT_SLIDES_MID_TICKS = 200;
     public static int DEPOSIT_SLIDES_MID_PRESET = 75;
     public static int DEPOSIT_SLIDES_LOW_TICKS = 0;

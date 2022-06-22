@@ -16,6 +16,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Debug.Logger;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
@@ -37,9 +38,9 @@ public class Robot {
     // public TapeDetector tapeDetector;
     public Logger logger;
     public Deposit deposit;
-    public CapMech capArm;
+    public CapMech capMech;
 
-    //    private final ElapsedTime profiler;
+    private final ElapsedTime profiler;
     private final List<LynxModule> allHubs;
     private final VoltageSensor battery;
     private double voltage;
@@ -168,6 +169,7 @@ public class Robot {
 
     public enum DepositTarget {
         high,
+        fastHigh,
         mid,
         low,
         shared,
@@ -195,6 +197,9 @@ public class Robot {
     }
 
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean startLogger, boolean carouselAuto, boolean resetEncoders) {
+        profiler = new ElapsedTime();
+        profiler.reset();
+
         this.x = x;
         this.y = y;
         this.theta = theta;
@@ -205,11 +210,17 @@ public class Robot {
 
         // init subsystems
         drivetrain = new Drivetrain(op, x, y, theta, isAuto);
+        profile(1);
         carousel = new Carousel(op, isAuto, isRed);
+        profile(2);
         logger = new Logger();
+        profile(3);
         deposit = new Deposit(op, isAuto, (isAuto || resetEncoders));
+        profile(4);
         intake = new Intake(op, isAuto, (isAuto || resetEncoders));
-        capArm = new CapMech(op, isAuto);
+        profile(5);
+        capMech = new CapMech(op, isAuto);
+        profile(6);
         //        tapeDetector = new TapeDetector(op);
 
         // set up bulk read
@@ -223,7 +234,6 @@ public class Robot {
         voltage = round(battery.getVoltage());
         log("Battery Voltage: " + voltage + "v");
         startVoltage = voltage;
-//        profiler = new ElapsedTime();
 
         // Initial Dashboard Drawings
 //        if (intake.getDistance() > 1000) {
@@ -258,7 +268,6 @@ public class Robot {
     }
 
     public void update() {
-//        profiler.reset();
         curTime = System.currentTimeMillis();
 
         // Don't check states every loop
@@ -278,7 +287,7 @@ public class Robot {
         }
 
         if (loopCounter % imuUpdatePeriod == 0) {
-            IMUay = -drivetrain.getAccel().yAccel;
+//            IMUay = -drivetrain.getAccel().yAccel;
         }
 
         loopCounter++;
@@ -548,25 +557,25 @@ public class Robot {
 
         switch (capState) {
             case 1: //arm up
-                if (capDown) capArm.init();
-                else capArm.home();
-                capArm.close();
+                if (capDown) capMech.init();
+                else capMech.home();
+                capMech.close();
                 break;
             case 2: //picking up tse
-                capArm.down();
-                capArm.open();
+                capMech.down();
+                capMech.open();
                 break;
             case 3: //hold cap
-                capArm.down();
-                capArm.close();
+                capMech.down();
+                capMech.close();
                 break;
             case 4: //capping
-                capArm.up();
-                capArm.close();
+                capMech.up();
+                capMech.close();
                 break;
             case 5: //release cap
-                capArm.up();
-                capArm.open();
+                capMech.up();
+                capMech.open();
         }
 //        addPacket("element", element == "ball" ? 0 : 1);
 
@@ -584,10 +593,11 @@ public class Robot {
 
 
     public void advanceCapState() {
-        if (capState != 4 && capState != 2) capArm.upOffset = capArm.downOffset = 0;
+        if (capState != 4 && capState != 2) capMech.upOffset = capMech.downOffset = 0;
         if (capState < 5)
             capState++;
         else {
+            capMech.capNumber = 2;
             capState = 0;
         }
     }
@@ -682,7 +692,7 @@ public class Robot {
     }
 
     private void profile(int num) {
-        //Log.w("profiler", num + ": " + profiler.milliseconds());
+        Log.w("profiler", num + ": " + profiler.milliseconds());
     }
 
     public void automationStep(String step) {

@@ -54,8 +54,10 @@ public class Teleop2P extends LinearOpMode {
     private double capUpOffset = 0;
     private double capDownOffset = 0;
     private boolean cappingDown = true;
+    private boolean fastHigh = true;
 
     private boolean capToggle = false;
+    private boolean fastHighToggle = false;
     private boolean intakeApprovalToggle = false;
     private boolean midOffsetUpToggle = false;
     private boolean midOffsetDownToggle = false;
@@ -94,6 +96,8 @@ public class Teleop2P extends LinearOpMode {
 //        imu = new IMU(robot.theta, this);
         waitForStart();
 
+        robot.cycleHub = Robot.DepositTarget.fastHigh;
+
         ElapsedTime cycleTimer = new ElapsedTime();
         cycleTimer.reset();
 
@@ -115,12 +119,20 @@ public class Teleop2P extends LinearOpMode {
 
             if (robot.rumble) gamepad1.rumble(500);
 
+            if (!fastHighToggle && gamepad2.touchpad) {
+                fastHigh = !fastHigh;
+                fastHighToggle = true;
+            } else if (fastHighToggle && !gamepad2.touchpad) {
+                fastHighToggle = false;
+            }
+
             if (gamepad1.left_bumper) {
                 robot.cycleHub = Robot.DepositTarget.mid;
             } else if (gamepad1.b) {
                 robot.cycleHub = Robot.DepositTarget.shared;
             } else if (gamepad1.left_trigger > .1) {
-                robot.cycleHub = Robot.DepositTarget.high;
+                if (fastHigh) robot.cycleHub = Robot.DepositTarget.fastHigh;
+                else robot.cycleHub = Robot.DepositTarget.high;
             }
 
             if (gamepad2.right_bumper) robot.carousel.turnon();
@@ -134,11 +146,11 @@ public class Teleop2P extends LinearOpMode {
             }
 
             if (robot.capState == 4 || robot.capState == 5) {
-                if (gamepad2.dpad_up) robot.capArm.upOffset += .007;
-                if (gamepad2.dpad_down) robot.capArm.upOffset -= .007;
+                if (gamepad2.dpad_up) robot.capMech.upOffset += .007;
+                if (gamepad2.dpad_down) robot.capMech.upOffset -= .007;
             } else if (robot.capState == 2 || robot.capState == 3) {
-                if (gamepad2.dpad_up) robot.capArm.downOffset += .007;
-                if (gamepad2.dpad_down) robot.capArm.downOffset -= .007;
+                if (gamepad2.dpad_up) robot.capMech.downOffset += .007;
+                if (gamepad2.dpad_down) robot.capMech.downOffset -= .007;
             } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.high) {
                 if (gamepad2.dpad_up) robot.deposit.highOffset += 1;
                 if (gamepad2.dpad_down) robot.deposit.highOffset -= 1;

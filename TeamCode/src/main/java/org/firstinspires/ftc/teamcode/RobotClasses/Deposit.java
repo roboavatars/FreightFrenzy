@@ -83,6 +83,11 @@ public class Deposit {
         op.telemetry.addData("Status", "Deposit Initialized");
     }
 
+    public void update() {
+        updateSlides();
+        updateArm();
+    }
+
     public void extendSlides () {extendSlides(Robot.DepositTarget.high);}
 
 
@@ -94,6 +99,7 @@ public class Deposit {
         else if (hub == Robot.DepositTarget.shared) slidesTarget = Constants.DEPOSIT_SLIDES_SHARED_TICKS;
         else if (hub == Robot.DepositTarget.cap) slidesTarget = Constants.DEPOSIT_SLIDES_CAP_TICKS;
         else if (hub == Robot.DepositTarget.duck) slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS + (int) Math.round(highOffset);
+        else if (hub == Robot.DepositTarget.fastHigh) slidesTarget = Constants.DEPOSIT_SLIDES_FAST_HIGH_TICKS;
 
 //        slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS;
     }
@@ -144,6 +150,8 @@ public class Deposit {
     public void armOut(Robot.DepositTarget hub) {
         if (hub == Robot.DepositTarget.shared) setArmControls(Constants.ARM_SHARED_POS + sharedOffset);
         else if (hub == Robot.DepositTarget.duck) setArmControls(Constants.ARM_DUCK_DEPOSIT_POS);
+        else if (hub == Robot.DepositTarget.high) setArmControls(Constants.ARM_HIGH_POS);
+        else if (hub == Robot.DepositTarget.fastHigh) setArmControls(Constants.ARM_FAST_HIGH_POS);
         else setArmControls(Constants.ARM_ALLIANCE_POS);
         isExtended = true;
     }
@@ -158,8 +166,9 @@ public class Deposit {
     }
 
     public void setArmControls(double pos) {
-        armServo1.setPosition((Math.max(0, Math.min(1, pos))));
-        armServo2.setPosition(Math.max(0, Math.min(1, 1 - pos + Constants.ARM_OFFSET)));
+        double offset = -.0168224 * pos + -.00285047;
+        armServo1.setPosition(Math.max(0, Math.min(1, pos)));
+        armServo2.setPosition(Math.max(0, Math.min(1, 1 - pos + offset)));
     }
 
     public int getSlidesPos() {
@@ -198,6 +207,7 @@ public class Deposit {
     public void release() {
         release(Robot.DepositTarget.high);
     }
+
     public void release(Robot.DepositTarget hub) {
         if (hub == Robot.DepositTarget.shared) setServoPos(Constants.DEPOSIT_RELEASE_POS);
         else setServoPos(Constants.DEPOSIT_FLICK_POS);

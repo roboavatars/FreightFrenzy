@@ -14,6 +14,8 @@ public class CapMech {
     public double upOffset = 0;
     public double downOffset = 0;
 
+    public int capNumber = 1;
+
     public CapMech(LinearOpMode op, boolean isAuto) {
         this.isAuto = isAuto;
 
@@ -42,7 +44,7 @@ public class CapMech {
         armServo.setPosition(Constants.CAP_INIT);    }
 
     public void down () {
-        armServo.setPosition(Constants.CAP_DOWN + downOffset);
+        armServo.setPosition((capNumber == 1 ? Constants.CAP_DOWN_1 : Constants.CAP_DOWN_2) + downOffset);
     }
 
     public void up () {

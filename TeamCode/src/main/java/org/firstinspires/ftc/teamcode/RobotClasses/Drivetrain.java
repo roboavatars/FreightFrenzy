@@ -137,8 +137,6 @@ public class Drivetrain {
         lastHeading = theta;
 
         op.telemetry.addData("Status", "Drivetrain Initialized");
-
-        imu = new IMU(PI / 2, op);
     }
 
     // retract odometry

@@ -100,8 +100,8 @@ public class Teleop1P extends LinearOpMode {
             if (robot.rumble) gamepad1.rumble(500);
 
             if (robot.capState == 4 || robot.capState == 5) {
-                if (gamepad1.dpad_up) robot.capArm.upOffset += .007;
-                if (gamepad1.dpad_down) robot.capArm.upOffset -= .007;
+                if (gamepad1.dpad_up) robot.capMech.upOffset += .007;
+                if (gamepad1.dpad_down) robot.capMech.upOffset -= .007;
             } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.high) {
                 if (gamepad1.dpad_up) robot.deposit.highOffset += 1;
                 if (gamepad1.dpad_down) robot.deposit.highOffset -= 1;
