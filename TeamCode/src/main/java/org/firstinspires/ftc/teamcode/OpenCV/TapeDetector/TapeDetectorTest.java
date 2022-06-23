@@ -3,9 +3,11 @@ package org.firstinspires.ftc.teamcode.OpenCV.TapeDetector;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.addPacket;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+@Disabled
 @TeleOp(name = "Tape Detector Pipeline Test")
 public class TapeDetectorTest extends LinearOpMode {
     private TapeDetector detector;

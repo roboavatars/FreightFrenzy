@@ -123,9 +123,10 @@ public class Deposit {
         else if (hub == Robot.DepositTarget.mid) slidesTarget = Constants.DEPOSIT_SLIDES_MID_TICKS + midOffset * Constants.DEPOSIT_SLIDES_MID_PRESET;
         else if (hub == Robot.DepositTarget.low) slidesTarget = Constants.DEPOSIT_SLIDES_LOW_TICKS;
         else if (hub == Robot.DepositTarget.shared) slidesTarget = Constants.DEPOSIT_SLIDES_SHARED_TICKS;
+        else if (hub == Robot.DepositTarget.oppShared) slidesTarget = Constants.DEPOSIT_SLIDES_OPP_SHARED_TICKS;
         else if (hub == Robot.DepositTarget.cap) slidesTarget = Constants.DEPOSIT_SLIDES_CAP_TICKS;
         else if (hub == Robot.DepositTarget.duck) slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS;
-        else if (hub == Robot.DepositTarget.fastHigh) slidesTarget = Constants.DEPOSIT_SLIDES_FAST_HIGH_TICKS;
+//        else if (hub == Robot.DepositTarget.fastHigh) slidesTarget = Constants.DEPOSIT_SLIDES_FAST_HIGH_TICKS;
 
 //        slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS;
     }
@@ -199,10 +200,10 @@ public class Deposit {
     }
 
     public void armOut(Robot.DepositTarget hub) {
-        if (hub == Robot.DepositTarget.shared) setArmControls(Constants.ARM_SHARED_POS + (int) Math.round(sharedOffset));
+        if ((hub == Robot.DepositTarget.shared || hub == Robot.DepositTarget.oppShared)) setArmControls(Constants.ARM_SHARED_POS + (int) Math.round(sharedOffset));
         else if (hub == Robot.DepositTarget.duck) setArmControls(Constants.ARM_DUCK_DEPOSIT_POS);
-        else if (hub == Robot.DepositTarget.high) setArmControls(Constants.ARM_HIGH_POS);
-        else if (hub == Robot.DepositTarget.fastHigh) setArmControls(Constants.ARM_FAST_HIGH_POS);
+        else if (hub == Robot.DepositTarget.high) setArmControls(isAuto ? Constants.ARM_AUTO_HIGH_POS : Constants.ARM_HIGH_POS);
+//        else if (hub == Robot.DepositTarget.fastHigh) setArmControls(Constants.ARM_FAST_HIGH_POS);
         else if (hub == Robot.DepositTarget.mid) setArmControls(Constants.ARM_MID_POS);
         else if (hub == Robot.DepositTarget.low) setArmControls(Constants.ARM_LOW_POS);
         isExtended = true;

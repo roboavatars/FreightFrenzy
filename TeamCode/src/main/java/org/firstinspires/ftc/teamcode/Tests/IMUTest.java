@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawField;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 import static java.lang.Math.PI;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -14,7 +15,7 @@ import org.firstinspires.ftc.teamcode.Localization.IMU;
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 
 @TeleOp(name = "00 IMU Test")
-//@Disabled
+@Disabled
 public class IMUTest extends LinearOpMode {
 
     @Override

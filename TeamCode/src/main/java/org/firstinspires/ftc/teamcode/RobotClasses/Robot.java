@@ -95,6 +95,7 @@ public class Robot {
 
     public int depositState = -1;
     public int sharedState = 0;
+    public int oppSharedState = 0;
     public int capState = 1;
     private double transferStart;
     private double startExtendTime;
@@ -168,12 +169,13 @@ public class Robot {
 
     public enum DepositTarget {
         high,
-        fastHigh,
+//        fastHigh,
         mid,
         low,
         shared,
         cap,
-        duck
+        duck,
+        oppShared
     }
 
     public DepositTarget cycleHub;
@@ -401,7 +403,7 @@ public class Robot {
         if (!intakeEnabled) intakeState = 7;
         switch (intakeState) {
             case 1: //intake home
-                if (!intakeUp && !(!isAuto && cycleHub == DepositTarget.shared) && capState == 1)
+                if (!intakeUp && !(!isAuto && (cycleHub == DepositTarget.shared || cycleHub == DepositTarget.oppShared)) && capState == 1)
                     intake.flipDown();
                 else intake.flipUp();
                 intake.off();

@@ -50,7 +50,7 @@ public class RedAutoWarehouse extends LinearOpMode {
         double parkThreshold = 6;
         double preloadScoreTime = 1;
 
-        double[] highCyclePos = new double[] {128, 74, 0.45};
+        double[] highCyclePos = new double[] {126, 74, 0.45};
         double[] midCyclePos = new double[] {127, 64, 0.3};
         double[] preloadDepositPos;
 
@@ -251,7 +251,7 @@ public class RedAutoWarehouse extends LinearOpMode {
 
                 if (robot.depositState == 6) {
                     cycleCounter++;
-                    highCyclePos[0] -= 0.5;
+                    highCyclePos[0] -= 0.55;
                     highCyclePos[2] += 0.03;
 //                    if (cycleCounter == 2) robot.noExtend = false;
 

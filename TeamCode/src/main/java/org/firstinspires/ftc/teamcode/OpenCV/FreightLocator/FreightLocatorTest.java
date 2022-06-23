@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawFreight;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 import static java.lang.Math.PI;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 import java.util.ArrayList;
 
 @TeleOp(name = "Freight Locator Pipeline Test")
-//@Disabled
+@Disabled
 public class FreightLocatorTest extends LinearOpMode {
 
     private FreightLocator detector;

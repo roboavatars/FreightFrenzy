@@ -51,11 +51,12 @@ public class Constants {
     public static int ARM_LOW_POS = 490;
     public static int ARM_DUCK_DEPOSIT_POS = 450;
     public static int ARM_DUCK_HOME_POS = 200;
-    public static int ARM_SHARED_POS = 550;
+    public static int ARM_SHARED_POS = 470;
     public static int ARM_HOME_POS = 0;
     public static int ARM_INIT_POS = 200;
-    public static int ARM_HIGH_POS = 450;
-    public static int ARM_FAST_HIGH_POS = 350;
+    public static int ARM_HIGH_POS = 500;
+    public static int ARM_AUTO_HIGH_POS = 500;
+//    public static int ARM_FAST_HIGH_POS = 350;
     public static int ARM_AUTO_INIT_POS = 55;
 
 //    public static double ARM_OFFSET = -.22;
@@ -66,16 +67,17 @@ public class Constants {
     public static double CAP_INIT = 1;
     public static double CAP_HOME = 0.75;
     public static double CAP_UP = 0.6;
-    public static double CAP_DOWN_1 = 0.22;
-    public static double CAP_DOWN_2 = 0.25;
+    public static double CAP_DOWN_1 = 0.195;
+    public static double CAP_DOWN_2 = 0.215;
 
     public static int DEPOSIT_SLIDES_HOME_TICKS = 0;
     public static int DEPOSIT_SLIDES_HIGH_TICKS = 500;
-    public static int DEPOSIT_SLIDES_FAST_HIGH_TICKS = 300;
+//    public static int DEPOSIT_SLIDES_FAST_HIGH_TICKS = 300;
     public static int DEPOSIT_SLIDES_MID_TICKS = 200;
     public static int DEPOSIT_SLIDES_MID_PRESET = 75;
     public static int DEPOSIT_SLIDES_LOW_TICKS = 0;
-    public static int DEPOSIT_SLIDES_SHARED_TICKS = 100;
+    public static int DEPOSIT_SLIDES_SHARED_TICKS = 0;
+    public static int DEPOSIT_SLIDES_OPP_SHARED_TICKS = 100;
     public static int DEPOSIT_SLIDES_CAP_TICKS = 500;
     public static double DEPOSIT_SLIDES_POWER = 1;
 

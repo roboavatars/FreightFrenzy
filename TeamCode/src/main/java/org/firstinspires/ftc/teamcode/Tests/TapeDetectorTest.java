@@ -5,12 +5,14 @@ import static org.firstinspires.ftc.teamcode.Debug.Dashboard.drawField;
 import static org.firstinspires.ftc.teamcode.Debug.Dashboard.sendPacket;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Localization.TapeDetector.TapeDetector;
 import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 
+@Disabled
 @Config
 @TeleOp(name = "Tape Detector Color Sensor Test")
 public class TapeDetectorTest extends LinearOpMode {

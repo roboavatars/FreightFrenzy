@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 //Config in Constants.java
+@Disabled
 @TeleOp(name = "Cycle Test")
 @Config
 public class CycleTest extends LinearOpMode {

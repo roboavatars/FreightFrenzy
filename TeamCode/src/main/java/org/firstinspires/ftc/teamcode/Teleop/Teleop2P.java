@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Localization.IMU;
 import org.firstinspires.ftc.teamcode.RobotClasses.Constants;
 import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
-@TeleOp(name = "2 Teleop 2P")
+@TeleOp(name = "0 Teleop 2P")
 @Config
 public class Teleop2P extends LinearOpMode {
 
@@ -54,13 +54,16 @@ public class Teleop2P extends LinearOpMode {
     private double capUpOffset = 0;
     private double capDownOffset = 0;
     private boolean cappingDown = true;
-    private boolean fastHigh = true;
+//    private boolean fastHigh = true;
+    public static double slidesOffsetAmount = 2.0;
 
     private boolean capToggle = false;
-    private boolean fastHighToggle = false;
+//    private boolean fastHighToggle = false;
     private boolean intakeApprovalToggle = false;
     private boolean midOffsetUpToggle = false;
     private boolean midOffsetDownToggle = false;
+    private boolean oppSharedToggle = false;
+    private boolean oppShared = false;
 
     /*
     Controller Buttons : *updated 5/30/22 2:48 PM*
@@ -96,7 +99,7 @@ public class Teleop2P extends LinearOpMode {
 //        imu = new IMU(robot.theta, this);
         waitForStart();
 
-        robot.cycleHub = Robot.DepositTarget.fastHigh;
+//        robot.cycleHub = Robot.DepositTarget.fastHigh;
 
         ElapsedTime cycleTimer = new ElapsedTime();
         cycleTimer.reset();
@@ -120,20 +123,21 @@ public class Teleop2P extends LinearOpMode {
             if (robot.intakeRumble) gamepad1.rumble(500);
             if (robot.transferRumble) gamepad1.rumble(500);
 
-            if (!fastHighToggle && gamepad2.touchpad) {
-                fastHigh = !fastHigh;
-                fastHighToggle = true;
-            } else if (fastHighToggle && !gamepad2.touchpad) {
-                fastHighToggle = false;
-            }
+//            if (!fastHighToggle && gamepad2.touchpad) {
+//                fastHigh = !fastHigh;
+//                fastHighToggle = true;
+//            } else if (fastHighToggle && !gamepad2.touchpad) {
+//                fastHighToggle = false;
+//            }
 
             if (gamepad1.left_bumper) {
                 robot.cycleHub = Robot.DepositTarget.mid;
             } else if (gamepad1.b) {
-                robot.cycleHub = Robot.DepositTarget.shared;
+                if (oppShared) robot.cycleHub = Robot.DepositTarget.oppShared;
+                else robot.cycleHub = Robot.DepositTarget.shared;
             } else if (gamepad1.left_trigger > .1) {
-                if (fastHigh) robot.cycleHub = Robot.DepositTarget.fastHigh;
-                else robot.cycleHub = Robot.DepositTarget.high;
+//                if (fastHigh) robot.cycleHub = Robot.DepositTarget.fastHigh;
+                robot.cycleHub = Robot.DepositTarget.high;
             }
 
             if (gamepad2.right_bumper) robot.carousel.turnon();
@@ -146,15 +150,19 @@ public class Teleop2P extends LinearOpMode {
                 capToggle = false;
             }
 
-            if (robot.capState == 4 || robot.capState == 5) {
-                if (gamepad2.dpad_up) robot.capMech.upOffset += .007;
-                if (gamepad2.dpad_down) robot.capMech.upOffset -= .007;
-            } else if (robot.capState == 2 || robot.capState == 3) {
-                if (gamepad2.dpad_up) robot.capMech.downOffset += .007;
-                if (gamepad2.dpad_down) robot.capMech.downOffset -= .007;
-            } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.high) {
-                if (gamepad2.dpad_up) robot.deposit.highOffset += 1;
-                if (gamepad2.dpad_down) robot.deposit.highOffset -= 1;
+            if (gamepad2.start) robot.capMech.capNumber = 1;
+
+            if (!oppSharedToggle && gamepad2.a) {
+                oppSharedToggle = false;
+                oppShared = !oppShared;
+            } else if (oppSharedToggle && !gamepad2.a) {
+                oppSharedToggle = true;
+            }
+
+
+            if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.high) {
+                if (gamepad2.dpad_up) robot.deposit.highOffset += slidesOffsetAmount;
+                if (gamepad2.dpad_down) robot.deposit.highOffset -= slidesOffsetAmount;
             } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.mid) {
                 if (!midOffsetUpToggle && gamepad2.dpad_up) {
                     if (robot.deposit.midOffset < 1) robot.deposit.midOffset++;
@@ -169,16 +177,22 @@ public class Teleop2P extends LinearOpMode {
                     midOffsetDownToggle = false;
                 }
                 addPacket("mid offset", robot.deposit.midOffset);
-            } else if (robot.depositState == 4 && robot.cycleHub == Robot.DepositTarget.shared) {
-                if (gamepad2.dpad_up) robot.deposit.sharedOffset += 0.003;
-                if (gamepad2.dpad_down) robot.deposit.sharedOffset -= 0.003;
+            } else if (robot.depositState == 4 && (robot.cycleHub == Robot.DepositTarget.shared || robot.cycleHub == Robot.DepositTarget.oppShared)) {
+                if (gamepad2.dpad_up) robot.deposit.sharedOffset -= 1;
+                if (gamepad2.dpad_down) robot.deposit.sharedOffset += 1;
             } else {
 //                if (gamepad2.dpad_up) robot.deposit.initialSlidesPos -= .4;
 //                if (gamepad2.dpad_down) robot.deposit.initialSlidesPos += .4;
             }
 
             if (Math.abs(gamepad2.right_stick_y) > .1) {
-                robot.intake.initialSlidesPos += .6 * gamepad2.right_stick_y;
+                if (robot.capState == 4 || robot.capState == 5) {
+                    robot.capMech.upOffset -= .007 * gamepad2.right_stick_y;
+                } else if (robot.capState == 2 || robot.capState == 3) {
+                    robot.capMech.downOffset -= .007 * gamepad2.right_stick_y;
+                } else {
+                    robot.intake.initialSlidesPos += .6 * gamepad2.right_stick_y;
+                }
             }
 
             if (Math.abs(gamepad2.left_stick_y) > .1) {
