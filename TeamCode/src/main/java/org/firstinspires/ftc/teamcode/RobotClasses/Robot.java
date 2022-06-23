@@ -194,7 +194,7 @@ public class Robot {
     }
 
     public Robot(LinearOpMode op, boolean startLogger) {
-        this(op, Logger.readPos()[1], Logger.readPos()[2], Logger.readPos()[3], false, Logger.readPos()[0] == 1, startLogger, false, false);
+        this(op, 0, 0, 0, /*Logger.readPos()[1], Logger.readPos()[2], Logger.readPos()[3],*/ false, Logger.readPos()[0] == 1, startLogger, false, false);
     }
 
     public Robot(LinearOpMode op, double x, double y, double theta, boolean isAuto, boolean isRed, boolean startLogger, boolean carouselAuto, boolean resetEncoders) {
