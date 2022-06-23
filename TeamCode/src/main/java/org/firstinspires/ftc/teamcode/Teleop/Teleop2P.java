@@ -36,10 +36,12 @@ public class Teleop2P extends LinearOpMode {
     private boolean defenseModeToggle = false;
 
     // Control Gains
-    public static double xyGain = 1;
+    public static double xGain = 1;
+    public static double yGain = 1;
     public static double wGain = 1;
 
-    public static double xySlowGain = 0.3;
+    public static double xSlowGain = 0.5;
+    public static double ySlowGain = 0.3;
     public static double wSlowGain = 0.4;
 
     public static boolean squaredControl = false;
@@ -66,24 +68,33 @@ public class Teleop2P extends LinearOpMode {
     private boolean oppShared = false;
 
     /*
-    Controller Buttons : *updated 5/30/22 2:48 PM*
+    Controller Buttons : *updated 6/23/22 2:12 PM*
+
     gamepad 1:
 
-    right trigger - intake
-    left trigger - release
-    left stick - xy movement
-    right stick - turn
+    Left Joystick: forward/back/right/left movement
+    Right Joystick: turning
+    Left Bumper (Top): extend deposit to alliance level 3 (press once); release freight (press again)
+    Left Bumper (Bottom): extend deposit to alliance level 2 (press once); release freight (press again)
+    Right Bumper (Top): intake without extending intake slides
+    Right Bumper (Bottom): intake and extend intake slides
+    Δ (Y): reverse intake
+    O (B): extend deposit to shared hub (press once); release freight (press again)
+
 
     gamepad 2:
 
-    a - deposit
-    y - capping mode
-    left bumper - mid goal
-    right bumper - carousel
-    dpad up - decrease slide offset
-    dpad down - increase slide offset
-    right trigger - increase intake offset
-    left trigger - decrease intake offset
+    Left Joystick: adjust the arm position for depositing in the shared hub
+    Right Joystick: raise/lower arm to cap team shipping element (if robot is int the middle of the capping sequence - see response to question 7);
+    offset the intake slides out or in
+    Left Bumper (Top):
+    Left Bumper (Bottom):
+    Right Bumper (Top):
+    Right Bumper (Bottom):
+    DPad Up/Down: change the alliance hub tilt preset - the slides will go to a different height depending on if the alliance hub is balanced, tiled away, or tilted towards the drivers. DPad Up sets the preset to tilted away; DPad Down sets the preset to tilted towards the drivers.
+    Δ (Y): advance the step of capping automation sequence
+    X (A): when cycling freight into the shared hub - toggles between cycling from the alliance’s warehouse and cycling from the opposite alliance’s warehouse
+    ☐(X): raise intake box (to traverse over barrier)
     */
 
     @Override
@@ -201,14 +212,17 @@ public class Teleop2P extends LinearOpMode {
 
             addPacket("initial slidesPos", robot.intake.initialSlidesPos);
 
-            double xyGain;
+            double xGain;
+            double yGain;
             double wGain;
 
             if (robot.capState != 1 || robot.depositState == 4) {
-                xyGain = this.xySlowGain;
+                xGain = this.xSlowGain;
+                yGain = this.ySlowGain;
                 wGain = this.wSlowGain;
             } else {
-                xyGain = this.xyGain;
+                xGain = this.xGain;
+                yGain = this.yGain;
                 wGain = this.wGain;
             }
 
@@ -221,15 +235,15 @@ public class Teleop2P extends LinearOpMode {
             if (fieldCentric) {
                 imu.updateHeading();
                 double theta = imu.getTheta();
-                double xControls = gamepad1.left_stick_x * xyGain;
-                double yControls = gamepad1.left_stick_y * xyGain;
+                double xControls = gamepad1.left_stick_x * xGain;
+                double yControls = gamepad1.left_stick_y * yGain;
                 robot.drivetrain.setControls(xControls * Math.sin(theta) + yControls * Math.cos(theta), xControls * Math.cos(theta) - yControls * Math.sin(theta), -gamepad1.right_stick_x * wGain);
             } else if (squaredControl) {
                 robot.drivetrain.setControls(-Math.signum(gamepad1.left_stick_y) * gamepad1.left_stick_y * gamepad1.left_stick_y,
                         -Math.signum(gamepad1.left_stick_x) * gamepad1.left_stick_x * gamepad1.left_stick_x,
                         -Math.signum(gamepad1.right_stick_x) * gamepad1.right_stick_x * gamepad1.right_stick_x);
             } else {
-                robot.drivetrain.setControls(xyGain * -gamepad1.left_stick_y, xyGain * -gamepad1.left_stick_x, wGain * -gamepad1.right_stick_x);
+                robot.drivetrain.setControls(yGain * -gamepad1.left_stick_y, xGain * -gamepad1.left_stick_x, wGain * -gamepad1.right_stick_x);
             }
 
             // Update Robot
