@@ -21,14 +21,14 @@ public class Constants {
     public static double INTAKE_POWER = 1;
     public static double INTAKE_DUCK_POWER = 0.2;
     public static double INTAKE_TRANSFER_POWER = -1;
-    public static double INTAKE_DUCK_TRANSFER_POWER = -1;
+    public static double INTAKE_DUCK_TRANSFER_POWER = -.85;
     public static double INTAKE_STALL_THRESHOLD = 6;
     public static double COLOR_SENSOR_THRESHOLD = 110;
 
     // Intake Slides
     public static int INTAKE_SLIDES_EXTEND_TICKS = 290;
     public static int INTAKE_SLIDES_HOME_TICKS = 50;
-    public static int INTAKE_SLIDES_DUCK_HOME_TICKS = 50;
+    public static int INTAKE_SLIDES_DUCK_HOME_TICKS = 30;
     public static double INTAKE_SLIDES_STALL_THRESHOLD = 1000; //TODO: tune
 
 
@@ -36,7 +36,7 @@ public class Constants {
     public static double INTAKE_UP_POS = 0.83;
     public static double INTAKE_UP_DUCK_POS = 0.83;
     public static double INTAKE_DOWN_POS = 0;
-    public static double INTAKE_DOWN_DUCKS_POS = 0.1;
+    public static double INTAKE_DOWN_DUCKS_POS = 0;
 
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.7;
@@ -47,8 +47,9 @@ public class Constants {
     public static double DEPOSIT_CAP_POS = 0.5;
 
     // Deposit Arm
-    public static int ARM_ALLIANCE_POS = 475;
-    public static int ARM_DUCK_DEPOSIT_POS = 350;
+    public static int ARM_MID_POS = 475;
+    public static int ARM_LOW_POS = 490;
+    public static int ARM_DUCK_DEPOSIT_POS = 450;
     public static int ARM_DUCK_HOME_POS = 200;
     public static int ARM_SHARED_POS = 550;
     public static int ARM_HOME_POS = 0;

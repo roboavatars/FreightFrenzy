@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RobotClasses.Deposit;
+import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 
 @TeleOp
 @Config
@@ -23,7 +24,7 @@ public class ArmTest extends LinearOpMode {
 
         while (opModeIsActive()) {
             deposit.setArmControls(pos);
-            deposit.updateArm();
+            deposit.updateArm(Robot.DepositTarget.high);
             addPacket("arm pos", deposit.getArmPos());
             addPacket("arm theta", deposit.getArmTheta());
             sendPacket();

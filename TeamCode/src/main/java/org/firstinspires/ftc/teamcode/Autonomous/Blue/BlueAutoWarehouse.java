@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodeDetector;
 import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodePipeline;
 import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
@@ -35,8 +36,8 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
         Robot robot = new Robot(this, 9, 78.5, PI, true, false, true);
 
-//        Vision detector = new Vision(this, true, Vision.Pipeline.Barcode);
-//        detector.start();
+        BarcodeDetector barcodeDetector = new BarcodeDetector(this, false, false);
+        barcodeDetector.start();
 
         // Segments
         boolean preloadScore = false;
@@ -64,6 +65,8 @@ public class BlueAutoWarehouse extends LinearOpMode {
         double passLineTime = 0;
 
         waitForStart();
+        barcodeCase = barcodeDetector.getResult();
+        addPacket("barcode", barcodeCase);
 
         ElapsedTime time = new ElapsedTime();
 
@@ -87,6 +90,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
         robot.depositingFreight = true;
         robot.depositApproval = false;
         robot.depositState = 2;
+        boolean intaked = false;
 
         while (opModeIsActive()) {
             addPacket("cycleCounter", cycleCounter);
@@ -146,6 +150,10 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             passLineTime = time.seconds();
                             addPacket("path", "going to warehouse right rn");
                             if (robot.y > Robot.startIntakingBlueAutoY - 1) goToWarehouseSteps++;
+                            if (robot.intakeState == 3) {
+                                robot.intakeApproval = false;
+                                intaked = true;
+                            }
                             break;
                         case 4:
                             robot.drivetrain.constantStrafeConstant = 0;

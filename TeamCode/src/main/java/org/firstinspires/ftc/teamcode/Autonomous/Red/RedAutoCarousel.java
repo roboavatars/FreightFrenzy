@@ -42,7 +42,7 @@ public class RedAutoCarousel extends LinearOpMode {
 
         double[] preloadScoreCoords;
         double[] spinPose = new double[]{129, 16, 7.2 * PI / 4};
-        double[] depositCoords = new double[]{85, 31, 5.2 * PI/4};
+        double[] depositCoords = new double[]{95, 31, 5.2 * PI/4};
         double[] parkCoords = new double[]{109, 10, 0};
 
         robot.carouselAuto = true;
@@ -107,7 +107,7 @@ public class RedAutoCarousel extends LinearOpMode {
                         robot.cycleHub = Robot.DepositTarget.duck;
                         Waypoint[] pathToCarousel = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, robot.theta, 10, 10, 0, 0),
-                                new Waypoint(spinPose[0], spinPose[1] + 4, spinPose[2], 1, -5, 1, timeToCarousel-0.2),
+                                new Waypoint(spinPose[0], spinPose[1] - 4, spinPose[2], 1, -5, 1, timeToCarousel-0.2),
                                 new Waypoint(spinPose[0], spinPose[1], spinPose[2], 1, -5, 0, timeToCarousel)
                         };
                         spinPath = new Path(pathToCarousel);
@@ -142,6 +142,20 @@ public class RedAutoCarousel extends LinearOpMode {
                     }
                     break;
                 case 3 :
+                    robot.intakeEnabled = false;
+                    robot.intakeUp = true;
+                    robot.capDown = true;
+                    robot.setTargetPoint(parkCoords[0], 6, PI/2);
+                    if (robot.isAtPose(parkCoords[0], 6, PI/2)
+                            && robot.notMoving()) {
+                        autoSteps++;
+                    }
+                    break;
+                case 4:
+                    robot.drivetrain.stop();
+                    addPacket("auto done", 0);
+                    break;
+                    /*
                     //sweep
                     if (time.seconds() < 1) {
                         robot.setTargetPoint(114, 15, 0);
@@ -217,6 +231,7 @@ public class RedAutoCarousel extends LinearOpMode {
                     robot.drivetrain.stop();
                     addPacket("auto done", 0);
                     break;
+                     */
             }
             robot.update();
         }

@@ -53,9 +53,11 @@ public class Deposit {
 
     //Arm PID constants
     public static double armUpKp = 0.01;
-    public static double armDownKp = 0.008;
     public static double armUpKd = 0.03;
+    public static double armDownKp = 0.008;
     public static double armDownKd = 0.02;
+    public static double armDuckKp = 0.008;
+    public static double armDuckKd = 0.02;
     public static double armGravityFF = 0.1;
 
     public int midOffset = 0;
@@ -109,7 +111,7 @@ public class Deposit {
 
     public void update(Robot.DepositTarget hub) {
         updateSlides(hub);
-        updateArm();
+        updateArm(hub);
     }
 
     public void extendSlides () {extendSlides(Robot.DepositTarget.high);}
@@ -122,7 +124,7 @@ public class Deposit {
         else if (hub == Robot.DepositTarget.low) slidesTarget = Constants.DEPOSIT_SLIDES_LOW_TICKS;
         else if (hub == Robot.DepositTarget.shared) slidesTarget = Constants.DEPOSIT_SLIDES_SHARED_TICKS;
         else if (hub == Robot.DepositTarget.cap) slidesTarget = Constants.DEPOSIT_SLIDES_CAP_TICKS;
-        else if (hub == Robot.DepositTarget.duck) slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS + (int) Math.round(highOffset);
+        else if (hub == Robot.DepositTarget.duck) slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS;
         else if (hub == Robot.DepositTarget.fastHigh) slidesTarget = Constants.DEPOSIT_SLIDES_FAST_HIGH_TICKS;
 
 //        slidesTarget = Constants.DEPOSIT_SLIDES_HIGH_TICKS;
@@ -146,13 +148,14 @@ public class Deposit {
                 slidesReset = true;
                 initialSlidesPos -= getSlidesPos();
             }
+            slidesError = slidesTarget - getSlidesPos();
         } else {
-            double slidesKp = hub != Robot.DepositTarget.duck ? this.slidesKp : this.slidesCapKp;
-            double slidesKd = hub != Robot.DepositTarget.duck ? this.slidesKd : this.slidesCapKd;
+//            double slidesKp = hub != Robot.DepositTarget.duck ? this.slidesKp : this.slidesCapKp;
+//            double slidesKd = hub != Robot.DepositTarget.duck ? this.slidesKd : this.slidesCapKd;
 
             int currentTicks = getSlidesPos();
-            initialSlidesPos += Math.abs(currentTicks - slidesLastTicks) * SLIDES_DRIFT_MULTIPLIER;
-            slidesLastTicks = currentTicks;
+//            initialSlidesPos += Math.abs(currentTicks - slidesLastTicks) * SLIDES_DRIFT_MULTIPLIER;
+//            slidesLastTicks = currentTicks;
 
             slidesErrorChange = slidesTarget - currentTicks - slidesError;
             slidesError = slidesTarget - currentTicks;
@@ -176,17 +179,17 @@ public class Deposit {
     }
 
     public boolean slidesAtPos() {
-        return slidesError < SLIDES_ERROR_THRESHOLD;
+        return Math.abs(slidesError) < SLIDES_ERROR_THRESHOLD;
     }
 
-    public void updateArm() {
+    public void updateArm(Robot.DepositTarget hub) {
         int currentTicks = getArmPos();
 
         armErrorChange = armTarget - currentTicks - armError;
         armError = armTarget - currentTicks;
 
-        double armKp = (armTarget == Constants.ARM_HOME_POS) ? armDownKp : armUpKp;
-        double armKd = (armTarget == Constants.ARM_HOME_POS) ? armDownKd : armUpKd;
+        double armKp = (armTarget == Constants.ARM_HOME_POS) ? armDownKp : /*(hub == Robot.DepositTarget.duck ? armDuckKp : */armUpKp;
+        double armKd = (armTarget == Constants.ARM_HOME_POS) ? armDownKd : /*(hub == Robot.DepositTarget.duck ? armDuckKd : */armUpKd;
 
         armMotor.setPower(Math.max(-ARM_MAX_POWER, Math.min(ARM_MAX_POWER, armKp * armError + armKd * armErrorChange + armGravityFF * Math.cos(getArmTheta()))));
     }
@@ -200,7 +203,8 @@ public class Deposit {
         else if (hub == Robot.DepositTarget.duck) setArmControls(Constants.ARM_DUCK_DEPOSIT_POS);
         else if (hub == Robot.DepositTarget.high) setArmControls(Constants.ARM_HIGH_POS);
         else if (hub == Robot.DepositTarget.fastHigh) setArmControls(Constants.ARM_FAST_HIGH_POS);
-        else setArmControls(Constants.ARM_ALLIANCE_POS);
+        else if (hub == Robot.DepositTarget.mid) setArmControls(Constants.ARM_MID_POS);
+        else if (hub == Robot.DepositTarget.low) setArmControls(Constants.ARM_LOW_POS);
         isExtended = true;
     }
 
@@ -218,7 +222,7 @@ public class Deposit {
     }
 
     public boolean isArmAtPos() {
-        return armError < ARM_ERROR_THRESHOLD;
+        return Math.abs(armError) < ARM_ERROR_THRESHOLD;
     }
 
     public boolean isArmHome() {

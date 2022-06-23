@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodeDetector;
 import org.firstinspires.ftc.teamcode.OpenCV.Barcode.BarcodePipeline;
 import org.firstinspires.ftc.teamcode.Pathing.Path;
 import org.firstinspires.ftc.teamcode.Pathing.Pose;
@@ -19,12 +20,15 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Config
 @Autonomous (name = "Blue Auto Carousel" , preselectTeleOp = "2 Teleop 2P", group = "Blue")
 public class BlueAutoCarousel extends LinearOpMode {
-    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Right;
+    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Left;
     public static double delay = 0;
 
     @Override
     public void runOpMode() {
         Robot robot = new Robot(this, 9, 41, PI, true, false, true);
+
+        BarcodeDetector barcodeDetector = new BarcodeDetector(this, false, false);
+        barcodeDetector.start();
 
         double goToPreloadTime = 1.5;
         double timeToCarousel = 2;
@@ -37,8 +41,8 @@ public class BlueAutoCarousel extends LinearOpMode {
         double startSweepTime = -1;
 
         double[] preloadScoreCoords;
-        double[] spinPose = new double[]{16, 14, 4.5 * PI / 4};
-        double[] depositCoords = new double[]{65, 31, 3.5 * PI/2};
+        double[] spinPose = new double[]{16, 16, 4.3 * PI / 4};
+        double[] depositCoords = new double[]{63, 28, 3.3 * PI/2};
         double[] parkCoords = new double[]{34.5, 10, PI};
 
         robot.carouselAuto = true;
@@ -48,6 +52,8 @@ public class BlueAutoCarousel extends LinearOpMode {
         Path gotoP = null;
 
         waitForStart();
+        barcodeCase = barcodeDetector.getResult();
+        addPacket("barcode", barcodeCase);
 
         ElapsedTime time = new ElapsedTime();
 
@@ -97,8 +103,8 @@ public class BlueAutoCarousel extends LinearOpMode {
 //                            && robot.notMoving();
 
                     if (robot.depositState == 6) {
-                        robot.cycleHub = Robot.DepositTarget.duck;
                         time.reset();
+                        robot.cycleHub = Robot.DepositTarget.duck;
                         Waypoint[] pathToCarousel = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, robot.theta, 10, 10, 0, 0),
                                 new Waypoint(spinPose[0], spinPose[1] + 4, spinPose[2], 1, -5, 0.8, timeToCarousel-0.2),
@@ -126,6 +132,8 @@ public class BlueAutoCarousel extends LinearOpMode {
                             robot.carousel.turnon();
                             if (time.seconds() - reachedSpinPos < 1 || !robot.notMoving()) {
                                 robot.drivetrain.setControls(0.3, 0, 0);
+                            } else {
+                                robot.drivetrain.setControls(0.2, 0, 0);
                             }
                         } else {
                             autoSteps++;
@@ -136,6 +144,20 @@ public class BlueAutoCarousel extends LinearOpMode {
                     }
                     break;
                 case 3 :
+                    robot.intakeEnabled = false;
+                    robot.intakeUp = true;
+                    robot.capDown = true;
+                    robot.setTargetPoint(34, 6, PI/2);
+                    if (robot.isAtPose(34, 6, PI/2)
+                            && robot.notMoving()) {
+                        autoSteps++;
+                    }
+                    break;
+                case 4:
+                    robot.drivetrain.stop();
+                    addPacket("auto done", 0);
+                    break;
+                    /*
                     //sweep
                     if (time.seconds() < 1) {
                         robot.setTargetPoint(30, 15, PI);
@@ -156,6 +178,9 @@ public class BlueAutoCarousel extends LinearOpMode {
                     }
                     break;
                 case 4 :
+                    if (robot.depositState == 2) autoSteps++;
+                    break;
+                case 5 :
                     robot.setTargetPoint(20, 6, PI);
                     if (robot.y < 10) {
                         Waypoint[] depositDuck = new Waypoint[]{
@@ -168,15 +193,14 @@ public class BlueAutoCarousel extends LinearOpMode {
                         autoSteps++;
                     }
                     break;
-                case 5:
+                case 6:
                     Pose curDepo = depoDuck.getRobotPose(Math.min(time.seconds(), timeToDeposit));
                     robot.setTargetPoint(new Target(curDepo).theta(curDepo.theta + PI));
 
-                    robot.depositApproval = time.seconds() > 1;
+                    robot.depositApproval = time.seconds() > 1.5;
 
-                    robot.releaseApproval = time.seconds() > timeToDeposit//robot.isAtPose(depositCoords[0], depositCoords[1], depositCoords[2], 4, 4, PI/10);
+                    robot.releaseApproval = time.seconds() > timeToDeposit + .5 //robot.isAtPose(depositCoords[0], depositCoords[1], depositCoords[2], 4, 4, PI/10);
                             && robot.notMoving();
-
                     if (robot.depositState == 6) {
                         Waypoint[] goToThePark = new Waypoint[]{
                                 new Waypoint(robot.x, robot.y, robot.theta, 10, 10, 0, 0),
@@ -188,18 +212,17 @@ public class BlueAutoCarousel extends LinearOpMode {
                         autoSteps++;
                     }
                     break;
-                case 6:
+                case 7:
                     robot.setTargetPoint(new Target(gotoP.getRobotPose(Math.min(time.seconds(), timeToPark))));
 
                     robot.intakeUp = true;
                     if (time.seconds() > 1) robot.capDown = true;
 
-                    if (robot.isAtPose(parkCoords[0], parkCoords[1], parkCoords[2])
-                            && robot.notMoving()) {
+                    if (time.seconds() > timeToPark) {
                         autoSteps++;
                     }
                     break;
-                case 7 :
+                case 8 :
                     robot.intakeUp = true;
                     robot.capDown = true;
                     robot.setTargetPoint(34, 6, PI/2);
@@ -208,10 +231,12 @@ public class BlueAutoCarousel extends LinearOpMode {
                         autoSteps++;
                     }
                     break;
-                case 8:
+                case 9:
                     robot.drivetrain.stop();
                     addPacket("auto done", 0);
                     break;
+
+                     */
             }
             robot.update();
         }

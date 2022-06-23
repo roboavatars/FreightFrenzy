@@ -119,8 +119,9 @@ public class Robot {
     public static double duckIntakeFlipThreshold = 1500;
     public static double retractDepositThreshold = 300;
     public static double clampThreshold = 200;
-    public static double duckClampThreshold = 300;
+    public static double duckClampThreshold = 0;
     public static double waitClampThreshold = 200;
+    public static double duckWaitClampThreshold = 300;
     public static double duckTransferThreshold = 300;
 
 
@@ -357,6 +358,7 @@ public class Robot {
         addPacket("pod zeroes", drivetrain.zero1 + " " + drivetrain.zero2 + " " + drivetrain.zero3);
         addPacket("intake slides", intake.getSlidesPos());
         addPacket("deposit slides", deposit.getSlidesPos());
+        addPacket("arm pos", deposit.getArmPos());
         addPacket("Intake Sensor", intakeSensorDist);
 
         if (!isAuto) {
@@ -403,7 +405,7 @@ public class Robot {
                     intake.flipDown();
                 else intake.flipUp();
                 intake.off();
-                if (isAuto && intakeApproval && (y >= (isRed ?  startIntakingRedAutoY : startIntakingBlueAutoY) || carouselAuto)) {
+                if (isAuto && intakeApproval && (y >= 92/*(isRed ?  startIntakingRedAutoY : startIntakingBlueAutoY) */|| carouselAuto)) {
                     intakeState++;
                     intakeFull = intake.isFull();
                     intakeStalling = intake.checkIfStalling();
@@ -459,7 +461,7 @@ public class Robot {
                 intake.home(cycleHub);
                 intake.setPower(Constants.INTAKE_RETRACT_POWER);
                 intake.flipUp(cycleHub);
-                if (intake.slidesIsHome() && ((System.currentTimeMillis() - intakeRetractStart) > ((isAuto) ? autoIntakeFlipThreshold : teleIntakeFlipThreshold)))
+                if (intake.slidesIsHome() && ((System.currentTimeMillis() - intakeRetractStart) > ((isAuto && !carouselAuto) ? autoIntakeFlipThreshold : teleIntakeFlipThreshold)))
                     intakeState++;
                 break;
             case 4: //wait for deposit to retract
@@ -470,8 +472,8 @@ public class Robot {
                 }
                 break;
             case 5: //transfer
-                intake.setPower(carouselAuto ? Constants.INTAKE_DUCK_TRANSFER_POWER : Constants.INTAKE_TRANSFER_POWER);
-                if (/*(!isAuto && depositApproval) || */(!carouselAuto && intakeTransferred) || (carouselAuto && curTime - transferStart > duckTransferThreshold)) {//(System.currentTimeMillis() - transferStart > (isAuto ? autoTransferThreshold : teleTransferThreshold))) {
+                intake.setPower(/*carouselAuto ? Constants.INTAKE_DUCK_TRANSFER_POWER : */Constants.INTAKE_TRANSFER_POWER);
+                if (/*(!isAuto && depositApproval) || */(/*!carouselAuto && */intakeTransferred)/* || (carouselAuto && curTime - transferStart > duckTransferThreshold)*/) {//(System.currentTimeMillis() - transferStart > (isAuto ? autoTransferThreshold : teleTransferThreshold))) {
                     intakeState++;
                     clampStart = System.currentTimeMillis();
                     depositState = 2;
@@ -480,7 +482,7 @@ public class Robot {
                 break;
             case 6: //wait for deposit to clamp down on freight
 //                intake.off();
-                if (System.currentTimeMillis() - clampStart > (carouselAuto ? duckClampThreshold : clampThreshold)) {
+                if (System.currentTimeMillis() - clampStart > (/*carouselAuto ? duckClampThreshold : */clampThreshold)) {
                     transferRumble = true;
                     intakeState = 1;
                 }
@@ -510,9 +512,12 @@ public class Robot {
                 deposit.sharedOffset = 0;
                 break;
             case 2: //once transfer done, hold freight
-                if (System.currentTimeMillis() - clampStart > waitClampThreshold) deposit.hold(cycleHub);
-                if (cycleHub == DepositTarget.duck) deposit.setArmControls(Constants.ARM_DUCK_HOME_POS);
-                if (carouselAuto) deposit.hold(DepositTarget.duck);
+                if (System.currentTimeMillis() - clampStart > waitClampThreshold/* && !carouselAuto*/) deposit.hold(cycleHub);
+                /*if (carouselAuto && System.currentTimeMillis() - clampStart > duckWaitClampThreshold) {
+                    deposit.setArmControls(Constants.ARM_DUCK_HOME_POS);
+                    deposit.hold(DepositTarget.duck);
+                }
+                 */
                 if (((isAuto && !carouselAuto && y <= extendDepositAutoY) || depositApproval) && (System.currentTimeMillis() - clampStart > waitClampThreshold))
                     depositState++;
                 break;
@@ -533,7 +538,7 @@ public class Robot {
                 break;
             case 5: //release & wait for freight to drop
                 deposit.release(cycleHub);
-                if (cycleHub == DepositTarget.duck) deposit.armOut();
+                //if (cycleHub == DepositTarget.duck) deposit.armOut();
                 if (System.currentTimeMillis() - depositStart > (isAuto ? (carouselAuto ? duckReleaseThreshold : autoReleaseThreshold) : teleReleaseThreshold)) {
                     depositState++;
                 }
