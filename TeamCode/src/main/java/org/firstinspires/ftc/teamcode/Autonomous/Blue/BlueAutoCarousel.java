@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Config
 @Autonomous (name = "Blue Auto Carousel" , preselectTeleOp = "2 Teleop 2P", group = "Blue")
 public class BlueAutoCarousel extends LinearOpMode {
-    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Left;
+    public static BarcodePipeline.Case barcodeCase;
     public static double delay = 0;
 
     @Override
@@ -53,7 +53,6 @@ public class BlueAutoCarousel extends LinearOpMode {
 
         waitForStart();
         barcodeCase = barcodeDetector.getResult();
-        addPacket("barcode", barcodeCase);
 
         ElapsedTime time = new ElapsedTime();
 
@@ -68,6 +67,11 @@ public class BlueAutoCarousel extends LinearOpMode {
             robot.cycleHub = Robot.DepositTarget.high;
         }
 
+        Robot.log("BarcodeCase: " + barcodeCase);
+        try {
+            barcodeDetector.stop();
+        } catch (Exception ignore) {}
+
         Waypoint[] preloadScoreWaypoints = new Waypoint[]{
                 new Waypoint(robot.x, robot.y, 3 * PI/2, 10, 10, 0, 0),
                 new Waypoint(preloadScoreCoords[0], preloadScoreCoords[1], preloadScoreCoords[2] + PI, 2, -10, 0.01, goToPreloadTime),
@@ -80,6 +84,8 @@ public class BlueAutoCarousel extends LinearOpMode {
         robot.intakeExtendDist = Constants.INTAKE_SLIDES_HOME_TICKS;
 
         while (opModeIsActive()) {
+            addPacket("barcode", barcodeCase);
+
             double timeLeft = 30 - (System.currentTimeMillis() - robot.startTime) / 1000;
             addPacket("time left", timeLeft);
 

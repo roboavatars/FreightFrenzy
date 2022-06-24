@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Config
 @Autonomous(name = "0 Blue Auto Warehouse", preselectTeleOp = "2 Teleop 2P", group = "Blue")
 public class BlueAutoWarehouse extends LinearOpMode {
-    public static BarcodePipeline.Case barcodeCase = BarcodePipeline.Case.Right;
+    public static BarcodePipeline.Case barcodeCase;
     public static double xDrift = 0;
 
     @Override
@@ -36,7 +36,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
         Robot robot = new Robot(this, 9, 78.5, PI, true, false, true);
 
-        BarcodeDetector barcodeDetector = new BarcodeDetector(this, false, false);
+        BarcodeDetector barcodeDetector = new BarcodeDetector(this, false, true);
         barcodeDetector.start();
 
         // Segments
@@ -51,7 +51,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
         double parkThreshold = 4.5;
         double preloadScoreTime = 1;
 
-        double[] highCyclePos = new double[]{16, 74, PI - 0.35};
+        double[] highCyclePos = new double[]{16, 72, PI - 0.35};
         double[] midCyclePos = new double[]{25, 72, PI - 0.3};
         double[] preloadDepositPos;
 
@@ -66,7 +66,6 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
         waitForStart();
         barcodeCase = barcodeDetector.getResult();
-        addPacket("barcode", barcodeCase);
 
         ElapsedTime time = new ElapsedTime();
 
@@ -81,6 +80,11 @@ public class BlueAutoWarehouse extends LinearOpMode {
             preloadDepositPos = new double[]{12, 74, 13 * PI / 15};
         }
 
+        Robot.log("Barcode Case: " + barcodeCase);
+        try {
+            barcodeDetector.stop();
+        } catch (Exception ignore) {}
+
         Waypoint[] preloadScoreWaypoints = new Waypoint[]{
                 new Waypoint(robot.x, robot.y, 3 * PI / 2, 10, 10, 0, 0),
                 new Waypoint(preloadDepositPos[0], preloadDepositPos[1], preloadDepositPos[2] + PI, 2, -10, 0, preloadScoreTime),
@@ -93,6 +97,8 @@ public class BlueAutoWarehouse extends LinearOpMode {
         boolean intaked = false;
 
         while (opModeIsActive()) {
+            addPacket("barcode", barcodeCase);
+
             addPacket("cycleCounter", cycleCounter);
             robot.intakeExtendDist = (int) Math.round(Constants.INTAKE_SLIDES_EXTEND_TICKS/3 + (cycleCounter + 1) * Constants.INTAKE_SLIDES_EXTEND_TICKS/4);
             addPacket("w", robot.w);
@@ -166,7 +172,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                                     robot.setTargetPoint(new Target(10, y, theta));
                                 } else {
                                     double x = Math.min(6 + 1 * (time.seconds() - passLineTime), 14);
-                                    double y = Robot.startIntakingBlueAutoY + 0.75 * (cycleCounter - 3) + (5 * Math.sin(4 * (time.seconds() - passLineTime)));
+                                    double y = Robot.startIntakingBlueAutoY + 3 * (cycleCounter - 3) + (5 * Math.sin(4 * (time.seconds() - passLineTime)));
                                     double theta = PI / 2 - (PI / 8 * Math.sin(4 * (time.seconds() - passLineTime)));
                                     robot.setTargetPoint(new Target(x, y, theta));
                                 }

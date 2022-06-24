@@ -32,7 +32,7 @@ public class BarcodePipeline extends OpenCvPipeline {
     public static int RED_RIGHT_DIVIDER = 180;
 
     // Carousel
-    public static int BLUE_LEFT_DIVIDER_C = 80;
+    public static int BLUE_LEFT_DIVIDER_C = 130;
     public static int BLUE_RIGHT_DIVIDER_C = 180;
     public static int RED_LEFT_DIVIDER_C = 90;
     public static int RED_RIGHT_DIVIDER_C = 165;
@@ -47,10 +47,10 @@ public class BarcodePipeline extends OpenCvPipeline {
     public int rightDivider;
 
     // CV Thresholds
-    public static int BLUE_MIN_H = 10;
-    public static int BLUE_MIN_S = 70;
-    public static int BLUE_MIN_V = 150;
-    public static int BLUE_MAX_H = 25;
+    public static int BLUE_MIN_H = 0;
+    public static int BLUE_MIN_S = 40;
+    public static int BLUE_MIN_V = 90;
+    public static int BLUE_MAX_H = 50;
     public static int BLUE_MAX_S = 255;
     public static int BLUE_MAX_V = 255;
     public static int RED_MIN_H = 120;
