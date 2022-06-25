@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Autonomous (name = "Red Auto Carousel" , preselectTeleOp = "2 Teleop 2P", group = "Red")
 public class RedAutoCarousel extends LinearOpMode {
     public BarcodePipeline.Case barcodeCase;
-    public static double delay = 3;
+    public static double delay = 0;
 
     @Override
     public void runOpMode() {
@@ -60,7 +60,7 @@ public class RedAutoCarousel extends LinearOpMode {
             preloadScoreCoords = new double[]{118, 48, 11 * PI/6};
             robot.cycleHub = Robot.DepositTarget.low;
         } else if (barcodeCase == BarcodePipeline.Case.Middle) {
-            preloadScoreCoords = new double[]{120, 48, 11 * PI/6};
+            preloadScoreCoords = new double[]{122, 48, 11 * PI/6};
             robot.cycleHub = Robot.DepositTarget.mid;
         } else {
             preloadScoreCoords = new double[]{128, 44, 11 * PI/6};

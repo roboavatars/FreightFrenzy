@@ -40,14 +40,14 @@ public class Constants {
 
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.6;
-    public static double DEPOSIT_HOLD_POS = 0.85;
+    public static double DEPOSIT_HOLD_POS = 0.9;
     public static double DEPOSIT_DUCK_HOLD_POS = 0.5;
     public static double DEPOSIT_RELEASE_POS = 0.73;
     public static double DEPOSIT_FLICK_POS = 0;
     public static double DEPOSIT_CAP_POS = 0.5;
 
     // Deposit Arm
-    public static int ARM_MID_POS = 475;
+    public static int ARM_MID_POS = 500;
     public static int ARM_LOW_POS = 490;
     public static int ARM_DUCK_DEPOSIT_POS = 450;
     public static int ARM_DUCK_HOME_POS = 200;
