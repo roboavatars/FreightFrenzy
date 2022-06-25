@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Autonomous (name = "Red Auto Carousel" , preselectTeleOp = "2 Teleop 2P", group = "Red")
 public class RedAutoCarousel extends LinearOpMode {
     public BarcodePipeline.Case barcodeCase;
-    public static double delay = 0;
+    public static double delay = 3;
 
     @Override
     public void runOpMode() {
@@ -134,7 +134,7 @@ public class RedAutoCarousel extends LinearOpMode {
                     robot.carousel.turnon();
 
                     if (reachedSpinPos != -1) {
-                        if (time.seconds() - reachedSpinPos < 6) {
+                        if (time.seconds() - reachedSpinPos < 10) {
                             robot.carousel.turnon();
                             if (time.seconds() - reachedSpinPos < 0.1 || !robot.notMoving()) {
                                 robot.drivetrain.setControls(0.23, 0, 0);

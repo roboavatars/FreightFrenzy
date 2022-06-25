@@ -28,7 +28,7 @@ public class BarcodePipeline extends OpenCvPipeline {
     public static int RECT_HEIGHT = 40;
     public static int BLUE_LEFT_DIVIDER = 80;
     public static int BLUE_RIGHT_DIVIDER = 135;
-    public static int RED_LEFT_DIVIDER = 100;
+    public static int RED_LEFT_DIVIDER = 120;
     public static int RED_RIGHT_DIVIDER = 180;
 
     // Carousel
@@ -61,7 +61,7 @@ public class BarcodePipeline extends OpenCvPipeline {
     public static int RED_MAX_V = 255;
 
     public static int AREA_MAX = 200;
-    public static int SQUARE_AREA = 120;
+    public static int SQUARE_AREA = 90;
 
     public int leftArea = -1;
     public int middleArea = -1;

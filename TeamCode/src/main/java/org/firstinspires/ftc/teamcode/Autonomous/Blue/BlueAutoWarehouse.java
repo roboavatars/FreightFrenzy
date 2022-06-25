@@ -51,7 +51,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
         double parkThreshold = 4.5;
         double preloadScoreTime = 1;
 
-        double[] highCyclePos = new double[]{16, 72, PI - 0.35};
+        double[] highCyclePos = new double[]{18, 72, PI - 0.35};
         double[] midCyclePos = new double[]{25, 72, PI - 0.3};
         double[] preloadDepositPos;
 
@@ -71,13 +71,13 @@ public class BlueAutoWarehouse extends LinearOpMode {
 
         if (barcodeCase == BarcodePipeline.Case.Left) {
             robot.cycleHub = Robot.DepositTarget.low;
-            preloadDepositPos = new double[]{22, 69, 13 * PI / 15};
+            preloadDepositPos = new double[]{23, 69, 13 * PI / 15};
         } else if (barcodeCase == BarcodePipeline.Case.Middle) {
             robot.cycleHub = Robot.DepositTarget.mid;
-            preloadDepositPos = new double[]{20, 71, 13 * PI / 15};
+            preloadDepositPos = new double[]{21, 71, 13 * PI / 15};
         } else {
             robot.cycleHub = Robot.DepositTarget.high;
-            preloadDepositPos = new double[]{12, 74, 13 * PI / 15};
+            preloadDepositPos = new double[]{14, 74, 13 * PI / 15};
         }
 
         Robot.log("Barcode Case: " + barcodeCase);

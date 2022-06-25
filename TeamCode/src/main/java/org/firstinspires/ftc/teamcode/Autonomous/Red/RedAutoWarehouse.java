@@ -50,7 +50,7 @@ public class RedAutoWarehouse extends LinearOpMode {
         double parkThreshold = 6;
         double preloadScoreTime = 1;
 
-        double[] highCyclePos = new double[] {126, 74, 0.45};
+        double[] highCyclePos = new double[] {126, 75, 0.45};
         double[] midCyclePos = new double[] {127, 64, 0.3};
         double[] preloadDepositPos;
 

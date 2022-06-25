@@ -99,8 +99,6 @@ public class Robot {
     public int capState = 1;
     private double transferStart;
     private double startExtendTime;
-    private double sharedDepositStart;
-    private double sharedRetractStart;
     private double depositStart;
     private double depositStartRetract;
     private double intakeRetractStart;
@@ -108,22 +106,14 @@ public class Robot {
     private double clampStart = -Double.MAX_VALUE;
     public int intakeState = 1;
     public boolean intakeEnabled = true;
-    public static double teleTransferThreshold = 750;
-    public static double autoTransferThreshold = 1000;
-    public static double turretDepositThreshold = 1000;
-    public static double turretHomeThreshold = 1000;
     public static double teleReleaseThreshold = 250;
-    public static double autoReleaseThreshold = 250;
+    public static double autoReleaseThreshold = 500;
     public static double duckReleaseThreshold = 500;
     public static double teleIntakeFlipThreshold = 400;
     public static double autoIntakeFlipThreshold = 800;
-    public static double duckIntakeFlipThreshold = 1500;
     public static double retractDepositThreshold = 300;
-    public static double clampThreshold = 200;
-    public static double duckClampThreshold = 0;
-    public static double waitClampThreshold = 200;
-    public static double duckWaitClampThreshold = 300;
-    public static double duckTransferThreshold = 300;
+    public static double clampThreshold = 500;
+    public static double waitClampThreshold = 500;
 
 
     //    public String element;

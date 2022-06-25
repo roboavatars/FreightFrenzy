@@ -6,7 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 public class Constants {
 
     // Drivetrain
-    public static double VERT_ODO_NORMAL_POS = 0.65;
+    public static double VERT_ODO_NORMAL_POS = 0.75;
     public static double VERT_ODO_RETRACT_POS = 0;
     public static double LAT_ODO_NORMAL_POS = 0.75;
     public static double LAT_ODO_RETRACT_POS = 0.48;
@@ -33,17 +33,17 @@ public class Constants {
 
 
     // Intake Servo
-    public static double INTAKE_UP_POS = 0.83;
-    public static double INTAKE_UP_DUCK_POS = 0.83;
-    public static double INTAKE_DOWN_POS = 0;
+    public static double INTAKE_UP_POS = 0.8;
+    public static double INTAKE_UP_DUCK_POS = 0.8;
+    public static double INTAKE_DOWN_POS = 0.04;
     public static double INTAKE_DOWN_DUCKS_POS = 0;
 
     // Deposit Servo
     public static double DEPOSIT_OPEN_POS = 0.6;
-    public static double DEPOSIT_HOLD_POS = 0;
+    public static double DEPOSIT_HOLD_POS = 0.85;
     public static double DEPOSIT_DUCK_HOLD_POS = 0.5;
     public static double DEPOSIT_RELEASE_POS = 0.73;
-    public static double DEPOSIT_FLICK_POS = 1;
+    public static double DEPOSIT_FLICK_POS = 0;
     public static double DEPOSIT_CAP_POS = 0.5;
 
     // Deposit Arm
