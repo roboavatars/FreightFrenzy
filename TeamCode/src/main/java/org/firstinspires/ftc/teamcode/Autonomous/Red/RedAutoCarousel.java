@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Config
 @Autonomous (name = "Red Auto Carousel" , preselectTeleOp = "2 Teleop 2P", group = "Red")
 public class RedAutoCarousel extends LinearOpMode {
-    public static BarcodePipeline.Case barcodeCase;
+    public BarcodePipeline.Case barcodeCase;
     public static double delay = 0;
 
     @Override

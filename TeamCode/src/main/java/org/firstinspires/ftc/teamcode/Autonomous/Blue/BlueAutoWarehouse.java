@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Robot;
 @Config
 @Autonomous(name = "0 Blue Auto Warehouse", preselectTeleOp = "2 Teleop 2P", group = "Blue")
 public class BlueAutoWarehouse extends LinearOpMode {
-    public static BarcodePipeline.Case barcodeCase;
+    public BarcodePipeline.Case barcodeCase;
     public static double xDrift = 0;
 
     @Override

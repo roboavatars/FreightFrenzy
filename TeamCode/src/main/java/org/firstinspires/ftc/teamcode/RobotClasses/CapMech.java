@@ -22,8 +22,7 @@ public class CapMech {
         armServo = op.hardwareMap.get(Servo.class, "capArm");
         clawServo = op.hardwareMap.get(Servo.class, "capClaw");
 
-        if (isAuto) init();
-        else home();
+        if (!isAuto) home();
         close();
 
         op.telemetry.addData("Status", "Cap Mech Initialized");
