@@ -112,8 +112,8 @@ public class Robot {
     public static double teleIntakeFlipThreshold = 400;
     public static double autoIntakeFlipThreshold = 800;
     public static double retractDepositThreshold = 300;
-    public static double clampThreshold = 500;
-    public static double waitClampThreshold = 500;
+    public static double clampThreshold = 300;
+    public static double waitClampThreshold = 300;
 
 
     //    public String element;
