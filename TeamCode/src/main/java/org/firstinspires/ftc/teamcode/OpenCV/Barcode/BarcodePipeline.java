@@ -144,6 +144,14 @@ public class BarcodePipeline extends OpenCvPipeline {
             leftArea = Core.countNonZero(left);
             middleArea = Core.countNonZero(middle);
 
+            if (leftArea > AREA_MAX) {
+                leftArea = 0;
+            }
+
+            if (middleArea > AREA_MAX) {
+                middleArea = 0;
+            }
+
             // Find Area with Minimum Area
             int minArea = leftArea;
             outputCase = Case.Left;
@@ -168,6 +176,14 @@ public class BarcodePipeline extends OpenCvPipeline {
             // Compute White Area for each Region
             middleArea = Core.countNonZero(middle);
             rightArea = Core.countNonZero(right);
+
+            if (middleArea > AREA_MAX) {
+                middleArea = 0;
+            }
+
+            if (rightArea > AREA_MAX) {
+                rightArea = 0;
+            }
 
             // Find Area with Minimum Area
             int minArea = middleArea;

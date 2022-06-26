@@ -134,7 +134,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                             robot.drivetrain.constantStrafeConstant = 0; //-0.4
                             robot.setTargetPoint(new Target(141, 78, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
                             addPacket("path", "going to the wall right rn");
-                            if (robot.x > 135.5 && Math.abs(PI / 2 - robot.theta) < PI / 10) {
+                            if ((robot.x > 135.5 && Math.abs(PI / 2 - robot.theta) < PI / 10) || time.seconds() > 3.5) {
                                 goToWarehouseSteps++;
                                 time.reset();
                             }
@@ -175,13 +175,14 @@ public class RedAutoWarehouse extends LinearOpMode {
                             if (robot.intakeState == 3 || intaked) {
                                 robot.intakeApproval = false;
                                 goToWarehouseSteps++;
+                                time.reset();
                             }
 
                             addPacket("path", "creeping right rn");
                             break;
                         case 5:
                             robot.setTargetPoint(new Target(138, robot.startIntakingRedAutoY, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
-                            if (robot.x > 135.5 && Math.abs(PI / 2 - robot.theta) < PI / 10) {
+                            if ((robot.x > 135.5 && Math.abs(PI / 2 - robot.theta) < PI / 10) || time.seconds() > 3.5) {
                                 goToWarehouseSteps++;
                                 time.reset();
                             }

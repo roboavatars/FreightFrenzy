@@ -135,7 +135,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                             robot.drivetrain.constantStrafeConstant = 0; //0.4
                             robot.setTargetPoint(new Target(3, 73, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
                             addPacket("path", "going to the wall right rn");
-                            if (robot.x < (8.5 + xDrift*cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10) {
+                            if ((robot.x < (8.5 + xDrift*cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10) || time.seconds() > 3.5) {
                                 goToWarehouseSteps++;
                                 time.reset();
                             }
@@ -179,6 +179,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
                                 if (robot.intakeState == 3 || robot.intakeState == 4) {
                                     robot.intakeApproval = false;
                                     goToWarehouseSteps++;
+                                    time.reset();
                                 }
                             }
                             addPacket("path", "creeping right rn");
@@ -189,7 +190,7 @@ public class BlueAutoWarehouse extends LinearOpMode {
 //                            } else {
 //                                robot.setTargetPoint(new Target(9, Robot.startIntakingBlueAutoY, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
 //                            }
-                            if (robot.x < (10 + xDrift*cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10) {
+                            if ((robot.x < (10 + xDrift*cycleCounter) && Math.abs(PI / 2 - robot.theta) < PI / 10) || time.seconds() > 3.5) {
                                 goToWarehouseSteps++;
                                 time.reset();
                             }
