@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.OpenCV.BaseDetector;
 import org.firstinspires.ftc.teamcode.OpenCV.Vision;
+import org.opencv.core.Mat;
 
 public class BarcodeDetector extends BaseDetector {
     private BarcodePipeline pipeline;
@@ -17,5 +18,9 @@ public class BarcodeDetector extends BaseDetector {
 
     public BarcodePipeline.Case getResult() {
         return pipeline.getResult();
+    }
+
+    public Mat processFrame(Mat input) {
+        return pipeline.processFrame(input);
     }
 }

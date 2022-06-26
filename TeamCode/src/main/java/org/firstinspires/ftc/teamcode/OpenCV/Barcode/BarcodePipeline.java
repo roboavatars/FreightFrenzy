@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -13,6 +14,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,8 +28,8 @@ public class BarcodePipeline extends OpenCvPipeline {
     // Image Cropping
     public static int RECT_WIDTH = 280;
     public static int RECT_HEIGHT = 40;
-    public static int BLUE_LEFT_DIVIDER = 80;
-    public static int BLUE_RIGHT_DIVIDER = 135;
+    public static int BLUE_LEFT_DIVIDER = 70;
+    public static int BLUE_RIGHT_DIVIDER = 130;
     public static int RED_LEFT_DIVIDER = 120;
     public static int RED_RIGHT_DIVIDER = 180;
 
@@ -39,7 +41,7 @@ public class BarcodePipeline extends OpenCvPipeline {
 
     public static int RETURN_IMAGE = 0;
 
-    public static int xw = 25;
+    public static int xw = 10;
     public static int xc = 10;
     public static int y = 130;
 
@@ -62,10 +64,15 @@ public class BarcodePipeline extends OpenCvPipeline {
 
     public static int AREA_MAX = 300;
     public static int SQUARE_AREA = 90;
+    public static double ASPECT_MAX = 0.4;
 
     public int leftArea = -1;
     public int middleArea = -1;
     public int rightArea = -1;
+    
+    private double leftAspect = -1;
+    private double middleAspect = -1;
+    private double rightAspect = -1;
 
     // Image Processing Mats
     private Mat hsv = new Mat();
@@ -114,7 +121,7 @@ public class BarcodePipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-//         Crop Input Image
+        // Crop Input Image
         if (isWarehouse) {
             input = new Mat(input, new Rect(xw, y, RECT_WIDTH, RECT_HEIGHT));
         } else {
@@ -144,11 +151,14 @@ public class BarcodePipeline extends OpenCvPipeline {
             leftArea = Core.countNonZero(left);
             middleArea = Core.countNonZero(middle);
 
-            if (leftArea > AREA_MAX) {
+            leftAspect = getAspectRatio(left);
+            middleAspect = getAspectRatio(middle);
+
+            if (leftArea > AREA_MAX || leftAspect == -1 || leftAspect > ASPECT_MAX) {
                 leftArea = 0;
             }
 
-            if (middleArea > AREA_MAX) {
+            if (middleArea > AREA_MAX || middleAspect == -1 || middleAspect > ASPECT_MAX) {
                 middleArea = 0;
             }
 
@@ -177,11 +187,14 @@ public class BarcodePipeline extends OpenCvPipeline {
             middleArea = Core.countNonZero(middle);
             rightArea = Core.countNonZero(right);
 
-            if (middleArea > AREA_MAX) {
+            middleAspect = getAspectRatio(middle);
+            rightAspect = getAspectRatio(right);
+
+            if (middleArea > AREA_MAX || middleAspect == -1 || middleAspect > ASPECT_MAX) {
                 middleArea = 0;
             }
 
-            if (rightArea > AREA_MAX) {
+            if (rightArea > AREA_MAX || rightAspect == -1 || rightAspect > ASPECT_MAX) {
                 rightArea = 0;
             }
 
@@ -238,6 +251,31 @@ public class BarcodePipeline extends OpenCvPipeline {
         } else {
             return input;
         }
+    }
+
+    private double getAspectRatio(Mat input) {
+        // Find Contours
+        List<MatOfPoint> contours = new ArrayList<>();
+        Imgproc.findContours(input, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
+
+        // Loop Through Contours
+        double maxArea = 0;
+        double aspectRatio = -1;
+        double area;
+        for (MatOfPoint contour : contours) {
+            area = Imgproc.contourArea(contour);
+            if (area > maxArea) {
+                maxArea = area;
+                Rect boundingBox = Imgproc.boundingRect(contour);
+                if (boundingBox.height != 0 && boundingBox.width != 0) {
+                    aspectRatio = (double) boundingBox.height / boundingBox.width;
+                } else {
+                    aspectRatio = -1;
+                }
+            }
+        }
+
+        return aspectRatio;
     }
 
     public Case getResult() {
