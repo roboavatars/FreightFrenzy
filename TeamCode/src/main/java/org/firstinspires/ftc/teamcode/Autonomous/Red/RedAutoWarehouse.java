@@ -182,6 +182,7 @@ public class RedAutoWarehouse extends LinearOpMode {
                             break;
                         case 5:
                             robot.setTargetPoint(new Target(138, robot.startIntakingRedAutoY, PI / 2).thetaKp((Math.abs(robot.theta - PI / 2) < PI / 6) ? Drivetrain.thetaKp : 10));
+                            if (time.seconds() > 3.5) Robot.log("overriding");
                             if ((robot.x > 135.5 && Math.abs(PI / 2 - robot.theta) < PI / 10) || time.seconds() > 3.5) {
                                 goToWarehouseSteps++;
                                 time.reset();

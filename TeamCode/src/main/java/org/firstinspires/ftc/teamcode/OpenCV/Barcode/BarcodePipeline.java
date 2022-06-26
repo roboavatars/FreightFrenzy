@@ -60,7 +60,7 @@ public class BarcodePipeline extends OpenCvPipeline {
     public static int RED_MAX_S = 255;
     public static int RED_MAX_V = 255;
 
-    public static int AREA_MAX = 200;
+    public static int AREA_MAX = 300;
     public static int SQUARE_AREA = 90;
 
     public int leftArea = -1;
