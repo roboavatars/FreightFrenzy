@@ -61,8 +61,8 @@ public class Drivetrain {
     public static double ticksToInch1 = 0.00052760297876;
     public static double ticksToInch2 = 0.00051440329218;
     public static double ticksToInch3 = 0.00051870587;
-    public static double ODOMETRY_TRACK_WIDTH = 9.32090892786918918;
-    public static double ODOMETRY_HORIZONTAL_OFFSET = 8;
+    public static double ODOMETRY_TRACK_WIDTH = 14;
+    public static double ODOMETRY_HORIZONTAL_OFFSET = 5;
 
     private final double ODOMETRY_HEADING_THRESHOLD = PI / 8;
 

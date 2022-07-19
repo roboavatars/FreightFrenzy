@@ -31,4 +31,6 @@ dependencies {
     implementation 'com.spartronics4915.lib:ftc265:2.1.9'
     implementation 'org.openftc:easyopencv:1.5.1'
     implementation 'org.openftc:apriltag:1.0.0'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'com.acmerobotics.roadrunner:core:0.5.5'
 }
