@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Drivetrain;
 @TeleOp(name = "Odometry / Drivetrain Test")
 public class OdoDrivetrainTest extends LinearOpMode {
     private double x, y, theta, prevTime;
+    public static long sleep = 0;
 
     @Override
     public void runOpMode() {
@@ -59,6 +60,8 @@ public class OdoDrivetrainTest extends LinearOpMode {
             telemetry.addData("Y: ", y);
             telemetry.addData("Theta: ", theta);
             telemetry.update();
+
+            sleep(sleep);
         }
     }
 }

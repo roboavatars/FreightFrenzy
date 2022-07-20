@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.rudruner.drive.opmode;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -14,8 +15,11 @@ import org.firstinspires.ftc.teamcode.rudruner.drive.SampleMecanumDrive;
  * exercise is to ascertain whether the localizer has been configured properly (note: the pure
  * encoder localizer heading may be significantly off if the track width has not been tuned).
  */
+@Config
 @TeleOp(group = "drive")
 public class LocalizationTest extends LinearOpMode {
+    double prevTime;
+    public static long sleep = 0;
     @Override
     public void runOpMode() throws InterruptedException {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
@@ -39,7 +43,13 @@ public class LocalizationTest extends LinearOpMode {
             telemetry.addData("x", poseEstimate.getX());
             telemetry.addData("y", poseEstimate.getY());
             telemetry.addData("heading", poseEstimate.getHeading());
+            double curTime = (double) System.currentTimeMillis() / 1000;
+            double timeDiff = curTime - prevTime;
+            prevTime = curTime;
+            telemetry.addData("Update Frequency (Hz)", 1 / timeDiff);
             telemetry.update();
+
+            sleep(sleep);
         }
     }
 }

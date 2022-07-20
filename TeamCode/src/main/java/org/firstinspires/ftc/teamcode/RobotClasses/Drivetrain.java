@@ -61,7 +61,7 @@ public class Drivetrain {
     public static double ticksToInch1 = 0.00052760297876;
     public static double ticksToInch2 = 0.00051440329218;
     public static double ticksToInch3 = 0.00051870587;
-    public static double ODOMETRY_TRACK_WIDTH = 14;
+    public static double ODOMETRY_TRACK_WIDTH = 13.7363997368;
     public static double ODOMETRY_HORIZONTAL_OFFSET = 5;
 
     private final double ODOMETRY_HEADING_THRESHOLD = PI / 8;
@@ -120,15 +120,15 @@ public class Drivetrain {
             motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
 
-        vertOdoRetractServo = hardwareMap.get(Servo.class, "vertOdo");
-        latOdoRetractServo = hardwareMap.get(Servo.class, "latOdo");
-        if(isAuto) {
-            vertOdoRetractServo.setPosition(Constants.VERT_ODO_NORMAL_POS);
-            latOdoRetractServo.setPosition(Constants.LAT_ODO_NORMAL_POS);
-        } else {
-            vertOdoRetractServo.setPosition(Constants.VERT_ODO_RETRACT_POS);
-            latOdoRetractServo.setPosition(Constants.LAT_ODO_RETRACT_POS);
-        }
+//        vertOdoRetractServo = hardwareMap.get(Servo.class, "vertOdo");
+//        latOdoRetractServo = hardwareMap.get(Servo.class, "latOdo");
+//        if(isAuto) {
+//            vertOdoRetractServo.setPosition(Constants.VERT_ODO_NORMAL_POS);
+//            latOdoRetractServo.setPosition(Constants.LAT_ODO_NORMAL_POS);
+//        } else {
+//            vertOdoRetractServo.setPosition(Constants.VERT_ODO_RETRACT_POS);
+//            latOdoRetractServo.setPosition(Constants.LAT_ODO_RETRACT_POS);
+//        }
 
         x = initialX;
         y = initialY;
