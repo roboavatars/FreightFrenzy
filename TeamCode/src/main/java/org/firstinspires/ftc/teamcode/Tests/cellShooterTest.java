@@ -58,6 +58,7 @@ public class cellShooterTest extends LinearOpMode{
             addPacket("Velocity Bottom", shooterBottom.getVelocity());
             addPacket("Target V", velo);
 
+            sendPacket();
         }
 
     }
